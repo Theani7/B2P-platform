@@ -13,6 +13,13 @@ from .api.v1.portfolio.routes import router as portfolio_router
 from .api.v1.social_links.routes import router as social_links_router
 from .api.v1.upload.routes import router as upload_router
 from .api.v1.campaign.routes import router as campaign_router
+from .api.v1.marketplace.routes import router as marketplace_router
+from .api.v1.applications.routes import promoter_router as promoter_app_router
+from .api.v1.applications.routes import business_router as business_app_router
+from .api.v1.invitations.routes import business_router as business_invitation_router
+from .api.v1.invitations.routes import promoter_router as promoter_invitation_router
+from .api.v1.collaborations.routes import business_router as business_collab_router
+from .api.v1.collaborations.routes import promoter_router as promoter_collab_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -39,6 +46,13 @@ app.include_router(portfolio_router, prefix=settings.API_V1_STR)
 app.include_router(social_links_router, prefix=settings.API_V1_STR)
 app.include_router(upload_router, prefix=settings.API_V1_STR)
 app.include_router(campaign_router, prefix=settings.API_V1_STR)
+app.include_router(marketplace_router, prefix=settings.API_V1_STR)
+app.include_router(promoter_app_router, prefix=settings.API_V1_STR)
+app.include_router(business_app_router, prefix=settings.API_V1_STR)
+app.include_router(business_invitation_router, prefix=settings.API_V1_STR)
+app.include_router(promoter_invitation_router, prefix=settings.API_V1_STR)
+app.include_router(business_collab_router, prefix=settings.API_V1_STR)
+app.include_router(promoter_collab_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")

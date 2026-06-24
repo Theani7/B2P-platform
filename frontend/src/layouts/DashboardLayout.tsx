@@ -13,11 +13,17 @@ const BUSINESS_NAV = [
   { to: "/business/promoters", label: "Discover" },
   { to: "/business/saved-promoters", label: "Shortlist" },
   { to: "/business/campaigns", label: "Campaigns" },
+  { to: "/business/invitations", label: "Invitations" },
+  { to: "/business/collaborations", label: "Collabs" },
   { to: "/business/profile", label: "Profile" },
 ];
 
 const PROMOTER_NAV = [
   { to: "/promoter/dashboard", label: "Dashboard" },
+  { to: "/promoter/marketplace", label: "Marketplace" },
+  { to: "/promoter/applications", label: "Applications" },
+  { to: "/promoter/invitations", label: "Invitations" },
+  { to: "/promoter/collaborations", label: "Collabs" },
   { to: "/promoter/profile", label: "Profile" },
 ];
 

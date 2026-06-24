@@ -19,6 +19,12 @@ const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage"));
 const EditCampaignPage = lazy(() => import("./pages/EditCampaignPage"));
 const PromoterDirectoryPage = lazy(() => import("./pages/PromoterDirectoryPage"));
 const SavedPromotersPage = lazy(() => import("./pages/SavedPromotersPage"));
+const CampaignMarketplacePage = lazy(() => import("./pages/CampaignMarketplacePage"));
+const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
+const BusinessApplicationsPage = lazy(() => import("./pages/BusinessApplicationsPage"));
+const BusinessInvitationsPage = lazy(() => import("./pages/BusinessInvitationsPage"));
+const PromoterInvitationsPage = lazy(() => import("./pages/PromoterInvitationsPage"));
+const CollaborationsPage = lazy(() => import("./pages/CollaborationsPage"));
 
 function ProtectedRoute({ role, children }: { role?: Role; children: JSX.Element }) {
   const { user, isLoading: authLoading } = useAuth();
@@ -65,6 +71,13 @@ export default function AppRoutes() {
       <Route path="/business/campaigns/:id/edit" element={<ProtectedRoute role={Role.BUSINESS}><EditCampaignPage /></ProtectedRoute>} />
       <Route path="/business/promoters" element={<ProtectedRoute role={Role.BUSINESS}><PromoterDirectoryPage /></ProtectedRoute>} />
       <Route path="/business/saved-promoters" element={<ProtectedRoute role={Role.BUSINESS}><SavedPromotersPage /></ProtectedRoute>} />
+      <Route path="/business/collaborations" element={<ProtectedRoute><CollaborationsPage /></ProtectedRoute>} />
+      <Route path="/business/invitations" element={<ProtectedRoute role={Role.BUSINESS}><BusinessInvitationsPage /></ProtectedRoute>} />
+      <Route path="/business/campaigns/:campaignId/applications" element={<ProtectedRoute role={Role.BUSINESS}><BusinessApplicationsPage /></ProtectedRoute>} />
+      <Route path="/promoter/marketplace" element={<ProtectedRoute role={Role.PROMOTER}><CampaignMarketplacePage /></ProtectedRoute>} />
+      <Route path="/promoter/applications" element={<ProtectedRoute role={Role.PROMOTER}><MyApplicationsPage /></ProtectedRoute>} />
+      <Route path="/promoter/invitations" element={<ProtectedRoute role={Role.PROMOTER}><PromoterInvitationsPage /></ProtectedRoute>} />
+      <Route path="/promoter/collaborations" element={<ProtectedRoute><CollaborationsPage /></ProtectedRoute>} />
       <Route path="*" element={<RoleRedirect />} />
     </Routes>
   );
