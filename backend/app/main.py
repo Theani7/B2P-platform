@@ -12,6 +12,7 @@ from .api.v1.promoter.routes import router as promoter_router, public_router, di
 from .api.v1.portfolio.routes import router as portfolio_router
 from .api.v1.social_links.routes import router as social_links_router
 from .api.v1.upload.routes import router as upload_router
+from .api.v1.campaign.routes import router as campaign_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -37,6 +38,7 @@ app.include_router(directory_router, prefix=settings.API_V1_STR)
 app.include_router(portfolio_router, prefix=settings.API_V1_STR)
 app.include_router(social_links_router, prefix=settings.API_V1_STR)
 app.include_router(upload_router, prefix=settings.API_V1_STR)
+app.include_router(campaign_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")

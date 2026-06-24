@@ -22,6 +22,21 @@ Base URL: `/api/v1`
 - `GET /auth/business/reports` → BUSINESS only
 - `GET /auth/promoter/campaigns` → PROMOTER only
 
+## Campaigns (BUSINESS only)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/campaigns` | Create campaign |
+| GET | `/campaigns` | List own campaigns (paginated, searchable) |
+| GET | `/campaigns/{id}` | Get campaign by ID |
+| PUT | `/campaigns/{id}` | Update campaign (partial) |
+| DELETE | `/campaigns/{id}` | Delete campaign |
+| POST | `/campaigns/{id}/archive` | Archive campaign |
+| POST | `/campaigns/{id}/reopen` | Reopen archived campaign |
+| GET | `/campaigns/dashboard/stats` | Dashboard statistics |
+
+See [campaign-api.md](./campaign-api.md) for full details.
+
 ## Standard response envelope
 
 Success:

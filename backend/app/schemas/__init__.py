@@ -37,6 +37,15 @@ from .social_link import (
     SocialLinkUpdate,
     SocialLinkRead,
 )
+from .campaign import (
+    CampaignStatus,
+    CampaignVisibility,
+    CampaignBase,
+    CampaignCreate,
+    CampaignUpdate,
+    CampaignRead,
+    CampaignListRead,
+)
 
 __all__ = [
     "RoleEnum",
@@ -68,4 +77,11 @@ __all__ = [
     "SocialLinkCreate",
     "SocialLinkUpdate",
     "SocialLinkRead",
+    "CampaignStatus",
+    "CampaignVisibility",
+    "CampaignBase",
+    "CampaignCreate",
+    "CampaignUpdate",
+    "CampaignRead",
+    "CampaignListRead",
 ]

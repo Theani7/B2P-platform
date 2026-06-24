@@ -4,6 +4,7 @@ from .business_profile import BusinessProfile
 from .promoter_profile import PromoterProfile, NicheEnum
 from .portfolio_item import PortfolioItem
 from .social_link import SocialLink, PlatformEnum
+from .campaign import Campaign, CampaignStatus, CampaignVisibility
 
 __all__ = [
     "User",
@@ -15,4 +16,7 @@ __all__ = [
     "PortfolioItem",
     "SocialLink",
     "PlatformEnum",
+    "Campaign",
+    "CampaignStatus",
+    "CampaignVisibility",
 ]

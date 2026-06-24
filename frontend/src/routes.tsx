@@ -11,6 +11,10 @@ const Register = lazy(() => import("../pages/Register"));
 const BusinessProfilePage = lazy(() => import("../pages/BusinessProfilePage"));
 const PromoterProfilePage = lazy(() => import("../pages/PromoterProfilePage"));
 const PublicPromoterProfilePage = lazy(() => import("../pages/PublicPromoterProfilePage"));
+const CampaignListPage = lazy(() => import("../pages/CampaignListPage"));
+const CampaignDetailsPage = lazy(() => import("../pages/CampaignDetailsPage"));
+const CreateCampaignPage = lazy(() => import("../pages/CreateCampaignPage"));
+const EditCampaignPage = lazy(() => import("../pages/EditCampaignPage"));
 const LoadingSpinner = lazy(() => import("../components/LoadingSpinner"));
 
 function ProtectedRoute({ role, children }: { role?: Role; children: JSX.Element }) {
@@ -47,6 +51,10 @@ export default function AppRoutes() {
       <Route path="/promoter/profile" element={<ProtectedRoute role={Role.PROMOTER}><PromoterProfilePage /></ProtectedRoute>} />
       <Route path="/promoter/directory" element={<ProtectedRoute role={Role.BUSINESS}><div>Directory (Business only)</div></ProtectedRoute>} />
       <Route path="/promoters/:username" element={<PublicPromoterProfilePage />} />
+      <Route path="/business/campaigns" element={<ProtectedRoute role={Role.BUSINESS}><CampaignListPage /></ProtectedRoute>} />
+      <Route path="/business/campaigns/create" element={<ProtectedRoute role={Role.BUSINESS}><CreateCampaignPage /></ProtectedRoute>} />
+      <Route path="/business/campaigns/:id" element={<ProtectedRoute role={Role.BUSINESS}><CampaignDetailsPage /></ProtectedRoute>} />
+      <Route path="/business/campaigns/:id/edit" element={<ProtectedRoute role={Role.BUSINESS}><EditCampaignPage /></ProtectedRoute>} />
       <Route path="*" element={<RoleRedirect />} />
     </Routes>
   );

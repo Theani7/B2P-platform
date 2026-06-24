@@ -28,3 +28,23 @@
 | token_hash | varchar(255) | unique, indexed |
 | expires_at | timestamptz | |
 | created_at | timestamptz | default now() |
+
+## campaigns
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | UUID | PK |
+| business_profile_id | UUID | FK → business_profiles.id, indexed |
+| title | varchar(255) | required |
+| description | text | min 20 chars |
+| category | varchar(100) | |
+| budget | float | > 0 |
+| location | varchar(255) | |
+| target_audience | text | nullable |
+| requirements | text | nullable |
+| start_date | timestamptz | |
+| end_date | timestamptz | >= start_date |
+| status | varchar(20) | DRAFT/OPEN/ACTIVE/COMPLETED/ARCHIVED/CANCELLED, indexed |
+| visibility | varchar(20) | PUBLIC/PRIVATE |
+| created_at | timestamptz | default now() |
+| updated_at | timestamptz | auto updated |
