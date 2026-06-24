@@ -7,6 +7,11 @@ from .exceptions.handlers import register_exception_handlers
 from .middleware.security_headers import SecurityHeadersMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
 from .api.v1.auth.routes import router as auth_router
+from .api.v1.business.routes import router as business_router
+from .api.v1.promoter.routes import router as promoter_router, public_router, directory_router
+from .api.v1.portfolio.routes import router as portfolio_router
+from .api.v1.social_links.routes import router as social_links_router
+from .api.v1.upload.routes import router as upload_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -20,12 +25,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(SecurityHeadersMiddleware)
-# Simple per-IP rate limit for auth routes
 app.add_middleware(RateLimitMiddleware, limit=5, window=60)
 
 register_exception_handlers(app)
 
 app.include_router(auth_router, prefix=settings.API_V1_STR)
+app.include_router(business_router, prefix=settings.API_V1_STR)
+app.include_router(promoter_router, prefix=settings.API_V1_STR)
+app.include_router(public_router, prefix=settings.API_V1_STR)
+app.include_router(directory_router, prefix=settings.API_V1_STR)
+app.include_router(portfolio_router, prefix=settings.API_V1_STR)
+app.include_router(social_links_router, prefix=settings.API_V1_STR)
+app.include_router(upload_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")

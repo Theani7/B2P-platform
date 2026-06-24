@@ -77,4 +77,13 @@ pre-commit install
 
 ---
 
-**Keep this file up‑to‑date** whenever new scripts, env vars, or workflow steps are introduced. It is the single source of truth for agents to avoid missing non‑obvious commands or configuration quirks.
+## Sprint 2 Setup
+
+After Sprint 1 is configured, run Sprint 2 migrations:
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+Sprint 2 adds: business_profiles, promoter_profiles, portfolio_items, social_links tables.
