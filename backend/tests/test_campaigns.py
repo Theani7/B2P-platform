@@ -2,7 +2,8 @@
 import pytest
 from httpx import AsyncClient
 from app.main import app
-from app.db.session import Base, engine
+from app.db.base import Base
+from app.db.session import engine
 from datetime import datetime, timezone, timedelta
 
 

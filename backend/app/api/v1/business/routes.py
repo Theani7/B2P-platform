@@ -1,12 +1,15 @@
-"""Business profile routes."""
-from fastapi import APIRouter, Depends, status
+"""Business profile routes + shortlist (saved promoters)."""
+from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
+from typing import List
 
-from ...dependencies.auth import get_current_user, require_role
-from ...core.role import Role
-from ...schemas.business_profile import BusinessProfileCreate, BusinessProfileUpdate, BusinessProfileRead
-from ...services.business_profile import create_or_update, get_my_profile, delete_profile
-from ...db.session import get_db
+from ....dependencies.auth import get_current_user, require_role
+from ....core.role import Role
+from ....schemas.business_profile import BusinessProfileCreate, BusinessProfileUpdate, BusinessProfileRead
+from ....schemas.discovery import SavedPromoterRead, PromoterDirectoryResponse
+from ....services.business_profile import create_or_update, get_my_profile, delete_profile
+from ....services.discovery import save_promoter, remove_saved_promoter, get_saved_promoters
+from ....db.session import get_db
 
 router = APIRouter(prefix="/business", tags=["business"], dependencies=[Depends(require_role(Role.BUSINESS))])
 
@@ -30,3 +33,36 @@ def update_profile(payload: BusinessProfileUpdate, db: Session = Depends(get_db)
 def delete_profile_endpoint(db: Session = Depends(get_db), user=Depends(get_current_user)):
     delete_profile(db, user)
     return None
+
+
+# --- Saved Promoters (Shortlist) ---
+
+
+@router.post("/saved-promoters/{promoter_id}", status_code=status.HTTP_201_CREATED)
+def add_saved_promoter(promoter_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    saved = save_promoter(db, user, promoter_id)
+    return {"success": True, "data": {"id": str(saved.id)}}
+
+
+@router.delete("/saved-promoters/{promoter_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_saved_promoter(promoter_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    remove_saved_promoter(db, user, promoter_id)
+    return None
+
+
+@router.get("/saved-promoters", response_model=PromoterDirectoryResponse)
+def list_saved_promoters(
+    search: str = "",
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    items, total = get_saved_promoters(db, user, search=search, page=page, limit=limit)
+    return PromoterDirectoryResponse(
+        items=[s.promoter_profile for s in items],
+        total=total,
+        page=page,
+        limit=limit,
+        pages=max(1, (total + limit - 1) // limit),
+    )

@@ -46,6 +46,12 @@ from .campaign import (
     CampaignRead,
     CampaignListRead,
 )
+from .discovery import (
+    PromoterDirectoryItem,
+    PromoterDirectoryResponse,
+    PromoterPublicProfileRead,
+    SavedPromoterRead,
+)
 
 __all__ = [
     "RoleEnum",
@@ -84,4 +90,8 @@ __all__ = [
     "CampaignUpdate",
     "CampaignRead",
     "CampaignListRead",
+    "PromoterDirectoryItem",
+    "PromoterDirectoryResponse",
+    "PromoterPublicProfileRead",
+    "SavedPromoterRead",
 ]

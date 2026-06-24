@@ -5,11 +5,11 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from ...dependencies.auth import get_current_user, require_role
-from ...core.role import Role
-from ...schemas.portfolio_item import PortfolioItemCreate, PortfolioItemUpdate, PortfolioItemRead
-from ...services.portfolio import create_item, get_my_items, update_item, delete_item
-from ...db.session import get_db
+from ....dependencies.auth import get_current_user, require_role
+from ....core.role import Role
+from ....schemas.portfolio_item import PortfolioItemCreate, PortfolioItemUpdate, PortfolioItemRead
+from ....services.portfolio import create_item, get_my_items, update_item, delete_item
+from ....db.session import get_db
 
 router = APIRouter(prefix="/portfolio", tags=["portfolio"], dependencies=[Depends(require_role(Role.PROMOTER))])
 

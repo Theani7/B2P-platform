@@ -2,10 +2,10 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from ...core.role import Role
-from ...dependencies.auth import get_current_user, require_role
-from ...db.session import get_db
-from ...schemas.user import (
+from ....core.role import Role
+from ....dependencies.auth import get_current_user, require_role
+from ....db.session import get_db
+from ....schemas.user import (
     ForgotPasswordSchema,
     LoginSchema,
     RefreshSchema,
@@ -16,7 +16,7 @@ from ...schemas.user import (
     UserUpdate,
     VerifyEmailSchema,
 )
-from ...services.auth import (
+from ....services.auth import (
     forgot_password,
     login,
     refresh,

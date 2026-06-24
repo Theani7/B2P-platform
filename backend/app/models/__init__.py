@@ -5,6 +5,7 @@ from .promoter_profile import PromoterProfile, NicheEnum
 from .portfolio_item import PortfolioItem
 from .social_link import SocialLink, PlatformEnum
 from .campaign import Campaign, CampaignStatus, CampaignVisibility
+from .saved_promoter import SavedPromoter
 
 __all__ = [
     "User",
@@ -19,4 +20,5 @@ __all__ = [
     "Campaign",
     "CampaignStatus",
     "CampaignVisibility",
+    "SavedPromoter",
 ]

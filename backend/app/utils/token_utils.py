@@ -1,6 +1,7 @@
 """Token helpers for verification and password reset."""
 import secrets
 from datetime import datetime, timedelta
+from typing import Optional
 
 from jose import jwt
 
@@ -24,7 +25,7 @@ def hash_token(token: str) -> str:
     return token
 
 
-def is_token_expired(expiry: datetime | None) -> bool:
+def is_token_expired(expiry: Optional[datetime]) -> bool:
     if expiry is None:
         return True
     return datetime.utcnow() > expiry

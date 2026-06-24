@@ -5,11 +5,11 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from ...dependencies.auth import get_current_user, require_role
-from ...core.role import Role
-from ...schemas.social_link import SocialLinkCreate, SocialLinkUpdate, SocialLinkRead
-from ...services.social_links import create_link, get_my_links, update_link, delete_link
-from ...db.session import get_db
+from ....dependencies.auth import get_current_user, require_role
+from ....core.role import Role
+from ....schemas.social_link import SocialLinkCreate, SocialLinkUpdate, SocialLinkRead
+from ....services.social_links import create_link, get_my_links, update_link, delete_link
+from ....db.session import get_db
 
 router = APIRouter(prefix="/social-links", tags=["social-links"], dependencies=[Depends(require_role(Role.PROMOTER))])
 

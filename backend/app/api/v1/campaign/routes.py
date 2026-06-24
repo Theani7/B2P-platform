@@ -1,11 +1,12 @@
 """Campaign management routes."""
+from typing import Optional
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
-from ...dependencies.auth import get_current_user, require_role
-from ...core.role import Role
-from ...schemas.campaign import CampaignCreate, CampaignUpdate, CampaignRead, CampaignListRead
-from ...services.campaign import (
+from ....dependencies.auth import get_current_user, require_role
+from ....core.role import Role
+from ....schemas.campaign import CampaignCreate, CampaignUpdate, CampaignRead, CampaignListRead
+from ....services.campaign import (
     create_campaign,
     get_campaign,
     list_campaigns,
@@ -15,7 +16,7 @@ from ...services.campaign import (
     reopen_campaign,
     get_dashboard_stats,
 )
-from ...db.session import get_db
+from ....db.session import get_db
 
 router = APIRouter(
     prefix="/campaigns",
@@ -31,7 +32,7 @@ def create(payload: CampaignCreate, db: Session = Depends(get_db), user=Depends(
 
 @router.get("", response_model=CampaignListRead)
 def list_all(
-    search: str | None = Query(None),
+    search: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     sort: str = Query("created_at"),

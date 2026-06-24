@@ -2,8 +2,8 @@
 import pytest
 from httpx import AsyncClient
 from app.main import app
-from app.db.session import Base, engine
-from sqlalchemy.orm import Session
+from app.db.base import Base
+from app.db.session import engine
 
 
 @pytest.fixture(autouse=True)
@@ -77,6 +77,6 @@ async def test_promoter_directory(client: AsyncClient):
     token = reg.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
-    resp = await client.get("/api/v1/directory/promoters", headers=headers)
+    resp = await client.get("/api/v1/promoters", headers=headers)
     assert resp.status_code == 200
-    assert isinstance(resp.json(), list)
+    assert "items" in resp.json()

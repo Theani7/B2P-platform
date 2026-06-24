@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from .app_error import AppError
 
 
-def _error_response(message: str, status_code: int = 400, errors: list | None = None):
+def _error_response(message: str, status_code: int = 400, errors=None):
     return JSONResponse(
         status_code=status_code,
         content={"success": False, "message": message, "errors": errors or []},
