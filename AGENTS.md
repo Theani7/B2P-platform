@@ -1,3 +1,7 @@
+## Git workflow
+
+- On major changes (new features, config changes, bug fixes), commit and push to GitHub. Use concise commit messages matching repo style.
+
 ## Backend specifics agents must know
 
 - **JWT secret**: `settings.SECRET_KEY` defaults to `"CHANGE_ME_IN_PROD"`; override via environment variable `SECRET_KEY` for any non‑dev run.
