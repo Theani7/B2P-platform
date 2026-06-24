@@ -1,6 +1,7 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import { useCurrentUser, useLogout } from "../features/auth/api";
 import { User } from "../features/auth/types";
+import { Role } from "../constants/roles";
 
 type AuthContextType = {
   user?: User;
@@ -16,15 +17,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => logoutMutation.mutate();
 
-  return (
-    <AuthContext.Provider value={{ user, isLoading, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, isLoading, logout }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
+};
+
+export const useHasRole = (role: Role) => {
+  const { user } = useAuth();
+  return user?.role === role;
 };

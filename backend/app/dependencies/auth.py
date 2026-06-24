@@ -1,22 +1,21 @@
-"""FastAPI dependencies for authentication and RBAC.
-
-`get_current_user` validates the access token and returns the ORM object.
-`require_role` is a factory that produces a dependency checking the
-user's role.
-"""
-from fastapi import Depends, HTTPException, status
+"""FastAPI auth dependencies with role enforcement."""
+from datetime import datetime, timezone
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from ..core import security
+from ..core.role import Role
 from ..db.session import get_db
-from ..models.user import User, RoleEnum
+from ..models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+    request: Request,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
 ) -> User:
     try:
         payload = security.decode_token(token)
@@ -29,11 +28,13 @@ def get_current_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user or not user.is_active:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive user")
+    if user.locked_until and datetime.now(timezone.utc) < user.locked_until.replace(tzinfo=timezone.utc):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account locked")
     return user
 
 
-def require_role(required_role: RoleEnum):
-    def role_checker(current_user: User = Depends(get_current_user)) -> User:
+def require_role(required_role: Role):
+    def checker(current_user: User = Depends(get_current_user)) -> User:
         if current_user.role != required_role:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -41,4 +42,4 @@ def require_role(required_role: RoleEnum):
             )
         return current_user
 
-    return role_checker
+    return checker

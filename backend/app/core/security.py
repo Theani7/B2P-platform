@@ -1,9 +1,6 @@
-"""Security utilities: password hashing and JWT handling.
-
-We use Passlib's bcrypt scheme for passwords and python‑jose for JWT.
-"""
-from datetime import datetime, timedelta
-from typing import Any, Dict
+"""Security utilities with audience/issuer validation and token helpers."""
+from datetime import datetime, timedelta, timezone
+from typing import Any
 
 from passlib.context import CryptContext
 from jose import JWTError, jwt
@@ -21,24 +18,24 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def _create_token(data: Dict[str, Any], expires_delta: timedelta) -> str:
-    to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm="HS256")
+def _encode(payload: dict[str, Any], expires_delta: timedelta) -> str:
+    payload.update({"exp": datetime.now(timezone.utc) + expires_delta, "iss": settings.JWT_ISSUER, "aud": settings.JWT_AUDIENCE})
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
 
 
 def create_access_token(user_id: str, role: str) -> str:
-    return _create_token({"sub": user_id, "role": role}, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+    return _encode({"sub": user_id, "role": role}, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
 
 
 def create_refresh_token(user_id: str) -> str:
-    return _create_token({"sub": user_id}, timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
+    return _encode({"sub": user_id, "type": "refresh"}, timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
 
 
-def decode_token(token: str) -> Dict[str, Any]:
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        return payload
-    except JWTError as exc:
-        raise exc
+def decode_token(token: str) -> dict[str, Any]:
+    return jwt.decode(
+        token,
+        settings.SECRET_KEY,
+        algorithms=["HS256"],
+        audience=settings.JWT_AUDIENCE,
+        issuer=settings.JWT_ISSUER,
+    )

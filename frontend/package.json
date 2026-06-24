@@ -16,14 +16,21 @@
     "react-dom": "^19",
     "react-hook-form": "^7",
     "react-router-dom": "^6",
-    "zod": "^3"
+    "zod": "^3",
+    "react-hot-toast": "^2"
   },
   "devDependencies": {
     "@shadcn/ui": "^0.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^6",
+    "@typescript-eslint/parser": "^6",
     "autoprefixer": "^10",
+    "eslint": "^8",
+    "eslint-config-prettier": "^9",
+    "eslint-plugin-react": "^7",
     "postcss": "^8",
+    "prettier": "^3",
     "tailwindcss": "^3",
     "typescript": "^5",
     "vite": "^5",

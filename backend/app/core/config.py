@@ -1,11 +1,6 @@
-"""Application configuration and environment variables.
-
-The Settings class uses pydantic‑settings to read from a .env file (or
-environment) and provides defaults suitable for local development.
-Replace SECRET_KEY and DATABASE_URL in production.
-"""
-
+"""Core configuration with hardened defaults and audience/issuer."""
 from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "B2P Connect"
@@ -15,7 +10,22 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost/b2p_db"
 
+    # JWT claims
+    JWT_AUDIENCE: str = "api.b2p.com"
+    JWT_ISSUER: str = "auth.b2p.com"
+
+    # Rate limiting
+    RATE_LIMIT_AUTH: str = "5/minute"
+
+    # Account lockout
+    MAX_FAILED_LOGIN_ATTEMPTS: int = 5
+    LOCK_MINUTES: int = 15
+
+    # CORS
+    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+
     class Config:
         env_file = ".env"
+
 
 settings = Settings()
