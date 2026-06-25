@@ -39,6 +39,7 @@ from .api.v1.profile_completion.routes import router as profile_completion_route
 from .api.v1.profile_completion.routes import router as profile_completion_router
 from .portfolio.routes import router as portfolio_router
 from .social.routes import router as social_router
+from .chat.routes import router as chat_router
 
 # Structured logging
 logging.basicConfig(
@@ -104,6 +105,7 @@ app.include_router(activity_router, prefix=f"{settings.API_V1_STR}/activity", ta
 app.include_router(profile_completion_router, prefix=f"{settings.API_V1_STR}/profile-completion", tags=["profile-completion"])
 app.include_router(portfolio_router, prefix=f"{settings.API_V1_STR}/portfolio", tags=["portfolio"])
 app.include_router(social_router, prefix=f"{settings.API_V1_STR}")
+app.include_router(chat_router, prefix=f"{settings.API_V1_STR}/chat", tags=["chat"])
 
 
 @app.get("/health")

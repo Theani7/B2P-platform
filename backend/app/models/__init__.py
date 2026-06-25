@@ -17,6 +17,7 @@ from .portfolio_media import PortfolioMedia
 from .social_link import SocialLink
 from .platform_setting import PlatformSetting
 from .verification_request import VerificationRequest
+from .chat import Conversation, Message, MessageType
 
 __all__ = [
     "User",

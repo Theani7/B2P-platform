@@ -1,0 +1,127 @@
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import { useAuth } from "../../features/auth";
+import { MessageBubble } from "./MessageBubble";
+import { MessageComposer } from "./MessageComposer";
+import { TypingIndicator } from "./TypingIndicator";
+import { useChatWebSocket, useConversationHistory, useMarkConversationRead, Conversation, Message } from "../../features/chat";
+import { Phone, Video, Info, Search } from "lucide-react";
+
+interface ChatWindowProps {
+  conversation: Conversation;
+}
+
+export function ChatWindow({ conversation }: ChatWindowProps) {
+  const { user, token } = useAuth();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversationHistory(conversation.collaboration_id);
+  const markRead = useMarkConversationRead();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
+  const { isConnected, lastMessage, sendMessage } = useChatWebSocket(conversation.id, token || undefined);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const otherParticipant = conversation.participants.find(p => p.id !== user?.id) || conversation.participants[0];
+
+  // Load history
+  useEffect(() => {
+    if (data?.pages) {
+      const allMessages = data.pages.flatMap(page => page.messages).reverse(); // Oldest to newest
+      setMessages(allMessages);
+    }
+  }, [data]);
+
+  // Handle incoming WS messages
+  useEffect(() => {
+    if (!lastMessage) return;
+
+    if (lastMessage.type === "MESSAGE") {
+      setMessages(prev => [...prev, lastMessage.payload]);
+      setIsOtherTyping(false);
+      markRead.mutate(conversation.id);
+    } else if (lastMessage.type === "TYPING_START") {
+      if (lastMessage.payload.user_id !== user?.id) {
+        setIsOtherTyping(true);
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => setIsOtherTyping(false), 3000);
+      }
+    } else if (lastMessage.type === "TYPING_STOP") {
+      if (lastMessage.payload.user_id !== user?.id) {
+        setIsOtherTyping(false);
+      }
+    } else if (lastMessage.type === "READ_RECEIPT") {
+      setMessages(prev => prev.map(m => 
+        (m.sender_id === user?.id && !m.read_at) ? { ...m, read_at: new Date().toISOString() } : m
+      ));
+    }
+  }, [lastMessage, user?.id, conversation.id]);
+
+  // Scroll to bottom on new message
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isOtherTyping]);
+
+  // Send message
+  const handleSend = (text: string) => {
+    sendMessage({
+      type: "MESSAGE",
+      payload: { text }
+    });
+  };
+
+  const handleTyping = () => {
+    sendMessage({
+      type: "TYPING_START",
+      payload: {}
+    });
+  };
+
+  // Scroll to fetch more
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (e.currentTarget.scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-white">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
+        <div className="flex items-center gap-3">
+          <img src={otherParticipant?.avatar || "/default-avatar.png"} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
+          <div>
+            <h2 className="text-sm font-bold text-gray-900">{otherParticipant?.name || "Unknown"}</h2>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-emerald-500" : "bg-gray-300"}`}></span>
+              <span className="text-xs font-medium text-gray-500">{isConnected ? "Online" : "Connecting..."}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 text-gray-400">
+          <button className="p-2 hover:bg-gray-50 hover:text-gray-600 rounded-full transition-colors"><Search size={18} /></button>
+          <button className="p-2 hover:bg-gray-50 hover:text-gray-600 rounded-full transition-colors"><Info size={18} /></button>
+        </div>
+      </div>
+
+      {/* Messages Area */}
+      <div 
+        className="flex-1 overflow-y-auto p-6 bg-white"
+        onScroll={handleScroll}
+        ref={scrollRef}
+      >
+        {isFetchingNextPage && <div className="text-center text-xs text-gray-400 my-2">Loading older messages...</div>}
+        
+        {messages.map((msg) => (
+          <MessageBubble key={msg.id} message={msg} isOwn={msg.sender_id === user?.id} />
+        ))}
+        
+        {isOtherTyping && <TypingIndicator />}
+      </div>
+
+      {/* Input */}
+      <MessageComposer onSend={handleSend} onTyping={handleTyping} />
+    </div>
+  );
+}
