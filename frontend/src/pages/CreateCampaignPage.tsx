@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useCreateCampaign } from "../features/campaigns/api";
 import CampaignForm, { CampaignFormValues } from "../components/CampaignForm";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { PageHeader } from "../components/ui";
 
 export default function CreateCampaignPage() {
   const navigate = useNavigate();
@@ -26,8 +27,11 @@ export default function CreateCampaignPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <h1 className="text-2xl font-bold text-text">Create Campaign</h1>
-      <div className="rounded-lg border p-6">
+      <PageHeader
+        title="Create Campaign"
+        description="Fill out the details below to launch a new promoter campaign"
+      />
+      <div className="bg-white border border-gray-100 rounded-xl p-5">
         <CampaignForm
           onSubmit={onSubmit}
           isSubmitting={createCampaign.isPending}

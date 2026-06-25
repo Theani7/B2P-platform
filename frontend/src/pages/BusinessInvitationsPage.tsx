@@ -5,34 +5,18 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { PageHeader, Badge } from "../components/ui";
 import {
   Send,
   XCircle,
-  CheckCircle2,
-  Clock,
   Mail,
   MapPin,
   DollarSign,
   CalendarDays,
   MessageSquare,
-  Ban,
   ArrowRight,
   UserPlus,
 } from "lucide-react";
-
-const STATUS_STYLES: Record<string, string> = {
-  PENDING: "bg-brand-amber-50 text-brand-amber-900 ring-brand-amber/20",
-  ACCEPTED: "bg-brand-teal-50 text-brand-teal-900 ring-brand-teal/20",
-  REJECTED: "bg-brand-coral-50 text-brand-coral-900 ring-brand-coral/20",
-  EXPIRED: "bg-gray-100 text-gray-500 ring-gray-200",
-};
-
-const STATUS_ICONS: Record<string, React.ElementType> = {
-  PENDING: Clock,
-  ACCEPTED: CheckCircle2,
-  REJECTED: XCircle,
-  EXPIRED: XCircle,
-};
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING: "Awaiting Response",
@@ -77,10 +61,13 @@ export default function BusinessInvitationsPage() {
         title="No invitations sent"
         description="Invite promoters from their public profiles to collaborate on your campaigns."
         action={
-          <div className="flex items-center gap-2 mt-2">
-            <UserPlus size={20} className="text-brand-purple" />
-            <span className="text-sm text-gray-500">Browse promoter directory to send invites</span>
-          </div>
+          <Link
+            to="/business/promoters"
+            className="inline-flex items-center gap-2 bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+          >
+            <UserPlus size={16} />
+            Browse Promoter Directory
+          </Link>
         }
       />
     );
@@ -89,47 +76,48 @@ export default function BusinessInvitationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-2xl bg-brand-purple p-8">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-white">
-            <Mail size={28} />
-          </div>
-          <div>
-            <h1 className="text-2xl font-medium text-white">Sent Invitations</h1>
-            <p className="text-sm text-white/70 mt-0.5">Track and manage your promoter invitations</p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Sent Invitations"
+        description="Track and manage your promoter invitations"
+      />
 
       {/* Invitations List */}
       <div className="space-y-4">
         {data.items.map((inv) => {
-          const StatusIcon = STATUS_ICONS[inv.status] || Clock;
+          const badgeVariant =
+            inv.status === "PENDING"
+              ? "pending"
+              : inv.status === "ACCEPTED"
+              ? "verified"
+              : inv.status === "REJECTED"
+              ? "rejected"
+              : "draft";
+
           return (
             <div
               key={inv.id}
-              className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-200 transition-all duration-200 hover:-translate-y-0.5"
+              className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-200 transition-colors duration-150"
             >
-              <div className="p-6">
+              <div className="p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 min-w-0 flex-1">
                     {/* Campaign Icon */}
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-purple-50 to-brand-indigo-50 flex items-center justify-center flex-shrink-0 ring-1 ring-brand-purple/10">
-                      <Send size={20} className="text-brand-purple" />
+                    <div className="w-10 h-10 rounded-lg bg-brand-purple-50 flex items-center justify-center flex-shrink-0 text-brand-purple-900">
+                      <Send size={18} />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="text-base font-medium text-gray-900 truncate">{inv.campaign_title}</h3>
-                      <div className="mt-2 flex flex-wrap items-center gap-3">
-                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2.5 py-1 rounded-lg ring-1 ring-gray-100">
-                          <Mail size={11} className="text-brand-purple" />
+                      <h3 className="text-sm font-medium text-gray-900 truncate">{inv.campaign_title}</h3>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-3">
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
+                          <Mail size={10} className="text-brand-purple" />
                           {inv.campaign_category}
                         </span>
-                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
-                          <DollarSign size={12} className="text-brand-teal" />
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                          <DollarSign size={10} className="text-brand-teal" />
                           ${inv.campaign_budget?.toLocaleString()}
                         </span>
-                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
-                          <MapPin size={12} className="text-gray-400" />
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                          <MapPin size={10} className="text-gray-400" />
                           {inv.campaign_location}
                         </span>
                       </div>
@@ -137,23 +125,22 @@ export default function BusinessInvitationsPage() {
                   </div>
 
                   {/* Status Badge */}
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium ring-1 flex-shrink-0 ${STATUS_STYLES[inv.status] ?? ""}`}>
-                    <StatusIcon size={12} />
+                  <Badge variant={badgeVariant}>
                     {STATUS_LABELS[inv.status] || inv.status}
-                  </span>
+                  </Badge>
                 </div>
 
                 {/* Message */}
                 {inv.message && (
-                  <div className="mt-4 flex gap-3 p-4 bg-gray-50 rounded-xl ring-1 ring-gray-100">
+                  <div className="mt-3.5 flex gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
                     <MessageSquare size={14} className="text-gray-400 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-600">{inv.message}</p>
+                    <p className="text-xs text-gray-600">{inv.message}</p>
                   </div>
                 )}
 
                 {/* Footer */}
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                  <span className="inline-flex items-center gap-1 text-xs text-gray-400 font-normal">
                     <CalendarDays size={12} />
                     Sent {new Date(inv.created_at).toLocaleDateString("en-US", {
                       month: "short",
@@ -165,16 +152,15 @@ export default function BusinessInvitationsPage() {
                     <button
                       onClick={() => handleCancel(inv.id)}
                       disabled={cancelMutation.isPending}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-coral hover:text-brand-coral-900 bg-brand-coral-50 px-3 py-1.5 rounded-lg hover:bg-brand-coral-100 transition-colors"
+                      className="bg-brand-coral-50 text-brand-coral-900 border border-red-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition-colors"
                     >
-                      <Ban size={12} />
-                      {cancelMutation.isPending ? "Cancelling..." : "Cancel"}
+                      Cancel
                     </button>
                   )}
                   {inv.status === "ACCEPTED" && (
                     <Link
                       to="/business/collaborations"
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-teal hover:text-brand-teal-900 transition-colors"
+                      className="text-xs text-brand-purple hover:underline flex items-center gap-1 font-medium"
                     >
                       View Collaboration <ArrowRight size={12} />
                     </Link>
@@ -188,23 +174,23 @@ export default function BusinessInvitationsPage() {
 
       {/* Pagination */}
       {data.pages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-4">
+        <div className="flex items-center justify-center gap-2 pt-4">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
-            <ArrowRight size={14} className="rotate-180" />
+            <ArrowRight size={12} className="rotate-180" />
             Previous
           </button>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
+                className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
                   p === page
-                    ? "bg-brand-purple text-white"
+                    ? "bg-brand-indigo text-white"
                     : "text-gray-500 hover:bg-gray-100"
                 }`}
               >
@@ -215,10 +201,10 @@ export default function BusinessInvitationsPage() {
           <button
             onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
             disabled={page >= data.pages}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
             Next
-            <ArrowRight size={14} />
+            <ArrowRight size={12} />
           </button>
         </div>
       )}

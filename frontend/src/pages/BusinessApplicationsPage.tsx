@@ -5,34 +5,20 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { PageHeader, Avatar, Badge } from "../components/ui";
 import {
   ArrowLeft,
-  CheckCircle2,
-  XCircle,
   MapPin,
   Users,
   TrendingUp,
-  Clock,
   Star,
   MessageSquare,
   Briefcase,
   Eye,
   BadgeCheck,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
-
-const STATUS_STYLES: Record<string, string> = {
-  PENDING: "bg-brand-amber-50 text-brand-amber-900 ring-brand-amber/20",
-  ACCEPTED: "bg-brand-teal-50 text-brand-teal-900 ring-brand-teal/20",
-  REJECTED: "bg-brand-coral-50 text-brand-coral-900 ring-brand-coral/20",
-  WITHDRAWN: "bg-gray-100 text-gray-500 ring-gray-200",
-};
-
-const STATUS_ICONS: Record<string, React.ElementType> = {
-  PENDING: Clock,
-  ACCEPTED: CheckCircle2,
-  REJECTED: XCircle,
-  WITHDRAWN: XCircle,
-};
 
 export default function BusinessApplicationsPage() {
   const { campaignId } = useParams<{ campaignId: string }>();
@@ -76,15 +62,14 @@ export default function BusinessApplicationsPage() {
   if (!data || data.items.length === 0) {
     return (
       <div className="space-y-6">
-        <Link to="/business/campaigns" className="inline-flex items-center gap-2 text-sm text-brand-purple hover:text-brand-purple-900 font-medium transition-colors">
-          <ArrowLeft size={16} />
-          Back to Campaigns
+        <Link to="/business/campaigns" className="text-xs text-brand-purple hover:underline inline-flex items-center gap-1 font-medium mb-3">
+          &larr; Back to Campaigns
         </Link>
         <EmptyState
           title="No applications yet"
           description="Promoters haven't applied to this campaign yet. Try promoting it more or inviting specific promoters."
           action={
-            <Link to="/business/campaigns" className="inline-flex items-center gap-2 bg-brand-purple text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity">
+            <Link to="/business/campaigns" className="inline-flex items-center gap-2 bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
               <ArrowLeft size={16} />
               Back to Campaigns
             </Link>
@@ -99,44 +84,45 @@ export default function BusinessApplicationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/business/campaigns"
-            className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"
-          >
-            <ArrowLeft size={18} />
-          </Link>
-          <div>
-            <h1 className="text-xl font-medium text-gray-900">Applications</h1>
-            <p className="text-xs text-gray-500 mt-0.5">{data.total} applicant{data.total !== 1 ? 's' : ''} found</p>
-          </div>
-        </div>
+      <div>
+        <Link to="/business/campaigns" className="text-xs text-brand-purple hover:underline inline-flex items-center gap-1 font-medium mb-3">
+          &larr; Back to Campaigns
+        </Link>
+        <PageHeader
+          title="Applications"
+          description={`${data.total} applicant${data.total !== 1 ? 's' : ''} found for this campaign.`}
+        />
       </div>
 
       {/* Applications List */}
       <div className="space-y-4">
         {items.map((app: any) => {
-          const StatusIcon = STATUS_ICONS[app.status] || Clock;
+          const badgeVariant =
+            app.status === "PENDING"
+              ? "pending"
+              : app.status === "ACCEPTED"
+              ? "verified"
+              : app.status === "REJECTED"
+              ? "rejected"
+              : "draft";
+
           return (
             <div
               key={app.id}
-              className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-200 transition-all duration-200 hover:-translate-y-0.5"
+              className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-200 transition-colors duration-150"
             >
-              <div className="p-6">
-                <div className="flex items-start gap-5">
+              <div className="p-5">
+                <div className="flex items-start gap-4">
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
-                    <div className="w-14 h-14 rounded-2xl bg-brand-purple-50 flex items-center justify-center text-xl font-bold text-brand-purple-900 ring-1 ring-brand-purple/10 overflow-hidden">
-                      {app.promoter_avatar_url ? (
-                        <img src={app.promoter_avatar_url} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        app.promoter_username?.[0]?.toUpperCase() ?? "?"
-                      )}
-                    </div>
+                    {app.promoter_avatar_url ? (
+                      <img src={app.promoter_avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <Avatar initials={app.promoter_username?.[0]?.toUpperCase() ?? "?"} size="md" colorIndex={app.id?.charCodeAt(0) || 0} />
+                    )}
                     {app.promoter_verified && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-teal flex items-center justify-center ring-2 ring-white">
-                        <BadgeCheck size={12} className="text-white" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brand-teal flex items-center justify-center ring-2 ring-white">
+                        <BadgeCheck size={10} className="text-white" />
                       </div>
                     )}
                   </div>
@@ -145,8 +131,8 @@ export default function BusinessApplicationsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <div className="flex items-center gap-2.5">
-                          <h3 className="text-base font-medium text-gray-900">{app.promoter_username}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-medium text-gray-900">{app.promoter_username}</h3>
                           {app.promoter_verified && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-teal-50 text-brand-teal-900 ring-1 ring-brand-teal/10">
                               <BadgeCheck size={10} />
@@ -155,38 +141,37 @@ export default function BusinessApplicationsPage() {
                           )}
                         </div>
                         {app.promoter_headline && (
-                          <p className="text-sm text-gray-500 mt-0.5">{app.promoter_headline}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{app.promoter_headline}</p>
                         )}
                       </div>
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium ring-1 flex-shrink-0 ${STATUS_STYLES[app.status] ?? ""}`}>
-                        <StatusIcon size={12} />
+                      <Badge variant={badgeVariant}>
                         {app.status}
-                      </span>
+                      </Badge>
                     </div>
 
                     {/* Stats Row */}
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
-                      <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2.5 py-1 rounded-lg ring-1 ring-gray-100">
-                        <Briefcase size={12} className="text-brand-purple" />
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
+                        <Briefcase size={10} className="text-brand-purple" />
                         {app.promoter_niche}
                       </span>
                       {app.promoter_location && (
-                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
-                          <MapPin size={12} className="text-gray-400" />
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                          <MapPin size={10} className="text-gray-400" />
                           {app.promoter_location}
                         </span>
                       )}
-                      <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
-                        <Users size={12} className="text-gray-400" />
+                      <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                        <Users size={10} className="text-gray-400" />
                         {app.promoter_followers_count?.toLocaleString()} followers
                       </span>
-                      <span className="inline-flex items-center gap-1.5 text-xs text-brand-teal font-medium">
-                        <TrendingUp size={12} />
+                      <span className="inline-flex items-center gap-1 text-xs text-brand-teal font-medium">
+                        <TrendingUp size={10} />
                         {app.promoter_engagement_rate?.toFixed(1)}% eng.
                       </span>
                       {app.promoter_years_experience != null && (
-                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
-                          <Star size={12} className="text-gray-400" />
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                          <Star size={10} className="text-gray-400" />
                           {app.promoter_years_experience}yr exp.
                         </span>
                       )}
@@ -194,36 +179,36 @@ export default function BusinessApplicationsPage() {
 
                     {/* Message */}
                     {app.message && (
-                      <div className="mt-4 flex gap-3 p-4 bg-gray-50 rounded-xl ring-1 ring-gray-100">
+                      <div className="mt-3.5 flex gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
                         <MessageSquare size={14} className="text-gray-400 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-gray-600">{app.message}</p>
+                        <p className="text-xs text-gray-600">{app.message}</p>
                       </div>
                     )}
 
                     {/* Actions */}
                     {app.status === "PENDING" && (
-                      <div className="mt-5 flex gap-3">
+                      <div className="mt-4 flex items-center gap-3">
                         <button
                           onClick={() => handleAccept(app.id)}
                           disabled={acceptMutation.isPending}
-                          className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-teal to-brand-teal-900 text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 shadow-sm"
+                          className="bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors inline-flex items-center gap-1.5"
                         >
-                          <CheckCircle2 size={16} />
+                          <CheckCircle2 size={12} />
                           {acceptMutation.isPending ? "Accepting..." : "Accept"}
                         </button>
                         <button
                           onClick={() => handleReject(app.id)}
                           disabled={rejectMutation.isPending}
-                          className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-600 rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-gray-50 hover:text-brand-coral hover:border-brand-coral/30 transition-all disabled:opacity-50"
+                          className="bg-brand-coral-50 text-brand-coral-900 border border-red-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition-colors inline-flex items-center gap-1.5"
                         >
-                          <XCircle size={16} />
+                          <XCircle size={12} />
                           {rejectMutation.isPending ? "Rejecting..." : "Reject"}
                         </button>
                         <Link
                           to={`/promoters/${app.promoter_username}`}
-                          className="inline-flex items-center gap-2 text-sm text-brand-purple hover:text-brand-purple-900 font-medium ml-auto transition-colors"
+                          className="text-xs text-brand-purple hover:underline flex items-center gap-1 font-medium ml-auto"
                         >
-                          <Eye size={16} />
+                          <Eye size={12} />
                           View Profile
                         </Link>
                       </div>
@@ -238,23 +223,23 @@ export default function BusinessApplicationsPage() {
 
       {/* Pagination */}
       {data.pages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-4">
+        <div className="flex items-center justify-center gap-2 pt-4">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={12} />
             Previous
           </button>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
+                className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
                   p === page
-                    ? "bg-brand-purple text-white"
+                    ? "bg-brand-indigo text-white"
                     : "text-gray-500 hover:bg-gray-100"
                 }`}
               >
@@ -265,10 +250,10 @@ export default function BusinessApplicationsPage() {
           <button
             onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
             disabled={page >= data.pages}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
             Next
-            <ArrowLeft size={14} className="rotate-180" />
+            <ArrowLeft size={12} className="rotate-180" />
           </button>
         </div>
       )}

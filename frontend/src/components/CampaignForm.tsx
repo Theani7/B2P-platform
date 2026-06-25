@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CampaignStatus, CampaignVisibility } from "../features/campaigns/types";
+import { Input, Select, Textarea, Button } from "./ui";
 
 const schema = z
   .object({
@@ -34,6 +35,20 @@ interface CampaignFormProps {
   submitLabel: string;
 }
 
+const visibilityOptions = [
+  { value: CampaignVisibility.PUBLIC, label: "Public" },
+  { value: CampaignVisibility.PRIVATE, label: "Private" },
+];
+
+const statusOptions = [
+  { value: CampaignStatus.DRAFT, label: "Draft" },
+  { value: CampaignStatus.OPEN, label: "Open" },
+  { value: CampaignStatus.ACTIVE, label: "Active" },
+  { value: CampaignStatus.COMPLETED, label: "Completed" },
+  { value: CampaignStatus.CANCELLED, label: "Cancelled" },
+  { value: CampaignStatus.ARCHIVED, label: "Archived" },
+];
+
 export default function CampaignForm({
   defaultValues,
   onSubmit,
@@ -57,139 +72,117 @@ export default function CampaignForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-text">Title</label>
-          <input
+          <Input
+            label="Title"
+            error={errors.title?.message}
             {...register("title")}
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
+            placeholder="e.g. Summer Kathmandu Streetwear Launch"
           />
-          {errors.title && (
-            <p className="mt-1 text-sm text-danger">{errors.title.message}</p>
-          )}
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-text">Description</label>
-          <textarea
+          <Textarea
+            label="Description"
+            error={errors.description?.message}
             {...register("description")}
             rows={4}
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
+            placeholder="Explain the campaign goals, deliverables, and details..."
           />
-          {errors.description && (
-            <p className="mt-1 text-sm text-danger">{errors.description.message}</p>
-          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text">Category</label>
-          <input
+          <Input
+            label="Category"
+            error={errors.category?.message}
             {...register("category")}
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
+            placeholder="Fashion, Tech, Food..."
           />
-          {errors.category && (
-            <p className="mt-1 text-sm text-danger">{errors.category.message}</p>
-          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text">Budget</label>
-          <input
-            {...register("budget")}
+          <Input
+            label="Budget ($)"
             type="number"
-            step="0.01"
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
+            step="1"
+            error={errors.budget?.message}
+            {...register("budget")}
+            placeholder="1000"
           />
-          {errors.budget && (
-            <p className="mt-1 text-sm text-danger">{errors.budget.message}</p>
-          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text">Location</label>
-          <input
+          <Input
+            label="Location"
+            error={errors.location?.message}
             {...register("location")}
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
+            placeholder="Kathmandu, Nepal or Remote"
           />
-          {errors.location && (
-            <p className="mt-1 text-sm text-danger">{errors.location.message}</p>
-          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text">Target Audience</label>
-          <input
+          <Input
+            label="Target Audience"
+            error={errors.target_audience?.message}
             {...register("target_audience")}
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
+            placeholder="Gen Z, College students, Tech enthusiasts..."
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-text">Requirements</label>
-          <textarea
+          <Textarea
+            label="Requirements"
+            error={errors.requirements?.message}
             {...register("requirements")}
             rows={3}
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
+            placeholder="Specific deliverables, posting frequency, hashtags..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text">Start Date</label>
-          <input
+          <Input
+            label="Start Date"
+            type="date"
+            error={errors.start_date?.message}
             {...register("start_date")}
-            type="date"
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
           />
-          {errors.start_date && (
-            <p className="mt-1 text-sm text-danger">{errors.start_date.message}</p>
-          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text">End Date</label>
-          <input
+          <Input
+            label="End Date"
+            type="date"
+            error={errors.end_date?.message}
             {...register("end_date")}
-            type="date"
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
           />
-          {errors.end_date && (
-            <p className="mt-1 text-sm text-danger">{errors.end_date.message}</p>
-          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text">Visibility</label>
-          <select
+          <Select
+            label="Visibility"
+            error={errors.visibility?.message}
+            options={visibilityOptions}
             {...register("visibility")}
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
-          >
-            <option value={CampaignVisibility.PUBLIC}>Public</option>
-            <option value={CampaignVisibility.PRIVATE}>Private</option>
-          </select>
+          />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text">Status</label>
-          <select
+          <Select
+            label="Status"
+            error={errors.status?.message}
+            options={statusOptions}
             {...register("status")}
-            className="mt-1 block w-full rounded border border-gray-300 p-2"
-          >
-            <option value={CampaignStatus.DRAFT}>Draft</option>
-            <option value={CampaignStatus.OPEN}>Open</option>
-            <option value={CampaignStatus.ACTIVE}>Active</option>
-            <option value={CampaignStatus.COMPLETED}>Completed</option>
-            <option value={CampaignStatus.CANCELLED}>Cancelled</option>
-            <option value={CampaignStatus.ARCHIVED}>Archived</option>
-          </select>
+          />
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <button
+      <div className="flex justify-end pt-4 border-t border-gray-100">
+        <Button
           type="submit"
-          disabled={isSubmitting}
-          className="rounded bg-primary px-6 py-2 font-medium text-white hover:bg-primary/90 disabled:opacity-50"
+          variant="cta"
+          loading={isSubmitting}
         >
-          {isSubmitting ? "Saving..." : submitLabel}
-        </button>
+          {submitLabel}
+        </Button>
       </div>
     </form>
   );

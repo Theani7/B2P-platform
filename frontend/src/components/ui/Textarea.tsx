@@ -18,7 +18,7 @@ export function Textarea({ label, error, className = "", id, ...props }: Textare
       )}
       <textarea
         id={textareaId}
-        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple ${
+        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo ${
           error ? "border-brand-coral focus:border-brand-indigo focus:ring-brand-indigo" : "border-gray-200"
         } ${className}`}
         aria-invalid={!!error}

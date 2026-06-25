@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useCampaign, useUpdateCampaign } from "../features/campaigns/api";
 import CampaignForm, { CampaignFormValues } from "../components/CampaignForm";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { PageHeader } from "../components/ui";
 
 export default function EditCampaignPage() {
   const { id } = useParams<{ id: string }>();
@@ -57,8 +58,11 @@ export default function EditCampaignPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <h1 className="text-2xl font-bold text-text">Edit Campaign</h1>
-      <div className="rounded-lg border p-6">
+      <PageHeader
+        title="Edit Campaign"
+        description="Update your campaign details and visibility status"
+      />
+      <div className="bg-white border border-gray-100 rounded-xl p-5">
         <CampaignForm
           defaultValues={defaultValues}
           onSubmit={onSubmit}

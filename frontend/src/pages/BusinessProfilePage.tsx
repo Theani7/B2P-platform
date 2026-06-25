@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBusinessProfile, useUpsertBusinessProfile } from "../features/profile/api";
 import { useAuth } from "../providers/AuthProvider";
-import { Button, Input, Label, Textarea } from "@/components/ui";
+import { Button, Input, Label, Textarea, PageHeader } from "@/components/ui";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
@@ -60,17 +60,10 @@ export default function BusinessProfilePage() {
   return (
     <div className="space-y-8">
       {/* Page Header */}
-      <div className="rounded-2xl bg-brand-purple p-8">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-white">
-            <Building2 size={28} />
-          </div>
-          <div>
-            <h1 className="text-2xl font-medium text-white">Business Profile</h1>
-            <p className="text-sm text-white/70 mt-0.5">Manage your company information and public presence</p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Business Profile"
+        description="Manage your company information and public presence"
+      />
 
       {/* Profile Setup Warning Banner */}
       {!user?.has_profile && (
@@ -91,16 +84,16 @@ export default function BusinessProfilePage() {
         {/* Profile Sections Nav */}
         <div className="space-y-3">
           <div className="bg-white border border-gray-100 rounded-xl p-5 space-y-1">
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-purple-50 text-brand-purple font-medium text-sm">
-              <Building2 size={18} />
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-purple-50 text-brand-purple-900 font-medium text-sm">
+              <Building2 size={16} />
               Company Info
             </div>
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 text-sm">
-              <Globe size={18} />
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 text-sm cursor-pointer">
+              <Globe size={16} />
               Online Presence
             </div>
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 text-sm">
-              <FileText size={18} />
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 text-sm cursor-pointer">
+              <FileText size={16} />
               Description
             </div>
           </div>
@@ -109,11 +102,9 @@ export default function BusinessProfilePage() {
         {/* Form */}
         <div className="lg:col-span-2">
           <div className="bg-white border border-gray-100 rounded-xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-brand-purple-50/50 to-transparent">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-brand-purple-50 flex items-center justify-center">
-                  <Building2 size={16} className="text-brand-purple" />
-                </div>
+            <div className="px-5 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Building2 size={16} className="text-brand-purple" />
                 <h2 className="text-sm font-medium text-gray-900">Company Information</h2>
               </div>
             </div>
