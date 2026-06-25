@@ -93,7 +93,6 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loginMutation.isPending}
-          style={{ backgroundColor: "#5B4FCF" }}
           className="w-full mt-2 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loginMutation.isPending && <Loader2 size={16} className="animate-spin" />}
