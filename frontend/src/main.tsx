@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
+import { UnsavedChangesProvider } from "./context/UnsavedChangesContext";
 import AppRoutes from "./routes";
 import { Toaster } from "react-hot-toast";
 import "./index.css";
@@ -25,8 +26,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          <AppRoutes />
-          <Toaster position="bottom-right" />
+          <UnsavedChangesProvider>
+            <AppRoutes />
+            <Toaster position="bottom-right" />
+          </UnsavedChangesProvider>
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
