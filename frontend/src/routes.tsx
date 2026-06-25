@@ -29,6 +29,7 @@ const CollaborationsPage = lazy(() => import("./pages/CollaborationsPage"));
 const CampaignMatchesPage = lazy(() => import("./pages/CampaignMatchesPage"));
 const MyReviewsPage = lazy(() => import("./pages/MyReviewsPage"));
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
+const PromoterSettingsPage = lazy(() => import("./pages/PromoterSettingsPage"));
 
 function ProtectedRoute({ role, children }: { role?: Role; children: React.ReactNode }) {
   const { user, isLoading: authLoading } = useAuth();
@@ -98,6 +99,7 @@ export default function AppRoutes() {
       <Route path="/promoter/collaborations" element={<ProtectedRoute><CollaborationsPage /></ProtectedRoute>} />
       <Route path="/my/reviews" element={<ProtectedRoute><MyReviewsPage /></ProtectedRoute>} />
       <Route path="/users/:userId/reviews" element={<ProtectedRoute><UserReviewsPage /></ProtectedRoute>} />
+      <Route path="/promoter/settings" element={<ProtectedRoute role={Role.PROMOTER}><PromoterSettingsPage /></ProtectedRoute>} />
       <Route path="*" element={<RoleRedirect />} />
     </Routes>
   );

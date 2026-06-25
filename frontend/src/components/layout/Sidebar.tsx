@@ -110,7 +110,7 @@ export function Sidebar({ role }: SidebarProps) {
       {/* Bottom Section */}
       <div className="border-t border-gray-200 p-4 space-y-1">
         <NavLink
-          to={role === Role.BUSINESS ? "/business/profile" : "/profile"}
+          to={role === Role.BUSINESS ? "/business/profile" : "/promoter/settings"}
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
               isActive ? "bg-primary-50 text-primary-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
