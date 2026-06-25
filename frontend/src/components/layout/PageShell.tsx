@@ -1,5 +1,6 @@
 import React from "react";
 import { Sidebar } from "./Sidebar";
+import { TopHeader } from "./TopHeader";
 
 interface PageShellProps {
   role: string;
@@ -8,11 +9,14 @@ interface PageShellProps {
 
 export function PageShell({ role, children }: PageShellProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50 flex">
       <Sidebar role={role} />
-      <main className="ml-[220px] flex-1 overflow-y-auto p-6">
-        {children}
-      </main>
+      <div className="flex-1 flex flex-col min-w-0 md:ml-[280px]">
+        <TopHeader />
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  Zap
 } from "lucide-react";
 
 interface SidebarProps {
@@ -22,13 +23,12 @@ interface SidebarProps {
 }
 
 const businessLinks = [
-  { to: "/business/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/business/dashboard", label: "Overview", icon: LayoutDashboard },
   { to: "/business/campaigns", label: "Campaigns", icon: Megaphone },
   { to: "/business/promoters", label: "Find Promoters", icon: Users },
   { to: "/business/collaborations", label: "Collaborations", icon: Handshake },
-  { to: "/business/saved-promoters", label: "Saved", icon: Bookmark },
+  { to: "/business/saved-promoters", label: "Saved Promoters", icon: Bookmark },
   { to: "/business/invitations", label: "Invitations", icon: Mail },
-  { to: "/business/profile", label: "Settings", icon: Settings },
 ];
 
 const promoterLinks = [
@@ -64,56 +64,79 @@ export function Sidebar({ role }: SidebarProps) {
   const links = getLinks(role);
 
   return (
-    <aside className="w-[220px] flex-shrink-0 bg-white border-r border-gray-100 flex flex-col h-screen fixed left-0 top-0 z-40">
+    <aside className="hidden md:flex w-[280px] flex-shrink-0 bg-white border-r border-gray-200 flex-col h-screen fixed left-0 top-0 z-40">
       {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-gray-100">
-        <NavLink to="/" className="flex items-center gap-0.5 text-lg font-medium">
-          <span className="text-brand-purple">B2P</span>
-          <span className="text-gray-900">Connect</span>
+      <div className="h-16 flex items-center px-6 border-b border-gray-200">
+        <NavLink to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-gray-900">
+          <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white">
+            <Zap size={18} />
+          </div>
+          B2P Connect
         </NavLink>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
-        {links.map((link) => {
-          const Icon = link.icon;
-          return (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                  isActive
-                    ? "bg-brand-purple-50 text-brand-purple-900 font-medium"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                }`
-              }
-            >
-              <Icon size={18} strokeWidth={1.8} />
-              {link.label}
-            </NavLink>
-          );
-        })}
-      </nav>
+      <div className="flex-1 overflow-y-auto">
+        <nav className="p-4 space-y-1">
+          <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            Main Menu
+          </div>
+          {links.map((link) => {
+            const Icon = link.icon;
+            return (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-primary-50 text-primary-700"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon size={18} className={isActive ? "text-primary-600" : "text-gray-400"} />
+                    {link.label}
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
+      </div>
 
-      {/* User + Logout */}
-      <div className="border-t border-gray-100 p-3">
-        <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          <div className="w-8 h-8 rounded-full bg-brand-purple-50 text-brand-purple-900 flex items-center justify-center text-xs font-medium flex-shrink-0">
-            {user?.full_name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) || "??"}
+      {/* Bottom Section */}
+      <div className="border-t border-gray-200 p-4 space-y-1">
+        <NavLink
+          to={role === Role.BUSINESS ? "/business/profile" : "/profile"}
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+              isActive ? "bg-primary-50 text-primary-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`
+          }
+        >
+          <Settings size={18} className="text-gray-400" />
+          Settings
+        </NavLink>
+        <button
+          onClick={() => logout.mutate()}
+          className="flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200"
+        >
+          <LogOut size={18} className="text-gray-400 group-hover:text-red-500" />
+          Sign out
+        </button>
+
+        <div className="mt-4 pt-4 border-t border-gray-100 px-3 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-medium border border-primary-200">
+            {user?.full_name?.charAt(0)?.toUpperCase() || "U"}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-gray-900 truncate">{user?.full_name || "User"}</p>
-            <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
+            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
           </div>
         </div>
-        <button
-          onClick={() => logout.mutate()}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors"
-        >
-          <LogOut size={18} strokeWidth={1.8} />
-          Sign out
-        </button>
       </div>
     </aside>
   );

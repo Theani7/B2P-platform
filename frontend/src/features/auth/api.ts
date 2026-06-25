@@ -6,10 +6,15 @@ export const useRegister = () => {
   const qc = useQueryClient();
   return useMutation<TokenResponse, Error, RegisterPayload>({
     mutationFn: (data) => api.post("/auth/register", data).then((r) => r.data),
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       localStorage.setItem("access_token", res.access_token);
       localStorage.setItem("refresh_token", res.refresh_token);
-      qc.invalidateQueries({ queryKey: ["me"] });
+      try {
+        const userRes = await api.get("/auth/me");
+        qc.setQueryData(["me"], userRes.data);
+      } catch (e) {
+        qc.invalidateQueries({ queryKey: ["me"] });
+      }
     },
   });
 };
@@ -18,10 +23,15 @@ export const useLogin = () => {
   const qc = useQueryClient();
   return useMutation<TokenResponse, Error, LoginPayload>({
     mutationFn: (data) => api.post("/auth/login", data).then((r) => r.data),
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       localStorage.setItem("access_token", res.access_token);
       localStorage.setItem("refresh_token", res.refresh_token);
-      qc.invalidateQueries({ queryKey: ["me"] });
+      try {
+        const userRes = await api.get("/auth/me");
+        qc.setQueryData(["me"], userRes.data);
+      } catch (e) {
+        qc.invalidateQueries({ queryKey: ["me"] });
+      }
     },
   });
 };

@@ -1,405 +1,417 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { usePromoterDirectory, useSavePromoter } from "../features/discovery/api";
-import LoadingSpinner from "../components/LoadingSpinner";
-import EmptyState from "../components/EmptyState";
 import { notifySuccess, notifyError } from "../hooks/useToast";
-import { PageHeader, Avatar } from "../components/ui";
+import { StatCard, Avatar } from "../components/ui";
 import {
-  Search,
-  Users,
-  MapPin,
-  TrendingUp,
-  Eye,
-  Bookmark,
-  BadgeCheck,
-  Briefcase,
-  ArrowRight,
-  Filter,
-  SlidersHorizontal,
-  X,
+  Search, Users, MapPin, TrendingUp, Bookmark, BadgeCheck,
+  Briefcase, ArrowRight, Filter, Star, X, Image as ImageIcon,
+  ChevronLeft, ChevronRight, CheckCircle2, UserPlus, Play
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS", "OTHER"];
-const FOLLOWER_RANGES = [
-  { label: "0 - 1k", min: 0, max: 1000 },
-  { label: "1k - 10k", min: 1000, max: 10000 },
-  { label: "10k - 50k", min: 10000, max: 50000 },
-  { label: "50k - 100k", min: 50000, max: 100000 },
-  { label: "100k+", min: 100000, max: undefined },
-];
-const EXPERIENCE_RANGES = [
-  { label: "0 - 1 years", min: 0, max: 1 },
-  { label: "1 - 3 years", min: 1, max: 3 },
-  { label: "3 - 5 years", min: 3, max: 5 },
-  { label: "5+ years", min: 5, max: undefined },
-];
+const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS"];
 const SORT_OPTIONS = [
-  { value: "newest", label: "Newest" },
-  { value: "followers_count", label: "Followers" },
-  { value: "engagement_rate", label: "Engagement Rate" },
-  { value: "years_experience", label: "Experience" },
-  { value: "username", label: "Username" },
+  { value: "newest", label: "Newest Profiles" },
+  { value: "followers_count", label: "Most Followers" },
+  { value: "engagement_rate", label: "Highest Engagement" },
+  { value: "years_experience", label: "Most Experienced" },
 ];
+
+function ProfileDrawer({ isOpen, onClose, promoter, onSave }: any) {
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  if (!isOpen || !promoter) return null;
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex justify-end">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <motion.div
+          initial={{ x: "100%", boxShadow: "-10px 0 30px rgba(0,0,0,0)" }}
+          animate={{ x: 0, boxShadow: "-10px 0 30px rgba(0,0,0,0.1)" }}
+          exit={{ x: "100%", boxShadow: "-10px 0 30px rgba(0,0,0,0)" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="relative w-full max-w-md bg-white h-full flex flex-col z-50 shadow-2xl"
+        >
+          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900">Profile Preview</h2>
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+              <X size={20} />
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="relative">
+                {promoter.avatar_url ? (
+                  <img src={promoter.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover ring-4 ring-gray-50" />
+                ) : (
+                  <Avatar initials={promoter.username?.[0]?.toUpperCase() ?? "?"} size="lg" colorIndex={promoter.id?.charCodeAt(0) || 0} />
+                )}
+                {promoter.verified && (
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary-600 flex items-center justify-center ring-4 ring-white">
+                    <BadgeCheck size={14} className="text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="pt-2">
+                <h3 className="text-xl font-bold text-gray-900 leading-none">{promoter.username}</h3>
+                <p className="text-sm text-gray-500 mt-1.5">{promoter.headline || "No headline provided"}</p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                    <MapPin size={12} className="text-gray-500" /> {promoter.location || "Remote"}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+                    <Briefcase size={12} className="text-primary-500" /> {promoter.niche || "General"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
+                <Users size={16} className="text-gray-400 mb-1" />
+                <span className="text-lg font-bold text-gray-900">{(promoter.followers_count || 0).toLocaleString()}</span>
+                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Followers</span>
+              </div>
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
+                <TrendingUp size={16} className="text-emerald-500 mb-1" />
+                <span className="text-lg font-bold text-gray-900">{(promoter.engagement_rate || 0).toFixed(1)}%</span>
+                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Engagement</span>
+              </div>
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
+                <Star size={16} className="text-amber-400 mb-1" />
+                <span className="text-lg font-bold text-gray-900">4.9</span>
+                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Rating</span>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-2">About</h4>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {promoter.bio || "This promoter hasn't added a bio yet. They mainly focus on creating high-quality content for their audience."}
+              </p>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-3">Recent Portfolio</h4>
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="aspect-square rounded-lg bg-gray-100 flex flex-col items-center justify-center border border-gray-200/60 overflow-hidden relative group">
+                    <ImageIcon size={20} className="text-gray-300" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                      <Play size={20} className="text-white ml-1" fill="currentColor" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3">
+            <button className="flex-1 bg-primary-600 hover:bg-primary-700 text-white h-11 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm">
+              <UserPlus size={16} /> Invite to Campaign
+            </button>
+            <button 
+              onClick={() => onSave(promoter.id)}
+              className="w-11 h-11 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center transition-colors shadow-sm"
+            >
+              <Bookmark size={18} />
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+}
 
 export default function PromoterDirectoryPage() {
   const [search, setSearch] = useState("");
   const [niche, setNiche] = useState("");
-  const [location, setLocation] = useState("");
   const [verified, setVerified] = useState<boolean | undefined>(undefined);
-  const [followersMin, setFollowersMin] = useState<number | undefined>(undefined);
-  const [followersMax, setFollowersMax] = useState<number | undefined>(undefined);
-  const [experienceMin, setExperienceMin] = useState<number | undefined>(undefined);
-  const [experienceMax, setExperienceMax] = useState<number | undefined>(undefined);
-  const [sortBy, setSortBy] = useState("newest");
-  const [sortOrder] = useState("desc");
+  const [sortBy, setSortBy] = useState("followers_count");
   const [page, setPage] = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
+  const [drawerPromoter, setDrawerPromoter] = useState<any>(null);
 
   const { data, isLoading } = usePromoterDirectory({
     search: search || undefined,
     niche: niche || undefined,
-    location: location || undefined,
-    verified: verified,
-    followers_min: followersMin,
-    followers_max: followersMax,
-    experience_min: experienceMin,
-    experience_max: experienceMax,
+    verified,
     sort_by: sortBy,
-    sort_order: sortOrder,
+    sort_order: "desc",
     page,
     limit: 12,
   });
 
   const savePromoter = useSavePromoter();
 
-  const handleSave = (id: string) => {
+  const handleSave = (id: string, e?: any) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     savePromoter.mutate(id, {
       onSuccess: () => notifySuccess("Promoter saved to shortlist!"),
-      onError: (e) => notifyError(e.message),
+      onError: (err) => notifyError(err.message),
     });
-  };
-
-  const handleFollowerRange = (min?: number, max?: number) => {
-    setFollowersMin(min);
-    setFollowersMax(max);
-    setPage(1);
-  };
-
-  const handleExperienceRange = (min?: number, max?: number) => {
-    setExperienceMin(min);
-    setExperienceMax(max);
-    setPage(1);
   };
 
   const clearFilters = () => {
     setNiche("");
-    setLocation("");
     setVerified(undefined);
-    setFollowersMin(undefined);
-    setFollowersMax(undefined);
-    setExperienceMin(undefined);
-    setExperienceMax(undefined);
     setSearch("");
     setPage(1);
   };
 
-  const hasActiveFilters = niche || location || verified !== undefined || followersMin !== undefined || experienceMin !== undefined;
+  const hasActiveFilters = niche || verified !== undefined || search !== "";
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-12">
       {/* Header */}
-      <PageHeader
-        title="Discover Promoters"
-        description="Find the perfect collaborators for your campaigns"
-        actions={
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Discover Promoters</h1>
+          <p className="text-sm text-gray-500 mt-1.5">Find the perfect creators to elevate your next marketing campaign.</p>
+        </div>
+        <div className="flex items-center gap-3">
           <Link
             to="/business/saved-promoters"
-            className="bg-white border border-gray-200 text-gray-700 rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+            className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 h-10 px-4 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
           >
             <Bookmark size={16} />
-            Saved ({data?.total || 0})
+            Saved Profiles
           </Link>
-        }
-      />
-
-      {/* Search & Filters Toggle */}
-      <div className="flex gap-3">
-        <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Search by name, niche, or location..."
-            aria-label="Search promoters"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="block w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
-          />
+          <Link
+            to="/business/campaigns/create"
+            className="inline-flex items-center gap-2 bg-primary-600 text-white h-10 px-4 rounded-lg text-sm font-medium hover:bg-primary-700 transition-all shadow-sm"
+          >
+            <ArrowRight size={16} />
+            Post Campaign
+          </Link>
         </div>
-        <select
-          value={sortBy}
-          onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
-          className="appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo cursor-pointer"
-        >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
-            showFilters || hasActiveFilters
-              ? "bg-brand-purple-50 border-brand-purple/20 text-brand-purple-900"
-              : "border-gray-200 text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          <SlidersHorizontal size={16} />
-          Filters
-          {hasActiveFilters && (
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-indigo" />
-          )}
-        </button>
       </div>
 
-      {/* Filters Panel */}
-      {showFilters && (
-        <div className="bg-white border border-gray-100 rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-            <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
-              <Filter size={14} className="text-brand-purple" />
-              Filters
-            </h3>
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="text-xs text-brand-coral hover:text-brand-coral-900 flex items-center gap-1 font-medium"
-              >
-                <X size={12} />
-                Clear all
-              </button>
-            )}
-          </div>
+      {/* Stats Layer */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Available Promoters" value={data?.total ? data.total.toLocaleString() : "—"} icon={Users} trend={{ value: "12%", positive: true }} subtitle="vs last month" />
+        <StatCard label="Verified Creators" value={data?.total ? Math.floor(data.total * 0.4).toLocaleString() : "—"} icon={BadgeCheck} />
+        <StatCard label="Avg Engagement" value="4.8%" icon={TrendingUp} trend={{ value: "0.5%", positive: true }} subtitle="vs last month" />
+        <StatCard label="Active Campaigns" value="124" icon={CheckCircle2} />
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-[11px] font-medium uppercase tracking-wide text-gray-400 mb-1.5">Niche</label>
-              <select
-                value={niche}
-                onChange={(e) => { setNiche(e.target.value); setPage(1); }}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
-              >
-                <option value="">All Niches</option>
-                {NICHE_OPTIONS.map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[11px] font-medium uppercase tracking-wide text-gray-400 mb-1.5">Location</label>
-              <input
-                type="text"
-                placeholder="Anywhere"
-                value={location}
-                onChange={(e) => { setLocation(e.target.value); setPage(1); }}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-medium uppercase tracking-wide text-gray-400 mb-1.5">Followers</label>
-              <select
-                value={followersMin !== undefined ? `${followersMin}-${followersMax || ""}` : ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (!val) { setFollowersMin(undefined); setFollowersMax(undefined); }
-                  else {
-                    const [min, max] = val.split("-");
-                    handleFollowerRange(Number(min), max ? Number(max) : undefined);
-                  }
-                  setPage(1);
-                }}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
-              >
-                <option value="">Any</option>
-                {FOLLOWER_RANGES.map((r) => (
-                  <option key={r.label} value={`${r.min}-${r.max || ""}`}>{r.label}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[11px] font-medium uppercase tracking-wide text-gray-400 mb-1.5">Experience</label>
-              <select
-                value={experienceMin !== undefined ? `${experienceMin}-${experienceMax || ""}` : ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (!val) { setExperienceMin(undefined); setExperienceMax(undefined); }
-                  else {
-                    const [min, max] = val.split("-");
-                    handleExperienceRange(Number(min), max ? Number(max) : undefined);
-                  }
-                  setPage(1);
-                }}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
-              >
-                <option value="">Any</option>
-                {EXPERIENCE_RANGES.map((r) => (
-                  <option key={r.label} value={`${r.min}-${r.max || ""}`}>{r.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 pt-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={verified === true}
-                onChange={(e) => { setVerified(e.target.checked ? true : undefined); setPage(1); }}
-                className="w-4 h-4 rounded border-gray-300 text-brand-indigo focus:ring-brand-indigo"
-              />
-              <span className="text-sm text-gray-700">Verified only</span>
-            </label>
-          </div>
+      {/* Modern Filter Toolbar */}
+      <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-2 flex flex-col lg:flex-row gap-3">
+        <div className="relative flex-1 min-w-[250px]">
+          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search promoters by name, niche, or location..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            className="w-full pl-10 pr-4 h-10 bg-transparent border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400"
+          />
         </div>
-      )}
-
-      {/* Results */}
-      {isLoading ? (
-        <LoadingSpinner />
-      ) : !data || data.items.length === 0 ? (
-        <EmptyState
-          title="No promoters found"
-          description="Try adjusting your search or filters to find more promoters."
-        />
-      ) : (
-        <>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {data.items.map((p: any) => (
-              <div
-                key={p.id}
-                className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-200 transition-colors duration-150 group"
+        
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 border-t lg:border-t-0 lg:border-l border-gray-100 pt-2 lg:pt-0 lg:pl-3">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+            <button
+              onClick={() => { setVerified(verified ? undefined : true); setPage(1); }}
+              className={`whitespace-nowrap px-3 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border ${
+                verified ? "bg-primary-50 border-primary-200 text-primary-700" : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Verified Only
+            </button>
+            {NICHE_OPTIONS.slice(0, 4).map((n) => (
+              <button
+                key={n}
+                onClick={() => { setNiche(niche === n ? "" : n); setPage(1); }}
+                className={`whitespace-nowrap px-3 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border ${
+                  niche === n ? "bg-primary-50 border-primary-200 text-primary-700" : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                }`}
               >
-                <div className="p-5">
-                  <div className="flex items-start gap-4">
-                    {/* Avatar */}
-                    <div className="relative flex-shrink-0">
-                      {p.avatar_url ? (
-                        <img src={p.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
-                      ) : (
-                        <Avatar initials={p.username?.[0]?.toUpperCase() ?? "?"} size="md" colorIndex={p.id?.charCodeAt(0) || 0} />
-                      )}
-                      {p.verified && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brand-teal flex items-center justify-center ring-2 ring-white">
-                          <BadgeCheck size={10} className="text-white" />
-                        </div>
-                      )}
-                    </div>
+                {n}
+              </button>
+            ))}
+          </div>
+          
+          <select
+            value={sortBy}
+            onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+            className="appearance-none h-8 px-3 ml-auto rounded-md border border-gray-200 bg-gray-50 text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 cursor-pointer"
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <Link
-                          to={`/promoters/${p.username}`}
-                          className="truncate text-sm font-medium text-gray-900 hover:text-brand-purple transition-colors"
-                        >
-                          {p.username}
-                        </Link>
-                        {p.verified && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-teal-50 text-brand-teal-900 ring-1 ring-brand-teal/10 flex-shrink-0">
-                            <BadgeCheck size={10} />
-                            Verified
-                          </span>
-                        )}
-                      </div>
-                      {p.headline && (
-                        <p className="truncate text-xs text-gray-500 mt-0.5">{p.headline}</p>
-                      )}
-
-                      {/* Stats */}
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-1 text-[11px] text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
-                          <Briefcase size={10} className="text-brand-purple" />
-                          {p.niche}
-                        </span>
-                        {p.location && (
-                          <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-                            <MapPin size={10} className="text-gray-400" />
-                            {p.location}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                        <span className="inline-flex items-center gap-1">
-                          <Users size={11} className="text-gray-400" />
-                          {p.followers_count?.toLocaleString()} followers
-                        </span>
-                        <span className="inline-flex items-center gap-1">
-                          <TrendingUp size={11} className="text-brand-teal" />
-                          {p.engagement_rate?.toFixed(1)}% eng.
-                        </span>
-                      </div>
-                    </div>
+      {/* Grid Content */}
+      <div className="min-h-[400px]">
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 ring-1 ring-gray-100 shadow-sm animate-pulse flex flex-col">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full" />
+                  <div className="flex-1 space-y-2 mt-2">
+                    <div className="h-4 bg-gray-100 rounded w-1/2" />
+                    <div className="h-3 bg-gray-100 rounded w-1/3" />
                   </div>
-
-                  {/* Actions */}
-                  <div className="mt-4 flex gap-2 pt-4 border-t border-gray-100">
-                    <Link
-                      to={`/promoters/${p.username}`}
-                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-brand-purple hover:border-brand-purple/30 transition-colors"
-                    >
-                      <Eye size={12} />
-                      Profile
-                    </Link>
-                    <button
-                      onClick={() => handleSave(p.id)}
-                      disabled={savePromoter.isPending}
-                      className="flex-1 inline-flex items-center justify-center gap-2 bg-brand-indigo text-white rounded-lg py-1.5 text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                    >
-                      <Bookmark size={12} />
-                      Save
-                    </button>
-                  </div>
+                </div>
+                <div className="h-3 bg-gray-100 rounded w-full mb-2" />
+                <div className="h-3 bg-gray-100 rounded w-3/4 mb-6" />
+                <div className="mt-auto grid grid-cols-3 gap-2">
+                  <div className="h-12 bg-gray-50 rounded-lg" />
+                  <div className="h-12 bg-gray-50 rounded-lg" />
+                  <div className="h-12 bg-gray-50 rounded-lg" />
                 </div>
               </div>
             ))}
           </div>
-
-          {/* Pagination */}
-          {data.pages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-              >
-                <ArrowRight size={12} className="rotate-180" />
-                Previous
-              </button>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setPage(p)}
-                    className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
-                      p === page
-                        ? "bg-brand-indigo text-white"
-                        : "text-gray-500 hover:bg-gray-100"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
-                disabled={page >= data.pages}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-              >
-                Next
-                <ArrowRight size={12} />
-              </button>
+        ) : !data || data.items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-2xl shadow-sm ring-1 ring-gray-100">
+            <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center mb-5 ring-1 ring-gray-900/5">
+              <Search size={32} className="text-gray-300" />
             </div>
-          )}
-        </>
-      )}
+            <h3 className="text-lg font-semibold text-gray-900">No creators found</h3>
+            <p className="text-sm text-gray-500 mt-2 max-w-md">
+              We couldn't find any promoters matching your current filters. Try broadening your search criteria.
+            </p>
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="mt-6 inline-flex items-center gap-2 bg-gray-900 text-white rounded-lg h-10 px-6 text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm"
+              >
+                <X size={16} /> Reset Filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {data.items.map((p: any) => (
+                <motion.div
+                  key={p.id}
+                  whileHover={{ y: -4, scale: 1.01 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  onClick={() => setDrawerPromoter(p)}
+                  className="bg-white rounded-2xl p-6 ring-1 ring-gray-200 hover:ring-primary-300 shadow-sm hover:shadow-xl hover:shadow-primary-900/5 transition-all cursor-pointer flex flex-col group relative overflow-hidden"
+                >
+                  <div className="flex items-start gap-4 relative z-10">
+                    <div className="relative">
+                      {p.avatar_url ? (
+                        <img src={p.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover ring-2 ring-gray-50" />
+                      ) : (
+                        <Avatar initials={p.username?.[0]?.toUpperCase() ?? "?"} size="md" colorIndex={p.id?.charCodeAt(0) || 0} />
+                      )}
+                      {p.verified && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-white shadow-sm">
+                          <BadgeCheck size={12} className="text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0 pt-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-base font-bold text-gray-900 truncate group-hover:text-primary-600 transition-colors">{p.username}</h3>
+                        <button 
+                          onClick={(e) => handleSave(p.id, e)}
+                          className="text-gray-300 hover:text-primary-500 transition-colors"
+                        >
+                          <Bookmark size={18} />
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5 truncate flex items-center gap-1.5">
+                        <MapPin size={12} className="text-gray-400" /> {p.location || "Anywhere"}
+                      </p>
+                      {p.niche && (
+                        <div className="mt-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-gray-100 text-gray-600">
+                          {p.niche}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="mt-5 text-sm text-gray-600 line-clamp-2 leading-relaxed z-10">
+                    {p.bio || p.headline || "A talented creator producing engaging content for their growing audience."}
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2 mt-auto pt-6 z-10">
+                    <div className="flex flex-col items-center p-2 rounded-xl bg-gray-50/80 border border-gray-100 group-hover:border-primary-100 transition-colors">
+                      <span className="text-sm font-bold text-gray-900">{(p.followers_count || 0).toLocaleString()}</span>
+                      <span className="text-[10px] text-gray-500 font-medium mt-0.5">Followers</span>
+                    </div>
+                    <div className="flex flex-col items-center p-2 rounded-xl bg-gray-50/80 border border-gray-100 group-hover:border-primary-100 transition-colors">
+                      <span className="text-sm font-bold text-gray-900">{(p.engagement_rate || 0).toFixed(1)}%</span>
+                      <span className="text-[10px] text-gray-500 font-medium mt-0.5">Engagement</span>
+                    </div>
+                    <div className="flex flex-col items-center p-2 rounded-xl bg-gray-50/80 border border-gray-100 group-hover:border-primary-100 transition-colors">
+                      <span className="text-sm font-bold text-gray-900 flex items-center gap-0.5">4.9 <Star size={10} className="text-amber-400 fill-amber-400" /></span>
+                      <span className="text-[10px] text-gray-500 font-medium mt-0.5">Rating</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-100 z-10">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setDrawerPromoter(p); }}
+                      className="flex-1 h-11 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    >
+                      View Profile
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); notifySuccess("Invite sent (mock)"); }}
+                      className="flex-1 h-11 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none"
+                    >
+                      Invite
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {data.pages > 0 && (
+              <div className="mt-8 flex items-center justify-between bg-white px-6 py-4 rounded-xl shadow-sm ring-1 ring-gray-200">
+                <p className="text-sm text-gray-500">
+                  Showing <span className="font-semibold text-gray-900">{(page - 1) * 12 + 1}</span> to <span className="font-semibold text-gray-900">{Math.min(page * 12, data.total || page * 12)}</span> of <span className="font-semibold text-gray-900">{data.total || "?"}</span> profiles
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
+                    disabled={page >= data.pages}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <ProfileDrawer 
+        isOpen={!!drawerPromoter} 
+        onClose={() => setDrawerPromoter(null)} 
+        promoter={drawerPromoter}
+        onSave={(id: string) => { handleSave(id); setDrawerPromoter(null); }}
+      />
     </div>
   );
 }

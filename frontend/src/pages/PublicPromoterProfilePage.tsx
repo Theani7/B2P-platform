@@ -4,14 +4,18 @@ import { useUserRating } from "../features/reviews/api";
 import RatingStars from "../components/reviews/RatingStars";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { MapPin, Users, TrendingUp, Briefcase, Link as LinkIcon, Camera, Music, Video, Globe, MessageSquare } from "lucide-react";
 
-const PLATFORM_ICONS: Record<string, string> = {
-  INSTAGRAM: "📸",
-  TIKTOK: "🎵",
-  YOUTUBE: "▶️",
-  FACEBOOK: "📘",
-  LINKEDIN: "💼",
-  X: "𝕏",
+const getPlatformIcon = (platform: string) => {
+  switch (platform) {
+    case "INSTAGRAM": return <Camera size={16} />;
+    case "TIKTOK": return <Music size={16} />;
+    case "YOUTUBE": return <Video size={16} />;
+    case "FACEBOOK": return <Globe size={16} />;
+    case "LINKEDIN": return <Briefcase size={16} />;
+    case "X": return <MessageSquare size={16} />;
+    default: return <LinkIcon size={16} />;
+  }
 };
 
 export default function PublicPromoterProfilePage() {
@@ -83,11 +87,11 @@ export default function PublicPromoterProfilePage() {
               {profile.niche && (
                 <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium">{profile.niche}</span>
               )}
-              {profile.location && <span>📍 {profile.location}</span>}
-              <span>👥 {profile.followers_count.toLocaleString()} followers</span>
-              <span>📈 {profile.engagement_rate.toFixed(1)}% engagement rate</span>
+              {profile.location && <span className="flex items-center gap-1.5"><MapPin size={14} className="text-gray-400" /> {profile.location}</span>}
+              <span className="flex items-center gap-1.5"><Users size={14} className="text-gray-400" /> {profile.followers_count.toLocaleString()} followers</span>
+              <span className="flex items-center gap-1.5"><TrendingUp size={14} className="text-gray-400" /> {profile.engagement_rate.toFixed(1)}% engagement rate</span>
               {profile.years_experience != null && (
-                <span>💼 {profile.years_experience} year{profile.years_experience !== 1 ? "s" : ""} experience</span>
+                <span className="flex items-center gap-1.5"><Briefcase size={14} className="text-gray-400" /> {profile.years_experience} year{profile.years_experience !== 1 ? "s" : ""} experience</span>
               )}
             </div>
           </div>
@@ -170,7 +174,7 @@ export default function PublicPromoterProfilePage() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 rounded border px-4 py-2 text-sm hover:bg-gray-50"
               >
-                <span>{PLATFORM_ICONS[link.platform] ?? "🔗"}</span>
+                {getPlatformIcon(link.platform)}
                 {link.platform}
               </a>
             ))}

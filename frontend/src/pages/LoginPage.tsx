@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLogin } from "../features/auth/api";
 import { useAuth } from "../providers/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import AuthLayout from "../layouts/AuthLayout";
 
 const schema = z.object({
@@ -38,7 +38,7 @@ export default function LoginPage() {
     setServerError(null);
     loginMutation.mutate(data, {
       onError: (err: any) => {
-        const msg = err?.response?.data?.message || err?.message || "Login failed. Please try again.";
+        const msg = err?.response?.data?.message || err?.response?.data?.detail || err?.message || "Login failed. Please check your credentials.";
         setServerError(msg);
       },
     });
@@ -50,6 +50,13 @@ export default function LoginPage() {
       <p className="text-sm text-gray-500 text-center mt-1 mb-8">Log in to your B2P Connect account</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        {serverError && (
+          <div className="bg-brand-coral-50 border border-brand-coral/20 text-brand-coral-900 px-3 py-2.5 rounded-lg text-sm flex items-start gap-2.5">
+            <AlertCircle size={16} className="mt-0.5 text-brand-coral" />
+            <span className="flex-1">{serverError}</span>
+          </div>
+        )}
+
         {/* Email */}
         <div>
           <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1.5">Email address</label>
@@ -98,8 +105,6 @@ export default function LoginPage() {
           {loginMutation.isPending && <Loader2 size={16} className="animate-spin" />}
           {loginMutation.isPending ? "Logging in..." : "Log in"}
         </button>
-
-        {serverError && <p className="text-xs text-brand-coral text-center mt-2">{serverError}</p>}
       </form>
 
       <p className="text-sm text-gray-500 text-center mt-6">

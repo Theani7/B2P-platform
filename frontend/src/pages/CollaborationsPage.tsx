@@ -10,7 +10,8 @@ import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
-import { PageHeader, Badge } from "../components/ui";
+import { PageHeader, Badge, Table } from "../components/ui";
+import { type TableColumn } from "../components/ui/Table";
 import {
   CheckCircle2,
   XCircle,
@@ -101,6 +102,113 @@ export default function CollaborationsPage() {
     });
   };
 
+  const columns: TableColumn<any>[] = [
+    {
+      key: "campaign",
+      header: "Campaign",
+      render: (c: any) => (
+        <div className="min-w-0">
+          <div className="text-sm font-medium text-gray-900 font-semibold">{c.campaign_title}</div>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-xs text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
+              <TrendingUp size={10} className="text-brand-teal" />
+              {c.campaign_category}
+            </span>
+            <span className="inline-flex items-center gap-1 text-xs text-gray-500 font-medium">
+              {formatNepaliCurrency(c.campaign_budget)}
+            </span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "partner",
+      header: "Partner",
+      render: (c: any) => (
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-brand-teal-50 flex items-center justify-center flex-shrink-0 text-xs font-medium text-brand-teal-900">
+            {c.partner_avatar_url ? (
+              <img src={c.partner_avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
+            ) : (
+              c.partner_name?.slice(0, 2).toUpperCase() || "??"
+            )}
+          </div>
+          <span className="text-sm font-medium text-gray-900">{c.partner_name}</span>
+        </div>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (c: any) => {
+        const StatusIcon = STATUS_ICONS[c.status] || Clock;
+        const badgeVariant = STATUS_BADGE_VARIANT[c.status] || "draft";
+        return (
+          <Badge variant={badgeVariant as any}>
+            <StatusIcon size={12} className="mr-1" />
+            {STATUS_LABELS[c.status] || c.status}
+          </Badge>
+        );
+      },
+    },
+    {
+      key: "dates",
+      header: "Dates",
+      render: (c: any) => (
+        <div className="flex flex-col gap-1 text-xs text-gray-500">
+          <span className="inline-flex items-center gap-1.5">
+            <CalendarDays size={12} />
+            Started: {new Date(c.started_at).toLocaleDateString("en-US", {
+              month: "short", day: "numeric", year: "numeric"
+            })}
+          </span>
+          {c.completed_at && (
+            <span className="inline-flex items-center gap-1.5">
+              <CheckCircle2 size={12} className="text-brand-teal" />
+              Completed: {new Date(c.completed_at).toLocaleDateString("en-US", {
+                month: "short", day: "numeric", year: "numeric"
+              })}
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (c: any) => (
+        <div className="flex items-center gap-3">
+          {c.status === "ACTIVE" && (
+            <button
+              onClick={() => handleComplete(c.id)}
+              className="bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors inline-flex items-center gap-1.5"
+            >
+              <CheckCircle2 size={14} />
+              Mark Complete
+            </button>
+          )}
+          {c.status === "COMPLETED" && (
+            <button
+              onClick={() => setReviewingCollabId(c.id)}
+              className="bg-brand-indigo text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity inline-flex items-center gap-1.5"
+            >
+              <Star size={14} />
+              Write Review
+            </button>
+          )}
+          {c.status === "ACTIVE" && (
+            <Link
+              to={isBusiness ? "/business/campaigns" : "/promoter/collaborations"}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-purple hover:underline ml-auto"
+            >
+              View Details <ArrowRight size={12} />
+            </Link>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -114,103 +222,7 @@ export default function CollaborationsPage() {
       />
 
       {/* Collaborations List */}
-      <div className="space-y-4">
-        {data.items.map((c) => {
-          const StatusIcon = STATUS_ICONS[c.status] || Clock;
-          const badgeVariant = STATUS_BADGE_VARIANT[c.status] || "draft";
-          return (
-            <div
-              key={c.id}
-              className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-200 transition-colors duration-150"
-            >
-              <div className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-4 min-w-0 flex-1">
-                    {/* Partner Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-brand-teal-50 flex items-center justify-center flex-shrink-0 text-sm font-medium text-brand-teal-900">
-                      {c.partner_avatar_url ? (
-                        <img src={c.partner_avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
-                      ) : (
-                        c.partner_name?.slice(0, 2).toUpperCase() || "??"
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-medium text-gray-900 truncate">{c.campaign_title}</h3>
-                      <div className="mt-1.5 flex flex-wrap items-center gap-3">
-                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
-                          <TrendingUp size={10} className="text-brand-teal" />
-                          {c.campaign_category}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-xs text-gray-500 font-medium">
-                          {formatNepaliCurrency(c.campaign_budget)}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
-                          <UserCheck size={12} className="text-gray-400" />
-                          Partner: {c.partner_name}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Status Badge */}
-                  <Badge variant={badgeVariant as any}>
-                    <StatusIcon size={12} className="mr-1" />
-                    {STATUS_LABELS[c.status] || c.status}
-                  </Badge>
-                </div>
-
-                {/* Dates */}
-                <div className="mt-4 flex items-center gap-4 text-xs text-gray-400">
-                  <span className="inline-flex items-center gap-1.5">
-                    <CalendarDays size={12} />
-                    Started {new Date(c.started_at).toLocaleDateString("en-US", {
-                      month: "short", day: "numeric", year: "numeric"
-                    })}
-                  </span>
-                  {c.completed_at && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-teal" />
-                      Completed {new Date(c.completed_at).toLocaleDateString("en-US", {
-                        month: "short", day: "numeric", year: "numeric"
-                      })}
-                    </span>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="mt-4 flex items-center gap-3 pt-4 border-t border-gray-100">
-                  {c.status === "ACTIVE" && (
-                    <button
-                      onClick={() => handleComplete(c.id)}
-                      className="bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors inline-flex items-center gap-1.5"
-                    >
-                      <CheckCircle2 size={14} />
-                      Mark Complete
-                    </button>
-                  )}
-                  {c.status === "COMPLETED" && (
-                    <button
-                      onClick={() => setReviewingCollabId(c.id)}
-                      className="bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity inline-flex items-center gap-2"
-                    >
-                      <Star size={14} />
-                      Write Review
-                    </button>
-                  )}
-                  {c.status === "ACTIVE" && (
-                    <Link
-                      to={isBusiness ? "/business/campaigns" : "/promoter/collaborations"}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-purple hover:underline ml-auto"
-                    >
-                      View Details <ArrowRight size={12} />
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <Table columns={columns} data={data.items} />
 
       {/* Pagination */}
       {data.pages > 1 && (

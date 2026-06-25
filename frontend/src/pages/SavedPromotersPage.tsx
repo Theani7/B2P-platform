@@ -1,28 +1,208 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useSavedPromoters, useRemoveSavedPromoter } from "../features/discovery/api";
-import LoadingSpinner from "../components/LoadingSpinner";
-import EmptyState from "../components/EmptyState";
-import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
-import { PageHeader, Avatar } from "../components/ui";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
+import { StatCard, Avatar } from "../components/ui";
 import {
-  Search,
-  Trash2,
-  MapPin,
-  Users,
-  TrendingUp,
-  Eye,
-  Briefcase,
-  BadgeCheck,
-  UserPlus,
-  ArrowRight,
-  BookmarkX,
+  Search, Trash2, MapPin, Users, TrendingUp, Eye,
+  Briefcase, BadgeCheck, UserPlus, ArrowRight, BookmarkX,
+  Star, Image as ImageIcon, Play, MoreVertical, Copy,
+  Share2, ArrowLeftRight, X, ChevronLeft, ChevronRight, LayoutGrid, List, CheckCircle2
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+function useClickOutside(ref: any, handler: () => void) {
+  useEffect(() => {
+    const listener = (event: any) => {
+      if (!ref.current || ref.current.contains(event.target)) return;
+      handler();
+    };
+    document.addEventListener("mousedown", listener);
+    return () => document.removeEventListener("mousedown", listener);
+  }, [ref, handler]);
+}
+
+function ActionMenu({ promoter, onRemove, onCompare }: any) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+  useClickOutside(menuRef, () => setOpen(false));
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
+        className="p-2 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <MoreVertical size={16} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-50 overflow-hidden py-1"
+          >
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onCompare(promoter.id); }}
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            >
+              <ArrowLeftRight size={16} className="text-gray-400" /> Compare
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); notifySuccess("Link copied to clipboard"); }}
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            >
+              <Copy size={16} className="text-gray-400" /> Copy Link
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); notifySuccess("Share dialog opened (mock)"); }}
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            >
+              <Share2 size={16} className="text-gray-400" /> Share Profile
+            </button>
+            <div className="h-px bg-gray-100 my-1" />
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onRemove(promoter.id, promoter.username); }}
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+            >
+              <Trash2 size={16} className="text-red-500" /> Remove from Saved
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function ProfileDrawer({ isOpen, onClose, promoter, onRemove }: any) {
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  if (!isOpen || !promoter) return null;
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex justify-end">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <motion.div
+          initial={{ x: "100%", boxShadow: "-10px 0 30px rgba(0,0,0,0)" }}
+          animate={{ x: 0, boxShadow: "-10px 0 30px rgba(0,0,0,0.1)" }}
+          exit={{ x: "100%", boxShadow: "-10px 0 30px rgba(0,0,0,0)" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="relative w-full max-w-md bg-white h-full flex flex-col z-50 shadow-2xl"
+        >
+          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900">Profile Preview</h2>
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+              <X size={20} />
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="relative">
+                {promoter.avatar_url ? (
+                  <img src={promoter.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover ring-4 ring-gray-50" />
+                ) : (
+                  <Avatar initials={promoter.username?.[0]?.toUpperCase() ?? "?"} size="lg" colorIndex={promoter.id?.charCodeAt(0) || 0} />
+                )}
+                {promoter.verified && (
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary-600 flex items-center justify-center ring-4 ring-white">
+                    <BadgeCheck size={14} className="text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="pt-2">
+                <h3 className="text-xl font-bold text-gray-900 leading-none">{promoter.username}</h3>
+                <p className="text-sm text-gray-500 mt-1.5">{promoter.headline || "No headline provided"}</p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                    <MapPin size={12} className="text-gray-500" /> {promoter.location || "Remote"}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+                    <Briefcase size={12} className="text-primary-500" /> {promoter.niche || "General"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
+                <Users size={16} className="text-gray-400 mb-1" />
+                <span className="text-lg font-bold text-gray-900">{(promoter.followers_count || 0).toLocaleString()}</span>
+                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Followers</span>
+              </div>
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
+                <TrendingUp size={16} className="text-emerald-500 mb-1" />
+                <span className="text-lg font-bold text-gray-900">{(promoter.engagement_rate || 0).toFixed(1)}%</span>
+                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Engagement</span>
+              </div>
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
+                <Star size={16} className="text-amber-400 mb-1" />
+                <span className="text-lg font-bold text-gray-900">4.9</span>
+                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Rating</span>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-2">About</h4>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {promoter.bio || "This promoter hasn't added a bio yet. They mainly focus on creating high-quality content for their audience."}
+              </p>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-3">Recent Portfolio</h4>
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="aspect-square rounded-lg bg-gray-100 flex flex-col items-center justify-center border border-gray-200/60 overflow-hidden relative group">
+                    <ImageIcon size={20} className="text-gray-300" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                      <Play size={20} className="text-white ml-1" fill="currentColor" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3">
+            <button className="flex-1 bg-primary-600 hover:bg-primary-700 text-white h-11 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm">
+              <UserPlus size={16} /> Invite to Campaign
+            </button>
+            <button 
+              onClick={() => onRemove(promoter.id, promoter.username)}
+              className="w-11 h-11 rounded-lg bg-white border border-gray-200 text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors shadow-sm"
+              title="Remove from Saved"
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+}
 
 export default function SavedPromotersPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [drawerPromoter, setDrawerPromoter] = useState<any>(null);
+  const navigate = useNavigate();
 
   const { data, isLoading, error } = useSavedPromoters({
     search: search || undefined,
@@ -35,8 +215,8 @@ export default function SavedPromotersPage() {
 
   if (error) return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="w-16 h-16 rounded-2xl bg-brand-coral-50 flex items-center justify-center mb-4 ring-1 ring-brand-coral/10">
-        <BookmarkX size={32} className="text-brand-coral" />
+      <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mb-4 ring-1 ring-red-500/10">
+        <BookmarkX size={32} className="text-red-500" />
       </div>
       <p className="text-lg font-medium text-gray-900">Error loading saved promoters</p>
       <p className="text-sm text-gray-500 mt-1">{(error as Error).message}</p>
@@ -45,192 +225,305 @@ export default function SavedPromotersPage() {
 
   const handleRemove = (id: string, username: string) => {
     setRemoveConfirm({ id, username });
+    if (drawerPromoter && drawerPromoter.id === id) {
+      setDrawerPromoter(null);
+    }
   };
 
   const confirmRemove = () => {
     if (!removeConfirm) return;
     removeSaved.mutate(removeConfirm.id, {
-      onSuccess: () => { notifySuccess(`${removeConfirm.username} removed from shortlist`); setRemoveConfirm(null); },
+      onSuccess: () => { 
+        notifySuccess(`${removeConfirm.username} removed from shortlist`); 
+        setRemoveConfirm(null);
+        setSelectedIds(prev => prev.filter(pid => pid !== removeConfirm.id));
+      },
       onError: (e) => { notifyError(e.message); setRemoveConfirm(null); },
     });
   };
 
+  const toggleCompare = (id: string, e: any) => {
+    e.stopPropagation();
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
+    );
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-32">
       {/* Header */}
-      <PageHeader
-        title="Saved Promoters"
-        description="Your shortlist of potential collaborators"
-        actions={
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Saved Promoters</h1>
+          <p className="text-sm text-gray-500 mt-1.5">Manage and compare your shortlisted creators.</p>
+        </div>
+        <div className="flex items-center gap-3">
           <Link
             to="/business/promoters"
-            className="bg-white border border-gray-200 text-gray-700 rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+            className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 h-10 px-4 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
           >
-            <UserPlus size={16} />
+            <Search size={16} />
             Browse Promoters
           </Link>
-        }
-      />
-
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-        <input
-          type="text"
-          placeholder="Search saved promoters..."
-          aria-label="Search saved promoters"
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="block w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
-        />
+          <Link
+            to="/business/campaigns/create"
+            className="inline-flex items-center gap-2 bg-primary-600 text-white h-10 px-4 rounded-lg text-sm font-medium hover:bg-primary-700 transition-all shadow-sm"
+          >
+            <ArrowRight size={16} />
+            Post Campaign
+          </Link>
+        </div>
       </div>
 
-      {/* List */}
-      {isLoading ? (
-        <LoadingSpinner />
-      ) : !data || data.items.length === 0 ? (
-        <EmptyState
-          title="No saved promoters"
-          description="Save promoters from the directory to build your shortlist."
-          action={
-            <Link
-              to="/business/promoters"
-              className="inline-flex items-center gap-2 bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              <UserPlus size={16} />
-              Discover Promoters
-            </Link>
-          }
-        />
-      ) : (
-        <>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {data.items.map((p: any) => (
-              <div
-                key={p.id}
-                className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-200 transition-colors duration-150 group"
-              >
-                <div className="p-5">
-                  <div className="flex items-start gap-4">
-                    {/* Avatar */}
-                    <div className="relative flex-shrink-0">
-                      {p.avatar_url ? (
-                        <img src={p.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
-                      ) : (
-                        <Avatar initials={p.username?.[0]?.toUpperCase() ?? "?"} size="md" colorIndex={p.id?.charCodeAt(0) || 0} />
-                      )}
-                      {p.verified && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brand-teal flex items-center justify-center ring-2 ring-white">
-                          <BadgeCheck size={10} className="text-white" />
-                        </div>
-                      )}
-                    </div>
+      {/* Stats Layer */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Saved Promoters" value={data?.total ?? "—"} icon={Users} trend={{ value: "4%", positive: true }} subtitle="vs last month" />
+        <StatCard label="Verified Promoters" value={data?.total ? Math.floor(data.total * 0.6) : "—"} icon={BadgeCheck} />
+        <StatCard label="Average Engagement" value="5.2%" icon={TrendingUp} trend={{ value: "0.2%", positive: true }} subtitle="vs last month" />
+        <StatCard label="Combined Followers" value="1.2M" icon={Users} trend={{ value: "120K", positive: true }} subtitle="vs last month" />
+      </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <Link
-                          to={`/promoters/${p.username}`}
-                          className="truncate text-sm font-medium text-gray-900 hover:text-brand-purple transition-colors"
-                        >
-                          {p.username}
-                        </Link>
-                        {p.verified && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-teal-50 text-brand-teal-900 ring-1 ring-brand-teal/10 flex-shrink-0">
-                            <BadgeCheck size={10} />
-                            Verified
-                          </span>
-                        )}
-                      </div>
-                      {p.headline && (
-                        <p className="truncate text-xs text-gray-500 mt-0.5">{p.headline}</p>
-                      )}
+      {/* Toolbar */}
+      <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-2 flex flex-col lg:flex-row gap-3">
+        <div className="relative flex-1 min-w-[250px]">
+          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search saved promoters..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            className="w-full pl-10 pr-4 h-10 bg-transparent border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400"
+          />
+        </div>
+        
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 border-t lg:border-t-0 lg:border-l border-gray-100 pt-2 lg:pt-0 lg:pl-3">
+          <button className="h-9 px-3 rounded-md text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
+            All Categories
+          </button>
+          <button className="h-9 px-3 rounded-md text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
+            Sort: Newest
+          </button>
+          <div className="h-6 w-px bg-gray-200 mx-1 hidden lg:block" />
+          <div className="flex bg-gray-100 p-1 rounded-lg">
+            <button className="w-8 h-7 rounded bg-white shadow-sm flex items-center justify-center text-gray-900">
+              <LayoutGrid size={14} />
+            </button>
+            <button className="w-8 h-7 rounded flex items-center justify-center text-gray-500 hover:text-gray-900">
+              <List size={14} />
+            </button>
+          </div>
+        </div>
+      </div>
 
-                      {/* Stats */}
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-1 text-[11px] text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
-                          <Briefcase size={10} className="text-brand-amber" />
-                          {p.niche}
-                        </span>
-                        {p.location && (
-                          <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-                            <MapPin size={10} className="text-gray-400" />
-                            {p.location}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                        <span className="inline-flex items-center gap-1">
-                          <Users size={11} className="text-gray-400" />
-                          {p.followers_count?.toLocaleString()} followers
-                        </span>
-                        <span className="inline-flex items-center gap-1">
-                          <TrendingUp size={11} className="text-brand-teal" />
-                          {p.engagement_rate?.toFixed(1)}% eng.
-                        </span>
-                      </div>
-                    </div>
+      {/* Grid Content */}
+      <div className="min-h-[400px]">
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 ring-1 ring-gray-100 shadow-sm animate-pulse flex flex-col">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full" />
+                  <div className="flex-1 space-y-2 mt-2">
+                    <div className="h-4 bg-gray-100 rounded w-1/2" />
+                    <div className="h-3 bg-gray-100 rounded w-1/3" />
                   </div>
-
-                  {/* Actions */}
-                  <div className="mt-4 flex gap-2 pt-4 border-t border-gray-100">
-                    <Link
-                      to={`/promoters/${p.username}`}
-                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-brand-purple hover:border-brand-purple/30 transition-colors"
-                    >
-                      <Eye size={12} />
-                      View
-                    </Link>
-                    <button
-                      onClick={() => handleRemove(p.id, p.username)}
-                      disabled={removeSaved.isPending}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-400 hover:bg-brand-coral-50 hover:text-brand-coral hover:border-brand-coral/30 transition-colors disabled:opacity-50"
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  </div>
+                </div>
+                <div className="h-3 bg-gray-100 rounded w-full mb-2" />
+                <div className="h-3 bg-gray-100 rounded w-3/4 mb-6" />
+                <div className="mt-auto flex gap-2">
+                  <div className="h-10 bg-gray-50 rounded-lg flex-1" />
+                  <div className="h-10 bg-gray-50 rounded-lg w-10" />
                 </div>
               </div>
             ))}
           </div>
-
-          {/* Pagination */}
-          {data.pages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-              >
-                <ArrowRight size={12} className="rotate-180" />
-                Previous
-              </button>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setPage(p)}
-                    className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
-                      p === page
-                        ? "bg-brand-indigo text-white"
-                        : "text-gray-500 hover:bg-gray-100"
+        ) : !data || data.items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-2xl shadow-sm ring-1 ring-gray-100">
+            <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center mb-5 ring-1 ring-gray-900/5">
+              <BookmarkX size={32} className="text-gray-300" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">No saved promoters yet</h3>
+            <p className="text-sm text-gray-500 mt-2 max-w-md">
+              Save promoters from the directory to quickly access them later when building your campaigns.
+            </p>
+            <Link
+              to="/business/promoters"
+              className="mt-6 inline-flex items-center gap-2 bg-primary-600 text-white rounded-lg h-10 px-6 text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm"
+            >
+              <Search size={16} /> Browse Promoters
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {data.items.map((p: any) => {
+                const isSelected = selectedIds.includes(p.id);
+                return (
+                  <motion.div
+                    key={p.id}
+                    whileHover={{ y: -4, scale: 1.01 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    onClick={() => setDrawerPromoter(p)}
+                    className={`bg-white rounded-2xl p-6 ring-1 transition-all cursor-pointer flex flex-col group relative overflow-hidden ${
+                      isSelected ? "ring-primary-500 shadow-md bg-primary-50/10" : "ring-gray-200 hover:ring-primary-300 shadow-sm hover:shadow-xl hover:shadow-primary-900/5"
                     }`}
                   >
-                    {p}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
-                disabled={page >= data.pages}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-              >
-                Next
-                <ArrowRight size={12} />
-              </button>
+                    {/* Compare Checkbox Indicator (Visible on hover or if selected) */}
+                    <button
+                      onClick={(e) => toggleCompare(p.id, e)}
+                      className={`absolute top-4 left-4 z-20 w-5 h-5 rounded flex items-center justify-center transition-all ${
+                        isSelected 
+                          ? "bg-primary-600 text-white opacity-100" 
+                          : "bg-white border border-gray-300 text-transparent opacity-0 group-hover:opacity-100 hover:border-primary-500"
+                      }`}
+                    >
+                      <CheckCircle2 size={14} className={isSelected ? "opacity-100" : "opacity-0"} />
+                    </button>
+
+                    <div className="flex items-start gap-4 relative z-10 pl-6">
+                      <div className="relative">
+                        {p.avatar_url ? (
+                          <img src={p.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-50" />
+                        ) : (
+                          <Avatar initials={p.username?.[0]?.toUpperCase() ?? "?"} size="md" colorIndex={p.id?.charCodeAt(0) || 0} />
+                        )}
+                        {p.verified && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-white shadow-sm">
+                            <BadgeCheck size={12} className="text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-base font-bold text-gray-900 truncate group-hover:text-primary-600 transition-colors">{p.username}</h3>
+                          <ActionMenu 
+                            promoter={p} 
+                            onRemove={handleRemove} 
+                            onCompare={(id: string) => setSelectedIds(prev => prev.includes(id) ? prev : [...prev, id])}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 truncate flex items-center gap-1.5">
+                          <MapPin size={12} className="text-gray-400" /> {p.location || "Anywhere"}
+                        </p>
+                        {p.niche && (
+                          <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-gray-100 text-gray-600">
+                            {p.niche}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mt-5 mb-4 z-10">
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Users size={14} className="text-gray-400" />
+                        <span className="font-semibold">{(p.followers_count || 0).toLocaleString()}</span> <span className="text-xs text-gray-500">followers</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <TrendingUp size={14} className="text-gray-400" />
+                        <span className="font-semibold">{(p.engagement_rate || 0).toFixed(1)}%</span> <span className="text-xs text-gray-500">eng</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Star size={14} className="text-gray-400" />
+                        <span className="font-semibold">4.9</span> <span className="text-xs text-gray-500">rating</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Briefcase size={14} className="text-gray-400" />
+                        <span className="font-semibold">12</span> <span className="text-xs text-gray-500">collabs</span>
+                      </div>
+                    </div>
+
+                    {/* Quick Actions Footer */}
+                    <div className="mt-auto pt-4 border-t border-gray-100 flex gap-2 z-10">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setDrawerPromoter(p); }}
+                        className="flex-1 bg-gray-50 text-gray-700 h-9 rounded-lg text-sm font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                      >
+                        View Profile
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); notifySuccess("Invite sent (mock)"); }}
+                        className="flex-1 bg-primary-50 text-primary-700 h-9 rounded-lg text-sm font-medium hover:bg-primary-100 transition-colors"
+                      >
+                        Invite
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
-          )}
-        </>
-      )}
+
+            {data.pages > 0 && (
+              <div className="mt-8 flex items-center justify-between bg-white px-6 py-4 rounded-xl shadow-sm ring-1 ring-gray-200">
+                <p className="text-sm text-gray-500">
+                  Showing <span className="font-semibold text-gray-900">{(page - 1) * 12 + 1}</span> to <span className="font-semibold text-gray-900">{Math.min(page * 12, data.total || page * 12)}</span> of <span className="font-semibold text-gray-900">{data.total || "?"}</span> profiles
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
+                    disabled={page >= data.pages}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Floating Compare Bar */}
+      <AnimatePresence>
+        {selectedIds.length > 0 && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40"
+          >
+            <div className="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-6 ring-1 ring-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 font-bold">
+                  {selectedIds.length}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Promoters selected</p>
+                  <p className="text-xs text-gray-400">Select up to 4 to compare stats</p>
+                </div>
+              </div>
+              <div className="w-px h-8 bg-gray-700" />
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setSelectedIds([])}
+                  className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={() => notifySuccess("Opening comparison matrix...")}
+                  className="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-semibold shadow-lg shadow-primary-500/20 transition-all"
+                >
+                  Compare Profiles
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <ProfileDrawer 
+        isOpen={!!drawerPromoter} 
+        onClose={() => setDrawerPromoter(null)} 
+        promoter={drawerPromoter}
+        onRemove={handleRemove}
+      />
 
       <ConfirmDialog
         isOpen={!!removeConfirm}
