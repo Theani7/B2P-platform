@@ -2,6 +2,8 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { notificationKeys } from './api';
 import { useAuth } from '../auth';
+import { notifyAchievement } from '../../hooks/useToast';
+import { achievementKeys } from '../achievements';
 
 export function useNotificationWebSocket() {
   const { token } = useAuth();
@@ -28,6 +30,9 @@ export function useNotificationWebSocket() {
         if (data.type === "NEW_NOTIFICATION") {
           // Invalidate queries to trigger refetch
           queryClient.invalidateQueries({ queryKey: notificationKeys.all });
+        } else if (data.type === "ACHIEVEMENT_UNLOCKED") {
+          notifyAchievement(data.data.achievement);
+          queryClient.invalidateQueries({ queryKey: achievementKeys.all });
         }
       } catch (e) {
         console.error("Failed to parse WebSocket message", e);

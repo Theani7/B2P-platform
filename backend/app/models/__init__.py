@@ -19,6 +19,7 @@ from .platform_setting import PlatformSetting
 from .verification_request import VerificationRequest
 from .chat import Conversation, Message, MessageType
 from .notifications.models import Notification, NotificationType
+from .achievements.models import Achievement, UserAchievement
 
 __all__ = [
     "User",

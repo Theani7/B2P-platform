@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import {
   User, Images, Upload, BadgeCheck, Globe, Lock, Shield, Bell, Palette, Link as LinkIcon,
-  BarChart3, Briefcase, Camera, Save, Settings, AlertCircle, Eye
+  BarChart3, Briefcase, Camera, Save, Settings, AlertCircle, Eye, Trophy
 } from "lucide-react";
 
 import { useForm } from "react-hook-form";
@@ -14,6 +14,7 @@ import { usePromoterProfileCompletion } from "../features/profile-completion";
 import { ProfileCompletionWidget } from "../components/ui";
 import { PortfolioSettings } from "../components/portfolio/PortfolioSettings";
 import { SocialSettings } from "../components/social/SocialSettings";
+import { AchievementsDashboard } from "../components/achievements";
 
 export default function PromoterSettingsPage() {
   const { user } = useAuth();
@@ -98,6 +99,7 @@ export default function PromoterSettingsPage() {
                 { id: "profile", label: "Profile Information", icon: User },
                 { id: "portfolio", label: "Portfolio", icon: Images },
                 { id: "social", label: "Social Accounts", icon: Globe },
+                { id: "achievements", label: "Achievements & Badges", icon: Trophy },
                 { id: "categories", label: "Creator Categories", icon: Briefcase },
                 { id: "analytics", label: "Audience & Analytics", icon: BarChart3 },
               ].map(item => (
@@ -266,6 +268,18 @@ export default function PromoterSettingsPage() {
                 transition={{ duration: 0.15 }}
               >
                 <PortfolioSettings />
+              </motion.div>
+            )}
+
+            {activeTab === "achievements" && (
+              <motion.div
+                key="achievements"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.15 }}
+              >
+                <AchievementsDashboard />
               </motion.div>
             )}
 
