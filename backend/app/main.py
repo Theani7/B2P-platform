@@ -45,6 +45,7 @@ from .notifications.routes import ws_router as notifications_ws_router
 from .achievements.routes import router as achievements_router
 from .search.routes import router as search_router
 from .export.routes import router as export_router
+from .sharing.routes import router as sharing_router
 
 # Structured logging
 logging.basicConfig(
@@ -118,6 +119,7 @@ app.include_router(notifications_router, prefix=f"{settings.API_V1_STR}/notifica
 app.include_router(achievements_router, prefix=f"{settings.API_V1_STR}/achievements", tags=["achievements"])
 app.include_router(search_router, prefix=f"{settings.API_V1_STR}/search", tags=["search"])
 app.include_router(export_router, prefix=f"{settings.API_V1_STR}/export", tags=["export"])
+app.include_router(sharing_router, prefix=f"{settings.API_V1_STR}/share", tags=["share"])
 app.include_router(notifications_ws_router, tags=["WebSockets"])
 
 
