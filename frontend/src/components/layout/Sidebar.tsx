@@ -84,7 +84,7 @@ export function Sidebar({ role }: SidebarProps) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
-                    ? "bg-brand-indigo/8 text-brand-indigo font-medium"
+                    ? "bg-brand-purple-50 text-brand-purple-900 font-medium"
                     : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                 }`
               }

@@ -101,7 +101,7 @@ export default function CampaignForm({
 
         <div>
           <Input
-            label="Budget ($)"
+            label="Budget (Rs.)"
             type="number"
             step="1"
             error={errors.budget?.message}

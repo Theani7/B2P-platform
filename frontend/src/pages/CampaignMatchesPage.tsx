@@ -6,6 +6,7 @@ import MatchResultsCard from "../components/matching/MatchResultsCard";
 import MatchBreakdownCard from "../components/matching/MatchBreakdownCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import { PageHeader } from "../components/ui";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 type FilterKey = "all" | "EXCELLENT_MATCH" | "GOOD_MATCH" | "AVERAGE_MATCH" | "LOW_MATCH";
@@ -56,29 +57,37 @@ export default function CampaignMatchesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <Link to={`/business/campaigns/${campaignId}`} className="text-sm text-primary hover:underline">
-            &larr; Back to Campaign
-          </Link>
-          <h1 className="mt-2 text-2xl font-bold text-text">Recommended Promoters</h1>
-        </div>
-        <button
-          onClick={handleGenerate}
-          disabled={generating}
-          className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
+      <div>
+        <Link
+          to={`/business/campaigns/${campaignId}`}
+          className="text-xs text-brand-purple hover:underline inline-flex items-center gap-1 font-medium"
         >
-          {generating ? "Generating..." : "Generate Recommendations"}
-        </button>
+          &larr; Back to Campaign
+        </Link>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 rounded-lg border p-4">
-        <div>
-          <label className="mr-2 text-sm text-gray-600">Classification</label>
+      <PageHeader
+        title="Recommended Promoters"
+        actions={
+          <button
+            onClick={handleGenerate}
+            disabled={generating}
+            className="bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {generating ? "Generating..." : "Generate Recommendations"}
+          </button>
+        }
+      />
+
+      <div className="flex flex-wrap items-center gap-4 bg-white border border-gray-100 rounded-xl p-5">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+            Classification
+          </label>
           <select
             value={filterClassification}
             onChange={(e) => { setFilterClassification(e.target.value as FilterKey); setPage(1); }}
-            className="rounded border px-3 py-1.5 text-sm"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
           >
             <option value="all">All</option>
             <option value="EXCELLENT_MATCH">Excellent</option>
@@ -87,12 +96,14 @@ export default function CampaignMatchesPage() {
             <option value="LOW_MATCH">Low</option>
           </select>
         </div>
-        <div>
-          <label className="mr-2 text-sm text-gray-600">Min Score</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+            Min Score
+          </label>
           <select
             value={minScore ?? ""}
             onChange={(e) => { setMinScore(e.target.value ? Number(e.target.value) : undefined); setPage(1); }}
-            className="rounded border px-3 py-1.5 text-sm"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
           >
             <option value="">Any</option>
             <option value="90">90+</option>
@@ -100,14 +111,14 @@ export default function CampaignMatchesPage() {
             <option value="50">50+</option>
           </select>
         </div>
-        <label className="flex items-center space-x-2">
+        <label className="flex items-center gap-2 self-end pb-0.5">
           <input
             type="checkbox"
             checked={verifiedOnly}
             onChange={(e) => { setVerifiedOnly(e.target.checked); setPage(1); }}
-            className="rounded"
+            className="w-4 h-4 rounded border-gray-300 text-brand-indigo focus:ring-brand-indigo"
           />
-          <span className="text-sm text-gray-600">Verified Only</span>
+          <span className="text-sm text-gray-900">Verified Only</span>
         </label>
       </div>
 
@@ -123,12 +134,16 @@ export default function CampaignMatchesPage() {
               <MatchResultsCard key={match.id} match={match} onInvite={handleInvite} />
             ))}
             {data.pages > 1 && (
-              <div className="flex justify-center space-x-2">
+              <div className="flex justify-center gap-1.5">
                 {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
                   <button
                     key={p}
                     onClick={() => setPage(p)}
-                    className={`rounded px-3 py-1 text-sm ${p === page ? "bg-primary text-white" : "border text-gray-600 hover:bg-gray-50"}`}
+                    className={`px-3 py-1 text-sm font-medium transition-colors ${
+                      p === page
+                        ? "bg-brand-indigo text-white rounded-lg"
+                        : "text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-900"
+                    }`}
                   >
                     {p}
                   </button>
@@ -146,3 +161,4 @@ export default function CampaignMatchesPage() {
     </div>
   );
 }
+

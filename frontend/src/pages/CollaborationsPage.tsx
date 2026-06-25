@@ -12,7 +12,6 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
 import { PageHeader, Badge } from "../components/ui";
 import {
-  Handshake,
   CheckCircle2,
   XCircle,
   Clock,
