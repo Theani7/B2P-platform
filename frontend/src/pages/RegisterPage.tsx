@@ -12,7 +12,13 @@ const schema = z.object({
   username: z.string().min(3, "Min 3 characters").max(30),
   full_name: z.string().min(1, "Full name is required").max(255),
   email: z.string().email("Enter a valid email"),
-  password: z.string().min(8, "Min 8 characters"),
+  password: z.string()
+    .min(12, "Password must be at least 12 characters")
+    .regex(/[A-Z]/, "Password must include at least one uppercase letter")
+    .regex(/[a-z]/, "Password must include at least one lowercase letter")
+    .regex(/\d/, "Password must include at least one digit")
+    .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must include at least one special character")
+    .refine((val) => !val.includes(" "), "Password cannot contain spaces"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
@@ -156,7 +162,7 @@ export default function RegisterPage() {
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <p className="text-[11px] text-gray-400 mt-1">Min 8 characters</p>
+          <p className="text-[11px] text-gray-400 mt-1">Min 12 characters, with uppercase, lowercase, number, and special char</p>
           {errors.password && <p className="text-xs text-brand-coral mt-1">{errors.password.message}</p>}
         </div>
 
