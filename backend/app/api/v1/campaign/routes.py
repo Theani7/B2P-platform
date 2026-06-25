@@ -17,6 +17,7 @@ from ....services.campaign import (
     get_dashboard_stats,
 )
 from ....db.session import get_db
+from ....activity.service import ActivityService
 
 router = APIRouter(
     prefix="/campaigns",

@@ -1,9 +1,13 @@
 import { Link } from "react-router-dom";
 import { useAdminAnalytics } from "../features/analytics/api";
+import { useAdminActivity } from "../features/activity/api";
+import { ActivityCard } from "../components/ui/ActivityCard";
+import { Activity } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function AdminDashboardPage() {
   const { data: analytics, isLoading, error } = useAdminAnalytics();
+  const { data: activityData, isLoading: activityLoading } = useAdminActivity({ size: 10 });
 
   if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
   if (isLoading) return <LoadingSpinner />;
@@ -59,6 +63,24 @@ export default function AdminDashboardPage() {
             </Link>
           ))}
         </div>
+      </div>
+
+      <div className="rounded-lg border bg-white p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Activity size={18} className="text-gray-500" />
+          <h2 className="text-lg font-semibold text-text">Platform Activity</h2>
+        </div>
+        {activityLoading ? (
+          <div className="py-8 flex justify-center"><LoadingSpinner /></div>
+        ) : !activityData?.items?.length ? (
+          <p className="text-sm text-gray-500">No recent activity.</p>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {activityData.items.map((activity) => (
+              <ActivityCard key={activity.id} activity={activity} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

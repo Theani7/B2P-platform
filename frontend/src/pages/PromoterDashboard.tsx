@@ -5,6 +5,9 @@ import { usePromoterAnalytics } from "../features/analytics/api";
 
 import { Avatar, StatCard } from "../components/ui";
 import { formatNepaliCurrency } from "../utils/currency";
+import { useMyActivity } from "../features/activity/api";
+import { ActivityCard } from "../components/ui/ActivityCard";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 import {
   Briefcase,
@@ -29,6 +32,7 @@ export default function PromoterDashboard() {
   const { data: invitations, isLoading: invsLoading } = usePromoterInvitations({ limit: 5 });
   const { data: collabs, isLoading: collabsLoading } = usePromoterCollaborations({ limit: 5 });
   const { data: analytics } = usePromoterAnalytics();
+  const { data: activityData, isLoading: activityLoading } = useMyActivity({ size: 5 });
 
   const pendingInvites = analytics?.summary?.invitations_pending ?? 0;
   const activeCollabs = analytics?.summary?.active_collaborations ?? 0;
@@ -88,11 +92,30 @@ export default function PromoterDashboard() {
         {/* MAIN COLUMN (8 cols) */}
         <div className="lg:col-span-8 space-y-8">
           
-          {/* 7. CREATOR ANALYTICS */}
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-6 flex flex-col items-center justify-center text-center h-72">
-            <BarChart3 size={32} className="text-gray-300 mb-3" />
-            <h2 className="text-lg font-bold text-gray-900 mb-1">Profile Performance</h2>
-            <p className="text-xs text-gray-500">Analytics are currently unavailable.</p>
+          {/* RECENT ACTIVITY */}
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <BarChart3 size={16} className="text-gray-500" />
+                <h2 className="text-sm font-semibold text-gray-900">Recent Activity</h2>
+              </div>
+            </div>
+            {activityLoading ? (
+              <div className="p-8 flex justify-center"><LoadingSpinner /></div>
+            ) : !activityData?.items?.length ? (
+              <div className="p-8 text-center">
+                <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-3">
+                  <BarChart3 size={20} className="text-gray-400" />
+                </div>
+                <p className="text-sm font-medium text-gray-900">No recent activity</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100 flex-1">
+                {activityData.items.map((activity) => (
+                  <ActivityCard key={activity.id} activity={activity} />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* 6. ACTIVE COLLABORATIONS */}

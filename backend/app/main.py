@@ -33,6 +33,7 @@ from .api.v1.matching.routes import router as matching_router
 from .api.v1.reviews.routes import router as review_router
 from .api.v1.admin.routes import router as admin_router
 from .api.v1.promoter_verification.routes import router as promoter_verification_router
+from .api.v1.activity.routes import router as activity_router
 
 # Structured logging
 logging.basicConfig(
@@ -92,6 +93,7 @@ app.include_router(matching_router, prefix=settings.API_V1_STR)
 app.include_router(review_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(promoter_verification_router, prefix=settings.API_V1_STR)
+app.include_router(activity_router, prefix=f"{settings.API_V1_STR}/activity", tags=["activity"])
 
 
 @app.get("/health")

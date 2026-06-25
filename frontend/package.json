@@ -14,6 +14,7 @@
     "@tanstack/react-query": "^5",
     "@vitejs/plugin-react": "^4.7.0",
     "axios": "^1",
+    "date-fns": "^4.4.0",
     "framer-motion": "^12.41.0",
     "jsdom": "^29.1.1",
     "lucide-react": "^1.21.0",

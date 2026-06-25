@@ -1,15 +1,14 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 
-import { useBusinessCollaborations, useBusinessInvitations } from "../features/collaboration/api";
-import { CollaborationStatus, InvitationStatus } from "../features/collaboration/types";
+import { useBusinessInvitations } from "../features/collaboration/api";
+import { InvitationStatus } from "../features/collaboration/types";
 import { StatCard } from "../components/ui";
 import {
   Plus,
   Search,
   Zap,
   Mail,
-  ChevronRight,
   FolderOpen,
   CheckCircle2,
   FolderDot
@@ -24,16 +23,18 @@ import {
   ResponsiveContainer
 } from "recharts";
 import { useBusinessAnalytics } from "../features/analytics";
+import { useBusinessActivity } from "../features/activity";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { ActivityCard } from "../components/ui/ActivityCard";
+import { Activity } from "lucide-react";
 
 export default function BusinessDashboard() {
   const { user } = useAuth();
   const { data: analytics, isLoading: statsLoading } = useBusinessAnalytics();
-  const { data: collabs } = useBusinessCollaborations({ limit: 5 });
   const { data: invitations } = useBusinessInvitations({ limit: 5 });
+  const { data: activityData, isLoading: activityLoading } = useBusinessActivity({ size: 5 });
 
   const pendingInvitations = invitations?.items?.filter((i) => i.status === InvitationStatus.PENDING) ?? [];
-  const activeCollabs = collabs?.items?.filter((c) => c.status === CollaborationStatus.ACTIVE) ?? [];
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -197,38 +198,27 @@ export default function BusinessDashboard() {
             )}
           </div>
 
-          {/* Active Collaborations */}
+          {/* Recent Activity Stream */}
           <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <Zap size={16} className="text-gray-500" />
-                <h2 className="text-sm font-semibold text-gray-900">Active Collabs</h2>
+                <Activity size={16} className="text-gray-500" />
+                <h2 className="text-sm font-semibold text-gray-900">Recent Activity</h2>
               </div>
             </div>
-            {activeCollabs.length === 0 ? (
+            {activityLoading ? (
+              <div className="p-8 flex justify-center"><LoadingSpinner /></div>
+            ) : !activityData?.items?.length ? (
               <div className="p-8 text-center">
                 <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-3">
-                  <Zap size={20} className="text-gray-400" />
+                  <Activity size={20} className="text-gray-400" />
                 </div>
-                <p className="text-sm font-medium text-gray-900">No active collabs</p>
+                <p className="text-sm font-medium text-gray-900">No recent activity</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-100 flex-1">
-                {activeCollabs.map((c) => (
-                  <Link
-                    key={c.id}
-                    to="/business/collaborations"
-                    className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-primary-50 text-primary-700 flex items-center justify-center text-sm font-medium flex-shrink-0">
-                      {c.partner_name?.slice(0, 2).toUpperCase() || "??"}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">{c.partner_name}</p>
-                      <p className="text-xs text-gray-500 truncate mt-0.5">{c.campaign_title}</p>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
-                  </Link>
+                {activityData.items.map((activity) => (
+                  <ActivityCard key={activity.id} activity={activity} />
                 ))}
               </div>
             )}
