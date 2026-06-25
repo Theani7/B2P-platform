@@ -2,6 +2,7 @@ import { Bell, Search, Plus, User } from "lucide-react";
 import { useAuth } from "../../providers/AuthProvider";
 import { Link } from "react-router-dom";
 import { NotificationBell } from "../notifications";
+import { CommandPalette } from "../command-palette";
 
 export function TopHeader() {
   const { user } = useAuth();
@@ -9,14 +10,7 @@ export function TopHeader() {
   return (
     <header className="h-16 px-6 border-b border-gray-200 bg-white flex items-center justify-between sticky top-0 z-30">
       <div className="flex-1 max-w-lg flex items-center">
-        <div className="relative w-full">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search campaigns, promoters..."
-            className="w-full bg-slate-50 border border-gray-200 rounded-lg pl-10 pr-4 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-          />
-        </div>
+        <CommandPalette />
       </div>
 
       <div className="flex items-center gap-4 pl-4 ml-auto">
