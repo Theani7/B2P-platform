@@ -5,6 +5,7 @@ import { Role } from "./constants/roles";
 import LoadingSpinner from "./components/LoadingSpinner";
 import React from "react";
 
+const Landing = lazy(() => import("./pages/Landing"));
 const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
 const BusinessDashboard = lazy(() => import("./pages/BusinessDashboard"));
 const PromoterDashboard = lazy(() => import("./pages/PromoterDashboard"));
@@ -60,7 +61,7 @@ function RoleRedirect() {
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<RoleRedirect />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
       <Route path="/business/dashboard" element={<ProtectedRoute role={Role.BUSINESS}><BusinessDashboard /></ProtectedRoute>} />
