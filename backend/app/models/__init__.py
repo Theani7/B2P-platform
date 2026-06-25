@@ -10,6 +10,7 @@ from .campaign_application import CampaignApplication, ApplicationStatus
 from .campaign_invitation import CampaignInvitation, InvitationStatus
 from .collaboration import Collaboration, CollaborationStatus
 from .match_result import MatchResult
+from .review import Review
 
 __all__ = [
     "User",
@@ -32,4 +33,5 @@ __all__ = [
     "Collaboration",
     "CollaborationStatus",
     "MatchResult",
+    "Review",
 ]

@@ -21,6 +21,7 @@ from .api.v1.invitations.routes import promoter_router as promoter_invitation_ro
 from .api.v1.collaborations.routes import business_router as business_collab_router
 from .api.v1.collaborations.routes import promoter_router as promoter_collab_router
 from .api.v1.matching.routes import router as matching_router
+from .api.v1.reviews.routes import router as review_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -55,6 +56,7 @@ app.include_router(promoter_invitation_router, prefix=settings.API_V1_STR)
 app.include_router(business_collab_router, prefix=settings.API_V1_STR)
 app.include_router(promoter_collab_router, prefix=settings.API_V1_STR)
 app.include_router(matching_router, prefix=settings.API_V1_STR)
+app.include_router(review_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")

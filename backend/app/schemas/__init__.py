@@ -52,6 +52,14 @@ from .discovery import (
     PromoterPublicProfileRead,
     SavedPromoterRead,
 )
+from .review import (
+    ReviewCreate,
+    ReviewUpdate,
+    ReviewRead,
+    ReviewListResponse,
+    RatingDistribution,
+    RatingSummary,
+)
 from .matching import (
     ScoreBreakdown,
     MatchResultPromoter,
@@ -140,4 +148,10 @@ __all__ = [
     "MatchResultRead",
     "MatchResultListResponse",
     "MatchGenerateResponse",
+    "ReviewCreate",
+    "ReviewUpdate",
+    "ReviewRead",
+    "ReviewListResponse",
+    "RatingDistribution",
+    "RatingSummary",
 ]

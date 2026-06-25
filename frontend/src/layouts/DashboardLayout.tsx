@@ -15,6 +15,7 @@ const BUSINESS_NAV = [
   { to: "/business/campaigns", label: "Campaigns" },
   { to: "/business/invitations", label: "Invitations" },
   { to: "/business/collaborations", label: "Collabs" },
+  { to: "/my/reviews", label: "My Reviews" },
   { to: "/business/profile", label: "Profile" },
 ];
 
@@ -24,6 +25,7 @@ const PROMOTER_NAV = [
   { to: "/promoter/applications", label: "Applications" },
   { to: "/promoter/invitations", label: "Invitations" },
   { to: "/promoter/collaborations", label: "Collabs" },
+  { to: "/my/reviews", label: "My Reviews" },
   { to: "/promoter/profile", label: "Profile" },
 ];
 

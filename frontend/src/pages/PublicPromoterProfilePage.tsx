@@ -1,5 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { usePublicPromoterProfile, useSavePromoter } from "../features/discovery/api";
+import { useUserRating } from "../features/reviews/api";
+import RatingStars from "../components/reviews/RatingStars";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
@@ -15,6 +17,7 @@ const PLATFORM_ICONS: Record<string, string> = {
 export default function PublicPromoterProfilePage() {
   const { username } = useParams<{ username: string }>();
   const { data: profile, isLoading } = usePublicPromoterProfile(username ?? "");
+  const { data: ratingSummary } = useUserRating(profile?.user_id ?? "");
   const savePromoter = useSavePromoter();
 
   const handleSave = () => {
@@ -90,6 +93,34 @@ export default function PublicPromoterProfilePage() {
           </div>
         </div>
       </div>
+
+      {ratingSummary && ratingSummary.total_reviews > 0 && (
+        <div className="rounded-lg border bg-white p-6">
+          <h2 className="mb-3 text-lg font-semibold text-text">Rating & Reviews</h2>
+          <div className="flex items-center space-x-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-text">{ratingSummary.average_rating}</div>
+              <RatingStars rating={ratingSummary.average_rating} size="sm" />
+              <p className="mt-1 text-sm text-gray-500">{ratingSummary.total_reviews} review{ratingSummary.total_reviews !== 1 ? "s" : ""}</p>
+            </div>
+            <div className="flex-1 space-y-1">
+              {[5, 4, 3, 2, 1].map((star) => {
+                const count = (ratingSummary.distribution as any)[`star_${star}`] || 0;
+                const pct = ratingSummary.total_reviews > 0 ? (count / ratingSummary.total_reviews) * 100 : 0;
+                return (
+                  <div key={star} className="flex items-center gap-2 text-sm">
+                    <span className="w-6 text-right text-gray-600">{star}</span>
+                    <div className="h-2 flex-1 rounded-full bg-gray-200">
+                      <div className="h-2 rounded-full bg-yellow-400" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="w-6 text-right text-gray-500">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {profile.bio && (
         <div className="rounded-lg border bg-white p-6">

@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useAuth } from "../providers/AuthProvider";
 import { Role } from "../constants/roles";
 import { useBusinessCollaborations, usePromoterCollaborations } from "../features/collaboration/api";
+import { useCompleteCollaboration, useCreateReview } from "../features/reviews/api";
+import ReviewFormDialog from "../components/reviews/ReviewFormDialog";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const STATUS_STYLES: Record<string, string> = {
   ACTIVE: "bg-green-100 text-green-700",
@@ -14,11 +17,14 @@ const STATUS_STYLES: Record<string, string> = {
 export default function CollaborationsPage() {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
+  const [reviewingCollabId, setReviewingCollabId] = useState<string | null>(null);
   const isBusiness = user?.role === Role.BUSINESS;
 
   const bizQuery = useBusinessCollaborations({ page, limit: 20 });
   const promQuery = usePromoterCollaborations({ page, limit: 20 });
   const { data, isLoading } = isBusiness ? bizQuery : promQuery;
+  const completeCollab = useCompleteCollaboration();
+  const createReview = useCreateReview();
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -34,6 +40,24 @@ export default function CollaborationsPage() {
       />
     );
   }
+
+  const handleComplete = (collabId: string) => {
+    completeCollab.mutate(collabId, {
+      onSuccess: () => notifySuccess("Collaboration completed"),
+      onError: () => notifyError("Failed to complete collaboration"),
+    });
+  };
+
+  const handleReviewSubmit = (data: { rating: number; comment?: string }) => {
+    if (!reviewingCollabId) return;
+    createReview.mutate({ collaborationId: reviewingCollabId, ...data }, {
+      onSuccess: () => {
+        notifySuccess("Review submitted");
+        setReviewingCollabId(null);
+      },
+      onError: () => notifyError("Failed to submit review"),
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -53,11 +77,13 @@ export default function CollaborationsPage() {
                   <span>Partner: {c.partner_name}</span>
                 </div>
               </div>
-              <span
-                className={`rounded px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[c.status] ?? ""}`}
-              >
-                {c.status}
-              </span>
+              <div className="flex items-center space-x-2">
+                <span
+                  className={`rounded px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[c.status] ?? ""}`}
+                >
+                  {c.status}
+                </span>
+              </div>
             </div>
             <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
               <span>Started {new Date(c.started_at).toLocaleDateString()}</span>
@@ -65,6 +91,26 @@ export default function CollaborationsPage() {
                 <span>Completed {new Date(c.completed_at).toLocaleDateString()}</span>
               )}
             </div>
+            {c.status === "ACTIVE" && (
+              <div className="mt-3">
+                <button
+                  onClick={() => handleComplete(c.id)}
+                  className="rounded border border-purple-300 px-3 py-1 text-xs font-medium text-purple-700 hover:bg-purple-50"
+                >
+                  Mark Complete
+                </button>
+              </div>
+            )}
+            {c.status === "COMPLETED" && (
+              <div className="mt-3">
+                <button
+                  onClick={() => setReviewingCollabId(c.id)}
+                  className="rounded bg-primary px-3 py-1 text-xs font-medium text-white hover:bg-primary/90"
+                >
+                  Write Review
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -89,6 +135,15 @@ export default function CollaborationsPage() {
             Next
           </button>
         </div>
+      )}
+
+      {reviewingCollabId && (
+        <ReviewFormDialog
+          open={!!reviewingCollabId}
+          onClose={() => setReviewingCollabId(null)}
+          onSubmit={handleReviewSubmit}
+          title="Review Partner"
+        />
       )}
     </div>
   );

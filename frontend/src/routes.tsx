@@ -26,6 +26,8 @@ const BusinessInvitationsPage = lazy(() => import("./pages/BusinessInvitationsPa
 const PromoterInvitationsPage = lazy(() => import("./pages/PromoterInvitationsPage"));
 const CollaborationsPage = lazy(() => import("./pages/CollaborationsPage"));
 const CampaignMatchesPage = lazy(() => import("./pages/CampaignMatchesPage"));
+const MyReviewsPage = lazy(() => import("./pages/MyReviewsPage"));
+const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 
 function ProtectedRoute({ role, children }: { role?: Role; children: JSX.Element }) {
   const { user, isLoading: authLoading } = useAuth();
@@ -80,6 +82,8 @@ export default function AppRoutes() {
       <Route path="/promoter/applications" element={<ProtectedRoute role={Role.PROMOTER}><MyApplicationsPage /></ProtectedRoute>} />
       <Route path="/promoter/invitations" element={<ProtectedRoute role={Role.PROMOTER}><PromoterInvitationsPage /></ProtectedRoute>} />
       <Route path="/promoter/collaborations" element={<ProtectedRoute><CollaborationsPage /></ProtectedRoute>} />
+      <Route path="/my/reviews" element={<ProtectedRoute><MyReviewsPage /></ProtectedRoute>} />
+      <Route path="/users/:userId/reviews" element={<ProtectedRoute><UserReviewsPage /></ProtectedRoute>} />
       <Route path="*" element={<RoleRedirect />} />
     </Routes>
   );
