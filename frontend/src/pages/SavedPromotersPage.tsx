@@ -3,24 +3,33 @@ import { Link } from "react-router-dom";
 import { useSavedPromoters, useRemoveSavedPromoter } from "../features/discovery/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 export default function SavedPromotersPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useSavedPromoters({
+  const { data, isLoading, error } = useSavedPromoters({
     search: search || undefined,
     page,
     limit: 12,
   });
 
   const removeSaved = useRemoveSavedPromoter();
+  const [removeConfirm, setRemoveConfirm] = useState<{ id: string; username: string } | null>(null);
+
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
 
   const handleRemove = (id: string, username: string) => {
-    removeSaved.mutate(id, {
-      onSuccess: () => notifySuccess(`${username} removed from shortlist`),
-      onError: (e) => notifyError(e.message),
+    setRemoveConfirm({ id, username });
+  };
+
+  const confirmRemove = () => {
+    if (!removeConfirm) return;
+    removeSaved.mutate(removeConfirm.id, {
+      onSuccess: () => { notifySuccess(`${removeConfirm.username} removed from shortlist`); setRemoveConfirm(null); },
+      onError: (e) => { notifyError(e.message); setRemoveConfirm(null); },
     });
   };
 
@@ -39,6 +48,7 @@ export default function SavedPromotersPage() {
       <input
         type="text"
         placeholder="Search saved promoters..."
+        aria-label="Search saved promoters"
         value={search}
         onChange={(e) => { setSearch(e.target.value); setPage(1); }}
         className="block w-full max-w-md rounded border border-gray-300 p-2 text-sm"
@@ -113,6 +123,7 @@ export default function SavedPromotersPage() {
                   <button
                     onClick={() => handleRemove(p.id, p.username)}
                     disabled={removeSaved.isPending}
+                    aria-label={`Remove ${p.username}`}
                     className="rounded border border-danger px-3 py-1.5 text-sm font-medium text-danger hover:bg-danger/5 disabled:opacity-50"
                   >
                     Remove
@@ -145,6 +156,14 @@ export default function SavedPromotersPage() {
           )}
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={!!removeConfirm}
+        onClose={() => setRemoveConfirm(null)}
+        onConfirm={confirmRemove}
+        title="Remove Promoter"
+        message={removeConfirm ? `Remove ${removeConfirm.username} from your shortlist?` : ""}
+      />
     </div>
   );
 }

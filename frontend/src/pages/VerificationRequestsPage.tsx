@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useAdminVerificationRequests, useAdminApproveVerification, useAdminRejectVerification } from "../features/admin/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import Dialog from "../components/ui/Dialog";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 export default function VerificationRequestsPage() {
@@ -11,20 +13,32 @@ export default function VerificationRequestsPage() {
   const approve = useAdminApproveVerification();
   const reject = useAdminRejectVerification();
 
+  const [approveConfirm, setApproveConfirm] = useState<string | null>(null);
+  const [rejectDialog, setRejectDialog] = useState<{ requestId: string; notes: string } | null>(null);
+
   if (isLoading) return <LoadingSpinner />;
 
   const handleApprove = (requestId: string) => {
-    approve.mutate({ requestId }, {
-      onSuccess: () => notifySuccess("Verification approved"),
-      onError: () => notifyError("Failed to approve"),
+    setApproveConfirm(requestId);
+  };
+
+  const confirmApprove = () => {
+    if (!approveConfirm) return;
+    approve.mutate({ requestId: approveConfirm }, {
+      onSuccess: () => { notifySuccess("Verification approved"); setApproveConfirm(null); },
+      onError: () => { notifyError("Failed to approve"); setApproveConfirm(null); },
     });
   };
 
   const handleReject = (requestId: string) => {
-    const notes = prompt("Rejection reason (optional):");
-    reject.mutate({ requestId, admin_notes: notes || undefined }, {
-      onSuccess: () => notifySuccess("Verification rejected"),
-      onError: () => notifyError("Failed to reject"),
+    setRejectDialog({ requestId, notes: "" });
+  };
+
+  const confirmReject = () => {
+    if (!rejectDialog) return;
+    reject.mutate({ requestId: rejectDialog.requestId, admin_notes: rejectDialog.notes || undefined }, {
+      onSuccess: () => { notifySuccess("Verification rejected"); setRejectDialog(null); },
+      onError: () => { notifyError("Failed to reject"); setRejectDialog(null); },
     });
   };
 
@@ -91,6 +105,35 @@ export default function VerificationRequestsPage() {
           <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Next</button>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!approveConfirm}
+        onClose={() => setApproveConfirm(null)}
+        onConfirm={confirmApprove}
+        title="Approve Verification"
+        message="Approve this verification request?"
+      />
+
+      <Dialog
+        isOpen={!!rejectDialog}
+        onClose={() => setRejectDialog(null)}
+        title="Reject Verification"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">Enter a reason for rejection (optional):</p>
+          <textarea
+            value={rejectDialog?.notes ?? ""}
+            onChange={(e) => setRejectDialog((prev) => prev ? { ...prev, notes: e.target.value } : null)}
+            className="w-full rounded border p-2 text-sm"
+            rows={3}
+            aria-label="Rejection notes"
+          />
+          <div className="flex justify-end gap-2">
+            <button onClick={() => setRejectDialog(null)} className="rounded border px-3 py-1.5 text-sm">Cancel</button>
+            <button onClick={confirmReject} className="rounded bg-danger px-3 py-1.5 text-sm font-medium text-white">Reject</button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

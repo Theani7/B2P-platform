@@ -94,7 +94,7 @@ def list_marketplace_campaigns(
     limit: int = 20,
     sort: str = "created_at",
 ) -> Tuple[List[CampaignMarketplaceItem], int]:
-    query = db.query(Campaign).filter(
+    query = db.query(Campaign).options(joinedload(Campaign.business_profile)).filter(
         Campaign.visibility == CampaignVisibility.PUBLIC,
         Campaign.status == CampaignStatus.OPEN,
     )
@@ -118,7 +118,7 @@ def list_marketplace_campaigns(
 
     items = []
     for c in campaigns:
-        business = db.query(BusinessProfile).filter(BusinessProfile.id == c.business_profile_id).first()
+        business = c.business_profile
         items.append(CampaignMarketplaceItem(
             id=c.id,
             business_profile_id=c.business_profile_id,
@@ -191,7 +191,7 @@ def get_promoter_applications(
     limit: int = 20,
 ) -> Tuple[List[CampaignApplicationWithCampaignRead], int]:
     promoter = _get_promoter_profile(db, user)
-    query = db.query(CampaignApplication).filter(
+    query = db.query(CampaignApplication).options(joinedload(CampaignApplication.campaign)).filter(
         CampaignApplication.promoter_profile_id == promoter.id,
     )
     total = query.count()
@@ -199,7 +199,7 @@ def get_promoter_applications(
 
     items = []
     for app in applications:
-        campaign = db.query(Campaign).filter(Campaign.id == app.campaign_id).first()
+        campaign = app.campaign
         items.append(CampaignApplicationWithCampaignRead(
             id=app.id,
             campaign_id=app.campaign_id,
@@ -230,7 +230,7 @@ def get_campaign_applications(
     business = _get_business_profile(db, user)
     campaign = _get_campaign_for_business(db, campaign_id, business.id)
 
-    query = db.query(CampaignApplication).filter(
+    query = db.query(CampaignApplication).options(joinedload(CampaignApplication.promoter_profile)).filter(
         CampaignApplication.campaign_id == campaign.id,
     )
     total = query.count()
@@ -238,7 +238,7 @@ def get_campaign_applications(
 
     items = []
     for app in applications:
-        promoter = db.query(PromoterProfile).filter(PromoterProfile.id == app.promoter_profile_id).first()
+        promoter = app.promoter_profile
         items.append(CampaignApplicationWithPromoterRead(
             id=app.id,
             campaign_id=app.campaign_id,
@@ -349,10 +349,9 @@ def get_business_invitations(
     limit: int = 20,
 ) -> Tuple[List[CampaignInvitationWithCampaignRead], int]:
     business = _get_business_profile(db, user)
-    campaigns = db.query(Campaign).filter(Campaign.business_profile_id == business.id).all()
-    campaign_ids = [c.id for c in campaigns]
+    campaign_ids = db.query(Campaign.id).filter(Campaign.business_profile_id == business.id)
 
-    query = db.query(CampaignInvitation).filter(
+    query = db.query(CampaignInvitation).options(joinedload(CampaignInvitation.campaign)).filter(
         CampaignInvitation.campaign_id.in_(campaign_ids),
     )
     total = query.count()
@@ -360,7 +359,7 @@ def get_business_invitations(
 
     items = []
     for inv in invitations:
-        campaign = db.query(Campaign).filter(Campaign.id == inv.campaign_id).first()
+        campaign = inv.campaign
         items.append(CampaignInvitationWithCampaignRead(
             id=inv.id,
             campaign_id=inv.campaign_id,
@@ -388,7 +387,7 @@ def get_promoter_invitations(
     limit: int = 20,
 ) -> Tuple[List[CampaignInvitationWithCampaignRead], int]:
     promoter = _get_promoter_profile(db, user)
-    query = db.query(CampaignInvitation).filter(
+    query = db.query(CampaignInvitation).options(joinedload(CampaignInvitation.campaign).joinedload(Campaign.business_profile)).filter(
         CampaignInvitation.promoter_profile_id == promoter.id,
     )
     total = query.count()
@@ -396,8 +395,8 @@ def get_promoter_invitations(
 
     items = []
     for inv in invitations:
-        campaign = db.query(Campaign).filter(Campaign.id == inv.campaign_id).first()
-        business = db.query(BusinessProfile).filter(BusinessProfile.id == campaign.business_profile_id).first() if campaign else None
+        campaign = inv.campaign
+        business = campaign.business_profile if campaign else None
         items.append(CampaignInvitationWithCampaignRead(
             id=inv.id,
             campaign_id=inv.campaign_id,
@@ -460,7 +459,7 @@ def get_business_collaborations(
     limit: int = 20,
 ) -> Tuple[List[CollaborationRead], int]:
     business = _get_business_profile(db, user)
-    query = db.query(Collaboration).filter(
+    query = db.query(Collaboration).options(joinedload(Collaboration.campaign), joinedload(Collaboration.promoter_profile)).filter(
         Collaboration.business_profile_id == business.id,
     )
     total = query.count()
@@ -468,8 +467,8 @@ def get_business_collaborations(
 
     items = []
     for collab in collaborations:
-        campaign = db.query(Campaign).filter(Campaign.id == collab.campaign_id).first()
-        promoter = db.query(PromoterProfile).filter(PromoterProfile.id == collab.promoter_profile_id).first()
+        campaign = collab.campaign
+        promoter = collab.promoter_profile
         items.append(CollaborationRead(
             id=collab.id,
             campaign_id=collab.campaign_id,
@@ -500,7 +499,7 @@ def get_promoter_collaborations(
     limit: int = 20,
 ) -> Tuple[List[CollaborationRead], int]:
     promoter = _get_promoter_profile(db, user)
-    query = db.query(Collaboration).filter(
+    query = db.query(Collaboration).options(joinedload(Collaboration.campaign), joinedload(Collaboration.business_profile)).filter(
         Collaboration.promoter_profile_id == promoter.id,
     )
     total = query.count()
@@ -508,8 +507,8 @@ def get_promoter_collaborations(
 
     items = []
     for collab in collaborations:
-        campaign = db.query(Campaign).filter(Campaign.id == collab.campaign_id).first()
-        business = db.query(BusinessProfile).filter(BusinessProfile.id == collab.business_profile_id).first()
+        campaign = collab.campaign
+        business = collab.business_profile
         items.append(CollaborationRead(
             id=collab.id,
             campaign_id=collab.campaign_id,

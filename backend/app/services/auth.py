@@ -86,7 +86,7 @@ def login(db: Session, payload: LoginSchema) -> TokenSchema:
 
 def refresh(db: Session, refresh_token: str) -> TokenSchema:
     from ..utils.token_utils import hash_token
-    from ..models.user import RevokedRefreshToken
+    from ..models.revoked_token import RevokedRefreshToken
     token_hash = hash_token(refresh_token)
     if db.query(RevokedRefreshToken).filter(RevokedRefreshToken.token_hash == token_hash).first():
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token revoked")

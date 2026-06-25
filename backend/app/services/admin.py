@@ -3,11 +3,12 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 from fastapi import HTTPException, Request, status
 from sqlalchemy import desc, func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..models.audit_log import AuditLog
 from ..models.business_profile import BusinessProfile
 from ..models.campaign import Campaign
+from ..models.campaign_application import CampaignApplication
 from ..models.collaboration import Collaboration, CollaborationStatus
 from ..models.platform_setting import PlatformSetting
 from ..models.promoter_profile import PromoterProfile
@@ -57,7 +58,7 @@ def get_dashboard_stats(db: Session) -> DashboardStats:
     total_promoters = db.query(User).filter(User.role == RoleEnum.PROMOTER).count()
     verified_promoters = db.query(PromoterProfile).filter(PromoterProfile.verified == True).count()
     total_campaigns = db.query(Campaign).count()
-    total_applications = db.query(Campaign).count()
+    total_applications = db.query(CampaignApplication).count()
     total_collaborations = db.query(Collaboration).count()
     total_reviews = db.query(Review).count()
 
@@ -89,7 +90,7 @@ def get_admin_users(
     role: Optional[str] = None,
     is_active: Optional[bool] = None,
 ) -> Tuple[List[AdminUserRead], int]:
-    query = db.query(User)
+    query = db.query(User).options(joinedload(User.business_profile), joinedload(User.promoter_profile))
     if search:
         pattern = f"%{search}%"
         query = query.filter(
@@ -180,7 +181,7 @@ def get_verification_requests(
     limit: int = 20,
     status_filter: Optional[str] = None,
 ) -> Tuple[List[VerificationRequestRead], int]:
-    query = db.query(VerificationRequest)
+    query = db.query(VerificationRequest).options(joinedload(VerificationRequest.promoter_profile))
     if status_filter:
         query = query.filter(VerificationRequest.status == status_filter)
     total = query.count()
@@ -188,7 +189,7 @@ def get_verification_requests(
 
     items = []
     for r in reqs:
-        profile = db.query(PromoterProfile).filter(PromoterProfile.id == r.promoter_profile_id).first()
+        profile = r.promoter_profile
         items.append(VerificationRequestRead(
             id=r.id,
             promoter_profile_id=r.promoter_profile_id,
@@ -278,7 +279,7 @@ def get_admin_campaigns(
     search: Optional[str] = None,
     status_filter: Optional[str] = None,
 ) -> Tuple[List[AdminCampaignRead], int]:
-    query = db.query(Campaign)
+    query = db.query(Campaign).options(joinedload(Campaign.business_profile))
     if search:
         pattern = f"%{search}%"
         query = query.filter(Campaign.title.ilike(pattern))
@@ -290,7 +291,7 @@ def get_admin_campaigns(
 
     items = []
     for c in campaigns:
-        biz = db.query(BusinessProfile).filter(BusinessProfile.id == c.business_profile_id).first()
+        biz = c.business_profile
         items.append(AdminCampaignRead(
             id=c.id,
             title=c.title,
@@ -332,7 +333,7 @@ def get_admin_reviews(
     limit: int = 20,
     search: Optional[str] = None,
 ) -> Tuple[List[AdminReviewRead], int]:
-    query = db.query(Review)
+    query = db.query(Review).options(joinedload(Review.reviewer), joinedload(Review.reviewee))
     if search:
         pattern = f"%{search}%"
         query = query.filter(Review.comment.ilike(pattern))
@@ -341,8 +342,8 @@ def get_admin_reviews(
 
     items = []
     for r in reviews:
-        reviewer = db.query(User).filter(User.id == r.reviewer_id).first()
-        reviewee = db.query(User).filter(User.id == r.reviewee_id).first()
+        reviewer = r.reviewer
+        reviewee = r.reviewee
         items.append(AdminReviewRead(
             id=r.id,
             collaboration_id=r.collaboration_id,
@@ -375,7 +376,7 @@ def get_audit_logs(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
 ) -> Tuple[List[AuditLogRead], int]:
-    query = db.query(AuditLog)
+    query = db.query(AuditLog).options(joinedload(AuditLog.user))
     if search:
         pattern = f"%{search}%"
         query = query.filter(AuditLog.action.ilike(pattern) | AuditLog.entity_type.ilike(pattern))
@@ -393,11 +394,7 @@ def get_audit_logs(
 
     items = []
     for log in logs:
-        username = ""
-        if log.user_id:
-            user = db.query(User).filter(User.id == log.user_id).first()
-            if user:
-                username = user.username
+        username = log.user.username if log.user else ""
         items.append(AuditLogRead(
             id=log.id,
             user_id=log.user_id,
@@ -473,7 +470,7 @@ def get_analytics(db: Session) -> AnalyticsData:
     total_promoters = db.query(User).filter(User.role == RoleEnum.PROMOTER).count()
     verified_promoters = db.query(PromoterProfile).filter(PromoterProfile.verified == True).count()
     total_campaigns = db.query(Campaign).count()
-    total_applications = db.query(Campaign).count()
+    total_applications = db.query(CampaignApplication).count()
     total_collaborations = db.query(Collaboration).count()
     total_reviews = db.query(Review).count()
 

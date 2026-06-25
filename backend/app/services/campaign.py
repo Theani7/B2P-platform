@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 from fastapi import HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..models.campaign import Campaign, CampaignStatus
@@ -144,13 +145,11 @@ def reopen_campaign(db: Session, user: User, campaign_id) -> Campaign:
 
 def get_dashboard_stats(db: Session, user: User) -> dict:
     profile = _get_business_profile(db, user)
-    campaigns = db.query(Campaign).filter(Campaign.business_profile_id == profile.id).all()
-
-    total = len(campaigns)
-    open_count = sum(1 for c in campaigns if c.status == CampaignStatus.OPEN)
-    active_count = sum(1 for c in campaigns if c.status == CampaignStatus.ACTIVE)
-    completed_count = sum(1 for c in campaigns if c.status == CampaignStatus.COMPLETED)
-    recent = sorted(campaigns, key=lambda c: c.created_at, reverse=True)[:5]
+    total = db.query(func.count(Campaign.id)).filter(Campaign.business_profile_id == profile.id).scalar()
+    open_count = db.query(func.count(Campaign.id)).filter(Campaign.business_profile_id == profile.id, Campaign.status == CampaignStatus.OPEN).scalar()
+    active_count = db.query(func.count(Campaign.id)).filter(Campaign.business_profile_id == profile.id, Campaign.status == CampaignStatus.ACTIVE).scalar()
+    completed_count = db.query(func.count(Campaign.id)).filter(Campaign.business_profile_id == profile.id, Campaign.status == CampaignStatus.COMPLETED).scalar()
+    recent = db.query(Campaign).filter(Campaign.business_profile_id == profile.id).order_by(Campaign.created_at.desc()).limit(5).all()
 
     return {
         "total_campaigns": total,

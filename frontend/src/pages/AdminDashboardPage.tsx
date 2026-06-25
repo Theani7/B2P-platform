@@ -3,8 +3,9 @@ import { useAdminDashboard } from "../features/admin/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function AdminDashboardPage() {
-  const { data, isLoading } = useAdminDashboard();
+  const { data, isLoading, error } = useAdminDashboard();
 
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
   if (isLoading) return <LoadingSpinner />;
 
   const cards = [
@@ -35,7 +36,7 @@ export default function AdminDashboardPage() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         {cards.map((card) => (
-          <div key={card.label} className="rounded-lg border bg-white p-4">
+          <div key={card.label} className="rounded-lg border bg-white p-4" aria-label={`${card.label}: ${typeof card.value === "number" && card.decimals ? card.value.toFixed(card.decimals) : card.value}`}>
             <div className={`h-2 w-12 rounded ${card.color}`} />
             <p className="mt-3 text-2xl font-bold text-text">
               {typeof card.value === "number" && card.decimals ? card.value.toFixed(card.decimals) : card.value}

@@ -6,7 +6,7 @@ Maximum score: 100.
 from typing import Any, Dict, List, Optional, Tuple
 from fastapi import HTTPException, status
 from sqlalchemy import desc
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..models.campaign import Campaign
 from ..models.promoter_profile import PromoterProfile
@@ -137,6 +137,11 @@ def generate_matches(db: Session, user: User, campaign_id: str) -> int:
 
     promoters = db.query(PromoterProfile).all()
 
+    existing_map = {
+        mr.promoter_profile_id: mr
+        for mr in db.query(MatchResult).filter(MatchResult.campaign_id == campaign.id).all()
+    }
+
     count = 0
     for promoter in promoters:
         breakdown: Dict[str, Any] = {
@@ -149,10 +154,7 @@ def generate_matches(db: Session, user: User, campaign_id: str) -> int:
         score = sum(breakdown.values())
         classification = _classify(score)
 
-        existing = db.query(MatchResult).filter(
-            MatchResult.campaign_id == campaign.id,
-            MatchResult.promoter_profile_id == promoter.id,
-        ).first()
+        existing = existing_map.get(promoter.id)
 
         if existing:
             existing.score = score
@@ -187,7 +189,7 @@ def get_matches(
     business_profile = _get_business_profile(db, user)
     campaign = _get_campaign(db, campaign_id, business_profile)
 
-    query = db.query(MatchResult).filter(MatchResult.campaign_id == campaign.id)
+    query = db.query(MatchResult).options(joinedload(MatchResult.promoter_profile)).filter(MatchResult.campaign_id == campaign.id)
 
     if classification:
         query = query.filter(MatchResult.classification == classification)
@@ -208,7 +210,7 @@ def get_matches(
 
     items = []
     for m in matches:
-        promoter = db.query(PromoterProfile).filter(PromoterProfile.id == m.promoter_profile_id).first()
+        promoter = m.promoter_profile
         if not promoter:
             continue
         breakdown = m.score_breakdown if m.score_breakdown else {}

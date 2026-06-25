@@ -2,17 +2,21 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAdminUsers, useAdminSuspendUser, useAdminActivateUser, useAdminDeleteUser } from "../features/admin/api";
 import LoadingSpinner from "../components/LoadingSpinner";
+import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 export default function UserManagementPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
-  const { data, isLoading } = useAdminUsers({ page, limit: 20, search: search || undefined, role: roleFilter || undefined });
+  const { data, isLoading, error } = useAdminUsers({ page, limit: 20, search: search || undefined, role: roleFilter || undefined });
   const suspendUser = useAdminSuspendUser();
   const activateUser = useAdminActivateUser();
   const deleteUser = useAdminDeleteUser();
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
   if (isLoading) return <LoadingSpinner />;
 
   const handleSuspend = (userId: string) => {
@@ -30,10 +34,14 @@ export default function UserManagementPage() {
   };
 
   const handleDelete = (userId: string) => {
-    if (!confirm("Delete this user permanently?")) return;
-    deleteUser.mutate(userId, {
-      onSuccess: () => notifySuccess("User deleted"),
-      onError: () => notifyError("Failed to delete user"),
+    setDeleteConfirm(userId);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteConfirm) return;
+    deleteUser.mutate(deleteConfirm, {
+      onSuccess: () => { notifySuccess("User deleted"); setDeleteConfirm(null); },
+      onError: () => { notifyError("Failed to delete user"); setDeleteConfirm(null); },
     });
   };
 
@@ -61,7 +69,13 @@ export default function UserManagementPage() {
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border">
+      {!data || data.items.length === 0 ? (
+        <EmptyState
+          title="No users found"
+          description="Try adjusting your search or filter criteria."
+        />
+      ) : (
+      <>
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
@@ -115,15 +129,23 @@ export default function UserManagementPage() {
             ))}
           </tbody>
         </table>
-      </div>
 
-      {data && data.pages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Previous</button>
-          <span className="text-sm text-gray-600">Page {data.page} of {data.pages}</span>
-          <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Next</button>
-        </div>
-      )}
+        {data && data.pages > 1 && (
+          <div className="flex items-center justify-center gap-2">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Previous</button>
+            <span className="text-sm text-gray-600">Page {data.page} of {data.pages}</span>
+            <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Next</button>
+          </div>
+        )}
+      </>)}
+
+      <ConfirmDialog
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        onConfirm={confirmDelete}
+        title="Delete User"
+        message="Delete this user permanently?"
+      />
     </div>
   );
 }

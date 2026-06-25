@@ -2,8 +2,9 @@ import { useAdminAnalytics } from "../features/admin/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function AnalyticsPage() {
-  const { data, isLoading } = useAdminAnalytics();
+  const { data, isLoading, error } = useAdminAnalytics();
 
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
   if (isLoading) return <LoadingSpinner />;
 
   const kpiCards = [
@@ -42,7 +43,7 @@ export default function AnalyticsPage() {
                 <div key={niche} className="flex items-center gap-3">
                   <span className="w-24 text-sm text-gray-600">{niche}</span>
                   <div className="h-4 flex-1 rounded-full bg-gray-200">
-                    <div className="h-4 rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                    <div className="h-4 rounded-full bg-primary" style={{ width: `${pct}%` }} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} />
                   </div>
                   <span className="w-12 text-right text-sm text-gray-500">{count}</span>
                 </div>

@@ -3,20 +3,28 @@ import { Link } from "react-router-dom";
 import { useCampaigns, useDeleteCampaign, useArchiveCampaign } from "../features/campaigns/api";
 import StatusBadge from "../components/StatusBadge";
 import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 export default function CampaignListPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const { data, isLoading, refetch } = useCampaigns({ page, limit: 10, search: search || undefined });
+  const { data, isLoading, error, refetch } = useCampaigns({ page, limit: 10, search: search || undefined });
   const deleteCampaign = useDeleteCampaign();
   const archiveCampaign = useArchiveCampaign();
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
+
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    deleteCampaign.mutate(id, {
-      onSuccess: () => notifySuccess("Campaign deleted"),
-      onError: () => notifyError("Failed to delete campaign"),
+    setDeleteConfirm({ id, title });
+  };
+
+  const confirmDelete = () => {
+    if (!deleteConfirm) return;
+    deleteCampaign.mutate(deleteConfirm.id, {
+      onSuccess: () => { notifySuccess("Campaign deleted"); setDeleteConfirm(null); },
+      onError: () => { notifyError("Failed to delete campaign"); setDeleteConfirm(null); },
     });
   };
 
@@ -42,6 +50,7 @@ export default function CampaignListPage() {
       <input
         type="text"
         placeholder="Search campaigns..."
+        aria-label="Search campaigns"
         value={search}
         onChange={(e) => { setSearch(e.target.value); setPage(1); }}
         className="block w-full max-w-md rounded border border-gray-300 p-2"
@@ -98,12 +107,14 @@ export default function CampaignListPage() {
                       <div className="flex items-center space-x-2">
                         <Link
                           to={`/business/campaigns/${c.id}`}
+                          aria-label={`View ${c.title}`}
                           className="text-sm text-primary hover:underline"
                         >
                           View
                         </Link>
                         <Link
                           to={`/business/campaigns/${c.id}/edit`}
+                          aria-label={`Edit ${c.title}`}
                           className="text-sm text-primary hover:underline"
                         >
                           Edit
@@ -111,6 +122,7 @@ export default function CampaignListPage() {
                         {c.status !== "ARCHIVED" && (
                           <button
                             onClick={() => handleArchive(c.id)}
+                            aria-label={`Archive ${c.title}`}
                             className="text-sm text-yellow-600 hover:underline"
                           >
                             Archive
@@ -118,6 +130,7 @@ export default function CampaignListPage() {
                         )}
                         <button
                           onClick={() => handleDelete(c.id, c.title)}
+                          aria-label={`Delete ${c.title}`}
                           className="text-sm text-danger hover:underline"
                         >
                           Delete
@@ -153,6 +166,14 @@ export default function CampaignListPage() {
           )}
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        onConfirm={confirmDelete}
+        title="Delete Campaign"
+        message={deleteConfirm ? `Delete "${deleteConfirm.title}"? This cannot be undone.` : ""}
+      />
     </div>
   );
 }

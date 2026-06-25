@@ -2,7 +2,7 @@
 from typing import Dict, List, Optional, Tuple
 from fastapi import HTTPException, status
 from sqlalchemy import desc
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from datetime import datetime, timezone
 
 from ..models.collaboration import Collaboration, CollaborationStatus
@@ -122,13 +122,13 @@ def delete_review(db: Session, user: User, review_id: str) -> None:
 
 
 def get_my_reviews(db: Session, user: User, page: int = 1, limit: int = 20) -> Tuple[List[ReviewRead], int]:
-    query = db.query(Review).filter(Review.reviewer_id == user.id)
+    query = db.query(Review).options(joinedload(Review.reviewer)).filter(Review.reviewer_id == user.id)
     total = query.count()
     reviews = query.order_by(desc(Review.created_at)).offset((page - 1) * limit).limit(limit).all()
 
     items = []
     for r in reviews:
-        reviewer = db.query(User).filter(User.id == r.reviewer_id).first()
+        reviewer = r.reviewer
         if not reviewer:
             continue
         items.append(ReviewRead(
@@ -145,13 +145,13 @@ def get_my_reviews(db: Session, user: User, page: int = 1, limit: int = 20) -> T
 
 
 def get_user_reviews(db: Session, user_id: str, page: int = 1, limit: int = 20) -> Tuple[List[ReviewRead], int]:
-    query = db.query(Review).filter(Review.reviewee_id == user_id)
+    query = db.query(Review).options(joinedload(Review.reviewer)).filter(Review.reviewee_id == user_id)
     total = query.count()
     reviews = query.order_by(desc(Review.created_at)).offset((page - 1) * limit).limit(limit).all()
 
     items = []
     for r in reviews:
-        reviewer = db.query(User).filter(User.id == r.reviewer_id).first()
+        reviewer = r.reviewer
         if not reviewer:
             continue
         items.append(ReviewRead(

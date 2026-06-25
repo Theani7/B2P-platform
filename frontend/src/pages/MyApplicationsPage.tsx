@@ -2,6 +2,7 @@ import { useState } from "react";
 import { usePromoterApplications, useWithdrawApplication } from "../features/collaboration/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -13,13 +14,21 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default function MyApplicationsPage() {
   const [page, setPage] = useState(1);
-  const { data, isLoading } = usePromoterApplications({ page, limit: 20 });
+  const { data, isLoading, error } = usePromoterApplications({ page, limit: 20 });
   const withdrawMutation = useWithdrawApplication();
+  const [withdrawConfirm, setWithdrawConfirm] = useState<string | null>(null);
+
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
 
   const handleWithdraw = (id: string) => {
-    withdrawMutation.mutate(id, {
-      onSuccess: () => notifySuccess("Application withdrawn"),
-      onError: (e) => notifyError(e.message),
+    setWithdrawConfirm(id);
+  };
+
+  const confirmWithdraw = () => {
+    if (!withdrawConfirm) return;
+    withdrawMutation.mutate(withdrawConfirm, {
+      onSuccess: () => { notifySuccess("Application withdrawn"); setWithdrawConfirm(null); },
+      onError: (e) => { notifyError(e.message); setWithdrawConfirm(null); },
     });
   };
 
@@ -69,6 +78,7 @@ export default function MyApplicationsPage() {
                 <button
                   onClick={() => handleWithdraw(app.id)}
                   disabled={withdrawMutation.isPending}
+                  aria-label="Withdraw application"
                   className="text-danger hover:underline"
                 >
                   Withdraw
@@ -100,6 +110,14 @@ export default function MyApplicationsPage() {
           </button>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!withdrawConfirm}
+        onClose={() => setWithdrawConfirm(null)}
+        onConfirm={confirmWithdraw}
+        title="Withdraw Application"
+        message="Are you sure you want to withdraw this application?"
+      />
     </div>
   );
 }

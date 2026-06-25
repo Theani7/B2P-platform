@@ -2,6 +2,7 @@ import { useState } from "react";
 import { usePromoterInvitations, useAcceptInvitation, useRejectInvitation } from "../features/collaboration/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -13,22 +14,34 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default function PromoterInvitationsPage() {
   const [page, setPage] = useState(1);
-  const { data, isLoading } = usePromoterInvitations({ page, limit: 20 });
+  const { data, isLoading, error } = usePromoterInvitations({ page, limit: 20 });
   const acceptMutation = useAcceptInvitation();
   const rejectMutation = useRejectInvitation();
+  const [actionConfirm, setActionConfirm] = useState<{ id: string; action: "accept" | "reject" } | null>(null);
+
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
 
   const handleAccept = (id: string) => {
-    acceptMutation.mutate(id, {
-      onSuccess: () => notifySuccess("Invitation accepted, collaboration started"),
-      onError: (e) => notifyError(e.message),
-    });
+    setActionConfirm({ id, action: "accept" });
   };
 
   const handleReject = (id: string) => {
-    rejectMutation.mutate(id, {
-      onSuccess: () => notifySuccess("Invitation rejected"),
-      onError: (e) => notifyError(e.message),
-    });
+    setActionConfirm({ id, action: "reject" });
+  };
+
+  const confirmAction = () => {
+    if (!actionConfirm) return;
+    if (actionConfirm.action === "accept") {
+      acceptMutation.mutate(actionConfirm.id, {
+        onSuccess: () => { notifySuccess("Invitation accepted, collaboration started"); setActionConfirm(null); },
+        onError: (e) => { notifyError(e.message); setActionConfirm(null); },
+      });
+    } else {
+      rejectMutation.mutate(actionConfirm.id, {
+        onSuccess: () => { notifySuccess("Invitation rejected"); setActionConfirm(null); },
+        onError: (e) => { notifyError(e.message); setActionConfirm(null); },
+      });
+    }
   };
 
   if (isLoading) return <LoadingSpinner />;
@@ -76,6 +89,7 @@ export default function PromoterInvitationsPage() {
                 <button
                   onClick={() => handleAccept(inv.id)}
                   disabled={acceptMutation.isPending}
+                  aria-label={`Accept invitation from ${inv.business_name}`}
                   className="rounded bg-success px-4 py-1.5 text-sm font-medium text-white hover:bg-success/90 disabled:opacity-50"
                 >
                   Accept
@@ -83,6 +97,7 @@ export default function PromoterInvitationsPage() {
                 <button
                   onClick={() => handleReject(inv.id)}
                   disabled={rejectMutation.isPending}
+                  aria-label={`Reject invitation from ${inv.business_name}`}
                   className="rounded border border-danger px-4 py-1.5 text-sm font-medium text-danger hover:bg-danger/5 disabled:opacity-50"
                 >
                   Reject
@@ -117,6 +132,14 @@ export default function PromoterInvitationsPage() {
           </button>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!actionConfirm}
+        onClose={() => setActionConfirm(null)}
+        onConfirm={confirmAction}
+        title={actionConfirm?.action === "accept" ? "Accept Invitation" : "Reject Invitation"}
+        message={actionConfirm?.action === "accept" ? "Accept this invitation and start collaborating?" : "Reject this invitation?"}
+      />
     </div>
   );
 }

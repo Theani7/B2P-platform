@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useBusinessInvitations, useCancelInvitation } from "../features/collaboration/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -13,13 +14,21 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default function BusinessInvitationsPage() {
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useBusinessInvitations({ page, limit: 20 });
+  const { data, isLoading, error } = useBusinessInvitations({ page, limit: 20 });
   const cancelMutation = useCancelInvitation();
+  const [cancelConfirm, setCancelConfirm] = useState<string | null>(null);
+
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
 
   const handleCancel = (id: string) => {
-    cancelMutation.mutate(id, {
-      onSuccess: () => notifySuccess("Invitation cancelled"),
-      onError: (e) => notifyError(e.message),
+    setCancelConfirm(id);
+  };
+
+  const confirmCancel = () => {
+    if (!cancelConfirm) return;
+    cancelMutation.mutate(cancelConfirm, {
+      onSuccess: () => { notifySuccess("Invitation cancelled"); setCancelConfirm(null); },
+      onError: (e) => { notifyError(e.message); setCancelConfirm(null); },
     });
   };
 
@@ -100,6 +109,14 @@ export default function BusinessInvitationsPage() {
           </button>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!cancelConfirm}
+        onClose={() => setCancelConfirm(null)}
+        onConfirm={confirmCancel}
+        title="Cancel Invitation"
+        message="Are you sure you want to cancel this invitation?"
+      />
     </div>
   );
 }

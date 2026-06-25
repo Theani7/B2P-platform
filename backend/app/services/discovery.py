@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 
 from fastapi import HTTPException, status
 from sqlalchemy import or_
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, contains_eager
 
 from ..models.business_profile import BusinessProfile
 from ..models.promoter_profile import PromoterProfile
@@ -139,20 +139,27 @@ def remove_saved_promoter(db: Session, user: User, promoter_id: str) -> None:
 
 def get_saved_promoters(db: Session, user: User, *, search: str = "", page: int = 1, limit: int = 20) -> Tuple[List[SavedPromoter], int]:
     business = _ensure_business_profile(db, user)
-    query = (
-        db.query(SavedPromoter)
-        .options(joinedload(SavedPromoter.promoter_profile))
-        .filter(SavedPromoter.business_profile_id == business.id)
-    )
 
     if search:
         like = f"%{search}%"
-        query = query.join(PromoterProfile).filter(
-            or_(
-                PromoterProfile.username.ilike(like),
-                PromoterProfile.headline.ilike(like),
-                PromoterProfile.niche.ilike(like),
+        query = (
+            db.query(SavedPromoter)
+            .join(PromoterProfile)
+            .options(contains_eager(SavedPromoter.promoter_profile))
+            .filter(
+                SavedPromoter.business_profile_id == business.id,
+                or_(
+                    PromoterProfile.username.ilike(like),
+                    PromoterProfile.headline.ilike(like),
+                    PromoterProfile.niche.ilike(like),
+                ),
             )
+        )
+    else:
+        query = (
+            db.query(SavedPromoter)
+            .options(joinedload(SavedPromoter.promoter_profile))
+            .filter(SavedPromoter.business_profile_id == business.id)
         )
 
     total = query.count()

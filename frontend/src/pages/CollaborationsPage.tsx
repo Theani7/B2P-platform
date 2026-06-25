@@ -6,6 +6,7 @@ import { useCompleteCollaboration, useCreateReview } from "../features/reviews/a
 import ReviewFormDialog from "../components/reviews/ReviewFormDialog";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -22,9 +23,12 @@ export default function CollaborationsPage() {
 
   const bizQuery = useBusinessCollaborations({ page, limit: 20 });
   const promQuery = usePromoterCollaborations({ page, limit: 20 });
-  const { data, isLoading } = isBusiness ? bizQuery : promQuery;
+  const { data, isLoading, error } = isBusiness ? bizQuery : promQuery;
   const completeCollab = useCompleteCollaboration();
   const createReview = useCreateReview();
+  const [completeConfirm, setCompleteConfirm] = useState<string | null>(null);
+
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -42,9 +46,14 @@ export default function CollaborationsPage() {
   }
 
   const handleComplete = (collabId: string) => {
-    completeCollab.mutate(collabId, {
-      onSuccess: () => notifySuccess("Collaboration completed"),
-      onError: () => notifyError("Failed to complete collaboration"),
+    setCompleteConfirm(collabId);
+  };
+
+  const confirmComplete = () => {
+    if (!completeConfirm) return;
+    completeCollab.mutate(completeConfirm, {
+      onSuccess: () => { notifySuccess("Collaboration completed"); setCompleteConfirm(null); },
+      onError: () => { notifyError("Failed to complete collaboration"); setCompleteConfirm(null); },
     });
   };
 
@@ -95,6 +104,7 @@ export default function CollaborationsPage() {
               <div className="mt-3">
                 <button
                   onClick={() => handleComplete(c.id)}
+                  aria-label={`Mark collaboration ${c.campaign_title} complete`}
                   className="rounded border border-purple-300 px-3 py-1 text-xs font-medium text-purple-700 hover:bg-purple-50"
                 >
                   Mark Complete
@@ -105,6 +115,7 @@ export default function CollaborationsPage() {
               <div className="mt-3">
                 <button
                   onClick={() => setReviewingCollabId(c.id)}
+                  aria-label={`Write review for ${c.campaign_title}`}
                   className="rounded bg-primary px-3 py-1 text-xs font-medium text-white hover:bg-primary/90"
                 >
                   Write Review
@@ -145,6 +156,14 @@ export default function CollaborationsPage() {
           title="Review Partner"
         />
       )}
+
+      <ConfirmDialog
+        isOpen={!!completeConfirm}
+        onClose={() => setCompleteConfirm(null)}
+        onConfirm={confirmComplete}
+        title="Mark Complete"
+        message="Are you sure you want to mark this collaboration as complete?"
+      />
     </div>
   );
 }

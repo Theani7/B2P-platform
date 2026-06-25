@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useCampaignApplications, useAcceptApplication, useRejectApplication } from "../features/collaboration/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -15,9 +16,12 @@ const STATUS_STYLES: Record<string, string> = {
 export default function BusinessApplicationsPage() {
   const { campaignId } = useParams<{ campaignId: string }>();
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useCampaignApplications(campaignId ?? "", { page, limit: 20 });
+  const { data, isLoading, error } = useCampaignApplications(campaignId ?? "", { page, limit: 20 });
   const acceptMutation = useAcceptApplication();
   const rejectMutation = useRejectApplication();
+  const [rejectConfirm, setRejectConfirm] = useState<string | null>(null);
+
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
 
   const handleAccept = (id: string) => {
     acceptMutation.mutate(id, {
@@ -27,9 +31,14 @@ export default function BusinessApplicationsPage() {
   };
 
   const handleReject = (id: string) => {
-    rejectMutation.mutate(id, {
-      onSuccess: () => notifySuccess("Application rejected"),
-      onError: (e) => notifyError(e.message),
+    setRejectConfirm(id);
+  };
+
+  const confirmReject = () => {
+    if (!rejectConfirm) return;
+    rejectMutation.mutate(rejectConfirm, {
+      onSuccess: () => { notifySuccess("Application rejected"); setRejectConfirm(null); },
+      onError: (e) => { notifyError(e.message); setRejectConfirm(null); },
     });
   };
 
@@ -105,6 +114,7 @@ export default function BusinessApplicationsPage() {
                     <button
                       onClick={() => handleAccept(app.id)}
                       disabled={acceptMutation.isPending}
+                      aria-label={`Accept application from ${app.promoter_username}`}
                       className="rounded bg-success px-4 py-1.5 text-sm font-medium text-white hover:bg-success/90 disabled:opacity-50"
                     >
                       Accept
@@ -112,6 +122,7 @@ export default function BusinessApplicationsPage() {
                     <button
                       onClick={() => handleReject(app.id)}
                       disabled={rejectMutation.isPending}
+                      aria-label={`Reject application from ${app.promoter_username}`}
                       className="rounded border border-danger px-4 py-1.5 text-sm font-medium text-danger hover:bg-danger/5 disabled:opacity-50"
                     >
                       Reject
@@ -145,6 +156,14 @@ export default function BusinessApplicationsPage() {
           </button>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!rejectConfirm}
+        onClose={() => setRejectConfirm(null)}
+        onConfirm={confirmReject}
+        title="Reject Application"
+        message="Are you sure you want to reject this application?"
+      />
     </div>
   );
 }

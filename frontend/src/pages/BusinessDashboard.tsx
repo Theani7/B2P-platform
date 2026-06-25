@@ -3,7 +3,9 @@ import { useCampaignDashboardStats } from "../features/campaigns/api";
 import StatusBadge from "../components/StatusBadge";
 
 export default function BusinessDashboard() {
-  const { data: stats, isLoading } = useCampaignDashboardStats();
+  const { data: stats, isLoading, error } = useCampaignDashboardStats();
+
+  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
 
   return (
     <div className="space-y-6">
@@ -17,7 +19,7 @@ export default function BusinessDashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4" aria-live="polite">
         <div className="rounded-lg border bg-white p-4">
           <p className="text-sm text-gray-500">Total Campaigns</p>
           <p className="mt-1 text-2xl font-bold text-text">

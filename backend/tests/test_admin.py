@@ -362,3 +362,146 @@ async def test_admin_analytics(client: AsyncClient):
     assert resp.status_code == 200
     data = resp.json()
     assert "total_users" in data
+
+
+# --- Campaign Moderation: Cancel ---
+
+@pytest.mark.anyio
+async def test_admin_cancel_campaign(client: AsyncClient):
+    admin_token, _ = await _register_admin(client)
+    biz_token = await _register_business(client)
+    await client.post("/api/v1/business/profile", json={
+        "company_name": "Test Corp", "industry": "TECH",
+    }, headers={"Authorization": f"Bearer {biz_token}"})
+    c = await client.post("/api/v1/campaigns", json={
+        "title": "Cancel Test", "description": "This campaign will be cancelled by admin.",
+        "category": "TECH", "budget": 1000, "location": "Remote",
+        "start_date": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
+        "end_date": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat(),
+    }, headers={"Authorization": f"Bearer {biz_token}"})
+    camp_id = c.json()["id"]
+
+    resp = await client.patch(
+        f"/api/v1/admin/campaigns/{camp_id}/cancel",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp.status_code == 200
+
+
+# --- Review Moderation: Delete ---
+
+@pytest.mark.anyio
+async def test_admin_delete_review(client: AsyncClient):
+    admin_token, _ = await _register_admin(client)
+    biz_token = await _register_business(client)
+    await client.post("/api/v1/business/profile", json={
+        "company_name": "Test Corp", "industry": "TECH",
+    }, headers={"Authorization": f"Bearer {biz_token}"})
+    c = await client.post("/api/v1/campaigns", json={
+        "title": "Review Campaign", "description": "Campaign for review deletion test.",
+        "category": "TECH", "budget": 1000, "location": "Remote",
+        "start_date": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
+        "end_date": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat(),
+    }, headers={"Authorization": f"Bearer {biz_token}"})
+    camp = c.json()
+    await client.put(
+        f"/api/v1/campaigns/{camp['id']}",
+        json={"status": "OPEN"},
+        headers={"Authorization": f"Bearer {biz_token}"},
+    )
+
+    promoter_token = await _register_promoter(client, "delrev")
+    await client.post("/api/v1/promoter/profile", json={
+        "username": "promouser_delrev",
+        "niche": "TECH",
+        "headline": "Review test",
+    }, headers={"Authorization": f"Bearer {promoter_token}"})
+
+    profile_resp = await client.get(
+        "/api/v1/promoter/profile",
+        headers={"Authorization": f"Bearer {promoter_token}"},
+    )
+    pp_id = profile_resp.json()["id"]
+
+    invite = await client.post(
+        f"/api/v1/campaigns/{camp['id']}/invite/{pp_id}",
+        json={},
+        headers={"Authorization": f"Bearer {biz_token}"},
+    )
+    inv_id = invite.json()["data"]["id"]
+    accept = await client.post(
+        f"/api/v1/invitations/{inv_id}/accept",
+        headers={"Authorization": f"Bearer {promoter_token}"},
+    )
+    collab_id = accept.json()["data"]["id"]
+    await client.post(
+        f"/api/v1/collaborations/{collab_id}/complete",
+        headers={"Authorization": f"Bearer {biz_token}"},
+    )
+    review = await client.post(
+        f"/api/v1/collaborations/{collab_id}/reviews",
+        json={"rating": 4, "comment": "Nice work"},
+        headers={"Authorization": f"Bearer {biz_token}"},
+    )
+    review_id = review.json()["id"]
+
+    resp = await client.delete(
+        f"/api/v1/admin/reviews/{review_id}",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp.status_code == 200
+
+
+# --- Invitation Listings ---
+
+@pytest.mark.anyio
+async def test_admin_list_invitations(client: AsyncClient):
+    biz_token = await _register_business(client)
+    await client.post("/api/v1/business/profile", json={
+        "company_name": "Test Corp", "industry": "TECH",
+    }, headers={"Authorization": f"Bearer {biz_token}"})
+    c = await client.post("/api/v1/campaigns", json={
+        "title": "Invite Campaign", "description": "Campaign for invitation list test.",
+        "category": "TECH", "budget": 1000, "location": "Remote",
+        "start_date": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
+        "end_date": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat(),
+    }, headers={"Authorization": f"Bearer {biz_token}"})
+    camp = c.json()
+    await client.put(
+        f"/api/v1/campaigns/{camp['id']}",
+        json={"status": "OPEN"},
+        headers={"Authorization": f"Bearer {biz_token}"},
+    )
+
+    promoter_token = await _register_promoter(client, "invlist")
+    await client.post("/api/v1/promoter/profile", json={
+        "username": "promouser_invlist",
+        "niche": "TECH",
+        "headline": "Invite list",
+    }, headers={"Authorization": f"Bearer {promoter_token}"})
+
+    profile_resp = await client.get(
+        "/api/v1/promoter/profile",
+        headers={"Authorization": f"Bearer {promoter_token}"},
+    )
+    pp_id = profile_resp.json()["id"]
+
+    await client.post(
+        f"/api/v1/campaigns/{camp['id']}/invite/{pp_id}",
+        json={},
+        headers={"Authorization": f"Bearer {biz_token}"},
+    )
+
+    resp = await client.get(
+        "/api/v1/business/invitations",
+        headers={"Authorization": f"Bearer {biz_token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["total"] >= 1
+
+    resp = await client.get(
+        "/api/v1/promoter/invitations",
+        headers={"Authorization": f"Bearer {promoter_token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["total"] >= 1

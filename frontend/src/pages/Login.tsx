@@ -3,7 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLogin } from "../features/auth/api";
 import { Link, useNavigate } from "react-router-dom";
-import { notifyError } from "../hooks/useToast";
+import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const schema = z.object({
   email: z.string().email(),
@@ -20,7 +20,7 @@ export default function Login() {
 
   const onSubmit = (data: FormValues) => {
     login.mutate(data, {
-      onSuccess: () => navigate("/"),
+      onSuccess: () => { notifySuccess("Welcome back!"); navigate("/"); },
       onError: () => notifyError("Login failed. Please check your credentials."),
     });
   };
@@ -29,12 +29,12 @@ export default function Login() {
     <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
       <div>
         <label className="block text-sm font-medium">Email</label>
-        <input {...register("email")} type="email" className="mt-1 block w-full rounded border p-2" />
+        <input {...register("email")} type="email" aria-label="Email address" className="mt-1 block w-full rounded border p-2" />
         {errors.email && <p className="mt-1 text-sm text-danger">{errors.email.message}</p>}
       </div>
       <div>
         <label className="block text-sm font-medium">Password</label>
-        <input {...register("password")} type="password" className="mt-1 block w-full rounded border p-2" />
+        <input {...register("password")} type="password" aria-label="Password" className="mt-1 block w-full rounded border p-2" />
         {errors.password && <p className="mt-1 text-sm text-danger">{errors.password.message}</p>}
       </div>
       <div className="flex items-center justify-between">

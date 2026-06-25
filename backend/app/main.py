@@ -1,11 +1,20 @@
-from fastapi import FastAPI
+import logging
+import sys
+from time import time
+from datetime import datetime, timezone
+
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from .core.config import settings
 from .core.role import Role
 from .exceptions.handlers import register_exception_handlers
 from .middleware.security_headers import SecurityHeadersMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
+from .db.session import get_db
 from .api.v1.auth.routes import router as auth_router
 from .api.v1.business.routes import router as business_router
 from .api.v1.promoter.routes import router as promoter_router, public_router, directory_router
@@ -25,7 +34,29 @@ from .api.v1.reviews.routes import router as review_router
 from .api.v1.admin.routes import router as admin_router
 from .api.v1.promoter_verification.routes import router as promoter_verification_router
 
+# Structured logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(name)s | %(message)s',
+    stream=sys.stdout,
+)
+logger = logging.getLogger("b2p")
+
 app = FastAPI(title=settings.PROJECT_NAME)
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time()
+    response = await call_next(request)
+    elapsed = time() - start
+    logger.info(
+        "%s %s → %d (%.2fms)",
+        request.method,
+        request.url.path,
+        response.status_code,
+        elapsed * 1000,
+    )
+    return response
 
 origins = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",") if o.strip()]
 
@@ -64,5 +95,37 @@ app.include_router(promoter_verification_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")
-def health():
-    return {"status": "ok"}
+def health(db: Session = Depends(get_db)):
+    db_status = "healthy"
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception:
+        db_status = "unhealthy"
+    return {
+        "status": "healthy" if db_status == "healthy" else "unhealthy",
+        "version": "1.0.0",
+        "database": db_status,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@app.get("/ready")
+def ready(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+        return {"status": "ready", "database": "connected"}
+    except Exception:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not ready", "database": "disconnected"},
+        )
+
+
+@app.get("/version")
+def version():
+    return {
+        "name": "B2P Connect",
+        "version": "1.0.0",
+        "api_version": "v1",
+        "environment": "production",
+    }
