@@ -1,6 +1,6 @@
 # Architecture
 
-B2P Connect follows a **Clean Architecture** approach on the backend and a **Feature-Sliced** layout on the frontend.
+Byparsathy follows a **Clean Architecture** approach on the backend and a **Feature-Sliced** layout on the frontend.
 
 ## Backend layers
 

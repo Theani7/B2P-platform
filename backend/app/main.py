@@ -124,7 +124,7 @@ def ready(db: Session = Depends(get_db)):
 @app.get("/version")
 def version():
     return {
-        "name": "B2P Connect",
+        "name": "Byparsathy",
         "version": "1.0.0",
         "api_version": "v1",
         "environment": "production",

@@ -1,4 +1,4 @@
-# B2P Connect — Brand to Promoter Collaboration Platform
+# Byparsathy — Brand to Promoter Collaboration Platform
 
 A full-stack SaaS platform connecting brands (businesses) with social media promoters/influencers for marketing campaigns. Built with **FastAPI + React + PostgreSQL**.
 
@@ -408,7 +408,7 @@ All endpoints are prefixed with `/api/v1`.
 | `MAX_FAILED_LOGIN_ATTEMPTS` | `5` | Lockout threshold |
 | `LOCK_MINUTES` | `15` | Lockout duration (minutes) |
 | `ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:3000` | CORS allowed origins |
-| `PROJECT_NAME` | `B2P Connect` | Application name |
+| `PROJECT_NAME` | `Byparsathy` | Application name |
 | `API_V1_STR` | `/api/v1` | API version prefix |
 
 ### Frontend (`frontend/.env`)

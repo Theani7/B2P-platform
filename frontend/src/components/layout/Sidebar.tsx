@@ -71,7 +71,7 @@ export function Sidebar({ role }: SidebarProps) {
           <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white">
             <Zap size={18} />
           </div>
-          B2P Connect
+          Byparsathy
         </NavLink>
       </div>
 

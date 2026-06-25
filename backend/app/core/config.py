@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "B2P Connect"
+    PROJECT_NAME: str = "Byparsathy"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = "CHANGE_ME_IN_PROD"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

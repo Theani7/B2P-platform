@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Seed the B2P Connect database with realistic demo data.
+"""Seed the Byparsathy database with realistic demo data.
 
 Usage:
     python -m app.seed_data
@@ -1170,7 +1170,7 @@ def seed_all() -> None:
     PASSWORD_HASH = get_password_hash(SEED_PASSWORD)
 
     print(f"\n{'=' * 60}")
-    print("  B2P Connect - Database Seed Script")
+    print("  Byparsathy - Database Seed Script")
     print(f"{'=' * 60}\n")
 
     db = SessionLocal()

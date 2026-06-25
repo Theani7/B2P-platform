@@ -447,7 +447,7 @@ def seed_default_settings(db: Session) -> None:
         ("promoter_niches", "LIFESTYLE,TECH,FASHION,FOOD,TRAVEL,FITNESS,GAMING,BUSINESS,OTHER", "Available promoter niches"),
         ("max_portfolio_items", "20", "Maximum portfolio items per promoter"),
         ("max_upload_size_mb", "10", "Maximum file upload size in MB"),
-        ("platform_name", "B2P Connect", "Platform display name"),
+        ("platform_name", "Byparsathy", "Platform display name"),
         ("support_email", "support@b2pconnect.com", "Platform support email address"),
     ]
     for key, value, desc in defaults:

@@ -47,7 +47,7 @@ export default function LoginPage() {
   return (
     <AuthLayout>
       <h1 className="text-xl font-medium text-gray-900 text-center">Welcome back</h1>
-      <p className="text-sm text-gray-500 text-center mt-1 mb-8">Log in to your B2P Connect account</p>
+      <p className="text-sm text-gray-500 text-center mt-1 mb-8">Log in to your Byparsathy account</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {serverError && (

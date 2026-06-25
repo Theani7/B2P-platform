@@ -62,7 +62,7 @@ function Hero() {
 
         {/* Subtext */}
         <p className="text-sm font-normal text-gray-500 leading-relaxed max-w-lg mx-auto mb-8">
-          B2P Connect matches your business with verified local promoters using smart scoring — by niche, audience, location, and track record.
+          Byparsathy matches your business with verified local promoters using smart scoring — by niche, audience, location, and track record.
         </p>
 
         {/* CTAs */}
@@ -187,7 +187,7 @@ function LogoBar() {
   return (
     <section className="py-8 border-y border-gray-100 bg-white">
       <p className="text-[11px] font-medium uppercase tracking-widest text-gray-400 text-center mb-5">
-        Businesses already on B2P Connect
+        Businesses already on Byparsathy
       </p>
       <div className="max-w-4xl mx-auto px-6 flex items-center justify-center flex-wrap gap-x-8 gap-y-3">
         {logos.map((name) => (
@@ -247,7 +247,7 @@ function Features() {
           <p className="text-[11px] font-medium uppercase tracking-widest text-[#7F77DD] mb-3">Platform features</p>
           <h2 className="text-2xl font-medium text-gray-900 mb-4">Everything a campaign needs, in one place</h2>
           <p className="text-sm font-normal text-gray-500 leading-relaxed max-w-xl mx-auto">
-            From finding the right promoter to tracking deliverables and collecting reviews — B2P Connect handles the full collaboration lifecycle.
+            From finding the right promoter to tracking deliverables and collecting reviews — Byparsathy handles the full collaboration lifecycle.
           </p>
         </div>
 
@@ -330,7 +330,7 @@ function ForWho() {
         <div className="text-center mb-12">
           <h2 className="text-2xl font-medium text-gray-900 mb-4">Built for both sides of the deal</h2>
           <p className="text-sm font-normal text-gray-500 leading-relaxed max-w-lg mx-auto">
-            B2P Connect works equally well whether you're a business launching campaigns or a promoter building your career.
+            Byparsathy works equally well whether you're a business launching campaigns or a promoter building your career.
           </p>
         </div>
 
@@ -409,7 +409,7 @@ function StatsBar() {
 const testimonials = [
   {
     stars: 5,
-    quote: "We used to spend hours on Instagram finding promoters. B2P Connect showed us the top matches in minutes and the brief builder meant no back-and-forth on expectations.",
+    quote: "We used to spend hours on Instagram finding promoters. Byparsathy showed us the top matches in minutes and the brief builder meant no back-and-forth on expectations.",
     initials: "PK",
     avatarBg: "bg-[#EEEDFE]",
     avatarColor: "text-[#3C3489]",
@@ -476,7 +476,7 @@ function FinalCTA() {
       <div className="max-w-xl mx-auto px-6">
         <h2 className="text-2xl font-medium text-gray-900 mb-4">Ready to run your first campaign?</h2>
         <p className="text-sm font-normal text-gray-500 leading-relaxed mb-8">
-          Join 200+ businesses and promoters already using B2P Connect to work smarter.
+          Join 200+ businesses and promoters already using Byparsathy to work smarter.
         </p>
         <div className="flex items-center justify-center gap-3">
           <Link to="/register" className="bg-[#5B4FCF] text-white rounded-lg px-6 py-3 text-sm font-medium hover:opacity-90">Create your first campaign</Link>
@@ -506,7 +506,7 @@ function Footer() {
           <a href="#" className="hover:text-gray-900">Contact</a>
         </div>
 
-        <p className="text-xs text-gray-400">© 2026 B2P Connect, Nepal</p>
+        <p className="text-xs text-gray-400">© 2026 Byparsathy, Nepal</p>
       </div>
     </footer>
   );
