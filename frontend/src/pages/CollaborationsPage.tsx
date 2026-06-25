@@ -1,33 +1,19 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import { Role } from "../constants/roles";
 import { useBusinessCollaborations, usePromoterCollaborations } from "../features/collaboration/api";
 import { useCompleteCollaboration, useCreateReview } from "../features/reviews/api";
 import ReviewFormDialog from "../components/reviews/ReviewFormDialog";
-import LoadingSpinner from "../components/LoadingSpinner";
-import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
-import { PageHeader, Badge, Table } from "../components/ui";
-import { type TableColumn } from "../components/ui/Table";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Star,
-  ArrowRight,
-  CalendarDays,
-  TrendingUp,
-  UserCheck,
+  CheckCircle2, XCircle, Clock, Star, ArrowRight, CalendarDays, TrendingUp,
+  Wallet, FileText, MapPin, MessageCircle, Eye, Download, Search, Filter,
+  Building2, Briefcase, UserCheck, SearchCheck, MoreVertical, Search as SearchIcon
 } from "lucide-react";
-
-const STATUS_BADGE_VARIANT: Record<string, string> = {
-  ACTIVE: "verified",
-  COMPLETED: "active",
-  CANCELLED: "rejected",
-};
 
 const STATUS_ICONS: Record<string, React.ElementType> = {
   ACTIVE: Clock,
@@ -35,231 +21,420 @@ const STATUS_ICONS: Record<string, React.ElementType> = {
   CANCELLED: XCircle,
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: "In Progress",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
-};
+const MOCK_ACTIVITY = [
+  { text: "Nike approved your content draft", time: "2h ago", icon: CheckCircle2, color: "text-emerald-500 bg-emerald-50" },
+  { text: "Deadline updated for TechVlog", time: "5h ago", icon: CalendarDays, color: "text-blue-500 bg-blue-50" },
+  { text: "Logitech submitted a 5-star review", time: "1d ago", icon: Star, color: "text-amber-500 bg-amber-50" },
+];
+
+function CardMenu({ collab, isBusiness, onComplete, onReview }: any) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      if (!menuRef.current || menuRef.current.contains(event.target as Node)) return;
+      setOpen(false);
+    };
+    document.addEventListener("mousedown", listener);
+    return () => document.removeEventListener("mousedown", listener);
+  }, []);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button 
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
+        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors border border-gray-200 bg-white shadow-sm"
+      >
+        <MoreVertical size={16} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.1 }}
+            className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-20 py-1"
+          >
+            <Link 
+              to={isBusiness ? "/business/campaigns" : "/promoter/collaborations"}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Eye size={16} className="text-gray-400"/> View Details
+            </Link>
+            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+              <MessageCircle size={16} className="text-gray-400"/> Open Chat
+            </button>
+            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+              <Download size={16} className="text-gray-400"/> Download Brief
+            </button>
+            
+            {(collab.status === "ACTIVE" || collab.status === "COMPLETED") && (
+              <div className="h-px bg-gray-100 my-1" />
+            )}
+            
+            {collab.status === "ACTIVE" && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); setOpen(false); onComplete(collab.id); }}
+                className="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 font-medium"
+              >
+                <CheckCircle2 size={16} className="text-emerald-500"/> Mark Complete
+              </button>
+            )}
+            {collab.status === "COMPLETED" && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); setOpen(false); onReview(collab.id); }}
+                className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 font-medium"
+              >
+                <Star size={16} className="text-amber-500"/> Write Review
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function CollaborationsPage() {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [reviewingCollabId, setReviewingCollabId] = useState<string | null>(null);
+  const [completeConfirm, setCompleteConfirm] = useState<string | null>(null);
+
   const isBusiness = user?.role === Role.BUSINESS;
 
-  const bizQuery = useBusinessCollaborations({ page, limit: 20 }, isBusiness);
-  const promQuery = usePromoterCollaborations({ page, limit: 20 }, !isBusiness);
+  const bizQuery = useBusinessCollaborations({ page, limit: 10 }, isBusiness);
+  const promQuery = usePromoterCollaborations({ page, limit: 10 }, !isBusiness);
   const { data, isLoading, error } = isBusiness ? bizQuery : promQuery;
+
   const completeCollab = useCompleteCollaboration();
   const createReview = useCreateReview();
-  const [completeConfirm, setCompleteConfirm] = useState<string | null>(null);
 
   if (error) return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="w-16 h-16 rounded-xl bg-brand-coral-50 flex items-center justify-center mb-4">
-        <XCircle size={32} className="text-brand-coral" />
+      <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mb-4 ring-1 ring-red-500/10">
+        <XCircle size={32} className="text-red-500" />
       </div>
-      <p className="text-xl font-medium text-gray-900">Error loading collaborations</p>
+      <p className="text-lg font-medium text-gray-900">Error loading workspace</p>
       <p className="text-sm text-gray-500 mt-1">{(error as Error).message}</p>
     </div>
   );
 
-  if (isLoading) return <LoadingSpinner />;
-
-  if (!data || data.items.length === 0) {
-    return (
-      <EmptyState
-        title="No collaborations yet"
-        description={
-          isBusiness
-            ? "Accept promoter applications or send invitations to start collaborating."
-            : "Apply to campaigns or accept invitations to start collaborating."
-        }
-      />
-    );
-  }
-
-  const handleComplete = (collabId: string) => {
-    setCompleteConfirm(collabId);
-  };
-
+  const handleComplete = (collabId: string) => setCompleteConfirm(collabId);
+  
   const confirmComplete = () => {
     if (!completeConfirm) return;
     completeCollab.mutate(completeConfirm, {
-      onSuccess: () => { notifySuccess("Collaboration marked as complete!"); setCompleteConfirm(null); },
-      onError: () => { notifyError("Failed to complete collaboration"); setCompleteConfirm(null); },
+      onSuccess: () => { notifySuccess("Project marked as complete!"); setCompleteConfirm(null); },
+      onError: () => { notifyError("Failed to complete project"); setCompleteConfirm(null); },
     });
   };
 
-  const handleReviewSubmit = (data: { rating: number; comment?: string }) => {
+  const handleReviewSubmit = (reviewData: { rating: number; comment?: string }) => {
     if (!reviewingCollabId) return;
-    createReview.mutate({ collaborationId: reviewingCollabId, ...data }, {
-      onSuccess: () => {
-        notifySuccess("Review submitted successfully!");
-        setReviewingCollabId(null);
-      },
+    createReview.mutate({ collaborationId: reviewingCollabId, ...reviewData }, {
+      onSuccess: () => { notifySuccess("Review submitted successfully!"); setReviewingCollabId(null); },
       onError: () => notifyError("Failed to submit review"),
     });
   };
 
-  const columns: TableColumn<any>[] = [
-    {
-      key: "campaign",
-      header: "Campaign",
-      render: (c: any) => (
-        <div className="min-w-0">
-          <div className="text-sm font-medium text-gray-900 font-semibold">{c.campaign_title}</div>
-          <div className="mt-1 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 text-xs text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
-              <TrendingUp size={10} className="text-brand-teal" />
-              {c.campaign_category}
-            </span>
-            <span className="inline-flex items-center gap-1 text-xs text-gray-500 font-medium">
-              {formatNepaliCurrency(c.campaign_budget)}
-            </span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "partner",
-      header: "Partner",
-      render: (c: any) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-brand-teal-50 flex items-center justify-center flex-shrink-0 text-xs font-medium text-brand-teal-900">
-            {c.partner_avatar_url ? (
-              <img src={c.partner_avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
-            ) : (
-              c.partner_name?.slice(0, 2).toUpperCase() || "??"
-            )}
-          </div>
-          <span className="text-sm font-medium text-gray-900">{c.partner_name}</span>
-        </div>
-      ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (c: any) => {
-        const StatusIcon = STATUS_ICONS[c.status] || Clock;
-        const badgeVariant = STATUS_BADGE_VARIANT[c.status] || "draft";
-        return (
-          <Badge variant={badgeVariant as any}>
-            <StatusIcon size={12} className="mr-1" />
-            {STATUS_LABELS[c.status] || c.status}
-          </Badge>
-        );
-      },
-    },
-    {
-      key: "dates",
-      header: "Dates",
-      render: (c: any) => (
-        <div className="flex flex-col gap-1 text-xs text-gray-500">
-          <span className="inline-flex items-center gap-1.5">
-            <CalendarDays size={12} />
-            Started: {new Date(c.started_at).toLocaleDateString("en-US", {
-              month: "short", day: "numeric", year: "numeric"
-            })}
-          </span>
-          {c.completed_at && (
-            <span className="inline-flex items-center gap-1.5">
-              <CheckCircle2 size={12} className="text-brand-teal" />
-              Completed: {new Date(c.completed_at).toLocaleDateString("en-US", {
-                month: "short", day: "numeric", year: "numeric"
-              })}
-            </span>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      render: (c: any) => (
-        <div className="flex items-center gap-3">
-          {c.status === "ACTIVE" && (
-            <button
-              onClick={() => handleComplete(c.id)}
-              className="bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors inline-flex items-center gap-1.5"
-            >
-              <CheckCircle2 size={14} />
-              Mark Complete
-            </button>
-          )}
-          {c.status === "COMPLETED" && (
-            <button
-              onClick={() => setReviewingCollabId(c.id)}
-              className="bg-brand-indigo text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity inline-flex items-center gap-1.5"
-            >
-              <Star size={14} />
-              Write Review
-            </button>
-          )}
-          {c.status === "ACTIVE" && (
-            <Link
-              to={isBusiness ? "/business/campaigns" : "/promoter/collaborations"}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-purple hover:underline ml-auto"
-            >
-              View Details <ArrowRight size={12} />
-            </Link>
-          )}
-        </div>
-      ),
-    },
-  ];
+  const collabs = data?.items || [];
+  const activeCount = collabs.filter((c:any) => c.status === 'ACTIVE').length;
+  const completedCount = collabs.filter((c:any) => c.status === 'COMPLETED').length;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <PageHeader
-        title="Collaborations"
-        description={
-          isBusiness
-            ? "Manage your partnerships with promoters"
-            : "Track your collaborations with businesses"
-        }
-      />
-
-      {/* Collaborations List */}
-      <Table columns={columns} data={data.items} />
-
-      {/* Pagination */}
-      {data.pages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-4">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-          >
-            <ArrowRight size={12} className="rotate-180" />
-            Previous
-          </button>
-          <div className="flex items-center gap-1">
-            {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
-                  p === page
-                    ? "bg-brand-indigo text-white"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
-            disabled={page >= data.pages}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-          >
-            Next
-            <ArrowRight size={12} />
-          </button>
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
+      
+      {/* 1. PREMIUM HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl shadow-sm ring-1 ring-gray-200 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-50/50 via-white to-white">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Workspace</h1>
+          <p className="text-sm text-gray-500 mt-2 max-w-xl">
+            {isBusiness ? "Manage your active and completed promoter partnerships." : "Manage your active and completed brand partnerships."}
+          </p>
         </div>
-      )}
+        <div className="flex items-center gap-3">
+          <button className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 h-11 px-5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">
+            <TrendingUp size={16} /> Analytics
+          </button>
+          <Link
+            to={isBusiness ? "/business/directory" : "/promoter/marketplace"}
+            className="inline-flex items-center gap-2 bg-primary-600 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+          >
+            <SearchIcon size={16} /> {isBusiness ? "Find Promoters" : "Browse Campaigns"}
+          </Link>
+        </div>
+      </div>
+
+      {/* 2. SUMMARY CARDS */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Active Projects</h3>
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><Clock size={14}/></div>
+          </div>
+          <div className="text-2xl font-bold text-gray-900">{activeCount}</div>
+          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ 2 started this week</p>
+        </div>
+        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Completed</h3>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><CheckCircle2 size={14}/></div>
+          </div>
+          <div className="text-2xl font-bold text-gray-900">{completedCount}</div>
+          <p className="text-xs text-gray-400 font-medium mt-1">All time</p>
+        </div>
+        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Pending Reviews</h3>
+            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><Star size={14}/></div>
+          </div>
+          <div className="text-2xl font-bold text-gray-900">1</div>
+          <p className="text-xs text-gray-400 font-medium mt-1">Awaiting your feedback</p>
+        </div>
+        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Total Earnings</h3>
+            <div className="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"><Wallet size={14}/></div>
+          </div>
+          <div className="text-2xl font-bold text-gray-900">रु 45K</div>
+          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ 15% vs last month</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        
+        {/* MAIN COLUMN (9 cols) */}
+        <div className="xl:col-span-9 space-y-6">
+          
+          {/* 3. FILTER TOOLBAR */}
+          <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="bg-white p-2 rounded-2xl shadow-sm ring-1 ring-gray-200 flex flex-col gap-3">
+              <div className="flex flex-col md:flex-row gap-2">
+                <div className="relative flex-1">
+                  <SearchIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search projects by name or partner..."
+                    value={search}
+                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                    className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-gray-400 text-gray-900"
+                  />
+                </div>
+                <div className="hidden md:flex items-center gap-2 pr-2">
+                  <div className="h-8 w-px bg-gray-100 mx-2"></div>
+                  <button className="h-10 px-4 rounded-xl bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors flex items-center gap-2">
+                    <Filter size={16}/> Filter
+                  </button>
+                  <select className="h-10 pl-4 pr-10 text-sm font-medium text-gray-700 bg-gray-50 border-none rounded-xl focus:ring-0 cursor-pointer">
+                    <option>Recently Updated</option>
+                    <option>Newest First</option>
+                    <option>Deadline</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar px-2 pb-1">
+                {["All", "Active", "Completed", "Pending Review", "Cancelled"].map(status => (
+                  <button 
+                    key={status}
+                    onClick={() => setStatusFilter(status.toLowerCase())}
+                    className={`whitespace-nowrap px-4 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border ${
+                      statusFilter === status.toLowerCase() 
+                      ? 'bg-gray-900 text-white border-gray-900' 
+                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* PROJECT LIST */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Array.from({length:4}).map((_,i) => <div key={i} className="bg-white rounded-2xl h-80 animate-pulse ring-1 ring-gray-100"></div>)}
+            </div>
+          ) : !collabs || collabs.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
+              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-4"><Briefcase size={32}/></div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">No active projects</h2>
+              <p className="text-sm text-gray-500 max-w-sm mb-6">You don't have any collaborations right now. Start by finding new partners.</p>
+              <Link to={isBusiness ? "/business/directory" : "/promoter/marketplace"} className="h-11 px-6 flex items-center justify-center rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-sm">
+                Explore Marketplace
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {collabs.map((c: any) => {
+                const isCompleted = c.status === "COMPLETED";
+                const isCancelled = c.status === "CANCELLED";
+                const isActive = c.status === "ACTIVE";
+
+                return (
+                  <motion.div
+                    key={c.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 hover:shadow-lg hover:ring-primary-200 transition-all group flex flex-col overflow-hidden"
+                  >
+                    <div className="p-6 flex-1 flex flex-col">
+                      
+                      {/* Top Row */}
+                      <div className="flex items-start justify-between gap-4 mb-5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-lg font-bold text-gray-700">
+                            {c.partner_avatar_url ? (
+                              <img src={c.partner_avatar_url} alt="" className="w-full h-full rounded-xl object-cover" />
+                            ) : (
+                              c.partner_name?.slice(0, 2).toUpperCase() || "??"
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="text-base font-bold text-gray-900 truncate pr-2">{c.campaign_title}</h3>
+                            <p className="text-sm text-gray-500 flex items-center gap-1.5 truncate mt-0.5">
+                              {isBusiness ? <UserCheck size={14}/> : <Building2 size={14}/>} {c.partner_name}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                            isActive ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                            isCompleted ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                            'bg-gray-50 text-gray-600 border border-gray-200'
+                          }`}>
+                            {c.status}
+                          </span>
+                          <CardMenu collab={c} isBusiness={isBusiness} onComplete={handleComplete} onReview={setReviewingCollabId} />
+                        </div>
+                      </div>
+
+                      {/* Financials & Dates */}
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Budget</p>
+                          <p className="text-sm font-bold text-gray-900">{formatNepaliCurrency(c.campaign_budget)}</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Timeline</p>
+                          <p className="text-sm font-bold text-gray-900">2 Weeks left</p>
+                        </div>
+                      </div>
+
+                      {/* Project Timeline */}
+                      <div className="mt-auto pt-2">
+                        <div className="flex items-center justify-between text-xs font-semibold mb-2">
+                          <span className="text-gray-900">Project Progress</span>
+                          <span className={isCompleted ? 'text-emerald-600' : 'text-blue-600'}>
+                            {isCompleted ? '100%' : '60%'}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500 w-full' : 'bg-blue-500 w-[60%]'}`}></div>
+                        </div>
+                        <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">
+                          <span className="text-gray-700">Agreement</span>
+                          <span className={!isCompleted ? "text-blue-600" : "text-gray-700"}>Content</span>
+                          <span className={isCompleted ? "text-emerald-600" : ""}>Review</span>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="bg-gray-50 border-t border-gray-100 p-4 flex gap-3">
+                      {isActive && (
+                        <button onClick={() => handleComplete(c.id)} className="flex-1 h-10 rounded-xl bg-gray-900 text-white text-sm font-bold hover:bg-primary-600 shadow-sm transition-colors flex items-center justify-center gap-2">
+                          <CheckCircle2 size={16}/> Complete
+                        </button>
+                      )}
+                      {isCompleted && (
+                        <button onClick={() => setReviewingCollabId(c.id)} className="flex-1 h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 shadow-sm transition-colors flex items-center justify-center gap-2">
+                          <Star size={16}/> Write Review
+                        </button>
+                      )}
+                      <Link to={isBusiness ? "/business/campaigns" : "/promoter/collaborations"} className={`h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 shadow-sm transition-colors flex items-center justify-center gap-2 ${isActive || isCompleted ? 'px-4' : 'flex-1'}`}>
+                        Details
+                      </Link>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {data && data.pages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-6">
+              <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1} className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50">Prev</button>
+              <div className="flex items-center gap-1">
+                {Array.from({length: data.pages}, (_,i) => i+1).map(p => (
+                  <button key={p} onClick={() => setPage(p)} className={`w-10 h-10 rounded-xl text-sm font-bold ${p === page ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+                    {p}
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setPage(p => Math.min(data.pages, p+1))} disabled={page === data.pages} className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50">Next</button>
+            </div>
+          )}
+        </div>
+
+        {/* SIDEBAR COLUMN (3 cols) */}
+        <div className="xl:col-span-3 space-y-6">
+          
+          {/* Upcoming Deadlines */}
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-5">
+            <h2 className="text-sm font-bold text-gray-900 mb-5 flex items-center gap-2"><Clock size={16} className="text-blue-500"/> Upcoming Deadlines</h2>
+            <div className="space-y-4">
+              <div className="bg-blue-50 rounded-xl p-3 border border-blue-100">
+                <p className="text-xs font-bold text-blue-900 mb-1">Content Draft Due</p>
+                <p className="text-xs text-blue-700 mb-2">Summer Apparel Collab</p>
+                <div className="flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 w-fit px-2 py-0.5 rounded">
+                  2 Days Left
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Activity Panel */}
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-5">
+            <h2 className="text-sm font-bold text-gray-900 mb-5">Recent Updates</h2>
+            <div className="space-y-5">
+              {MOCK_ACTIVITY.map((act, i) => {
+                const Icon = act.icon;
+                return (
+                  <div key={i} className="flex gap-3">
+                    <div className={`w-8 h-8 rounded-full ${act.color} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                      <Icon size={14} />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-900 font-medium leading-snug">{act.text}</p>
+                      <p className="text-xs text-gray-400 mt-1">{act.time}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          
+          {/* Review Reminders */}
+          <div className="bg-gradient-to-br from-amber-50 to-white rounded-2xl shadow-sm ring-1 ring-amber-100 p-5">
+            <h2 className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2"><Star size={16} className="text-amber-500"/> Review Reminder</h2>
+            <p className="text-xs text-amber-800/80 leading-relaxed mb-4">
+              Help the community by reviewing your completed collaboration with Nike.
+            </p>
+            <button className="w-full text-xs font-bold text-amber-700 bg-amber-100 hover:bg-amber-200 transition-colors h-9 rounded-lg flex items-center justify-center gap-2">
+              Write Review
+            </button>
+          </div>
+        </div>
+
+      </div>
 
       {reviewingCollabId && (
         <ReviewFormDialog
@@ -275,7 +450,7 @@ export default function CollaborationsPage() {
         onClose={() => setCompleteConfirm(null)}
         onConfirm={confirmComplete}
         title="Mark Complete"
-        message="Are you sure you want to mark this collaboration as complete? This will notify your partner."
+        message="Are you sure you want to mark this collaboration as complete? This will notify your partner and move the project to the review phase."
       />
     </div>
   );
