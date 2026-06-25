@@ -4,6 +4,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { formatNepaliCurrency } from "../utils/currency";
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-700",
@@ -58,7 +59,7 @@ export default function MyApplicationsPage() {
                 <div className="mt-1 flex items-center gap-3 text-sm text-gray-500">
                   <span>{app.campaign_category}</span>
                   <span>&middot;</span>
-                  <span>${app.campaign_budget?.toLocaleString()}</span>
+                  <span>{formatNepaliCurrency(app.campaign_budget)}</span>
                   <span>&middot;</span>
                   <span>{app.campaign_location}</span>
                 </div>

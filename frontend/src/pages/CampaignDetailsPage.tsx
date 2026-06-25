@@ -8,6 +8,7 @@ import {
 import StatusBadge from "../components/StatusBadge";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { PageHeader } from "../components/ui";
+import { formatNepaliCurrency } from "../utils/currency";
 
 export default function CampaignDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -117,7 +118,7 @@ export default function CampaignDetailsPage() {
             <div>
               <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Budget</span>
               <p className="mt-0.5 text-sm font-medium text-gray-900">
-                ${campaign.budget.toLocaleString()}
+                {formatNepaliCurrency(campaign.budget)}
               </p>
             </div>
             <div>

@@ -12,7 +12,6 @@ import {
   Edit3,
   Archive,
   Trash2,
-  DollarSign,
   MapPin,
   CalendarDays,
   ArrowRight,
@@ -20,6 +19,7 @@ import {
   Filter,
 } from "lucide-react";
 import { PageHeader } from "../components/ui";
+import { formatNepaliCurrency } from "../utils/currency";
 
 export default function CampaignListPage() {
   const [page, setPage] = useState(1);
@@ -140,9 +140,8 @@ export default function CampaignListPage() {
                           <StatusBadge status={c.status} />
                         </div>
                         <div className="mt-1.5 flex flex-wrap items-center gap-3">
-                          <span className="inline-flex items-center gap-1 text-xs text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded">
-                            <DollarSign size={10} className="text-brand-teal" />
-                            ${c.budget.toLocaleString()}
+                          <span className="inline-flex items-center gap-1 text-xs text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded font-medium">
+                            {formatNepaliCurrency(c.budget)}
                           </span>
                           <span className="inline-flex items-center gap-1 text-xs text-gray-500">
                             <MapPin size={10} className="text-gray-400" />

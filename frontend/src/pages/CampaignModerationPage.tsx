@@ -3,6 +3,7 @@ import { useAdminCampaigns, useAdminArchiveCampaign, useAdminCancelCampaign } fr
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { formatNepaliCurrency } from "../utils/currency";
 
 const STATUS_STYLES: Record<string, string> = {
   DRAFT: "bg-gray-100 text-gray-700",
@@ -63,7 +64,7 @@ export default function CampaignModerationPage() {
                     <span>&middot;</span>
                     <span>{c.category}</span>
                     <span>&middot;</span>
-                    <span>${c.budget.toLocaleString()}</span>
+                    <span>{formatNepaliCurrency(c.budget)}</span>
                     <span>&middot;</span>
                     <span>{c.location}</span>
                   </div>

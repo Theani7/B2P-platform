@@ -6,12 +6,12 @@ import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { PageHeader, Badge } from "../components/ui";
+import { formatNepaliCurrency } from "../utils/currency";
 import {
   Send,
   XCircle,
   Mail,
   MapPin,
-  DollarSign,
   CalendarDays,
   MessageSquare,
   ArrowRight,
@@ -112,9 +112,8 @@ export default function BusinessInvitationsPage() {
                           <Mail size={10} className="text-brand-purple" />
                           {inv.campaign_category}
                         </span>
-                        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-                          <DollarSign size={10} className="text-brand-teal" />
-                          ${inv.campaign_budget?.toLocaleString()}
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-500 font-medium">
+                          {formatNepaliCurrency(inv.campaign_budget)}
                         </span>
                         <span className="inline-flex items-center gap-1 text-xs text-gray-500">
                           <MapPin size={10} className="text-gray-400" />

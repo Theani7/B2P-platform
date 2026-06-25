@@ -4,6 +4,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { formatNepaliCurrency } from "../utils/currency";
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-700",
@@ -70,7 +71,7 @@ export default function PromoterInvitationsPage() {
                   <span>&middot;</span>
                   <span>{inv.campaign_category}</span>
                   <span>&middot;</span>
-                  <span>${inv.campaign_budget?.toLocaleString()}</span>
+                  <span>{formatNepaliCurrency(inv.campaign_budget)}</span>
                   <span>&middot;</span>
                   <span>{inv.campaign_location}</span>
                 </div>

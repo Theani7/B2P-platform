@@ -9,12 +9,12 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { formatNepaliCurrency } from "../utils/currency";
 import {
   Handshake,
   CheckCircle2,
   XCircle,
   Clock,
-  DollarSign,
   Star,
   ArrowRight,
   CalendarDays,
@@ -147,9 +147,8 @@ export default function CollaborationsPage() {
                           <TrendingUp size={11} className="text-brand-teal" />
                           {c.campaign_category}
                         </span>
-                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
-                          <DollarSign size={12} className="text-brand-teal" />
-                          ${c.campaign_budget?.toLocaleString()}
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-500 font-medium">
+                          {formatNepaliCurrency(c.campaign_budget)}
                         </span>
                         <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
                           <UserCheck size={12} className="text-gray-400" />

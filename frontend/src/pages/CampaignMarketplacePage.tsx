@@ -3,11 +3,11 @@ import { useCampaignMarketplace, useApplyToCampaign } from "../features/collabor
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { formatNepaliCurrency } from "../utils/currency";
 import {
   Store,
   Search,
   MapPin,
-  DollarSign,
   CalendarDays,
   ArrowRight,
   Send,
@@ -122,9 +122,8 @@ export default function CampaignMarketplacePage() {
                       <Briefcase size={10} />
                       {c.category}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-teal">
-                      <DollarSign size={14} />
-                      {c.budget.toLocaleString()}
+                    <span className="inline-flex items-center gap-1 text-sm font-medium text-brand-teal">
+                      {formatNepaliCurrency(c.budget)}
                     </span>
                   </div>
 
