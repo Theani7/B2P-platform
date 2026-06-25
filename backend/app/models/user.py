@@ -38,7 +38,6 @@ class User(Base):
     business_profile = relationship("BusinessProfile", back_populates="user", uselist=False)
     promoter_profile = relationship("PromoterProfile", back_populates="user", uselist=False)
     social_links = relationship("SocialLink", back_populates="user", cascade="all, delete-orphan", order_by="SocialLink.display_order")
-    portfolio_items = relationship("PortfolioItem", back_populates="promoter")
     user_achievements = relationship("UserAchievement", back_populates="user", cascade="all, delete-orphan")
 
     @property

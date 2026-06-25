@@ -26,5 +26,5 @@ class VerificationRequest(Base):
     reviewed_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     admin_notes = Column(Text, nullable=True)
 
-    promoter_profile = relationship("PromoterProfile", backref="verification_requests")
+    promoter_profile = relationship("PromoterProfile", back_populates="verification_requests")
     reviewer = relationship("User", backref="verification_reviews")

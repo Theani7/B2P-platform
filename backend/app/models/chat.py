@@ -5,7 +5,7 @@ from sqlalchemy import Column, DateTime, Enum, ForeignKey, String, Boolean, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from ..db.base_class import Base
+from ..db.base import Base
 
 class MessageType(str, enum.Enum):
     TEXT = "TEXT"

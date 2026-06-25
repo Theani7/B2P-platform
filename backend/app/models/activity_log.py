@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.sql import func
-from app.db.base_class import Base
+from app.db.base import Base
 
 class ActivityLog(Base):
     __tablename__ = "activity_logs"

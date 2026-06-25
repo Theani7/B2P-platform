@@ -41,4 +41,4 @@ class PromoterProfile(Base):
 
     user = relationship("User", back_populates="promoter_profile")
     portfolio_items = relationship("PortfolioItem", back_populates="promoter_profile", cascade="all, delete-orphan")
-    social_links = relationship("SocialLink", back_populates="promoter_profile", cascade="all, delete-orphan")
+    verification_requests = relationship("VerificationRequest", back_populates="promoter_profile")

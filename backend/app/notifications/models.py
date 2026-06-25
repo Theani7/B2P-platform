@@ -6,7 +6,7 @@ from sqlalchemy import Column, String, Boolean, DateTime, Enum, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 
-from app.db.base_class import Base
+from app.db.base import Base
 
 class NotificationType(str, enum.Enum):
     APPLICATION_RECEIVED = "APPLICATION_RECEIVED"
@@ -35,7 +35,7 @@ class Notification(Base):
     entity_id = Column(UUID(as_uuid=True), nullable=True)
     is_read = Column(Boolean, default=False, nullable=False, index=True)
     read_at = Column(DateTime(timezone=True), nullable=True)
-    metadata = Column("metadata", JSONB, nullable=True)
+    metadata_ = Column("metadata", JSONB, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False, index=True)
 
     recipient = relationship("User", foreign_keys=[recipient_id])
