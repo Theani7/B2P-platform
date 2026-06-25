@@ -5,6 +5,7 @@ import { usePromoterProfile, useUpsertPromoterProfile } from "../features/profil
 import { Button, Input, Label, Textarea, Select, Card } from "../components/ui";
 import { Sparkles, Save } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const NICHE_OPTIONS = [
   { value: "LIFESTYLE", label: "Lifestyle" },
@@ -42,6 +43,13 @@ export default function PromoterProfilePage() {
     },
   });
 
+  const onSubmit = (data: FormValues) => {
+    mutation.mutate(data, {
+      onSuccess: () => notifySuccess("Profile saved successfully"),
+      onError: () => notifyError("Failed to save profile"),
+    });
+  };
+
   if (profileLoading) return <LoadingSpinner />;
 
   return (
@@ -61,7 +69,7 @@ export default function PromoterProfilePage() {
 
       <div className="max-w-2xl">
         <Card padding="lg">
-          <form onSubmit={handleSubmit(data => mutation.mutate(data))} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-1">
               <Label>Username</Label>
               <Input {...register("username")} />

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./providers/AuthProvider";
 import { Role } from "./constants/roles";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -32,9 +32,22 @@ const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 
 function ProtectedRoute({ role, children }: { role?: Role; children: React.ReactNode }) {
   const { user, isLoading: authLoading } = useAuth();
+  const location = useLocation();
+
   if (authLoading) return <LoadingSpinner />;
   if (!user) return <Navigate to="/login" replace />;
   if (role && user.role !== role) return <Navigate to="/" replace />;
+
+  const isProfilePage =
+    location.pathname === "/business/profile" ||
+    location.pathname === "/promoter/profile";
+
+  if (!user.has_profile && !isProfilePage && user.role !== Role.ADMIN) {
+    const profilePath =
+      user.role === Role.BUSINESS ? "/business/profile" : "/promoter/profile";
+    return <Navigate to={profilePath} replace />;
+  }
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <DashboardLayout role={user.role as string}>

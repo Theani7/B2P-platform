@@ -4,26 +4,38 @@ import type { BusinessProfileRead, PromoterProfileRead } from "./types";
 
 // Business profile hooks
 export const useBusinessProfile = () =>
-  useQuery<BusinessProfileRead>({ queryKey: ["business-profile"], queryFn: () => api.get("/business/profile").then(r => r.data) });
+  useQuery<BusinessProfileRead>({
+    queryKey: ["business-profile"],
+    queryFn: () => api.get("/business/profile").then(r => r.data),
+  });
 
 export const useUpsertBusinessProfile = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { company_name: string; industry: string; description?: string; location?: string; website?: string }) =>
       api.post("/business/profile", data).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["business-profile"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["business-profile"] });
+      qc.invalidateQueries({ queryKey: ["me"] });
+    },
   });
 };
 
 // Promoter profile hooks
 export const usePromoterProfile = () =>
-  useQuery<PromoterProfileRead>({ queryKey: ["promoter-profile"], queryFn: () => api.get("/promoter/profile").then(r => r.data) });
+  useQuery<PromoterProfileRead>({
+    queryKey: ["promoter-profile"],
+    queryFn: () => api.get("/promoter/profile").then(r => r.data),
+  });
 
 export const useUpsertPromoterProfile = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: any) => api.post("/promoter/profile", data).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["promoter-profile"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["promoter-profile"] });
+      qc.invalidateQueries({ queryKey: ["me"] });
+    },
   });
 };
 

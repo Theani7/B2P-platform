@@ -24,6 +24,7 @@ export interface User {
   role: "BUSINESS" | "PROMOTER" | "ADMIN";
   is_active: boolean;
   is_verified: boolean;
+  has_profile: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -52,6 +52,7 @@ class UserRead(UserBase):
     last_login_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
+    has_profile: bool
 
     class Config:
         from_attributes = True

@@ -37,3 +37,14 @@ class User(Base):
 
     business_profile = relationship("BusinessProfile", back_populates="user", uselist=False)
     promoter_profile = relationship("PromoterProfile", back_populates="user", uselist=False)
+
+    @property
+    def has_profile(self) -> bool:
+        if self.role == RoleEnum.ADMIN:
+            return True
+        if self.role == RoleEnum.BUSINESS:
+            return self.business_profile is not None
+        if self.role == RoleEnum.PROMOTER:
+            return self.promoter_profile is not None
+        return False
+

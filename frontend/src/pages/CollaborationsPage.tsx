@@ -46,8 +46,8 @@ export default function CollaborationsPage() {
   const [reviewingCollabId, setReviewingCollabId] = useState<string | null>(null);
   const isBusiness = user?.role === Role.BUSINESS;
 
-  const bizQuery = useBusinessCollaborations({ page, limit: 20 });
-  const promQuery = usePromoterCollaborations({ page, limit: 20 });
+  const bizQuery = useBusinessCollaborations({ page, limit: 20 }, isBusiness);
+  const promQuery = usePromoterCollaborations({ page, limit: 20 }, !isBusiness);
   const { data, isLoading, error } = isBusiness ? bizQuery : promQuery;
   const completeCollab = useCompleteCollaboration();
   const createReview = useCreateReview();

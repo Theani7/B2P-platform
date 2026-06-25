@@ -152,22 +152,24 @@ export const useRejectInvitation = () => {
   });
 };
 
-export const useBusinessCollaborations = (params?: {
-  page?: number;
-  limit?: number;
-}) =>
+export const useBusinessCollaborations = (
+  params?: { page?: number; limit?: number },
+  enabled?: boolean,
+) =>
   useQuery<CollaborationListResponse>({
     queryKey: ["business-collaborations", params],
     queryFn: () =>
       api.get("/business/collaborations", { params }).then((r) => r.data),
+    enabled: enabled ?? true,
   });
 
-export const usePromoterCollaborations = (params?: {
-  page?: number;
-  limit?: number;
-}) =>
+export const usePromoterCollaborations = (
+  params?: { page?: number; limit?: number },
+  enabled?: boolean,
+) =>
   useQuery<CollaborationListResponse>({
     queryKey: ["promoter-collaborations", params],
     queryFn: () =>
       api.get("/promoter/collaborations", { params }).then((r) => r.data),
+    enabled: enabled ?? true,
   });

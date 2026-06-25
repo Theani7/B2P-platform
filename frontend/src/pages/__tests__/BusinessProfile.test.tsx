@@ -9,7 +9,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false } },
 });
 
-test("renders business profile form with heading and save button", () => {
+test("renders business profile form with heading and save button", async () => {
   render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -20,7 +20,7 @@ test("renders business profile form with heading and save button", () => {
     </QueryClientProvider>,
   );
 
-  expect(screen.getByRole("button", { name: /save profile/i })).toBeInTheDocument();
+  expect(await screen.findByRole("button", { name: /save profile/i })).toBeInTheDocument();
   expect(screen.getByText(/company name/i)).toBeInTheDocument();
   expect(screen.getByText(/industry/i)).toBeInTheDocument();
 });
