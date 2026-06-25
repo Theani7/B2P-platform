@@ -32,14 +32,11 @@ export default function BusinessDashboard() {
   return (
     <div className="space-y-8">
       {/* Hero Welcome Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-purple via-brand-indigo to-brand-purple-900 p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_60%)]" />
-        <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-white/5 blur-2xl" />
-        <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5 blur-xl" />
-        <div className="relative z-10 flex items-start justify-between">
+      <div className="rounded-2xl bg-brand-purple p-8">
+        <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-white shadow-lg">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white">
                 <Rocket size={24} />
               </div>
               <div>
@@ -53,14 +50,14 @@ export default function BusinessDashboard() {
           <div className="flex gap-3">
             <Link
               to="/business/promoters"
-              className="group bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
+              className="group bg-white/10 border border-white/20 text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
             >
               <Search size={16} />
               Find promoters
             </Link>
             <Link
               to="/business/campaigns/create"
-              className="group bg-white text-brand-purple rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-white/90 transition-all duration-200 flex items-center gap-2 shadow-lg"
+              className="group bg-white text-brand-purple rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-white/90 transition-all duration-200 flex items-center gap-2"
             >
               <Plus size={16} />
               Create campaign
@@ -131,7 +128,7 @@ export default function BusinessDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Active Collaborations */}
         <div className="bg-white border border-gray-100 rounded-xl overflow-hidden group hover:border-gray-200 transition-colors duration-200">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-brand-teal-50/50 to-transparent">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-brand-teal-50/50">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-brand-teal-50 flex items-center justify-center">
                 <Zap size={18} className="text-brand-teal" />
@@ -239,12 +236,12 @@ function StatCard({
 }) {
   const variantClass =
     variant === "purple"
-      ? "bg-gradient-to-br from-brand-purple-50 to-brand-purple-50/50 text-brand-purple ring-brand-purple/10"
+      ? "bg-brand-purple-50 text-brand-purple ring-brand-purple/10"
       : variant === "indigo"
-      ? "bg-gradient-to-br from-brand-indigo-50 to-brand-indigo-50/50 text-brand-indigo ring-brand-indigo/10"
+      ? "bg-brand-indigo-50 text-brand-indigo ring-brand-indigo/10"
       : variant === "teal"
-      ? "bg-gradient-to-br from-brand-teal-50 to-brand-teal-50/50 text-brand-teal ring-brand-teal/10"
-      : "bg-gradient-to-br from-green-50 to-emerald-50/50 text-green-600 ring-green-500/10";
+      ? "bg-brand-teal-50 text-brand-teal ring-brand-teal/10"
+      : "bg-green-50 text-green-600 ring-green-500/10";
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-6 hover:border-gray-200 transition-all duration-200 hover:-translate-y-0.5">
@@ -283,7 +280,7 @@ function QuickActionCard({
       to={to}
       className="group bg-white border border-gray-100 rounded-xl p-5 hover:border-gray-200 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-4"
     >
-      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color === "purple" ? "from-brand-purple-50 to-brand-indigo-50 text-brand-purple ring-brand-purple/10" : color === "teal" ? "from-brand-teal-50 to-brand-teal-50/50 text-brand-teal ring-brand-teal/10" : "from-brand-amber-50 to-brand-amber-50/50 text-brand-amber ring-brand-amber/10"} flex items-center justify-center ring-1 flex-shrink-0`}>
+      <div className={`w-12 h-12 rounded-xl ${color === "purple" ? "bg-brand-purple-50 text-brand-purple ring-brand-purple/10" : color === "teal" ? "bg-brand-teal-50 text-brand-teal ring-brand-teal/10" : "bg-brand-amber-50 text-brand-amber ring-brand-amber/10"} flex items-center justify-center ring-1 flex-shrink-0`}>
         <Icon size={22} />
       </div>
       <div className="min-w-0 flex-1">

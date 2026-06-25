@@ -127,7 +127,7 @@ export default function BusinessApplicationsPage() {
                 <div className="flex items-start gap-5">
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-purple-50 to-brand-indigo-50 flex items-center justify-center text-xl font-bold text-brand-purple-900 ring-1 ring-brand-purple/10 overflow-hidden">
+                    <div className="w-14 h-14 rounded-2xl bg-brand-purple-50 flex items-center justify-center text-xl font-bold text-brand-purple-900 ring-1 ring-brand-purple/10 overflow-hidden">
                       {app.promoter_avatar_url ? (
                         <img src={app.promoter_avatar_url} alt="" className="h-full w-full object-cover" />
                       ) : (

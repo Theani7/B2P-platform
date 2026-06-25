@@ -104,10 +104,9 @@ export default function CollaborationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-teal via-brand-teal-900 to-brand-purple-900 p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_60%)]" />
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-white shadow-lg ring-1 ring-white/20">
+      <div className="rounded-2xl bg-brand-teal p-8">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-white">
             <Handshake size={28} />
           </div>
           <div>
@@ -134,7 +133,7 @@ export default function CollaborationsPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 min-w-0 flex-1">
                     {/* Partner Avatar */}
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-teal-50 to-brand-teal-50/50 flex items-center justify-center flex-shrink-0 ring-1 ring-brand-teal/10 text-lg font-bold text-brand-teal-900">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-teal-50 flex items-center justify-center flex-shrink-0 ring-1 ring-brand-teal/10 text-lg font-bold text-brand-teal-900">
                       {c.partner_avatar_url ? (
                         <img src={c.partner_avatar_url} alt="" className="h-full w-full rounded-2xl object-cover" />
                       ) : (
@@ -190,7 +189,7 @@ export default function CollaborationsPage() {
                   {c.status === "ACTIVE" && (
                     <button
                       onClick={() => handleComplete(c.id)}
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-teal to-brand-teal-900 text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+                      className="inline-flex items-center gap-2 bg-brand-teal text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
                     >
                       <CheckCircle2 size={16} />
                       Mark Complete
@@ -199,7 +198,7 @@ export default function CollaborationsPage() {
                   {c.status === "COMPLETED" && (
                     <button
                       onClick={() => setReviewingCollabId(c.id)}
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-purple to-brand-indigo text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+                      className="inline-flex items-center gap-2 bg-brand-purple text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
                     >
                       <Star size={16} />
                       Write Review

@@ -58,11 +58,10 @@ export default function SavedPromotersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-amber via-brand-amber-900 to-brand-purple-900 p-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_60%)]" />
-        <div className="relative z-10 flex items-center justify-between">
+      <div className="rounded-2xl bg-brand-amber p-8">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-white shadow-lg ring-1 ring-white/20">
+            <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-white">
               <Bookmark size={28} />
             </div>
             <div>
@@ -72,7 +71,7 @@ export default function SavedPromotersPage() {
           </div>
           <Link
             to="/business/promoters"
-            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
+            className="bg-white/10 border border-white/20 text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
           >
             <UserPlus size={16} />
             Browse Promoters
