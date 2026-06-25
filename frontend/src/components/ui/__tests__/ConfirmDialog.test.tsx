@@ -65,7 +65,7 @@ describe("ConfirmDialog", () => {
       <ConfirmDialog isOpen={true} onClose={vi.fn()} onConfirm={vi.fn()} title="Confirm" message="Sure?" />,
     );
     const confirmBtn = screen.getByRole("button", { name: /confirm/i });
-    expect(confirmBtn.className).toContain("bg-brand-coral");
+    expect(confirmBtn.className).toContain("bg-brand-coral-50");
   });
 
   test("applies primary variant when specified", () => {

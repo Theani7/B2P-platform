@@ -115,7 +115,7 @@ export default function Register() {
             <button
               type="submit"
               disabled={registerMut.isPending}
-              className="w-full bg-brand-coral text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {registerMut.isPending ? "Creating..." : "Create account"}
             </button>

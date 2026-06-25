@@ -93,7 +93,8 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loginMutation.isPending}
-          className="w-full mt-2 bg-brand-coral text-white rounded-lg py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+          style={{ backgroundColor: "#5B4FCF" }}
+          className="w-full mt-2 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loginMutation.isPending && <Loader2 size={16} className="animate-spin" />}
           {loginMutation.isPending ? "Logging in..." : "Log in"}
@@ -102,13 +103,7 @@ export default function LoginPage() {
         {serverError && <p className="text-xs text-brand-coral text-center mt-2">{serverError}</p>}
       </form>
 
-      <div className="flex items-center gap-3 my-6">
-        <div className="flex-1 h-px bg-gray-100" />
-        <span className="text-xs text-gray-400">or</span>
-        <div className="flex-1 h-px bg-gray-100" />
-      </div>
-
-      <p className="text-sm text-gray-500 text-center">
+      <p className="text-sm text-gray-500 text-center mt-6">
         Don't have an account?{" "}
         <Link to="/register" className="text-brand-purple hover:underline">Sign up</Link>
       </p>

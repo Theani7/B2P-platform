@@ -12,6 +12,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </Link>
           {children}
         </div>
+        <p className="text-center text-xs text-gray-400 mt-6">
+          <Link to="/" className="hover:text-gray-600">← Back to home</Link>
+        </p>
       </div>
     </div>
   );

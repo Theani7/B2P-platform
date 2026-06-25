@@ -17,7 +17,7 @@ describe("Button", () => {
 
   test("applies cta variant classes", () => {
     render(<Button variant="cta">CTA</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-brand-coral");
+    expect(screen.getByRole("button").className).toContain("bg-brand-indigo");
   });
 
   test("applies secondary variant classes", () => {

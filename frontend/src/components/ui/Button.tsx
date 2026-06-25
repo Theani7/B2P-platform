@@ -16,7 +16,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary: "bg-brand-purple text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
-  cta: "bg-brand-coral text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
+  cta: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
   secondary: "bg-white border border-gray-200 text-gray-700 rounded-lg px-4 py-2 text-sm hover:bg-gray-50 transition-colors",
   "ghost-teal": "bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors",
   "ghost-destructive": "bg-brand-coral-50 text-brand-coral-900 border border-red-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition-colors",

@@ -31,7 +31,7 @@ export function ConfirmDialog({
         <Button variant="secondary" onClick={onClose} disabled={loading}>
           {cancelText}
         </Button>
-        <Button variant={variant === "destructive" ? "cta" : "primary"} onClick={onConfirm} loading={loading}>
+        <Button variant={variant === "destructive" ? "ghost-destructive" : "primary"} onClick={onConfirm} loading={loading}>
           {confirmText}
         </Button>
       </div>

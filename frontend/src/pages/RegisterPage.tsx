@@ -187,7 +187,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={registerMutation.isPending || !role}
-          className="w-full mt-2 bg-brand-coral text-white rounded-lg py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full mt-2 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {registerMutation.isPending && <Loader2 size={16} className="animate-spin" />}
           {registerMutation.isPending ? "Creating account..." : "Create account"}

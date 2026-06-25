@@ -36,7 +36,7 @@ function Nav() {
 
         <div className="flex items-center gap-3">
           <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2">Log in</Link>
-          <Link to="/register" className="bg-[#D85A30] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:opacity-90">Get started</Link>
+          <Link to="/register" className="bg-[#5B4FCF] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:opacity-90">Get started</Link>
         </div>
       </div>
     </nav>
@@ -67,7 +67,7 @@ function Hero() {
 
         {/* CTAs */}
         <div className="flex items-center justify-center gap-3 mb-14">
-          <Link to="/register" className="bg-[#D85A30] text-white rounded-lg px-6 py-3 text-sm font-medium hover:opacity-90">Start a campaign</Link>
+          <Link to="/register" className="bg-[#5B4FCF] text-white rounded-lg px-6 py-3 text-sm font-medium hover:opacity-90">Start a campaign</Link>
           <a href="#how-it-works" className="bg-white border border-gray-200 rounded-lg px-6 py-3 text-sm text-gray-700 hover:opacity-90">See how it works</a>
         </div>
 
@@ -350,7 +350,7 @@ function ForWho() {
                 </li>
               ))}
             </ul>
-            <Link to="/register" className="block text-center bg-[#D85A30] text-white rounded-lg px-6 py-3 text-sm font-medium hover:opacity-90">
+            <Link to="/register" className="block text-center bg-[#5B4FCF] text-white rounded-lg px-6 py-3 text-sm font-medium hover:opacity-90">
               Start as a business
             </Link>
           </div>
@@ -479,7 +479,7 @@ function FinalCTA() {
           Join 200+ businesses and promoters already using B2P Connect to work smarter.
         </p>
         <div className="flex items-center justify-center gap-3">
-          <Link to="/register" className="bg-[#D85A30] text-white rounded-lg px-6 py-3 text-sm font-medium hover:opacity-90">Create your first campaign</Link>
+          <Link to="/register" className="bg-[#5B4FCF] text-white rounded-lg px-6 py-3 text-sm font-medium hover:opacity-90">Create your first campaign</Link>
           <Link to="/register" className="bg-white border border-gray-200 rounded-lg px-6 py-3 text-sm text-gray-700 hover:opacity-90">Browse promoters</Link>
         </div>
       </div>

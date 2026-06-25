@@ -65,7 +65,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={login.isPending}
-              className="w-full bg-brand-coral text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {login.isPending ? "Signing in..." : "Sign in"}
             </button>
