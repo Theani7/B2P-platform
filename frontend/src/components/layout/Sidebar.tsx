@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../providers/AuthProvider";
-import { useLogout } from "../../features/auth/api";
 import { Role } from "../../constants/roles";
 import {
   LayoutDashboard,
@@ -59,8 +58,7 @@ function getLinks(role: string) {
 }
 
 export function Sidebar({ role }: SidebarProps) {
-  const { user } = useAuth();
-  const logout = useLogout();
+  const { user, openLogoutDialog } = useAuth();
   const links = getLinks(role);
 
   return (
@@ -121,7 +119,7 @@ export function Sidebar({ role }: SidebarProps) {
           Settings
         </NavLink>
         <button
-          onClick={() => logout.mutate()}
+          onClick={() => openLogoutDialog()}
           className="flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200"
         >
           <LogOut size={18} className="text-gray-400 group-hover:text-red-500" />
