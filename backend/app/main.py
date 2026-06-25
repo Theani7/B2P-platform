@@ -40,6 +40,8 @@ from .api.v1.profile_completion.routes import router as profile_completion_route
 from .portfolio.routes import router as portfolio_router
 from .social.routes import router as social_router
 from .chat.routes import router as chat_router
+from .notifications.routes import router as notifications_router
+from .notifications.routes import ws_router as notifications_ws_router
 
 # Structured logging
 logging.basicConfig(
@@ -106,6 +108,8 @@ app.include_router(profile_completion_router, prefix=f"{settings.API_V1_STR}/pro
 app.include_router(portfolio_router, prefix=f"{settings.API_V1_STR}/portfolio", tags=["portfolio"])
 app.include_router(social_router, prefix=f"{settings.API_V1_STR}")
 app.include_router(chat_router, prefix=f"{settings.API_V1_STR}/chat", tags=["chat"])
+app.include_router(notifications_router, prefix=f"{settings.API_V1_STR}/notifications", tags=["notifications"])
+app.include_router(notifications_ws_router, tags=["WebSockets"])
 
 
 @app.get("/health")

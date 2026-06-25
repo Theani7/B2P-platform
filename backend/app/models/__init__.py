@@ -18,6 +18,7 @@ from .social_link import SocialLink
 from .platform_setting import PlatformSetting
 from .verification_request import VerificationRequest
 from .chat import Conversation, Message, MessageType
+from .notifications.models import Notification, NotificationType
 
 __all__ = [
     "User",

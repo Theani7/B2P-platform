@@ -1,6 +1,7 @@
 import { Bell, Search, Plus, User } from "lucide-react";
 import { useAuth } from "../../providers/AuthProvider";
 import { Link } from "react-router-dom";
+import { NotificationBell } from "../notifications";
 
 export function TopHeader() {
   const { user } = useAuth();
@@ -26,10 +27,7 @@ export function TopHeader() {
           <Plus size={16} />
           Create Campaign
         </Link>
-        <button className="relative p-2 text-gray-400 hover:text-gray-600 transition-colors">
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
-        </button>
+        <NotificationBell />
         <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-medium border border-primary-200">
           {user?.full_name?.charAt(0) || <User size={14} />}
         </div>

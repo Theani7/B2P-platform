@@ -12,9 +12,13 @@ from app.models.user import User
 from app.models.chat import Conversation, Message, MessageType
 from app.models.collaboration import Collaboration, CollaborationStatus
 from app.chat.schemas import ConversationRead, MessageRead
-from app.chat.connection_manager import manager
+from app.chat.connection_manager import manager as chat_manager
 from app.schemas.response import SuccessResponse
 from app.activity.service import ActivityService
+from app.notifications.service import NotificationService
+from app.notifications.schemas import NotificationCreate
+from app.notifications.models import NotificationType
+import asyncio
 
 router = APIRouter()
 
@@ -182,7 +186,7 @@ async def websocket_endpoint(
         await websocket.close(code=1008)
         return
         
-    await manager.connect(websocket, conversation_id)
+    await chat_manager.connect(websocket, conversation_id)
     
     try:
         while True:
@@ -222,22 +226,45 @@ async def websocket_endpoint(
                 )
                 
                 # Broadcast
-                await manager.broadcast({
+                await chat_manager.broadcast({
                     "type": "MESSAGE",
                     "payload": MessageRead.model_validate(msg).model_dump()
                 }, conversation_id)
                 
+                # Notifications: Find the other participant and check if they're connected
+                other_user_id = collab.business_profile.user_id if user.id == collab.promoter_profile.user_id else collab.promoter_profile.user_id
+                
+                is_connected = False
+                if conversation_id in chat_manager.active_connections:
+                    # We need a way to check if other user is in this active connections.
+                    # A robust way is to just generate a notification if we are not tracking user identities in chat_manager.
+                    pass 
+                
+                # We'll just create the notification and let the WS broadcast push it. 
+                # If they are reading chat, it will be fetched as read.
+                notification_service = NotificationService(db)
+                notification_in = NotificationCreate(
+                    recipient_id=other_user_id,
+                    actor_id=user.id,
+                    type=NotificationType.NEW_MESSAGE,
+                    title="New Message",
+                    message=f"You received a new message from {user.username}",
+                    entity_type="chat_message",
+                    entity_id=msg.id
+                )
+                asyncio.create_task(notification_service.create_notification(notification_in))
+                
             elif event_type == "TYPING_START":
-                await manager.broadcast({
+                await chat_manager.broadcast({
                     "type": "TYPING_START",
                     "payload": {"user_id": str(user.id)}
                 }, conversation_id)
                 
             elif event_type == "TYPING_STOP":
-                await manager.broadcast({
+                await chat_manager.broadcast({
                     "type": "TYPING_STOP",
                     "payload": {"user_id": str(user.id)}
                 }, conversation_id)
                 
     except WebSocketDisconnect:
-        manager.disconnect(websocket, conversation_id)
+        chat_manager.disconnect(websocket, conversation_id)
