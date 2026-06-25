@@ -1,6 +1,7 @@
 # Project-specific
 .pre-commit-config.yaml
 AGENTS.md
+B2P_FRONTEND_DESIGN.md
 
 # macOS
 .DS_Store

@@ -1,32 +1,43 @@
-import { forwardRef, type ButtonHTMLAttributes } from "react";
+import React from "react";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "ghost" | "outline";
+type ButtonVariant =
+  | "primary"
+  | "cta"
+  | "secondary"
+  | "ghost-teal"
+  | "ghost-destructive"
+  | "icon";
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
   size?: "sm" | "md" | "lg";
   loading?: boolean;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+const variantClasses: Record<ButtonVariant, string> = {
+  primary: "bg-brand-purple text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
+  cta: "bg-brand-coral text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
+  secondary: "bg-white border border-gray-200 text-gray-700 rounded-lg px-4 py-2 text-sm hover:bg-gray-50 transition-colors",
+  "ghost-teal": "bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors",
+  "ghost-destructive": "bg-brand-coral-50 text-brand-coral-900 border border-red-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition-colors",
+  icon: "p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors",
+};
+
+const sizeClasses = {
+  sm: "px-3 py-1.5 text-xs",
+  md: "px-4 py-2 text-sm",
+  lg: "px-6 py-3 text-base",
+};
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = "primary", size = "md", loading, children, className = "", disabled, ...props }, ref) => {
-    const base = "inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2";
-    const variants = {
-      primary: "bg-primary text-white hover:bg-blue-700",
-      secondary: "bg-gray-100 text-gray-700 hover:bg-gray-200",
-      danger: "bg-danger text-white hover:bg-red-700",
-      ghost: "bg-transparent text-gray-700 hover:bg-gray-100",
-      outline: "bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50",
-    };
-    const sizes = {
-      sm: "px-3 py-1.5 text-xs",
-      md: "px-4 py-2 text-sm",
-      lg: "px-6 py-3 text-base",
-    };
+    const isDisabled = disabled || loading;
     return (
       <button
         ref={ref}
-        disabled={disabled || loading}
-        aria-disabled={disabled || loading}
-        className={`${base} ${variants[variant]} ${sizes[size]} ${disabled || loading ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
+        className={`${variantClasses[variant]} ${sizeClasses[size]} ${isDisabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
         {...props}
       >
         {loading && (
@@ -43,4 +54,3 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = "Button";
-export default Button;

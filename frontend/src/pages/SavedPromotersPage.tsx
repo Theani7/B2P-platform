@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useSavedPromoters, useRemoveSavedPromoter } from "../features/discovery/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
-import ConfirmDialog from "../components/ui/ConfirmDialog";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 export default function SavedPromotersPage() {

@@ -1,6 +1,6 @@
 import { test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Table from "../Table";
+import { Table } from "../Table";
 
 interface User {
   name: string;
@@ -79,5 +79,12 @@ describe("Table", () => {
     render(<Table columns={columns} data={data} onRowClick={vi.fn()} />);
     const aliceRow = screen.getByText("Alice").closest("tr");
     expect(aliceRow?.className).toContain("cursor-pointer");
+  });
+
+  test("applies rounded-xl and border-gray-100 to wrapper", () => {
+    const { container } = render(<Table columns={columns} data={data} />);
+    const wrapper = container.querySelector(".overflow-x-auto");
+    expect(wrapper?.className).toContain("rounded-xl");
+    expect(wrapper?.className).toContain("border-gray-100");
   });
 });

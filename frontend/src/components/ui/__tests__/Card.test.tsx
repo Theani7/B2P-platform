@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Card from "../Card";
+import { Card } from "../Card";
 
 describe("Card", () => {
   test("renders children", () => {
@@ -8,23 +8,34 @@ describe("Card", () => {
     expect(screen.getByText("Card content")).toBeInTheDocument();
   });
 
-  test("renders with default padding class", () => {
+  test("renders with default padding (md = p-5)", () => {
     render(<Card>Content</Card>);
-    expect(screen.getByText("Content").className).toContain("p-6");
+    const card = screen.getByText("Content");
+    expect(card.className).toContain("p-5");
   });
 
-  test("applies custom padding", () => {
-    render(<Card padding="p-4">Content</Card>);
-    expect(screen.getByText("Content").className).toContain("p-4");
-    expect(screen.getByText("Content").className).not.toContain("p-6");
+  test("applies sm padding", () => {
+    render(<Card padding="sm">Content</Card>);
+    const card = screen.getByText("Content");
+    expect(card.className).toContain("p-4");
+  });
+
+  test("applies lg padding", () => {
+    render(<Card padding="lg">Content</Card>);
+    const card = screen.getByText("Content");
+    expect(card.className).toContain("p-6");
+  });
+
+  test("applies none padding", () => {
+    render(<Card padding="none">Content</Card>);
+    const card = screen.getByText("Content");
+    expect(card.className).not.toContain("p-");
   });
 
   test("merges custom className", () => {
     render(<Card className="custom-class">Content</Card>);
     const card = screen.getByText("Content");
     expect(card.className).toContain("custom-class");
-    expect(card.className).toContain("bg-white");
-    expect(card.className).toContain("rounded-xl");
   });
 
   test("renders with base styling classes", () => {
@@ -33,8 +44,7 @@ describe("Card", () => {
     expect(card.className).toContain("bg-white");
     expect(card.className).toContain("rounded-xl");
     expect(card.className).toContain("border");
-    expect(card.className).toContain("border-gray-200");
-    expect(card.className).toContain("shadow-sm");
+    expect(card.className).toContain("border-gray-100");
   });
 
   test("renders complex children", () => {

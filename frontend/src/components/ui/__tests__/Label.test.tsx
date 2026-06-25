@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Label from "../Label";
+import { Label } from "../Label";
 
 describe("Label", () => {
   test("renders children", () => {
@@ -19,7 +19,7 @@ describe("Label", () => {
     expect(label.className).toContain("block");
     expect(label.className).toContain("text-sm");
     expect(label.className).toContain("font-medium");
-    expect(label.className).toContain("text-gray-700");
+    expect(label.className).toContain("text-gray-900");
   });
 
   test("merges custom className", () => {

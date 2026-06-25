@@ -1,7 +1,5 @@
-import Dialog from "./Dialog";
-import Button from "./Button";
-
-type ConfirmVariant = "primary" | "danger";
+import { Button } from "./Button";
+import { Dialog } from "./Dialog";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -10,42 +8,33 @@ interface ConfirmDialogProps {
   title: string;
   message: string;
   confirmText?: string;
-  variant?: ConfirmVariant;
+  cancelText?: string;
+  variant?: "destructive" | "primary";
   loading?: boolean;
 }
 
-export default function ConfirmDialog({
+export function ConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
   title,
   message,
   confirmText = "Confirm",
-  variant = "danger",
-  loading = false,
+  cancelText = "Cancel",
+  variant = "destructive",
+  loading,
 }: ConfirmDialogProps) {
   return (
-    <Dialog
-      isOpen={isOpen}
-      onClose={onClose}
-      title={title}
-      footer={
-        <>
-          <Button variant="secondary" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button
-            variant={variant}
-            onClick={onConfirm}
-            loading={loading}
-            disabled={loading}
-          >
-            {confirmText}
-          </Button>
-        </>
-      }
-    >
-      <p className="text-sm text-gray-600">{message}</p>
+    <Dialog isOpen={isOpen} onClose={onClose} title={title} size="sm">
+      <p className="text-sm text-gray-700">{message}</p>
+      <div className="flex gap-3 justify-end mt-6">
+        <Button variant="secondary" onClick={onClose} disabled={loading}>
+          {cancelText}
+        </Button>
+        <Button variant={variant === "destructive" ? "cta" : "primary"} onClick={onConfirm} loading={loading}>
+          {confirmText}
+        </Button>
+      </div>
     </Dialog>
   );
 }

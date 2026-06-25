@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useCampaigns, useDeleteCampaign, useArchiveCampaign } from "../features/campaigns/api";
 import StatusBadge from "../components/StatusBadge";
 import EmptyState from "../components/EmptyState";
-import ConfirmDialog from "../components/ui/ConfirmDialog";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 export default function CampaignListPage() {

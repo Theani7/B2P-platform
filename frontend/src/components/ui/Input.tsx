@@ -1,45 +1,42 @@
-import { forwardRef, type InputHTMLAttributes } from "react";
+import React from "react";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, helperText, className = "", id, ...props }, ref) => {
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
-    return (
-      <div className="space-y-1">
-        {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">
-            {label}
-          </label>
-        )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors ${
-            error ? "border-danger focus:ring-danger focus:border-danger" : "border-gray-300"
-          } ${className}`}
-          aria-invalid={!!error}
-          aria-describedby={error && inputId ? `${inputId}-error` : helperText && inputId ? `${inputId}-helper` : undefined}
-          {...props}
-        />
-        {error && (
-          <p id={`${inputId}-error`} className="text-sm text-danger" role="alert">
-            {error}
-          </p>
-        )}
-        {helperText && !error && (
-          <p id={`${inputId}-helper`} className="text-sm text-gray-500">
-            {helperText}
-          </p>
-        )}
-      </div>
-    );
-  }
-);
+export function Input({ label, error, helperText, className = "", id, ...props }: InputProps) {
+  const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
+  const errorId = error && inputId ? `${inputId}-error` : undefined;
+  const helperId = helperText && !error && inputId ? `${inputId}-helper` : undefined;
 
-Input.displayName = "Input";
-export default Input;
+  return (
+    <div className="space-y-1">
+      {label && (
+        <label htmlFor={inputId} className="block text-sm font-medium text-gray-900">
+          {label}
+        </label>
+      )}
+      <input
+        id={inputId}
+        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple ${
+          error ? "border-brand-coral focus:border-brand-coral focus:ring-brand-coral" : "border-gray-200"
+        } ${className}`}
+        aria-invalid={!!error}
+        aria-describedby={errorId || helperId}
+        {...props}
+      />
+      {error && (
+        <p id={errorId} className="text-sm text-brand-coral" role="alert">
+          {error}
+        </p>
+      )}
+      {helperText && !error && (
+        <p id={helperId} className="text-sm text-gray-500">
+          {helperText}
+        </p>
+      )}
+    </div>
+  );
+}

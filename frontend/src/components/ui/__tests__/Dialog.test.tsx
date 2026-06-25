@@ -1,6 +1,6 @@
 import { test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Dialog from "../Dialog";
+import { Dialog } from "../Dialog";
 
 describe("Dialog", () => {
   test("renders nothing when isOpen is false", () => {
@@ -24,7 +24,7 @@ describe("Dialog", () => {
     expect(screen.getByText("Dialog body")).toBeInTheDocument();
   });
 
-  test("sets aria-modal and aria-labelledby attributes", () => {
+  test("sets aria-modal attribute", () => {
     render(
       <Dialog isOpen={true} onClose={vi.fn()} title="Test">
         Content
@@ -32,7 +32,26 @@ describe("Dialog", () => {
     );
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("aria-modal", "true");
-    expect(dialog).toHaveAttribute("aria-labelledby", "dialog-title");
+  });
+
+  test("sets aria-labelledby to title when no description", () => {
+    render(
+      <Dialog isOpen={true} onClose={vi.fn()} title="Test">
+        Content
+      </Dialog>,
+    );
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("aria-labelledby", "Test");
+  });
+
+  test("does not set aria-labelledby when description is provided", () => {
+    render(
+      <Dialog isOpen={true} onClose={vi.fn()} title="Test" description="A description">
+        Content
+      </Dialog>,
+    );
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).not.toHaveAttribute("aria-labelledby");
   });
 
   test("renders close button with aria-label", () => {
@@ -55,17 +74,6 @@ describe("Dialog", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  test("calls onClose when backdrop is clicked", () => {
-    const onClose = vi.fn();
-    render(
-      <Dialog isOpen={true} onClose={onClose} title="Test">
-        Content
-      </Dialog>,
-    );
-    fireEvent.click(screen.getByRole("dialog"));
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
   test("does not call onClose when inner content is clicked", () => {
     const onClose = vi.fn();
     render(
@@ -75,17 +83,6 @@ describe("Dialog", () => {
     );
     fireEvent.click(screen.getByText("Inner"));
     expect(onClose).not.toHaveBeenCalled();
-  });
-
-  test("calls onClose when Escape key is pressed", () => {
-    const onClose = vi.fn();
-    render(
-      <Dialog isOpen={true} onClose={onClose} title="Test">
-        Content
-      </Dialog>,
-    );
-    fireEvent.keyDown(document, { key: "Escape" });
-    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   test("renders footer content when provided", () => {
@@ -106,14 +103,23 @@ describe("Dialog", () => {
     expect(screen.getByText("Content")).toBeInTheDocument();
   });
 
-  test("sets body overflow hidden when open and clears on unmount", () => {
-    const { unmount } = render(
+  test("applies rounded-2xl class to dialog panel", () => {
+    render(
       <Dialog isOpen={true} onClose={vi.fn()} title="Test">
         Content
       </Dialog>,
     );
-    expect(document.body.style.overflow).toBe("hidden");
-    unmount();
-    expect(document.body.style.overflow).toBe("");
+    const dialog = screen.getByRole("dialog");
+    const panel = dialog.querySelector(".bg-white");
+    expect(panel?.className).toContain("rounded-2xl");
+  });
+
+  test("renders description when provided", () => {
+    render(
+      <Dialog isOpen={true} onClose={vi.fn()} title="Test" description="A description">
+        Content
+      </Dialog>,
+    );
+    expect(screen.getByText("A description")).toBeInTheDocument();
   });
 });

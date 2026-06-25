@@ -2,8 +2,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button, Input, Label, Textarea } from "@/components/ui";
+import { Button, Card, Input, Label, Textarea } from "@/components/ui";
 import { notifySuccess, notifyError } from "@/hooks/useToast";
+import { TopBar } from "@/components/layout/TopBar";
 
 const schema = z.object({
   company_name: z.string().min(1, "Company name required"),
@@ -29,13 +30,35 @@ export default function BusinessProfilePage({ initialData }: BusinessProfilePage
   });
 
   return (
-    <form onSubmit={handleSubmit(data => mutation.mutate(data))} className="space-y-4">
-      <div><Label>Company Name</Label><Input {...register("company_name")} /></div>
-      <div><Label>Industry</Label><Input {...register("industry")} /></div>
-      <div><Label>Description</Label><Textarea {...register("description")} /></div>
-      <div><Label>Location</Label><Input {...register("location")} /></div>
-      <div><Label>Website</Label><Input {...register("website")} type="url" /></div>
-      <Button disabled={mutation.isPending} type="submit">{mutation.isPending ? "Saving..." : "Save Profile"}</Button>
-    </form>
+    <div>
+      <TopBar pageTitle="Business Profile" />
+      <Card padding="lg">
+        <form onSubmit={handleSubmit(data => mutation.mutate(data))} className="space-y-5">
+          <div className="space-y-1">
+            <Label>Company Name</Label>
+            <Input {...register("company_name")} />
+          </div>
+          <div className="space-y-1">
+            <Label>Industry</Label>
+            <Input {...register("industry")} />
+          </div>
+          <div className="space-y-1">
+            <Label>Description</Label>
+            <Textarea {...register("description")} rows={4} />
+          </div>
+          <div className="space-y-1">
+            <Label>Location</Label>
+            <Input {...register("location")} />
+          </div>
+          <div className="space-y-1">
+            <Label>Website</Label>
+            <Input {...register("website")} type="url" />
+          </div>
+          <Button variant="cta" disabled={mutation.isPending} type="submit">
+            {mutation.isPending ? "Saving..." : "Save Profile"}
+          </Button>
+        </form>
+      </Card>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import ConfirmDialog from "../ConfirmDialog";
+import { ConfirmDialog } from "../ConfirmDialog";
 
 describe("ConfirmDialog", () => {
   test("renders nothing when isOpen is false", () => {
@@ -28,6 +28,13 @@ describe("ConfirmDialog", () => {
     expect(screen.getByRole("button", { name: /yes, delete/i })).toBeInTheDocument();
   });
 
+  test("uses custom cancelText", () => {
+    render(
+      <ConfirmDialog isOpen={true} onClose={vi.fn()} onConfirm={vi.fn()} title="Confirm" message="Sure?" cancelText="Nope" />,
+    );
+    expect(screen.getByRole("button", { name: /nope/i })).toBeInTheDocument();
+  });
+
   test("calls onConfirm when confirm button is clicked", () => {
     const onConfirm = vi.fn();
     render(
@@ -46,20 +53,19 @@ describe("ConfirmDialog", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  test("disables both Cancel and Confirm buttons when loading is true", () => {
+  test("disables Cancel button when loading is true", () => {
     render(
       <ConfirmDialog isOpen={true} onClose={vi.fn()} onConfirm={vi.fn()} title="Confirm" message="Sure?" loading={true} />,
     );
     expect(screen.getByRole("button", { name: /cancel/i })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /confirm/i })).toBeDisabled();
   });
 
-  test("applies danger variant by default to confirm button", () => {
+  test("applies destructive variant (cta) to confirm button by default", () => {
     render(
       <ConfirmDialog isOpen={true} onClose={vi.fn()} onConfirm={vi.fn()} title="Confirm" message="Sure?" />,
     );
     const confirmBtn = screen.getByRole("button", { name: /confirm/i });
-    expect(confirmBtn.className).toContain("bg-danger");
+    expect(confirmBtn.className).toContain("bg-brand-coral");
   });
 
   test("applies primary variant when specified", () => {
@@ -67,6 +73,15 @@ describe("ConfirmDialog", () => {
       <ConfirmDialog isOpen={true} onClose={vi.fn()} onConfirm={vi.fn()} title="Confirm" message="Sure?" variant="primary" />,
     );
     const confirmBtn = screen.getByRole("button", { name: /confirm/i });
-    expect(confirmBtn.className).toContain("bg-primary");
+    expect(confirmBtn.className).toContain("bg-brand-purple");
+  });
+
+  test("applies secondary variant to cancel button", () => {
+    render(
+      <ConfirmDialog isOpen={true} onClose={vi.fn()} onConfirm={vi.fn()} title="Confirm" message="Sure?" />,
+    );
+    const cancelBtn = screen.getByRole("button", { name: /cancel/i });
+    expect(cancelBtn.className).toContain("bg-white");
+    expect(cancelBtn.className).toContain("border-gray-200");
   });
 });

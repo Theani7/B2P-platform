@@ -11,7 +11,7 @@ const variantStyles = {
   rectangular: "",
 };
 
-export default function Skeleton({
+export function Skeleton({
   className = "",
   variant = "text",
   width,

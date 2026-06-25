@@ -1,6 +1,6 @@
 import { test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Button from "../Button";
+import { Button } from "../Button";
 
 describe("Button", () => {
   test("renders children", () => {
@@ -8,25 +8,37 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
   });
 
-  test("applies default variant and size classes", () => {
+  test("applies default variant (primary) and size (md) classes", () => {
     render(<Button>Default</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("bg-primary");
+    expect(btn.className).toContain("bg-brand-purple");
     expect(btn.className).toContain("px-4 py-2");
   });
 
-  test("applies variant classes", () => {
-    const { rerender } = render(<Button variant="danger">Danger</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-danger");
+  test("applies cta variant classes", () => {
+    render(<Button variant="cta">CTA</Button>);
+    expect(screen.getByRole("button").className).toContain("bg-brand-coral");
+  });
 
-    rerender(<Button variant="secondary">Secondary</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-gray-100");
+  test("applies secondary variant classes", () => {
+    render(<Button variant="secondary">Secondary</Button>);
+    expect(screen.getByRole("button").className).toContain("bg-white");
+    expect(screen.getByRole("button").className).toContain("border-gray-200");
+  });
 
-    rerender(<Button variant="ghost">Ghost</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-transparent");
+  test("applies ghost-teal variant classes", () => {
+    render(<Button variant="ghost-teal">Ghost Teal</Button>);
+    expect(screen.getByRole("button").className).toContain("bg-brand-teal-50");
+  });
 
-    rerender(<Button variant="outline">Outline</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-transparent");
+  test("applies ghost-destructive variant classes", () => {
+    render(<Button variant="ghost-destructive">Ghost Destructive</Button>);
+    expect(screen.getByRole("button").className).toContain("bg-brand-coral-50");
+  });
+
+  test("applies icon variant classes", () => {
+    render(<Button variant="icon">Icon</Button>);
+    expect(screen.getByRole("button").className).toContain("p-2");
   });
 
   test("applies size classes", () => {
@@ -79,12 +91,5 @@ describe("Button", () => {
   test("passes additional HTML attributes", () => {
     render(<Button data-testid="my-btn">Test</Button>);
     expect(screen.getByTestId("my-btn")).toBeInTheDocument();
-  });
-
-  test("renders with focus ring classes", () => {
-    render(<Button>Focus</Button>);
-    const btn = screen.getByRole("button");
-    expect(btn.className).toContain("focus:outline-none");
-    expect(btn.className).toContain("focus:ring-2");
   });
 });

@@ -6,7 +6,7 @@ import { useCompleteCollaboration, useCreateReview } from "../features/reviews/a
 import ReviewFormDialog from "../components/reviews/ReviewFormDialog";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
-import ConfirmDialog from "../components/ui/ConfirmDialog";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const STATUS_STYLES: Record<string, string> = {

@@ -1,13 +1,13 @@
-import type { LabelHTMLAttributes, ReactNode } from "react";
+import React from "react";
 
-interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
-  children: ReactNode;
+interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  children: React.ReactNode;
 }
 
-const Label: React.FC<LabelProps> = ({ children, className = "", ...props }) => (
-  <label className={`block text-sm font-medium text-gray-700 ${className}`} {...props}>
-    {children}
-  </label>
-);
-
-export default Label;
+export function Label({ children, className = "", ...props }: LabelProps) {
+  return (
+    <label className={`block text-sm font-medium text-gray-900 ${className}`} {...props}>
+      {children}
+    </label>
+  );
+}

@@ -1,19 +1,21 @@
-import type { ReactNode } from "react";
+import React from "react";
 
-interface CardProps {
-  children: ReactNode;
-  className?: string;
-  padding?: string;
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  padding?: "none" | "sm" | "md" | "lg";
 }
 
-export default function Card({
-  children,
-  className = "",
-  padding = "p-6",
-}: CardProps) {
+const paddingClasses = {
+  none: "",
+  sm: "p-4",
+  md: "p-5",
+  lg: "p-6",
+};
+
+export function Card({ padding = "md", className = "", children, ...props }: CardProps) {
   return (
     <div
-      className={`bg-white rounded-xl border border-gray-200 shadow-sm ${padding} ${className}`}
+      className={`bg-white border border-gray-100 rounded-xl ${paddingClasses[padding]} ${className}`}
+      {...props}
     >
       {children}
     </div>

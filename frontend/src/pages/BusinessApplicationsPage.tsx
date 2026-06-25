@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useCampaignApplications, useAcceptApplication, useRejectApplication } from "../features/collaboration/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
-import ConfirmDialog from "../components/ui/ConfirmDialog";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const STATUS_STYLES: Record<string, string> = {

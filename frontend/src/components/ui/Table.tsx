@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import Skeleton from "./Skeleton";
-import EmptyState from "../EmptyState";
+import { Skeleton } from "./Skeleton";
 
 export interface TableColumn<T = any> {
   key: string;
@@ -28,7 +27,7 @@ function SkeletonRow({ cols }: { cols: number }) {
   );
 }
 
-export default function Table<T extends Record<string, any>>({
+export function Table<T extends Record<string, any>>({
   columns,
   data,
   loading = false,
@@ -37,7 +36,7 @@ export default function Table<T extends Record<string, any>>({
 }: TableProps<T>) {
   if (loading) {
     return (
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <div className="overflow-x-auto rounded-xl border border-gray-100">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -45,14 +44,14 @@ export default function Table<T extends Record<string, any>>({
                 <th
                   key={col.key}
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                  className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-gray-400"
                 >
                   {col.header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="bg-white">
             {Array.from({ length: 5 }).map((_, i) => (
               <SkeletonRow key={i} cols={columns.length} />
             ))}
@@ -64,16 +63,16 @@ export default function Table<T extends Record<string, any>>({
 
   if (data.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white">
-        <div className="py-12">
-          <EmptyState title={emptyMessage} />
+      <div className="rounded-xl border border-gray-100 bg-white">
+        <div className="py-12 text-center">
+          <p className="text-sm text-gray-500">{emptyMessage}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200">
+    <div className="overflow-x-auto rounded-xl border border-gray-100">
       <table className="w-full">
         <thead className="bg-gray-50">
           <tr>
@@ -81,14 +80,14 @@ export default function Table<T extends Record<string, any>>({
               <th
                 key={col.key}
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-gray-400"
               >
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
+        <tbody className="bg-white divide-y divide-gray-100">
           {data.map((item, idx) => (
             <tr
               key={idx}

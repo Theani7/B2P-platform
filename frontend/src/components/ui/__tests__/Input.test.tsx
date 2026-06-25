@@ -1,6 +1,6 @@
 import { test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Input from "../Input";
+import { Input } from "../Input";
 
 describe("Input", () => {
   test("renders input element", () => {
@@ -71,7 +71,12 @@ describe("Input", () => {
 
   test("applies error border class", () => {
     render(<Input error="Error" />);
-    expect(screen.getByRole("textbox").className).toContain("border-danger");
+    expect(screen.getByRole("textbox").className).toContain("border-brand-coral");
+  });
+
+  test("applies default border class", () => {
+    render(<Input />);
+    expect(screen.getByRole("textbox").className).toContain("border-gray-200");
   });
 
   test("sets aria-describedby for helper text", () => {

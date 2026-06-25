@@ -4,16 +4,20 @@ import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Login from "../Login";
 
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+});
+
 test("renders login form and shows validation errors", async () => {
   render(
-    <QueryClientProvider client={new QueryClient()}>
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Login />
       </BrowserRouter>
     </QueryClientProvider>,
   );
 
-  fireEvent.click(screen.getByRole("button", { name: /login/i }));
+  fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
   await waitFor(() => {
     expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
     expect(screen.getByText(/at least 8 character/i)).toBeInTheDocument();
@@ -21,7 +25,7 @@ test("renders login form and shows validation errors", async () => {
 
   fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "invalid-email" } });
   fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "short" } });
-  fireEvent.click(screen.getByRole("button", { name: /login/i }));
+  fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
   await waitFor(() => {
     expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
     expect(screen.getByText(/at least 8 character/i)).toBeInTheDocument();

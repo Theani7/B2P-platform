@@ -1,6 +1,6 @@
 import { test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Select from "../Select";
+import { Select } from "../Select";
 
 const options = [
   { value: "1", label: "Option One" },
@@ -12,7 +12,7 @@ describe("Select", () => {
   test("renders with label and options", () => {
     render(<Select label="Category" options={options} />);
     expect(screen.getByLabelText("Category")).toBeInTheDocument();
-    expect(screen.getByRole("combobox", { name: /category/i })).toBeInTheDocument();
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
     expect(screen.getByText("Option One")).toBeInTheDocument();
     expect(screen.getByText("Option Two")).toBeInTheDocument();
     expect(screen.getByText("Option Three")).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe("Select", () => {
     expect(placeholderOption).toHaveAttribute("disabled");
   });
 
-  test('does not render placeholder when not provided', () => {
+  test("does not render placeholder when not provided", () => {
     render(<Select label="Category" options={options} />);
     expect(screen.queryByText("Select...")).not.toBeInTheDocument();
   });
@@ -62,11 +62,6 @@ describe("Select", () => {
     expect(select).toHaveAttribute("id", "custom-id");
   });
 
-  test("has aria-label attribute", () => {
-    render(<Select label="Category" options={options} />);
-    expect(screen.getByRole("combobox")).toHaveAttribute("aria-label", "Category");
-  });
-
   test("merges custom className", () => {
     render(<Select label="Category" options={options} className="custom-class" />);
     expect(screen.getByRole("combobox").className).toContain("custom-class");
@@ -74,6 +69,11 @@ describe("Select", () => {
 
   test("applies error border class", () => {
     render(<Select label="Category" options={options} error="Error" />);
-    expect(screen.getByRole("combobox").className).toContain("border-danger");
+    expect(screen.getByRole("combobox").className).toContain("border-brand-coral");
+  });
+
+  test("applies default border class", () => {
+    render(<Select label="Category" options={options} />);
+    expect(screen.getByRole("combobox").className).toContain("border-gray-200");
   });
 });

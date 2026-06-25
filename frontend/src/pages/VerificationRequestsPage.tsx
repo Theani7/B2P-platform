@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useAdminVerificationRequests, useAdminApproveVerification, useAdminRejectVerification } from "../features/admin/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
-import Dialog from "../components/ui/Dialog";
-import ConfirmDialog from "../components/ui/ConfirmDialog";
+import { Dialog } from "../components/ui/Dialog";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 export default function VerificationRequestsPage() {

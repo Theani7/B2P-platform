@@ -1,29 +1,32 @@
-import type { ReactNode } from "react";
+import React from "react";
 
-type BadgeVariant = "default" | "success" | "warning" | "danger" | "info";
+type BadgeVariant =
+  | "active"
+  | "verified"
+  | "pending"
+  | "completed"
+  | "rejected"
+  | "draft";
 
 interface BadgeProps {
-  variant?: BadgeVariant;
-  children: ReactNode;
+  variant: BadgeVariant;
+  children: React.ReactNode;
   className?: string;
 }
 
-const variantStyles: Record<BadgeVariant, string> = {
-  default: "bg-gray-100 text-gray-700",
-  success: "bg-green-100 text-green-700",
-  warning: "bg-yellow-100 text-yellow-700",
-  danger: "bg-red-100 text-red-700",
-  info: "bg-blue-100 text-blue-700",
+const variantClasses: Record<BadgeVariant, string> = {
+  active: "bg-brand-purple-50 text-brand-purple-900",
+  verified: "bg-brand-teal-50 text-brand-teal-900",
+  pending: "bg-brand-amber-50 text-brand-amber-900",
+  completed: "bg-green-50 text-green-800",
+  rejected: "bg-brand-coral-50 text-brand-coral-900",
+  draft: "bg-gray-100 text-gray-500",
 };
 
-export default function Badge({
-  variant = "default",
-  children,
-  className = "",
-}: BadgeProps) {
+export function Badge({ variant, children, className = "" }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${variantClasses[variant]} ${className}`}
     >
       {children}
     </span>

@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import PageHeader from "../PageHeader";
-import Button from "../Button";
+import { PageHeader } from "../PageHeader";
+import { Button } from "../Button";
 
 describe("PageHeader", () => {
   test("renders title as h1", () => {
@@ -35,11 +35,11 @@ describe("PageHeader", () => {
     expect(screen.getByRole("heading")).toBeInTheDocument();
   });
 
-  test("renders title with bold text styling", () => {
+  test("renders title with text-xl and font-medium styling", () => {
     render(<PageHeader title="Title" />);
     const heading = screen.getByRole("heading");
-    expect(heading.className).toContain("text-2xl");
-    expect(heading.className).toContain("font-bold");
+    expect(heading.className).toContain("text-xl");
+    expect(heading.className).toContain("font-medium");
   });
 
   test("renders description with gray text", () => {

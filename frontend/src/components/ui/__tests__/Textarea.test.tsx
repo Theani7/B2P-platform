@@ -1,6 +1,6 @@
 import { test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Textarea from "../Textarea";
+import { Textarea } from "../Textarea";
 
 describe("Textarea", () => {
   test("renders textarea element", () => {
@@ -59,6 +59,11 @@ describe("Textarea", () => {
 
   test("applies error border class", () => {
     render(<Textarea error="Error" />);
-    expect(screen.getByRole("textbox").className).toContain("border-danger");
+    expect(screen.getByRole("textbox").className).toContain("border-brand-coral");
+  });
+
+  test("applies default border class", () => {
+    render(<Textarea />);
+    expect(screen.getByRole("textbox").className).toContain("border-gray-200");
   });
 });

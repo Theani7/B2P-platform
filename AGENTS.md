@@ -36,8 +36,16 @@
   - `GuestRoute` redirects logged‑in users to their dashboard.
   - `RoleRedirect` sends root (`/`) to the appropriate dashboard.
 - **Shared role enum**: `src/constants/roles.ts` exports `Role` enum; use everywhere to avoid magic strings.
-- **Tailwind design system** (`tailwind.config.ts`): colours – `primary:#2563EB`, `success:#16A34A`, `danger:#DC2626`, `background:#F8FAFC`, `text:#0F172A`. Use these keys (`bg-primary`, `text-danger`, etc.) for consistency.
-- **Form validation**: All forms use **React Hook Form** + **Zod**; errors are rendered with `text-danger`. Do not rely on native HTML `required` attributes.
+- **Tailwind design system** (`tailwind.config.ts`): **Use `B2P_FRONTEND_DESIGN.md` as the single source of truth for all design tokens.** Colors, typography, spacing, border radius, and component specs are defined there. Key tokens:
+  - Brand colors: `brand-purple` (#7F77DD), `brand-teal` (#1D9E75), `brand-coral` (#D85A30), `brand-amber` (#BA7517) with -50/-900 variants
+  - Semantic grays: `gray-50` (page bg), `white` (cards), `gray-100` (borders), `gray-500` (meta text), `gray-900` (body text)
+  - Match score rules: ≥85 → teal, 70–84 → amber, <70 → neutral gray
+  - Font: Inter (400/500 weights only), specific scale in spec
+  - Spacing: 2/3/4/5/6/8/12 scale only
+  - Radius: rounded (9999px), rounded-lg (8px), rounded-xl (12px), rounded-2xl (16px)
+  - **No box-shadows** — depth from borders and bg layering only
+  - Layout shell: 200px fixed sidebar, `bg-white` sidebar / `bg-gray-50` page bg
+- **Form validation**: All forms use **React Hook Form** + **Zod**; errors rendered with `text-brand-coral` (not `text-danger`). No native HTML `required`.
 - **Toasts**: Use `notifySuccess`, `notifyError` from `src/hooks/useToast.ts`.
 - **Code splitting**: Routes use `React.lazy` + `Suspense` with `<LoadingSpinner />`.
 - **Error handling**: Wrap app in `<ErrorBoundary>`.

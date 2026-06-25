@@ -26,30 +26,56 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
-      <div>
-        <label className="block text-sm font-medium">Email</label>
-        <input {...register("email")} type="email" aria-label="Email address" className="mt-1 block w-full rounded border p-2" />
-        {errors.email && <p className="mt-1 text-sm text-danger">{errors.email.message}</p>}
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <span className="text-brand-purple font-medium text-xl">B2P</span>
+          <span className="text-gray-900 font-medium text-xl">Connect</span>
+        </div>
+        <div className="bg-white border border-gray-100 rounded-2xl p-8">
+          <h1 className="text-xl font-medium text-gray-900 mb-6">Sign in</h1>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-900">Email</label>
+              <input
+                {...register("email")}
+                type="email"
+                id="email"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple"
+              />
+              {errors.email && <p className="text-sm text-brand-coral" role="alert">{errors.email.message}</p>}
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-900">Password</label>
+              <input
+                {...register("password")}
+                type="password"
+                id="password"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple"
+              />
+              {errors.password && <p className="text-sm text-brand-coral" role="alert">{errors.password.message}</p>}
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2">
+                <input type="checkbox" {...register("remember")} className="h-4 w-4 rounded border-gray-300" />
+                <span className="text-sm text-gray-700">Remember me</span>
+              </label>
+              <Link to="/forgot-password" className="text-sm text-brand-purple hover:underline">Forgot password?</Link>
+            </div>
+            <button
+              type="submit"
+              disabled={login.isPending}
+              className="w-full bg-brand-coral text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {login.isPending ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+          <div className="mt-6 text-center">
+            <span className="text-sm text-gray-500">Don't have an account? </span>
+            <Link to="/register" className="text-sm text-brand-purple hover:underline">Create one</Link>
+          </div>
+        </div>
       </div>
-      <div>
-        <label className="block text-sm font-medium">Password</label>
-        <input {...register("password")} type="password" aria-label="Password" className="mt-1 block w-full rounded border p-2" />
-        {errors.password && <p className="mt-1 text-sm text-danger">{errors.password.message}</p>}
-      </div>
-      <div className="flex items-center justify-between">
-        <label className="flex items-center space-x-2">
-          <input type="checkbox" {...register("remember")} className="h-4 w-4" />
-          <span className="text-sm">Remember me</span>
-        </label>
-        <Link to="/forgot-password" className="text-sm text-primary">Forgot password?</Link>
-      </div>
-      <button type="submit" disabled={login.isPending} className="w-full rounded bg-primary py-2 font-medium text-white hover:bg-primary-600">
-        {login.isPending ? "Logging in…" : "Login"}
-      </button>
-      <p className="mt-4 text-center text-sm">
-        No account? <Link to="/register" className="text-primary">Register</Link>
-      </p>
-    </form>
+    </div>
   );
 }
