@@ -2,8 +2,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePromoterProfile, useUpsertPromoterProfile } from "../features/profile/api";
+import { useAuth } from "../providers/AuthProvider";
 import { Button, Input, Label, Textarea, Select, Card } from "../components/ui";
-import { Sparkles, Save } from "lucide-react";
+import { Sparkles, Save, Info } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
@@ -30,6 +31,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function PromoterProfilePage() {
+  const { user } = useAuth();
   const { data: profile, isLoading: profileLoading } = usePromoterProfile();
   const mutation = useUpsertPromoterProfile();
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
@@ -66,6 +68,21 @@ export default function PromoterProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Profile Setup Warning Banner */}
+      {!user?.has_profile && (
+        <div className="max-w-2xl bg-brand-amber-50 border border-brand-amber/20 rounded-xl p-4 flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-brand-amber-500/10 flex items-center justify-center text-brand-amber flex-shrink-0">
+            <Info size={16} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-brand-amber-900">Profile Setup Required</p>
+            <p className="text-xs text-brand-amber-900/70 mt-0.5">
+              Please complete and save your promoter profile to unlock all sections, including the dashboard, marketplace, and collaborations.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-2xl">
         <Card padding="lg">

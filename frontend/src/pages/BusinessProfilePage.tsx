@@ -3,6 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBusinessProfile, useUpsertBusinessProfile } from "../features/profile/api";
+import { useAuth } from "../providers/AuthProvider";
 import { Button, Input, Label, Textarea } from "@/components/ui";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -13,6 +14,7 @@ import {
   FileText,
   Tag,
   Save,
+  Info,
 } from "lucide-react";
 
 const schema = z.object({
@@ -26,6 +28,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function BusinessProfilePage() {
+  const { user } = useAuth();
   const qc = useQueryClient();
   const { data: profile, isLoading: profileLoading } = useBusinessProfile();
 
@@ -68,6 +71,21 @@ export default function BusinessProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Profile Setup Warning Banner */}
+      {!user?.has_profile && (
+        <div className="bg-brand-amber-50 border border-brand-amber/20 rounded-xl p-4 flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-brand-amber-500/10 flex items-center justify-center text-brand-amber flex-shrink-0">
+            <Info size={16} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-brand-amber-900">Profile Setup Required</p>
+            <p className="text-xs text-brand-amber-900/70 mt-0.5">
+              Please complete and save your company profile to unlock all sections, including the dashboard, campaigns, and collaborations.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Profile Sections Nav */}
