@@ -44,8 +44,8 @@ export default function Login() {
         </label>
         <Link to="/forgot-password" className="text-sm text-primary">Forgot password?</Link>
       </div>
-      <button type="submit" disabled={login.isLoading} className="w-full rounded bg-primary py-2 font-medium text-white hover:bg-primary-600">
-        {login.isLoading ? "Logging in…" : "Login"}
+      <button type="submit" disabled={login.isPending} className="w-full rounded bg-primary py-2 font-medium text-white hover:bg-primary-600">
+        {login.isPending ? "Logging in…" : "Login"}
       </button>
       <p className="mt-4 text-center text-sm">
         No account? <Link to="/register" className="text-primary">Register</Link>

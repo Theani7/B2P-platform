@@ -32,7 +32,7 @@ export default function PromoterProfilePage({ initialData }: { initialData?: Par
       <div><Label>Niche</Label><select {...register("niche")} className="w-full rounded border p-2">
         {["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS", "OTHER"].map(n => <option key={n} value={n}>{n}</option>)}</select></div>
       <div><Label>Location</Label><Input {...register("location")} /></div>
-      <Button disabled={mutation.isLoading} type="submit">{mutation.isLoading ? "Saving..." : "Save Profile"}</Button>
+      <Button disabled={mutation.isPending} type="submit">{mutation.isPending ? "Saving..." : "Save Profile"}</Button>
     </form>
   );
 }

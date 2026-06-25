@@ -49,17 +49,17 @@ export default function Register() {
     <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
       <div>
         <label className="block text-sm font-medium">Username</label>
-        <input {...register("username")} className="mt-1 block w-full rounded border p-2" />
+        <input {...register("username")} aria-label="Username" className="mt-1 block w-full rounded border p-2" />
         {errors.username && <p className="mt-1 text-sm text-danger">{errors.username.message}</p>}
       </div>
       <div>
         <label className="block text-sm font-medium">Full Name</label>
-        <input {...register("full_name")} className="mt-1 block w-full rounded border p-2" />
+        <input {...register("full_name")} aria-label="Full Name" className="mt-1 block w-full rounded border p-2" />
         {errors.full_name && <p className="mt-1 text-sm text-danger">{errors.full_name.message}</p>}
       </div>
       <div>
         <label className="block text-sm font-medium">Email</label>
-        <input {...register("email")} type="email" className="mt-1 block w-full rounded border p-2" />
+        <input {...register("email")} type="email" aria-label="Email" className="mt-1 block w-full rounded border p-2" />
         {errors.email && <p className="mt-1 text-sm text-danger">{errors.email.message}</p>}
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -69,16 +69,16 @@ export default function Register() {
       {errors.role && <p className="mt-1 text-sm text-danger">{errors.role.message}</p>}
       <div>
         <label className="block text-sm font-medium">Password</label>
-        <input {...register("password")} type="password" className="mt-1 block w-full rounded border p-2" />
+        <input {...register("password")} type="password" aria-label="Password" className="mt-1 block w-full rounded border p-2" />
         {errors.password && <p className="mt-1 text-sm text-danger">{errors.password.message}</p>}
       </div>
       <div>
         <label className="block text-sm font-medium">Confirm Password</label>
-        <input {...register("confirm_password")} type="password" className="mt-1 block w-full rounded border p-2" />
+        <input {...register("confirm_password")} type="password" aria-label="Confirm Password" className="mt-1 block w-full rounded border p-2" />
         {errors.confirm_password && <p className="mt-1 text-sm text-danger">{errors.confirm_password.message}</p>}
       </div>
-      <button type="submit" disabled={registerMut.isLoading} className="w-full rounded bg-primary py-2 font-medium text-white hover:bg-primary-600">
-        {registerMut.isLoading ? "Creating…" : "Create Account"}
+      <button type="submit" disabled={registerMut.isPending} className="w-full rounded bg-primary py-2 font-medium text-white hover:bg-primary-600">
+        {registerMut.isPending ? "Creating…" : "Create Account"}
       </button>
     </form>
   );

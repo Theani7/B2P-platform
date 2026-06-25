@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "../services/apiClient";
-import { BusinessProfileRead } from "./business_profile";
-import { PromoterProfileRead } from "./promoter_profile";
+import api from "../../services/apiClient";
+import type { BusinessProfileRead, PromoterProfileRead } from "./types";
 
 // Business profile hooks
 export const useBusinessProfile = () =>

@@ -3,11 +3,11 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./providers/AuthProvider";
 import { Role } from "./constants/roles";
 import LoadingSpinner from "./components/LoadingSpinner";
+import React from "react";
 
 const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
 const BusinessDashboard = lazy(() => import("./pages/BusinessDashboard"));
 const PromoterDashboard = lazy(() => import("./pages/PromoterDashboard"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
@@ -29,7 +29,7 @@ const CampaignMatchesPage = lazy(() => import("./pages/CampaignMatchesPage"));
 const MyReviewsPage = lazy(() => import("./pages/MyReviewsPage"));
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 
-function ProtectedRoute({ role, children }: { role?: Role; children: JSX.Element }) {
+function ProtectedRoute({ role, children }: { role?: Role; children: React.ReactNode }) {
   const { user, isLoading: authLoading } = useAuth();
   if (authLoading) return <LoadingSpinner />;
   if (!user) return <Navigate to="/login" replace />;
@@ -43,7 +43,7 @@ function ProtectedRoute({ role, children }: { role?: Role; children: JSX.Element
   );
 }
 
-function GuestRoute({ children }: { children: JSX.Element }) {
+function GuestRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   if (isLoading) return <LoadingSpinner />;
   if (user) return <Navigate to={`/${user.role.toLowerCase()}/dashboard`} replace />;

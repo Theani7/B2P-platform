@@ -1,7 +1,8 @@
+import { test, expect } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Login from "../src/pages/Login";
+import Login from "../Login";
 
 test("renders login form and shows validation errors", async () => {
   render(
@@ -15,7 +16,7 @@ test("renders login form and shows validation errors", async () => {
   fireEvent.click(screen.getByRole("button", { name: /login/i }));
   await waitFor(() => {
     expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
-    expect(screen.getByText(/must be at least 8 characters/i)).toBeInTheDocument();
+    expect(screen.getByText(/at least 8 character/i)).toBeInTheDocument();
   });
 
   fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "invalid-email" } });
@@ -23,6 +24,6 @@ test("renders login form and shows validation errors", async () => {
   fireEvent.click(screen.getByRole("button", { name: /login/i }));
   await waitFor(() => {
     expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
-    expect(screen.getByText(/must be at least 8 characters/i)).toBeInTheDocument();
+    expect(screen.getByText(/at least 8 character/i)).toBeInTheDocument();
   });
 });

@@ -35,7 +35,7 @@ export default function BusinessProfilePage({ initialData }: BusinessProfilePage
       <div><Label>Description</Label><Textarea {...register("description")} /></div>
       <div><Label>Location</Label><Input {...register("location")} /></div>
       <div><Label>Website</Label><Input {...register("website")} type="url" /></div>
-      <Button disabled={mutation.isLoading} type="submit">{mutation.isLoading ? "Saving..." : "Save Profile"}</Button>
+      <Button disabled={mutation.isPending} type="submit">{mutation.isPending ? "Saving..." : "Save Profile"}</Button>
     </form>
   );
 }

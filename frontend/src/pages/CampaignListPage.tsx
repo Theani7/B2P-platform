@@ -9,7 +9,7 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 export default function CampaignListPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const { data, isLoading, error, refetch } = useCampaigns({ page, limit: 10, search: search || undefined });
+  const { data, isLoading, error } = useCampaigns({ page, limit: 10, search: search || undefined });
   const deleteCampaign = useDeleteCampaign();
   const archiveCampaign = useArchiveCampaign();
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
