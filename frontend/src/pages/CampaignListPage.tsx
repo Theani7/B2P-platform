@@ -4,6 +4,7 @@ import { useCampaigns, useDeleteCampaign, useArchiveCampaign, useReopenCampaign,
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { StatCard } from "../components/ui";
+import { ExportButton } from "../components/export";
 import {
   Megaphone, Plus, Search, Edit3, Archive, Trash2, MapPin, 
   Filter, MoreVertical, Eye, SlidersHorizontal,
@@ -161,13 +162,16 @@ export default function CampaignListPage() {
           <h1 className="text-3xl font-semibold tracking-tight text-gray-900">Campaigns</h1>
           <p className="text-sm text-gray-500 mt-1">Manage and track all your marketing campaigns.</p>
         </div>
-        <Link
-          to="/business/campaigns/create"
-          className="inline-flex items-center gap-2 bg-primary-600 text-white rounded-lg h-10 px-4 text-sm font-medium shadow-sm hover:bg-primary-700 transition-all"
-        >
-          <Plus size={16} />
-          Create Campaign
-        </Link>
+        <div className="flex gap-2">
+          <ExportButton module="campaigns" availableColumns={['id', 'title', 'status', 'budget', 'location']} />
+          <Link
+            to="/business/campaigns/create"
+            className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <Plus size={20} />
+            Create Campaign
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards */}

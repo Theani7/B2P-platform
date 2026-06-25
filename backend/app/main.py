@@ -44,6 +44,7 @@ from .notifications.routes import router as notifications_router
 from .notifications.routes import ws_router as notifications_ws_router
 from .achievements.routes import router as achievements_router
 from .search.routes import router as search_router
+from .export.routes import router as export_router
 
 # Structured logging
 logging.basicConfig(
@@ -81,7 +82,10 @@ app.add_middleware(
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware, limit=settings.RATE_LIMIT_AUTH, window=60)
 
-app.mount("/static", StaticFiles(directory="uploads"), name="static")
+# Serve static files (Portfolio Media & Exports)
+app.mount("/portfolio/media", StaticFiles(directory="uploads/portfolio"), name="portfolio_media")
+os.makedirs("uploads/exports", exist_ok=True)
+app.mount("/exports", StaticFiles(directory="uploads/exports"), name="exports")
 
 register_exception_handlers(app)
 
@@ -113,6 +117,7 @@ app.include_router(chat_router, prefix=f"{settings.API_V1_STR}/chat", tags=["cha
 app.include_router(notifications_router, prefix=f"{settings.API_V1_STR}/notifications", tags=["notifications"])
 app.include_router(achievements_router, prefix=f"{settings.API_V1_STR}/achievements", tags=["achievements"])
 app.include_router(search_router, prefix=f"{settings.API_V1_STR}/search", tags=["search"])
+app.include_router(export_router, prefix=f"{settings.API_V1_STR}/export", tags=["export"])
 app.include_router(notifications_ws_router, tags=["WebSockets"])
 
 
