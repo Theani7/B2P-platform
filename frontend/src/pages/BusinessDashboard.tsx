@@ -24,8 +24,9 @@ import {
 } from "recharts";
 import { useBusinessAnalytics } from "../features/analytics";
 import { useBusinessActivity } from "../features/activity";
+import { useBusinessProfileCompletion } from "../features/profile-completion";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { ActivityCard } from "../components/ui/ActivityCard";
+import { ActivityCard, ProfileCompletionWidget } from "../components/ui";
 import { Activity } from "lucide-react";
 
 export default function BusinessDashboard() {
@@ -33,6 +34,7 @@ export default function BusinessDashboard() {
   const { data: analytics, isLoading: statsLoading } = useBusinessAnalytics();
   const { data: invitations } = useBusinessInvitations({ limit: 5 });
   const { data: activityData, isLoading: activityLoading } = useBusinessActivity({ size: 5 });
+  const { data: profileCompletion, isLoading: completionLoading } = useBusinessProfileCompletion();
 
   const pendingInvitations = invitations?.items?.filter((i) => i.status === InvitationStatus.PENDING) ?? [];
 
@@ -152,8 +154,10 @@ export default function BusinessDashboard() {
           </div>
         </div>
 
-        {/* Quick Actions & Recent Activity */}
+        {/* Right Column: Profile Completion, Quick Actions & Recent Activity */}
         <div className="space-y-8">
+          <ProfileCompletionWidget data={profileCompletion} isLoading={completionLoading} />
+          
           {/* Pending Invitations */}
           <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">

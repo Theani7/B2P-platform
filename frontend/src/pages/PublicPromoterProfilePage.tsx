@@ -3,6 +3,8 @@ import { usePublicPromoterProfile, useSavePromoter } from "../features/discovery
 import { useUserRating } from "../features/reviews/api";
 import RatingStars from "../components/reviews/RatingStars";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { usePublicPortfolio } from "../features/portfolio";
+import { PortfolioGrid } from "../components/portfolio";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { MapPin, Users, TrendingUp, Briefcase, Link as LinkIcon, Camera, Music, Video, Globe, MessageSquare } from "lucide-react";
 
@@ -22,6 +24,7 @@ export default function PublicPromoterProfilePage() {
   const { username } = useParams<{ username: string }>();
   const { data: profile, isLoading } = usePublicPromoterProfile(username ?? "");
   const { data: ratingSummary } = useUserRating(profile?.user_id ?? "");
+  const { data: portfolioItems, isLoading: portfolioLoading } = usePublicPortfolio(profile?.id || "");
   const savePromoter = useSavePromoter();
 
   const handleSave = () => {
@@ -133,32 +136,10 @@ export default function PublicPromoterProfilePage() {
         </div>
       )}
 
-      {profile.portfolio_items.length > 0 && (
-        <div className="rounded-lg border bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-text">Portfolio</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {profile.portfolio_items.map((item) => (
-              <div key={item.id} className="rounded-lg border bg-gray-50 p-4">
-                {item.image_url && (
-                  <img src={item.image_url} alt={item.title} className="mb-2 h-40 w-full rounded object-cover" />
-                )}
-                <h3 className="font-medium text-text">{item.title}</h3>
-                {item.description && (
-                  <p className="mt-1 text-sm text-gray-600">{item.description}</p>
-                )}
-                {item.external_link && (
-                  <a
-                    href={item.external_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-block text-sm text-primary hover:underline"
-                  >
-                    View project &rarr;
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
+      {(!portfolioLoading && portfolioItems && portfolioItems.length > 0) && (
+        <div className="rounded-lg border bg-white p-6 mt-8">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">Portfolio</h2>
+          <PortfolioGrid items={portfolioItems} isOwner={false} />
         </div>
       )}
 

@@ -4,6 +4,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBusinessProfile, useUpsertBusinessProfile } from "../features/profile/api";
+import { useBusinessProfileCompletion } from "../features/profile-completion";
+import { ProfileCompletionWidget } from "../components/ui";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
@@ -64,6 +66,7 @@ export default function BusinessProfilePage() {
   }, [profile, reset]);
 
   const mutation = useUpsertBusinessProfile();
+  const { data: completionData, isLoading: completionLoading } = useBusinessProfileCompletion();
 
   const onSubmit = (data: FormValues) => {
     mutation.mutate(data, {
@@ -166,28 +169,9 @@ export default function BusinessProfilePage() {
             </nav>
           </div>
 
-          {/* Profile Checklist Widget */}
-          <div className="mt-6 bg-white rounded-2xl ring-1 ring-gray-200 p-5 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-900 mb-4">Setup Checklist</h3>
-            <div className="space-y-3">
-              {[
-                { key: 'company_name', label: 'Company Name' },
-                { key: 'logo_url', label: 'Company Logo' },
-                { key: 'description', label: 'Description' },
-                { key: 'website', label: 'Website' },
-                { key: 'industry', label: 'Industry' },
-              ].map(item => {
-                const isDone = !!profile?.[item.key as keyof typeof profile];
-                return (
-                  <div key={item.key} className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${isDone ? 'bg-emerald-500 border-emerald-500' : 'bg-gray-50 border-gray-200'}`}>
-                      {isDone && <CheckCircle2 size={12} className="text-white" />}
-                    </div>
-                    <span className={`text-sm ${isDone ? 'text-gray-900' : 'text-gray-500'}`}>{item.label}</span>
-                  </div>
-                );
-              })}
-            </div>
+          {/* Profile Completion Widget */}
+          <div className="mt-6">
+            <ProfileCompletionWidget data={completionData} isLoading={completionLoading} />
           </div>
         </div>
 

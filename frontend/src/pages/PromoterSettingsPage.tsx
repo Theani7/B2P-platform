@@ -10,6 +10,9 @@ import {
 
 import { useForm } from "react-hook-form";
 import { usePromoterProfile, useUpsertPromoterProfile } from "../features/profile/api";
+import { usePromoterProfileCompletion } from "../features/profile-completion";
+import { ProfileCompletionWidget } from "../components/ui";
+import { PortfolioSettings } from "../components/portfolio/PortfolioSettings";
 
 export default function PromoterSettingsPage() {
   const { user } = useAuth();
@@ -17,6 +20,7 @@ export default function PromoterSettingsPage() {
 
   const { data: profile, isLoading } = usePromoterProfile();
   const updateProfile = useUpsertPromoterProfile();
+  const { data: completionData, isLoading: completionLoading } = usePromoterProfileCompletion();
 
   const {
     register,
@@ -148,6 +152,9 @@ export default function PromoterSettingsPage() {
               </button>
             </div>
 
+            <div className="mt-8">
+              <ProfileCompletionWidget data={completionData} isLoading={completionLoading} />
+            </div>
           </div>
         </div>
 
@@ -254,8 +261,20 @@ export default function PromoterSettingsPage() {
               </motion.div>
             )}
 
+            {activeTab === "portfolio" && (
+              <motion.div
+                key="portfolio"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.15 }}
+              >
+                <PortfolioSettings />
+              </motion.div>
+            )}
+
             {/* Placeholder for other tabs to show it's functional */}
-            {["portfolio", "categories", "analytics", "notifications", "privacy", "security", "appearance", "connections"].includes(activeTab) && (
+            {["categories", "analytics", "notifications", "privacy", "security", "appearance", "connections"].includes(activeTab) && (
               <motion.div
                 key={activeTab}
                 initial={{ opacity: 0, y: 10 }}

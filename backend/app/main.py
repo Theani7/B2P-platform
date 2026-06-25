@@ -4,6 +4,7 @@ from time import time
 from datetime import datetime, timezone
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
@@ -34,6 +35,8 @@ from .api.v1.reviews.routes import router as review_router
 from .api.v1.admin.routes import router as admin_router
 from .api.v1.promoter_verification.routes import router as promoter_verification_router
 from .api.v1.activity.routes import router as activity_router
+from .api.v1.profile_completion.routes import router as profile_completion_router
+from .portfolio.routes import router as portfolio_router
 
 # Structured logging
 logging.basicConfig(
@@ -71,6 +74,8 @@ app.add_middleware(
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware, limit=settings.RATE_LIMIT_AUTH, window=60)
 
+app.mount("/static", StaticFiles(directory="uploads"), name="static")
+
 register_exception_handlers(app)
 
 app.include_router(auth_router, prefix=settings.API_V1_STR)
@@ -94,6 +99,8 @@ app.include_router(review_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(promoter_verification_router, prefix=settings.API_V1_STR)
 app.include_router(activity_router, prefix=f"{settings.API_V1_STR}/activity", tags=["activity"])
+app.include_router(profile_completion_router, prefix=f"{settings.API_V1_STR}/profile-completion", tags=["profile-completion"])
+app.include_router(portfolio_router, prefix=f"{settings.API_V1_STR}/portfolio", tags=["portfolio"])
 
 
 @app.get("/health")

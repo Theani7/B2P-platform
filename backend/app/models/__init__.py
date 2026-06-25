@@ -13,6 +13,7 @@ from .match_result import MatchResult
 from .review import Review
 from .audit_log import AuditLog
 from .activity_log import ActivityLog
+from .portfolio_media import PortfolioMedia
 from .platform_setting import PlatformSetting
 from .verification_request import VerificationRequest
 

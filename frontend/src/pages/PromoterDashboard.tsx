@@ -6,7 +6,8 @@ import { usePromoterAnalytics } from "../features/analytics/api";
 import { Avatar, StatCard } from "../components/ui";
 import { formatNepaliCurrency } from "../utils/currency";
 import { useMyActivity } from "../features/activity/api";
-import { ActivityCard } from "../components/ui/ActivityCard";
+import { usePromoterProfileCompletion } from "../features/profile-completion";
+import { ActivityCard, ProfileCompletionWidget } from "../components/ui";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 import {
@@ -33,6 +34,7 @@ export default function PromoterDashboard() {
   const { data: collabs, isLoading: collabsLoading } = usePromoterCollaborations({ limit: 5 });
   const { data: analytics } = usePromoterAnalytics();
   const { data: activityData, isLoading: activityLoading } = useMyActivity({ size: 5 });
+  const { data: profileCompletion, isLoading: completionLoading } = usePromoterProfileCompletion();
 
   const pendingInvites = analytics?.summary?.invitations_pending ?? 0;
   const activeCollabs = analytics?.summary?.active_collaborations ?? 0;
@@ -159,6 +161,8 @@ export default function PromoterDashboard() {
 
         {/* SIDEBAR COLUMN (4 cols) */}
         <div className="lg:col-span-4 space-y-8">
+        
+          <ProfileCompletionWidget data={profileCompletion} isLoading={completionLoading} />
 
           {/* 4. PENDING INVITATIONS */}
           <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-5">
@@ -192,26 +196,7 @@ export default function PromoterDashboard() {
             )}
           </div>
 
-          {/* 9. PROFILE INSIGHTS */}
-          <div className="bg-gradient-to-br from-indigo-50 to-white rounded-2xl shadow-sm ring-1 ring-indigo-100 p-5">
-            <h2 className="text-sm font-bold text-indigo-900 mb-4 flex items-center gap-2"><Sparkles size={16} className="text-indigo-500"/> Profile Insights</h2>
-            <div className="space-y-3">
-              <div className="bg-white rounded-xl p-3 border border-indigo-50 flex items-start gap-3">
-                <div className="mt-0.5"><Upload size={14} className="text-indigo-500"/></div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Add 2 more portfolio items</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Creators with 3+ items get 40% more invites.</p>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl p-3 border border-indigo-50 flex items-start gap-3">
-                <div className="mt-0.5"><User size={14} className="text-indigo-500"/></div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Write a better bio</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Keep it concise and highlight your exact niche.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+
 
           {/* 8. QUICK ACTIONS */}
           <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-5">
