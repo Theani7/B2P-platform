@@ -10,7 +10,7 @@ export function PageShell({ role, children }: PageShellProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar role={role} />
-      <main className="ml-[200px] flex-1 overflow-y-auto p-6">
+      <main className="ml-[220px] flex-1 overflow-y-auto p-6">
         {children}
       </main>
     </div>
