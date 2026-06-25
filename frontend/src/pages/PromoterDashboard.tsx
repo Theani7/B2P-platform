@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import { usePromoterInvitations, usePromoterCollaborations } from "../features/collaboration/api";
+import { usePromoterAnalytics } from "../features/analytics/api";
 
 import { Avatar, StatCard } from "../components/ui";
 import { formatNepaliCurrency } from "../utils/currency";
@@ -25,12 +26,12 @@ export default function PromoterDashboard() {
   const navigate = useNavigate();
   
   // Real Data Hooks
-    const { data: invitations, isLoading: invsLoading } = usePromoterInvitations({ limit: 5 });
+  const { data: invitations, isLoading: invsLoading } = usePromoterInvitations({ limit: 5 });
   const { data: collabs, isLoading: collabsLoading } = usePromoterCollaborations({ limit: 5 });
+  const { data: analytics } = usePromoterAnalytics();
 
-  
-  const pendingInvites = invitations?.total ?? 0;
-  const activeCollabs = collabs?.total ?? 0;
+  const pendingInvites = analytics?.summary?.invitations_pending ?? 0;
+  const activeCollabs = analytics?.summary?.active_collaborations ?? 0;
 
 
 
@@ -54,7 +55,9 @@ export default function PromoterDashboard() {
                   <h1 className="text-2xl font-bold text-gray-900">{user?.full_name ?? "Creator"}</h1>
                   <CheckCircle2 size={20} className="text-emerald-500 fill-emerald-50" />
                 </div>
-                <p className="text-sm text-gray-500 mt-0.5">Lifestyle & Tech Creator • ⭐ 4.9 (12 reviews)</p>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  ⭐ {analytics?.summary?.average_rating ?? "0.0"} ({analytics?.summary?.reviews_received ?? 0} reviews)
+                </p>
               </div>
             </div>
             

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
-import { useCampaignDashboardStats } from "../features/campaigns/api";
+
 import { useBusinessCollaborations, useBusinessInvitations } from "../features/collaboration/api";
 import { CollaborationStatus, InvitationStatus } from "../features/collaboration/types";
 import { StatCard } from "../components/ui";
@@ -23,19 +23,12 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts";
-
-const chartData = [
-  { name: "Jan", applications: 12 },
-  { name: "Feb", applications: 19 },
-  { name: "Mar", applications: 15 },
-  { name: "Apr", applications: 28 },
-  { name: "May", applications: 22 },
-  { name: "Jun", applications: 45 },
-];
+import { useBusinessAnalytics } from "../features/analytics";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function BusinessDashboard() {
   const { user } = useAuth();
-  const { data: stats, isLoading: statsLoading } = useCampaignDashboardStats();
+  const { data: analytics, isLoading: statsLoading } = useBusinessAnalytics();
   const { data: collabs } = useBusinessCollaborations({ limit: 5 });
   const { data: invitations } = useBusinessInvitations({ limit: 5 });
 
@@ -76,30 +69,30 @@ export default function BusinessDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           label="Total Campaigns"
-          value={statsLoading ? "—" : stats?.total_campaigns ?? 0}
+          value={statsLoading ? "—" : analytics?.summary.total_campaigns ?? 0}
           icon={FolderDot}
-          trend={{ value: "+12%", positive: true }}
+          trend={{ value: `${analytics?.growth.campaign_growth ?? 0}%`, positive: (analytics?.growth.campaign_growth ?? 0) >= 0 }}
           subtitle="from last month"
         />
         <StatCard
-          label="Open Campaigns"
-          value={statsLoading ? "—" : stats?.open_campaigns ?? 0}
+          label="Active Campaigns"
+          value={statsLoading ? "—" : analytics?.summary.active_campaigns ?? 0}
           icon={FolderOpen}
-          trend={{ value: "+4%", positive: true }}
-          subtitle="from last month"
+          trend={undefined}
+          subtitle="currently open"
         />
         <StatCard
           label="Active Collaborations"
-          value={statsLoading ? "—" : stats?.active_campaigns ?? 0}
+          value={statsLoading ? "—" : analytics?.summary.active_collaborations ?? 0}
           icon={Zap}
-          trend={{ value: "-2%", positive: false }}
+          trend={{ value: `${analytics?.growth.collaboration_growth ?? 0}%`, positive: (analytics?.growth.collaboration_growth ?? 0) >= 0 }}
           subtitle="from last month"
         />
         <StatCard
-          label="Completed Campaigns"
-          value={statsLoading ? "—" : stats?.completed_campaigns ?? 0}
+          label="Total Applications"
+          value={statsLoading ? "—" : analytics?.summary.total_applications ?? 0}
           icon={CheckCircle2}
-          trend={{ value: "+24%", positive: true }}
+          trend={{ value: `${analytics?.growth.application_growth ?? 0}%`, positive: (analytics?.growth.application_growth ?? 0) >= 0 }}
           subtitle="from last month"
         />
       </div>
@@ -115,39 +108,45 @@ export default function BusinessDashboard() {
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: '#6B7280' }} 
-                  dy={10} 
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: '#6B7280' }} 
-                />
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ color: '#111827', fontWeight: 500 }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="applications" 
-                  stroke="#6366F1" 
-                  strokeWidth={2}
-                  fillOpacity={1} 
-                  fill="url(#colorApps)" 
-                />
-              </AreaChart>
+              {analytics?.charts?.monthly_applications?.length ? (
+                <AreaChart data={analytics.charts.monthly_applications} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis 
+                    dataKey="month" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 12, fill: '#6B7280' }} 
+                    dy={10} 
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 12, fill: '#6B7280' }} 
+                  />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    itemStyle={{ color: '#111827', fontWeight: 500 }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="#6366F1" 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#colorApps)" 
+                  />
+                </AreaChart>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                  {statsLoading ? <LoadingSpinner className="w-8 h-8" /> : "No analytics available yet."}
+                </div>
+              )}
             </ResponsiveContainer>
           </div>
         </div>
