@@ -56,7 +56,7 @@ def calculate_business_completion(user: User):
     else: missing.append("verification")
     
     # Social links for business isn't directly in the model. We can just add it to missing, or check if they exist somehow.
-    if hasattr(bp, 'social_links') and bp.social_links:
+    if hasattr(user, 'social_links') and user.social_links:
         completed.append("social_links")
     else:
         missing.append("social_links")
@@ -123,7 +123,7 @@ def calculate_promoter_completion(user: User):
     if pp.portfolio_items: completed.append("portfolio")
     else: missing.append("portfolio")
     
-    if pp.social_links: completed.append("social_links")
+    if hasattr(user, 'social_links') and user.social_links: completed.append("social_links")
     else: missing.append("social_links")
     
     if user.email: completed.append("contact")

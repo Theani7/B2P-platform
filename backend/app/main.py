@@ -36,7 +36,9 @@ from .api.v1.admin.routes import router as admin_router
 from .api.v1.promoter_verification.routes import router as promoter_verification_router
 from .api.v1.activity.routes import router as activity_router
 from .api.v1.profile_completion.routes import router as profile_completion_router
+from .api.v1.profile_completion.routes import router as profile_completion_router
 from .portfolio.routes import router as portfolio_router
+from .social.routes import router as social_router
 
 # Structured logging
 logging.basicConfig(
@@ -101,6 +103,7 @@ app.include_router(promoter_verification_router, prefix=settings.API_V1_STR)
 app.include_router(activity_router, prefix=f"{settings.API_V1_STR}/activity", tags=["activity"])
 app.include_router(profile_completion_router, prefix=f"{settings.API_V1_STR}/profile-completion", tags=["profile-completion"])
 app.include_router(portfolio_router, prefix=f"{settings.API_V1_STR}/portfolio", tags=["portfolio"])
+app.include_router(social_router, prefix=f"{settings.API_V1_STR}")
 
 
 @app.get("/health")

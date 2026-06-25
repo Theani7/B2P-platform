@@ -13,6 +13,7 @@ import { usePromoterProfile, useUpsertPromoterProfile } from "../features/profil
 import { usePromoterProfileCompletion } from "../features/profile-completion";
 import { ProfileCompletionWidget } from "../components/ui";
 import { PortfolioSettings } from "../components/portfolio/PortfolioSettings";
+import { SocialSettings } from "../components/social/SocialSettings";
 
 export default function PromoterSettingsPage() {
   const { user } = useAuth();
@@ -252,12 +253,7 @@ export default function PromoterSettingsPage() {
               >
                 <h3 className="text-lg font-bold text-gray-900 mb-2">Social Accounts</h3>
                 <p className="text-sm text-gray-500 mb-8">Connect your social media accounts to showcase your audience to brands.</p>
-                
-                <div className="flex flex-col items-center justify-center p-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                  <Globe size={32} className="text-gray-300 mb-3" />
-                  <p className="text-sm font-medium text-gray-900">Social Accounts</p>
-                  <p className="text-xs text-gray-500 mt-1">Social account connection is coming soon.</p>
-                </div>
+                <SocialSettings />
               </motion.div>
             )}
 
@@ -274,7 +270,7 @@ export default function PromoterSettingsPage() {
             )}
 
             {/* Placeholder for other tabs to show it's functional */}
-            {["categories", "analytics", "notifications", "privacy", "security", "appearance", "connections"].includes(activeTab) && (
+            {["categories", "analytics", "notifications", "privacy", "security", "appearance"].includes(activeTab) && (
               <motion.div
                 key={activeTab}
                 initial={{ opacity: 0, y: 10 }}

@@ -5,6 +5,7 @@ import RatingStars from "../components/reviews/RatingStars";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { usePublicPortfolio } from "../features/portfolio";
 import { PortfolioGrid } from "../components/portfolio";
+import { SocialLinksDisplay } from "../components/social";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { MapPin, Users, TrendingUp, Briefcase, Link as LinkIcon, Camera, Music, Video, Globe, MessageSquare } from "lucide-react";
 
@@ -74,8 +75,9 @@ export default function PublicPromoterProfilePage() {
                   )}
                 </div>
                 {profile.headline && (
-                  <p className="mt-1 text-lg text-gray-600">{profile.headline}</p>
+                  <p className="mt-1 text-lg text-gray-600 mb-3">{profile.headline}</p>
                 )}
+                <SocialLinksDisplay userId={profile.user_id} />
               </div>
               <button
                 onClick={handleSave}
