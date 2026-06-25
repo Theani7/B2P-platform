@@ -1,23 +1,23 @@
 import { CampaignStatus } from "../features/campaigns/types";
 
-const statusStyles: Record<string, string> = {
-  DRAFT: "bg-gray-100 text-gray-700 border-gray-300",
-  OPEN: "bg-blue-100 text-blue-700 border-blue-300",
-  ACTIVE: "bg-green-100 text-green-700 border-green-300",
-  COMPLETED: "bg-purple-100 text-purple-700 border-purple-300",
-  ARCHIVED: "bg-yellow-100 text-yellow-700 border-yellow-300",
-  CANCELLED: "bg-red-100 text-red-700 border-red-300",
+const statusConfig: Record<string, { bg: string; text: string; dot: string }> = {
+  DRAFT: { bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400" },
+  OPEN: { bg: "bg-blue-50", text: "text-blue-700", dot: "bg-blue-500" },
+  ACTIVE: { bg: "bg-brand-teal-50", text: "text-brand-teal-900", dot: "bg-brand-teal" },
+  COMPLETED: { bg: "bg-green-50", text: "text-green-700", dot: "bg-green-500" },
+  ARCHIVED: { bg: "bg-brand-amber-50", text: "text-brand-amber-900", dot: "bg-brand-amber" },
+  CANCELLED: { bg: "bg-brand-coral-50", text: "text-brand-coral-900", dot: "bg-brand-coral" },
 };
 
 interface StatusBadgeProps {
-  status: CampaignStatus;
+  status: CampaignStatus | string;
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
+  const config = statusConfig[status] ?? statusConfig.DRAFT;
   return (
-    <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusStyles[status] ?? statusStyles.DRAFT}`}
-    >
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${config.bg} ${config.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
       {status}
     </span>
   );

@@ -4,6 +4,20 @@ import { usePromoterDirectory, useSavePromoter } from "../features/discovery/api
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import {
+  Search,
+  Users,
+  MapPin,
+  TrendingUp,
+  Eye,
+  Bookmark,
+  BadgeCheck,
+  Briefcase,
+  ArrowRight,
+  Filter,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 
 const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS", "OTHER"];
 const FOLLOWER_RANGES = [
@@ -37,8 +51,9 @@ export default function PromoterDirectoryPage() {
   const [experienceMin, setExperienceMin] = useState<number | undefined>(undefined);
   const [experienceMax, setExperienceMax] = useState<number | undefined>(undefined);
   const [sortBy, setSortBy] = useState("newest");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder] = useState("desc");
   const [page, setPage] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
 
   const { data, isLoading } = usePromoterDirectory({
     search: search || undefined,
@@ -59,7 +74,7 @@ export default function PromoterDirectoryPage() {
 
   const handleSave = (id: string) => {
     savePromoter.mutate(id, {
-      onSuccess: () => notifySuccess("Promoter saved to shortlist"),
+      onSuccess: () => notifySuccess("Promoter saved to shortlist!"),
       onError: (e) => notifyError(e.message),
     });
   };
@@ -88,236 +103,312 @@ export default function PromoterDirectoryPage() {
     setPage(1);
   };
 
+  const hasActiveFilters = niche || location || verified !== undefined || followersMin !== undefined || experienceMin !== undefined;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-text">Discover Promoters</h1>
-        <Link
-          to="/business/saved-promoters"
-          className="rounded border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
-        >
-          View Shortlist
-        </Link>
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-teal via-brand-teal-900 to-brand-purple-900 p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_60%)]" />
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-white shadow-lg ring-1 ring-white/20">
+              <Users size={28} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-medium text-white">Discover Promoters</h1>
+              <p className="text-sm text-white/70 mt-0.5">Find the perfect collaborators for your campaigns</p>
+            </div>
+          </div>
+          <Link
+            to="/business/saved-promoters"
+            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-white/20 transition-all duration-200 flex items-center gap-2"
+          >
+            <Bookmark size={16} />
+            Saved ({data?.total || 0})
+          </Link>
+        </div>
       </div>
 
-      <input
-        type="text"
-        placeholder="Search by username, headline, bio, niche, or location..."
-        value={search}
-        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-        className="block w-full rounded-lg border border-gray-300 p-3 text-sm"
-      />
+      {/* Search & Filters Toggle */}
+      <div className="flex gap-3">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search by name, niche, or location..."
+            aria-label="Search promoters"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            className="block w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 py-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple transition-all"
+          />
+        </div>
+        <select
+          value={sortBy}
+          onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+          className="appearance-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple transition-all cursor-pointer"
+        >
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
+            showFilters || hasActiveFilters
+              ? "bg-brand-purple-50 border-brand-purple/30 text-brand-purple"
+              : "border-gray-200 text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          <SlidersHorizontal size={16} />
+          Filters
+          {hasActiveFilters && (
+            <span className="w-2 h-2 rounded-full bg-brand-purple" />
+          )}
+        </button>
+      </div>
 
-      <div className="flex gap-6">
-        <aside className="w-64 shrink-0 space-y-5">
-          <div>
-            <h3 className="mb-2 text-sm font-semibold text-text">Niche</h3>
-            <select
-              value={niche}
-              onChange={(e) => { setNiche(e.target.value); setPage(1); }}
-              className="w-full rounded border border-gray-300 p-2 text-sm"
-            >
-              <option value="">All Niches</option>
-              {NICHE_OPTIONS.map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <h3 className="mb-2 text-sm font-semibold text-text">Location</h3>
-            <input
-              type="text"
-              placeholder="City, country..."
-              value={location}
-              onChange={(e) => { setLocation(e.target.value); setPage(1); }}
-              className="w-full rounded border border-gray-300 p-2 text-sm"
-            />
-          </div>
-
-          <div>
-            <h3 className="mb-2 text-sm font-semibold text-text">Followers</h3>
-            <div className="space-y-1">
+      {/* Filters Panel */}
+      {showFilters && (
+        <div className="bg-white border border-gray-100 rounded-xl p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
+              <Filter size={14} className="text-brand-purple" />
+              Filters
+            </h3>
+            {hasActiveFilters && (
               <button
-                onClick={() => handleFollowerRange(undefined, undefined)}
-                className={`block w-full rounded px-2 py-1 text-left text-sm ${!followersMin && !followersMax ? "bg-primary/10 text-primary" : "hover:bg-gray-100"}`}
+                onClick={clearFilters}
+                className="text-xs text-brand-coral hover:text-brand-coral-900 flex items-center gap-1 font-medium"
               >
-                All
+                <X size={12} />
+                Clear all
               </button>
-              {FOLLOWER_RANGES.map((r) => (
-                <button
-                  key={r.label}
-                  onClick={() => handleFollowerRange(r.min, r.max)}
-                  className={`block w-full rounded px-2 py-1 text-left text-sm ${followersMin === r.min && followersMax === r.max ? "bg-primary/10 text-primary" : "hover:bg-gray-100"}`}
-                >
-                  {r.label}
-                </button>
-              ))}
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Niche</label>
+              <select
+                value={niche}
+                onChange={(e) => { setNiche(e.target.value); setPage(1); }}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple"
+              >
+                <option value="">All Niches</option>
+                {NICHE_OPTIONS.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Location</label>
+              <input
+                type="text"
+                placeholder="Anywhere"
+                value={location}
+                onChange={(e) => { setLocation(e.target.value); setPage(1); }}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Followers</label>
+              <select
+                value={followersMin !== undefined ? `${followersMin}-${followersMax || ""}` : ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (!val) { setFollowersMin(undefined); setFollowersMax(undefined); }
+                  else {
+                    const [min, max] = val.split("-");
+                    handleFollowerRange(Number(min), max ? Number(max) : undefined);
+                  }
+                  setPage(1);
+                }}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple"
+              >
+                <option value="">Any</option>
+                {FOLLOWER_RANGES.map((r) => (
+                  <option key={r.label} value={`${r.min}-${r.max || ""}`}>{r.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Experience</label>
+              <select
+                value={experienceMin !== undefined ? `${experienceMin}-${experienceMax || ""}` : ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (!val) { setExperienceMin(undefined); setExperienceMax(undefined); }
+                  else {
+                    const [min, max] = val.split("-");
+                    handleExperienceRange(Number(min), max ? Number(max) : undefined);
+                  }
+                  setPage(1);
+                }}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple"
+              >
+                <option value="">Any</option>
+                {EXPERIENCE_RANGES.map((r) => (
+                  <option key={r.label} value={`${r.min}-${r.max || ""}`}>{r.label}</option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div>
-            <h3 className="mb-2 text-sm font-semibold text-text">Experience</h3>
-            <div className="space-y-1">
-              <button
-                onClick={() => handleExperienceRange(undefined, undefined)}
-                className={`block w-full rounded px-2 py-1 text-left text-sm ${!experienceMin && !experienceMax ? "bg-primary/10 text-primary" : "hover:bg-gray-100"}`}
-              >
-                All
-              </button>
-              {EXPERIENCE_RANGES.map((r) => (
-                <button
-                  key={r.label}
-                  onClick={() => handleExperienceRange(r.min, r.max)}
-                  className={`block w-full rounded px-2 py-1 text-left text-sm ${experienceMin === r.min && experienceMax === r.max ? "bg-primary/10 text-primary" : "hover:bg-gray-100"}`}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="mb-2 text-sm font-semibold text-text">Verified Only</h3>
-            <label className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={verified === true}
                 onChange={(e) => { setVerified(e.target.checked ? true : undefined); setPage(1); }}
-                className="rounded"
+                className="w-4 h-4 rounded border-gray-300 text-brand-purple focus:ring-brand-purple"
               />
-              Show verified only
+              <span className="text-sm text-gray-600">Verified only</span>
             </label>
           </div>
+        </div>
+      )}
 
-          <button
-            onClick={clearFilters}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
-          >
-            Clear Filters
-          </button>
-        </aside>
-
-        <div className="flex-1 space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">
-              {data ? `${data.total} promoter${data.total !== 1 ? "s" : ""} found` : ""}
-            </p>
-            <div className="flex items-center gap-2">
-              <select
-                value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
-                className="rounded border border-gray-300 p-2 text-sm"
+      {/* Results */}
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : !data || data.items.length === 0 ? (
+        <EmptyState
+          title="No promoters found"
+          description="Try adjusting your search or filters to find more promoters."
+        />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {data.items.map((p: any) => (
+              <div
+                key={p.id}
+                className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-200 hover:-translate-y-0.5 transition-all duration-200 group"
               >
-                {SORT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              <button
-                onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}
-                className="rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
-                title="Toggle sort order"
-              >
-                {sortOrder === "desc" ? "↓" : "↑"}
-              </button>
-            </div>
-          </div>
-
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : !data || data.items.length === 0 ? (
-            <EmptyState
-              title="No promoters found"
-              description="Try adjusting your search or filters."
-            />
-          ) : (
-            <>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {data.items.map((p) => (
-                  <div key={p.id} className="rounded-lg border bg-white p-4 hover:shadow-sm">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
+                <div className="p-5">
+                  <div className="flex items-start gap-4">
+                    {/* Avatar */}
+                    <div className="relative flex-shrink-0">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-purple-50 to-brand-indigo-50 flex items-center justify-center text-xl font-bold text-brand-purple-900 ring-1 ring-brand-purple/10 overflow-hidden">
                         {p.avatar_url ? (
-                          <img src={p.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
+                          <img src={p.avatar_url} alt="" className="h-full w-full object-cover" />
                         ) : (
-                          p.username[0].toUpperCase()
+                          p.username?.[0]?.toUpperCase() ?? "?"
                         )}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <Link
-                            to={`/promoters/${p.username}`}
-                            className="truncate font-semibold text-text hover:text-primary"
-                          >
-                            {p.username}
-                          </Link>
-                          {p.verified && (
-                            <span className="shrink-0 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700">
-                              Verified
-                            </span>
-                          )}
+                      {p.verified && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-teal flex items-center justify-center ring-2 ring-white">
+                          <BadgeCheck size={12} className="text-white" />
                         </div>
-                        {p.headline && (
-                          <p className="truncate text-sm text-gray-600">{p.headline}</p>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/promoters/${p.username}`}
+                          className="truncate font-medium text-gray-900 hover:text-brand-purple transition-colors"
+                        >
+                          {p.username}
+                        </Link>
+                        {p.verified && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-teal-50 text-brand-teal-900 ring-1 ring-brand-teal/10 flex-shrink-0">
+                            <BadgeCheck size={10} />
+                            Verified
+                          </span>
                         )}
                       </div>
-                    </div>
+                      {p.headline && (
+                        <p className="truncate text-sm text-gray-500 mt-0.5">{p.headline}</p>
+                      )}
 
-                    <div className="mt-3 space-y-1.5 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium">{p.niche}</span>
-                        {p.location && <span>{p.location}</span>}
+                      {/* Stats */}
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-1 text-[11px] text-gray-500 bg-gray-50 px-2 py-1 rounded-lg ring-1 ring-gray-100">
+                          <Briefcase size={10} className="text-brand-purple" />
+                          {p.niche}
+                        </span>
+                        {p.location && (
+                          <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                            <MapPin size={10} className="text-gray-400" />
+                            {p.location}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span>{p.followers_count.toLocaleString()} followers</span>
-                        <span>{p.engagement_rate.toFixed(1)}% eng.</span>
+                      <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                        <span className="inline-flex items-center gap-1">
+                          <Users size={11} className="text-gray-400" />
+                          {p.followers_count?.toLocaleString()} followers
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <TrendingUp size={11} className="text-brand-teal" />
+                          {p.engagement_rate?.toFixed(1)}% eng.
+                        </span>
                       </div>
-                    </div>
-
-                    <div className="mt-3 flex gap-2">
-                      <Link
-                        to={`/promoters/${p.username}`}
-                        className="flex-1 rounded border border-primary py-1.5 text-center text-sm font-medium text-primary hover:bg-primary/5"
-                      >
-                        View Profile
-                      </Link>
-                      <button
-                        onClick={() => handleSave(p.id)}
-                        disabled={savePromoter.isPending}
-                        className="rounded bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
-                      >
-                        Save
-                      </button>
                     </div>
                   </div>
+
+                  {/* Actions */}
+                  <div className="mt-4 flex gap-2 pt-4 border-t border-gray-50">
+                    <Link
+                      to={`/promoters/${p.username}`}
+                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-brand-purple hover:border-brand-purple/30 transition-all"
+                    >
+                      <Eye size={14} />
+                      Profile
+                    </Link>
+                    <button
+                      onClick={() => handleSave(p.id)}
+                      disabled={savePromoter.isPending}
+                      className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-purple to-brand-indigo text-white rounded-xl py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 shadow-sm"
+                    >
+                      <Bookmark size={14} />
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {data.pages > 1 && (
+            <div className="flex items-center justify-center gap-3 pt-4">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all"
+              >
+                <ArrowRight size={14} className="rotate-180" />
+                Previous
+              </button>
+              <div className="flex items-center gap-1.5">
+                {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
+                      p === page
+                        ? "bg-brand-purple text-white"
+                        : "text-gray-500 hover:bg-gray-100"
+                    }`}
+                  >
+                    {p}
+                  </button>
                 ))}
               </div>
-
-              {data.pages > 1 && (
-                <div className="flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className="rounded border px-3 py-1.5 text-sm disabled:opacity-50"
-                  >
-                    Previous
-                  </button>
-                  <span className="text-sm text-gray-600">
-                    Page {data.page} of {data.pages}
-                  </span>
-                  <button
-                    onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
-                    disabled={page >= data.pages}
-                    className="rounded border px-3 py-1.5 text-sm disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </>
+              <button
+                onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
+                disabled={page >= data.pages}
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all"
+              >
+                Next
+                <ArrowRight size={14} />
+              </button>
+            </div>
           )}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
