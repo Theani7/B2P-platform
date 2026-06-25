@@ -1,26 +1,16 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, } from "react-router-dom";
 import { useCampaignMarketplace, useApplyToCampaign } from "../features/collaboration/api";
-import { useAuth } from "../providers/AuthProvider";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search, MapPin, Calendar, Clock, DollarSign, Star, Bookmark, Share2, 
-  Filter, TrendingUp, Sparkles, CheckCircle, Users, Briefcase, Building2,
-  ArrowRight, X, Send, MoreVertical, Flag, Link as LinkIcon
+  Search, Calendar, Clock, DollarSign, Bookmark, Share2, 
+  Filter, Sparkles, CheckCircle, Briefcase, X, Send, MoreVertical, Flag, Link as LinkIcon
 } from "lucide-react";
 
-// Mock Data for visual elements
-const RECOMMENDED_CAMPAIGNS = [
-  { id: 'r1', title: 'Summer Tech Review 2026', business: 'Logitech', match: 96, category: 'TECH', budget: 45000, logo: 'L' },
-  { id: 'r2', title: 'Fitness Apparel Launch', business: 'FitWear', match: 88, category: 'FITNESS', budget: 25000, logo: 'F' },
-  { id: 'r3', title: 'Luxury Travel Vlog', business: 'StayCations', match: 85, category: 'TRAVEL', budget: 80000, logo: 'S' },
-];
-
-const QUICK_FILTERS = [
-  "Recommended", "Highest Budget", "Newest", "Remote", "Tech", "Lifestyle", "Fashion", "Urgent"
-];
+// Quick filters removed as backend does not currently support these specific string matches
+// Recommended campaigns removed due to lack of recommendation engine in backend
 
 function CardMenu() {
   const [open, setOpen] = useState(false);
@@ -70,13 +60,12 @@ function CardMenu() {
 }
 
 export default function CampaignMarketplacePage() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  
+  
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("created_at");
-  const [activeFilter, setActiveFilter] = useState("Newest");
 
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
@@ -142,32 +131,6 @@ export default function CampaignMarketplacePage() {
         </div>
       </div>
 
-      {/* 2. RECOMMENDED CAROUSEL */}
-      <div>
-        <h2 className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-3 px-1">Recommended For You</h2>
-        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-          {RECOMMENDED_CAMPAIGNS.map(camp => (
-            <div key={camp.id} className="min-w-[320px] bg-white rounded-2xl p-5 shadow-sm ring-1 ring-gray-200 hover:ring-primary-300 transition-all cursor-pointer group">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center font-bold text-gray-700 ring-1 ring-gray-200">
-                    {camp.logo}
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900 group-hover:text-primary-600 transition-colors">{camp.title}</h3>
-                    <p className="text-xs text-gray-500">{camp.business}</p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">{camp.match}% Match</span>
-              </div>
-              <div className="flex items-center justify-between mt-4 text-sm font-semibold">
-                <span className="text-gray-900">{formatNepaliCurrency(camp.budget)}</span>
-                <span className="text-primary-600 hover:text-primary-700">Apply Now <ArrowRight size={14} className="inline"/></span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* 3. STICKY SEARCH TOOLBAR & QUICK FILTERS */}
       <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -201,21 +164,6 @@ export default function CampaignMarketplacePage() {
             </div>
           </div>
           
-          <div className="flex gap-2 overflow-x-auto no-scrollbar px-2 pb-1">
-            {QUICK_FILTERS.map(filter => (
-              <button 
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={`whitespace-nowrap px-4 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border ${
-                  activeFilter === filter 
-                  ? 'bg-gray-900 text-white border-gray-900' 
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
 
         </div>
       </div>

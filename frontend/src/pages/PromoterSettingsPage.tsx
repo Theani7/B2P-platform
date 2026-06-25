@@ -2,26 +2,54 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import { notifySuccess } from "../hooks/useToast";
+import { notifySuccess, notifyError } from "../hooks/useToast";
 import {
   User, Images, Upload, BadgeCheck, Globe, Lock, Shield, Bell, Palette, Link as LinkIcon,
   BarChart3, Briefcase, Camera, Save, Settings, AlertCircle, Eye
 } from "lucide-react";
 
+import { useForm } from "react-hook-form";
+import { usePromoterProfile, useUpsertPromoterProfile } from "../features/profile/api";
+
 export default function PromoterSettingsPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
-  const [isDirty, setIsDirty] = useState(false);
 
-  // Mock saving functionality
-  const handleSave = () => {
-    setIsDirty(false);
-    notifySuccess("Profile updated successfully.");
+  const { data: profile, isLoading } = usePromoterProfile();
+  const updateProfile = useUpsertPromoterProfile();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { isDirty, isSubmitting },
+    reset,
+  } = useForm({
+    defaultValues: {
+      headline: "",
+      bio: "",
+    },
+  });
+
+  useEffect(() => {
+    if (profile) {
+      reset({
+        headline: profile.headline || "",
+        bio: profile.bio || "",
+      });
+    }
+  }, [profile, reset]);
+
+  const onSubmit = (data: any) => {
+    updateProfile.mutate(data, {
+      onSuccess: () => {
+        notifySuccess("Profile updated successfully");
+        reset(data); // reset to new values to clear isDirty
+      },
+      onError: () => notifyError("Failed to update profile"),
+    });
   };
 
-  const handleInputChange = () => {
-    if (!isDirty) setIsDirty(true);
-  };
+
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-32">
@@ -42,13 +70,13 @@ export default function PromoterSettingsPage() {
             <Eye size={16} /> Preview Public Profile
           </Link>
           <button
-            onClick={handleSave}
-            disabled={!isDirty}
+            onClick={handleSubmit(onSubmit)}
+            disabled={!isDirty || isSubmitting}
             className={`inline-flex items-center gap-2 h-11 px-5 rounded-xl text-sm font-semibold transition-colors shadow-sm ${
-              isDirty ? "bg-primary-600 text-white hover:bg-primary-700" : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              isDirty && !isSubmitting ? "bg-primary-600 text-white hover:bg-primary-700" : "bg-gray-100 text-gray-400 cursor-not-allowed"
             }`}
           >
-            <Save size={16} /> Save Changes
+            <Save size={16} /> {isSubmitting ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>
@@ -156,15 +184,14 @@ export default function PromoterSettingsPage() {
                       <h2 className="text-2xl font-bold text-gray-900 flex items-center justify-center sm:justify-start gap-2">
                         {user?.full_name || 'Creator Name'} <BadgeCheck size={20} className="text-blue-500"/>
                       </h2>
-                      <p className="text-sm text-gray-500 mt-1">@creator • Travel & Lifestyle</p>
+                      <p className="text-sm text-gray-500 mt-1">@{profile?.username || "creator"} • {profile?.niche || "Niche not set"}</p>
                     </div>
                     <div className="w-full sm:w-auto p-4 bg-gray-50 rounded-xl border border-gray-100">
-                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Profile Completion</p>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Profile Status</p>
                       <div className="flex items-center gap-3">
-                        <div className="flex-1 w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="w-[82%] h-full bg-emerald-500 rounded-full"></div>
-                        </div>
-                        <span className="text-sm font-bold text-gray-900">82%</span>
+                        <span className={`text-sm font-bold ${profile ? 'text-emerald-600' : 'text-gray-500'}`}>
+                          {profile ? 'Created' : 'Not setup'}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -173,32 +200,36 @@ export default function PromoterSettingsPage() {
                 {/* Profile Information Form */}
                 <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8">
                   <h3 className="text-lg font-bold text-gray-900 mb-6">Personal Information</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700">First Name</label>
-                      <input type="text" onChange={handleInputChange} className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm" defaultValue={user?.full_name?.split(' ')[0]} />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700">Last Name</label>
-                      <input type="text" onChange={handleInputChange} className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm" defaultValue={user?.full_name?.split(' ')[1]} />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700">Display Name</label>
-                      <input type="text" onChange={handleInputChange} className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm" defaultValue={user?.full_name} />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700">Email Address</label>
-                      <input type="email" onChange={handleInputChange} className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm" defaultValue={user?.email} />
-                    </div>
-                    <div className="space-y-2 sm:col-span-2">
-                      <label className="text-sm font-bold text-gray-700">Creator Headline</label>
-                      <input type="text" onChange={handleInputChange} placeholder="e.g. Tech Reviewer & Gadget Enthusiast" className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm" defaultValue="Travel & Lifestyle Creator" />
-                    </div>
-                    <div className="space-y-2 sm:col-span-2">
-                      <label className="text-sm font-bold text-gray-700">Bio</label>
-                      <textarea onChange={handleInputChange} rows={4} placeholder="Tell brands about yourself..." className="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm resize-none" defaultValue="Passionate creator traveling the world and sharing unique experiences. Open to brand deals in the hospitality space."></textarea>
-                    </div>
-                  </div>
+                  {isLoading ? (
+                    <div className="h-40 flex items-center justify-center text-gray-400">Loading...</div>
+                  ) : (
+                    <form className="grid grid-cols-1 sm:grid-cols-2 gap-6" onSubmit={handleSubmit(onSubmit)}>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">First Name</label>
+                        <input type="text" disabled className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 text-sm" value={user?.full_name?.split(' ')[0] || ""} />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Last Name</label>
+                        <input type="text" disabled className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 text-sm" value={user?.full_name?.split(' ')[1] || ""} />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Email Address</label>
+                        <input type="email" disabled className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 text-sm" value={user?.email || ""} />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Username</label>
+                        <input type="text" disabled className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 text-sm" value={profile?.username || ""} />
+                      </div>
+                      <div className="space-y-2 sm:col-span-2">
+                        <label className="text-sm font-bold text-gray-700">Creator Headline</label>
+                        <input type="text" {...register("headline")} placeholder="e.g. Tech Reviewer & Gadget Enthusiast" className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm" />
+                      </div>
+                      <div className="space-y-2 sm:col-span-2">
+                        <label className="text-sm font-bold text-gray-700">Bio</label>
+                        <textarea {...register("bio")} rows={4} placeholder="Tell brands about yourself..." className="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm resize-none"></textarea>
+                      </div>
+                    </form>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -215,42 +246,10 @@ export default function PromoterSettingsPage() {
                 <h3 className="text-lg font-bold text-gray-900 mb-2">Social Accounts</h3>
                 <p className="text-sm text-gray-500 mb-8">Connect your social media accounts to showcase your audience to brands.</p>
                 
-                <div className="space-y-4">
-                  {[
-                    { name: "Instagram", icon: Globe, color: "text-pink-600 bg-pink-50 ring-pink-100", connected: true, followers: "45.2K", username: "@creator_ig" },
-                    { name: "TikTok", icon: Globe, color: "text-gray-900 bg-gray-100 ring-gray-200", connected: true, followers: "120K", username: "@creator_tt" },
-                    { name: "YouTube", icon: Globe, color: "text-red-600 bg-red-50 ring-red-100", connected: false },
-                    { name: "Twitter/X", icon: Globe, color: "text-sky-500 bg-sky-50 ring-sky-100", connected: false },
-                  ].map(platform => (
-                    <div key={platform.name} className="flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ring-1 ring-inset ${platform.color}`}>
-                          <platform.icon size={20}/>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                            {platform.name}
-                            {platform.connected && <BadgeCheck size={14} className="text-blue-500"/>}
-                          </h4>
-                          {platform.connected ? (
-                            <p className="text-xs text-gray-500 mt-0.5">{platform.username} • {platform.followers} followers</p>
-                          ) : (
-                            <p className="text-xs text-gray-400 mt-0.5">Not connected</p>
-                          )}
-                        </div>
-                      </div>
-                      <button 
-                        onClick={handleInputChange}
-                        className={`h-9 px-4 rounded-lg text-sm font-bold transition-colors ${
-                          platform.connected 
-                          ? "bg-gray-100 text-gray-600 hover:bg-gray-200" 
-                          : "bg-gray-900 text-white hover:bg-gray-800"
-                        }`}
-                      >
-                        {platform.connected ? "Disconnect" : "Connect"}
-                      </button>
-                    </div>
-                  ))}
+                <div className="flex flex-col items-center justify-center p-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  <Globe size={32} className="text-gray-300 mb-3" />
+                  <p className="text-sm font-medium text-gray-900">Social Accounts</p>
+                  <p className="text-xs text-gray-500 mt-1">Social account connection is coming soon.</p>
                 </div>
               </motion.div>
             )}
@@ -267,10 +266,7 @@ export default function PromoterSettingsPage() {
               >
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-6"><Settings size={32}/></div>
                 <h3 className="text-xl font-bold text-gray-900 capitalize mb-2">{activeTab.replace('-', ' ')} Settings</h3>
-                <p className="text-sm text-gray-500 max-w-sm">This section contains settings for {activeTab}. Modify the form fields here to trigger the sticky save bar.</p>
-                <button onClick={handleInputChange} className="mt-6 px-6 h-10 rounded-xl bg-gray-100 text-gray-900 text-sm font-bold hover:bg-gray-200 transition-colors">
-                  Simulate Edit
-                </button>
+                <p className="text-sm text-gray-500 max-w-sm">This section is currently unavailable.</p>
               </motion.div>
             )}
 
@@ -330,11 +326,11 @@ export default function PromoterSettingsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => setIsDirty(false)} className="h-10 px-4 rounded-xl text-sm font-bold text-gray-300 hover:text-white hover:bg-white/10 transition-colors">
+                <button onClick={() => profile && reset(profile)} className="h-10 px-4 rounded-xl text-sm font-bold text-gray-300 hover:text-white hover:bg-white/10 transition-colors">
                   Discard
                 </button>
-                <button onClick={handleSave} className="h-10 px-6 rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-500 transition-colors shadow-lg">
-                  Save Changes
+                <button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} className="h-10 px-6 rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-500 transition-colors shadow-lg disabled:opacity-50">
+                  {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>

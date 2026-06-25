@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useSavedPromoters, useRemoveSavedPromoter } from "../features/discovery/api";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { StatCard, Avatar } from "../components/ui";
 import {
-  Search, Trash2, MapPin, Users, TrendingUp, Eye,
-  Briefcase, BadgeCheck, UserPlus, ArrowRight, BookmarkX,
+  Search, Trash2, MapPin, Users, TrendingUp, Briefcase, BadgeCheck, UserPlus, ArrowRight, BookmarkX,
   Star, Image as ImageIcon, Play, MoreVertical, Copy,
   Share2, ArrowLeftRight, X, ChevronLeft, ChevronRight, LayoutGrid, List, CheckCircle2
 } from "lucide-react";
@@ -57,18 +56,11 @@ function ActionMenu({ promoter, onRemove, onCompare }: any) {
             >
               <Copy size={16} className="text-gray-400" /> Copy Link
             </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); setOpen(false); notifySuccess("Share dialog opened (mock)"); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            <button 
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onRemove(promoter.id); }}
+              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
             >
-              <Share2 size={16} className="text-gray-400" /> Share Profile
-            </button>
-            <div className="h-px bg-gray-100 my-1" />
-            <button
-              onClick={(e) => { e.stopPropagation(); setOpen(false); onRemove(promoter.id, promoter.username); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-            >
-              <Trash2 size={16} className="text-red-500" /> Remove from Saved
+              <Trash2 size={16} /> Remove from list
             </button>
           </motion.div>
         )}
@@ -202,7 +194,7 @@ export default function SavedPromotersPage() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [drawerPromoter, setDrawerPromoter] = useState<any>(null);
-  const navigate = useNavigate();
+  
 
   const { data, isLoading, error } = useSavedPromoters({
     search: search || undefined,
@@ -436,15 +428,9 @@ export default function SavedPromotersPage() {
                     <div className="mt-auto pt-4 border-t border-gray-100 flex gap-2 z-10">
                       <button 
                         onClick={(e) => { e.stopPropagation(); setDrawerPromoter(p); }}
-                        className="flex-1 bg-gray-50 text-gray-700 h-9 rounded-lg text-sm font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                        className="w-full bg-gray-50 text-gray-700 h-9 rounded-lg text-sm font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors"
                       >
                         View Profile
-                      </button>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); notifySuccess("Invite sent (mock)"); }}
-                        className="flex-1 bg-primary-50 text-primary-700 h-9 rounded-lg text-sm font-medium hover:bg-primary-100 transition-colors"
-                      >
-                        Invite
                       </button>
                     </div>
                   </motion.div>

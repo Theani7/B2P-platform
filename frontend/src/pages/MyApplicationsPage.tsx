@@ -6,9 +6,8 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FileText, Briefcase, Building2, Calendar, MapPin, Clock,
-  CheckCircle, CircleDashed, XCircle, Eye, TrendingUp, Users,
-  MessageSquare, MoreHorizontal, ArrowRight, Search, Filter,
+  FileText, Briefcase, Building2, MapPin, Clock,
+  CheckCircle, CircleDashed, XCircle, Eye, TrendingUp, MessageSquare, MoreHorizontal, Search, Filter,
   ChevronRight, ChevronLeft, Send, BarChart3, AlertCircle, Share2
 } from "lucide-react";
 
@@ -120,13 +119,6 @@ export default function MyApplicationsPage() {
   const pendingCount = applications.filter((a:any) => a.status === 'PENDING').length;
   const acceptedCount = applications.filter((a:any) => a.status === 'ACCEPTED').length;
   const rejectedCount = applications.filter((a:any) => a.status === 'REJECTED').length;
-
-  const MOCK_ACTIVITY = [
-    { text: "Your application to Nike was viewed", time: "2h ago", icon: Eye, color: "text-blue-500 bg-blue-50" },
-    { text: "Adidas shortlisted you", time: "5h ago", icon: CheckCircle, color: "text-emerald-500 bg-emerald-50" },
-    { text: "Logitech campaign closed", time: "1d ago", icon: AlertCircle, color: "text-amber-500 bg-amber-50" }
-  ];
-
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
       
@@ -195,8 +187,8 @@ export default function MyApplicationsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* MAIN COLUMN (9 cols) */}
-        <div className="lg:col-span-9 space-y-6">
+        {/* MAIN LIST COLUMN */}
+        <div className="lg:col-span-12 space-y-6">
           
           {/* TOOLBAR */}
           <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -395,38 +387,7 @@ export default function MyApplicationsPage() {
           )}
         </div>
 
-        {/* SIDEBAR COLUMN (3 cols) */}
-        <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-5">
-            <h2 className="text-sm font-bold text-gray-900 mb-5">Recent Activity</h2>
-            <div className="space-y-5">
-              {MOCK_ACTIVITY.map((act, i) => {
-                const Icon = act.icon;
-                return (
-                  <div key={i} className="flex gap-3">
-                    <div className={`w-8 h-8 rounded-full ${act.color} flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                      <Icon size={14} />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-900 font-medium leading-snug">{act.text}</p>
-                      <p className="text-xs text-gray-400 mt-1">{act.time}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-indigo-50 to-white rounded-2xl shadow-sm ring-1 ring-indigo-100 p-5">
-            <h2 className="text-sm font-bold text-indigo-900 mb-2">Pro Tip</h2>
-            <p className="text-xs text-gray-600 leading-relaxed mb-4">
-              Writing a personalized cover message increases your chances of acceptance by 40%. Highlight your exact audience match.
-            </p>
-            <Link to="/promoter/profile" className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
-              Update Profile <ArrowRight size={12}/>
-            </Link>
-          </div>
-        </div>
+
 
       </div>
 

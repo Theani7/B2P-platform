@@ -9,11 +9,8 @@ import { PageHeader, Avatar, Badge } from "../components/ui";
 import { Table, TableColumn } from "../components/ui/Table";
 import {
   ArrowLeft,
-  MapPin,
   Users,
   TrendingUp,
-  Star,
-  MessageSquare,
   Briefcase,
   Eye,
   BadgeCheck,

@@ -5,13 +5,11 @@ import { useMyReviews, useDeleteReview, useUpdateReview, useUserRating } from ".
 import ReviewFormDialog from "../components/reviews/ReviewFormDialog";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
-import { formatNepaliCurrency } from "../utils/currency";
+
 import { motion } from "framer-motion";
 import {
-  Star, Building2, BadgeCheck, Calendar, Handshake, TrendingUp,
-  Award, Medal, Sparkles, MessageSquare, Eye, Edit, Trash2,
-  BarChart3, Users, Search, Filter, MoreHorizontal, ArrowRight,
-  ChevronLeft, ChevronRight, Briefcase, CheckCircle2
+  Star, BadgeCheck, Calendar, Award, Medal, Sparkles, MessageSquare, Eye, Edit, Trash2,
+  BarChart3, Search, ChevronLeft, ChevronRight, Briefcase, CheckCircle2
 } from "lucide-react";
 
 export default function MyReviewsPage() {
@@ -46,14 +44,7 @@ export default function MyReviewsPage() {
 
   const currentEditItem = editingId && reviewsData ? reviewsData.items.find((r:any) => r.id === editingId) : null;
 
-  // Mock distribution since API doesn't provide it yet
-  const distribution = [
-    { stars: 5, pct: 72 },
-    { stars: 4, pct: 18 },
-    { stars: 3, pct: 6 },
-    { stars: 2, pct: 2 },
-    { stars: 1, pct: 2 },
-  ];
+  // Mock distribution removed as API doesn't provide it yet
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
@@ -100,44 +91,10 @@ export default function MyReviewsPage() {
         </div>
 
         {/* Rating Distribution */}
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8">
-          <h2 className="text-sm font-bold text-gray-900 mb-6">Rating Distribution</h2>
-          <div className="space-y-4">
-            {distribution.map((dist) => (
-              <div key={dist.stars} className="flex items-center gap-3">
-                <span className="text-xs font-bold text-gray-700 w-12 flex items-center gap-1">
-                  {dist.stars} <Star size={10} className="fill-amber-400 text-amber-400"/>
-                </span>
-                <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${dist.pct}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="h-full bg-amber-400 rounded-full"
-                  />
-                </div>
-                <span className="text-xs font-medium text-gray-500 w-8 text-right">{dist.pct}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* KPI Cards Stack */}
-        <div className="flex flex-col gap-4">
-          <div className="bg-white flex-1 rounded-2xl shadow-sm ring-1 ring-gray-200 p-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><Handshake size={20}/></div>
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Completed Collabs</p>
-              <p className="text-2xl font-bold text-gray-900">42</p>
-            </div>
-          </div>
-          <div className="bg-white flex-1 rounded-2xl shadow-sm ring-1 ring-gray-200 p-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><TrendingUp size={20}/></div>
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Recommendation Rate</p>
-              <p className="text-2xl font-bold text-gray-900">96%</p>
-            </div>
-          </div>
+        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8 flex flex-col items-center justify-center text-center">
+          <BarChart3 size={32} className="text-gray-300 mb-3" />
+          <h2 className="text-sm font-bold text-gray-900 mb-1">Rating Distribution</h2>
+          <p className="text-xs text-gray-500">Distribution analytics are currently unavailable.</p>
         </div>
       </div>
 

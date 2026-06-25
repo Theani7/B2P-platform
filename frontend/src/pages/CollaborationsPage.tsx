@@ -10,22 +10,12 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  CheckCircle2, XCircle, Clock, Star, ArrowRight, CalendarDays, TrendingUp,
-  Wallet, FileText, MapPin, MessageCircle, Eye, Download, Search, Filter,
-  Building2, Briefcase, UserCheck, SearchCheck, MoreVertical, Search as SearchIcon
+  CheckCircle2, XCircle, Clock, Star, TrendingUp,
+  Wallet, MessageCircle, Eye, Download, Filter,
+  Building2, Briefcase, UserCheck, MoreVertical, Search as SearchIcon
 } from "lucide-react";
 
-const STATUS_ICONS: Record<string, React.ElementType> = {
-  ACTIVE: Clock,
-  COMPLETED: CheckCircle2,
-  CANCELLED: XCircle,
-};
 
-const MOCK_ACTIVITY = [
-  { text: "Nike approved your content draft", time: "2h ago", icon: CheckCircle2, color: "text-emerald-500 bg-emerald-50" },
-  { text: "Deadline updated for TechVlog", time: "5h ago", icon: CalendarDays, color: "text-blue-500 bg-blue-50" },
-  { text: "Logitech submitted a 5-star review", time: "1d ago", icon: Star, color: "text-amber-500 bg-amber-50" },
-];
 
 function CardMenu({ collab, isBusiness, onComplete, onReview }: any) {
   const [open, setOpen] = useState(false);
@@ -208,8 +198,8 @@ export default function CollaborationsPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         
-        {/* MAIN COLUMN (9 cols) */}
-        <div className="xl:col-span-9 space-y-6">
+        {/* MAIN COLUMN (12 cols) */}
+        <div className="xl:col-span-12 space-y-6">
           
           {/* 3. FILTER TOOLBAR */}
           <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -257,8 +247,8 @@ export default function CollaborationsPage() {
 
           {/* PROJECT LIST */}
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Array.from({length:4}).map((_,i) => <div key={i} className="bg-white rounded-2xl h-80 animate-pulse ring-1 ring-gray-100"></div>)}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({length:6}).map((_,i) => <div key={i} className="bg-white rounded-2xl h-80 animate-pulse ring-1 ring-gray-100"></div>)}
             </div>
           ) : !collabs || collabs.length === 0 ? (
             <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
@@ -270,10 +260,10 @@ export default function CollaborationsPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {collabs.map((c: any) => {
                 const isCompleted = c.status === "COMPLETED";
-                const isCancelled = c.status === "CANCELLED";
+                
                 const isActive = c.status === "ACTIVE";
 
                 return (
@@ -383,57 +373,6 @@ export default function CollaborationsPage() {
             </div>
           )}
         </div>
-
-        {/* SIDEBAR COLUMN (3 cols) */}
-        <div className="xl:col-span-3 space-y-6">
-          
-          {/* Upcoming Deadlines */}
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-5">
-            <h2 className="text-sm font-bold text-gray-900 mb-5 flex items-center gap-2"><Clock size={16} className="text-blue-500"/> Upcoming Deadlines</h2>
-            <div className="space-y-4">
-              <div className="bg-blue-50 rounded-xl p-3 border border-blue-100">
-                <p className="text-xs font-bold text-blue-900 mb-1">Content Draft Due</p>
-                <p className="text-xs text-blue-700 mb-2">Summer Apparel Collab</p>
-                <div className="flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 w-fit px-2 py-0.5 rounded">
-                  2 Days Left
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Activity Panel */}
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-5">
-            <h2 className="text-sm font-bold text-gray-900 mb-5">Recent Updates</h2>
-            <div className="space-y-5">
-              {MOCK_ACTIVITY.map((act, i) => {
-                const Icon = act.icon;
-                return (
-                  <div key={i} className="flex gap-3">
-                    <div className={`w-8 h-8 rounded-full ${act.color} flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                      <Icon size={14} />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-900 font-medium leading-snug">{act.text}</p>
-                      <p className="text-xs text-gray-400 mt-1">{act.time}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          
-          {/* Review Reminders */}
-          <div className="bg-gradient-to-br from-amber-50 to-white rounded-2xl shadow-sm ring-1 ring-amber-100 p-5">
-            <h2 className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2"><Star size={16} className="text-amber-500"/> Review Reminder</h2>
-            <p className="text-xs text-amber-800/80 leading-relaxed mb-4">
-              Help the community by reviewing your completed collaboration with Nike.
-            </p>
-            <button className="w-full text-xs font-bold text-amber-700 bg-amber-100 hover:bg-amber-200 transition-colors h-9 rounded-lg flex items-center justify-center gap-2">
-              Write Review
-            </button>
-          </div>
-        </div>
-
       </div>
 
       {reviewingCollabId && (

@@ -1,14 +1,14 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { usePromoterInvitations, useAcceptInvitation, useRejectInvitation } from "../features/collaboration/api";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-  Mail, Building2, Calendar, Clock, MapPin, Briefcase, Star, Sparkles,
-  CheckCircle2, XCircle, AlertCircle, Users, Eye, ArrowRight, MessageCircle,
-  MoreHorizontal, Search, Filter, Share2, Link as LinkIcon, BarChart3, Inbox
+  Mail, Building2, Clock, MapPin, Briefcase, Star, Sparkles,
+  CheckCircle2, XCircle, AlertCircle, MessageCircle,
+  Search, Filter, Link as BarChart3, Inbox
 } from "lucide-react";
 
 const STATUS_CONFIG: Record<string, { color: string; icon: any; label: string }> = {
@@ -63,7 +63,6 @@ export default function PromoterInvitationsPage() {
   const invites = data?.items || [];
   const pendingCount = invites.filter((i:any) => i.status === 'PENDING').length;
   const acceptedCount = invites.filter((i:any) => i.status === 'ACCEPTED').length;
-  const declinedCount = invites.filter((i:any) => i.status === 'REJECTED').length;
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">

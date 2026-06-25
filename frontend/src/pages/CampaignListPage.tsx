@@ -6,8 +6,8 @@ import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { StatCard } from "../components/ui";
 import {
   Megaphone, Plus, Search, Edit3, Archive, Trash2, MapPin, 
-  CalendarDays, Filter, MoreVertical, Copy, Eye, SlidersHorizontal,
-  FolderDot, FolderOpen, DollarSign, CheckCircle2, ChevronLeft, ChevronRight
+  Filter, MoreVertical, Eye, SlidersHorizontal,
+  FolderDot, FolderOpen, CheckCircle2, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
@@ -58,12 +58,7 @@ function ActionMenu({ campaign, onArchive, onReopen, onDelete }: any) {
             >
               <Edit3 size={16} className="text-gray-400" /> Edit Campaign
             </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); notifySuccess("Campaign duplicated (mock)"); setOpen(false); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-            >
-              <Copy size={16} className="text-gray-400" /> Duplicate
-            </button>
+
             <div className="h-px bg-gray-100 my-1" />
             {campaign.status !== "ARCHIVED" && campaign.status !== "CANCELLED" ? (
               <button
@@ -191,11 +186,6 @@ export default function CampaignListPage() {
           label="Active Campaigns"
           value={statsLoading ? "—" : stats?.active_campaigns ?? 0}
           icon={CheckCircle2}
-        />
-        <StatCard
-          label="Avg Budget"
-          value={statsLoading ? "—" : "Rs. 45K"} // Mocked as API doesn't return total budget currently
-          icon={DollarSign}
         />
       </div>
 

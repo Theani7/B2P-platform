@@ -6,9 +6,9 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 import { StatCard, Avatar } from "../components/ui";
 import { formatNepaliCurrency } from "../utils/currency";
 import {
-  Send, XCircle, MapPin, CalendarDays, MessageSquare,
+  Send, XCircle, MapPin, MessageSquare,
   UserPlus, Search, Clock, Users, Eye, MoreHorizontal,
-  Copy, Archive, Filter, CheckCircle2, ChevronRight, ChevronLeft, Calendar
+  Archive, Filter, CheckCircle2, ChevronRight, ChevronLeft, Calendar
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -47,7 +47,7 @@ function ActionMenu({ inv, onCancel }: any) {
             className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-50 overflow-hidden py-1"
           >
             <button
-              onClick={(e) => { e.stopPropagation(); setOpen(false); notifySuccess("Viewing Campaign"); }}
+              onClick={(e) => { e.stopPropagation(); setOpen(false); navigate(`/business/campaigns/${inv.campaign_id}`); }}
               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
               <Eye size={16} className="text-gray-400" /> View Campaign
@@ -57,18 +57,6 @@ function ActionMenu({ inv, onCancel }: any) {
               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
               <Users size={16} className="text-gray-400" /> View Promoter
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); setOpen(false); notifySuccess("Invitation copied"); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-            >
-              <Copy size={16} className="text-gray-400" /> Copy Invitation
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); setOpen(false); notifySuccess("Archived (mock)"); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-            >
-              <Archive size={16} className="text-gray-400" /> Archive
             </button>
             {inv.status === "PENDING" && (
               <>

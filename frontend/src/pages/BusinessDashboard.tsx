@@ -8,7 +8,6 @@ import {
   Plus,
   Search,
   Zap,
-  ArrowRight,
   Mail,
   ChevronRight,
   FolderOpen,

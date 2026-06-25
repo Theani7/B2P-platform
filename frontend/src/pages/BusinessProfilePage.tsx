@@ -4,12 +4,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBusinessProfile, useUpsertBusinessProfile } from "../features/profile/api";
-import { useAuth } from "../providers/AuthProvider";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
   Building2, Globe, MapPin, Briefcase, Image as ImageIcon,
-  Upload, ShieldCheck, Bell, Lock, CreditCard, Trash2, Save,
+  Upload, ShieldCheck, Bell, CreditCard, Trash2, Save,
   CheckCircle2, AlertCircle, RefreshCw, BadgeCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -36,7 +35,7 @@ const NAV_ITEMS = [
 ];
 
 export default function BusinessProfilePage() {
-  const { user } = useAuth();
+  
   const qc = useQueryClient();
   const { data: profile, isLoading: profileLoading } = useBusinessProfile();
   const [activeTab, setActiveTab] = useState("general");
@@ -83,10 +82,7 @@ export default function BusinessProfilePage() {
     </div>
   );
 
-  // Calculate mock profile completion
-  const requiredFields = ['company_name', 'industry', 'location', 'website', 'description'];
-  const filledFields = requiredFields.filter(f => profile?.[f as keyof typeof profile]);
-  const completionPercentage = Math.round((filledFields.length / requiredFields.length) * 100) || 20;
+  // Profile completion removed due to lack of backend support
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-32">
@@ -97,21 +93,7 @@ export default function BusinessProfilePage() {
           <p className="text-sm text-gray-500 mt-1.5">Manage your company information and public presence.</p>
         </div>
         <div className="flex flex-col items-end gap-2 w-full md:w-72">
-          <div className="flex items-center justify-between w-full text-sm font-semibold">
-            <span className="text-gray-700">Profile Completion</span>
-            <span className="text-primary-600">{completionPercentage}%</span>
-          </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${completionPercentage}%` }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className={`h-full rounded-full ${completionPercentage === 100 ? 'bg-emerald-500' : 'bg-primary-500'}`} 
-            />
-          </div>
-          {completionPercentage < 100 && (
-            <p className="text-xs text-gray-500 mt-1">Complete your profile to attract more promoters.</p>
-          )}
+          {/* Action buttons could go here */}
         </div>
       </div>
 

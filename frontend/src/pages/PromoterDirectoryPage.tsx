@@ -5,8 +5,8 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 import { StatCard, Avatar } from "../components/ui";
 import {
   Search, Users, MapPin, TrendingUp, Bookmark, BadgeCheck,
-  Briefcase, ArrowRight, Filter, Star, X, Image as ImageIcon,
-  ChevronLeft, ChevronRight, CheckCircle2, UserPlus, Play
+  Briefcase, ArrowRight, Star, X, Image as ImageIcon,
+  ChevronLeft, ChevronRight, CheckCircle2, Play
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -121,9 +121,7 @@ function ProfileDrawer({ isOpen, onClose, promoter, onSave }: any) {
           </div>
 
           <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3">
-            <button className="flex-1 bg-primary-600 hover:bg-primary-700 text-white h-11 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm">
-              <UserPlus size={16} /> Invite to Campaign
-            </button>
+
             <button 
               onClick={() => onSave(promoter.id)}
               className="w-11 h-11 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center transition-colors shadow-sm"
@@ -367,12 +365,6 @@ export default function PromoterDirectoryPage() {
                       className="flex-1 h-11 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-primary-500 focus:outline-none"
                     >
                       View Profile
-                    </button>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); notifySuccess("Invite sent (mock)"); }}
-                      className="flex-1 h-11 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none"
-                    >
-                      Invite
                     </button>
                   </div>
                 </motion.div>
