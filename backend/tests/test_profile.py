@@ -1,21 +1,23 @@
 """Tests for Sprint 2 profile functionality."""
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.db.base import Base
 from app.db.session import engine
+from app.middleware.rate_limit import reset_rate_limit_store
 
 
 @pytest.fixture(autouse=True)
 def _setup_db():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    reset_rate_limit_store()
     yield
 
 
 @pytest.fixture
 def client():
-    return AsyncClient(app=app, base_url="http://test")
+    return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
 
 
 @pytest.mark.anyio

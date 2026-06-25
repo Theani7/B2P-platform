@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     JWT_ISSUER: str = "auth.b2p.com"
 
     # Rate limiting
-    RATE_LIMIT_AUTH: str = "5/minute"
+    RATE_LIMIT_AUTH: int = 30
 
     # Account lockout
     MAX_FAILED_LOGIN_ATTEMPTS: int = 5

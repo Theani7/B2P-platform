@@ -22,6 +22,8 @@ from .api.v1.collaborations.routes import business_router as business_collab_rou
 from .api.v1.collaborations.routes import promoter_router as promoter_collab_router
 from .api.v1.matching.routes import router as matching_router
 from .api.v1.reviews.routes import router as review_router
+from .api.v1.admin.routes import router as admin_router
+from .api.v1.promoter_verification.routes import router as promoter_verification_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -35,7 +37,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(RateLimitMiddleware, limit=5, window=60)
+app.add_middleware(RateLimitMiddleware, limit=settings.RATE_LIMIT_AUTH, window=60)
 
 register_exception_handlers(app)
 
@@ -57,6 +59,8 @@ app.include_router(business_collab_router, prefix=settings.API_V1_STR)
 app.include_router(promoter_collab_router, prefix=settings.API_V1_STR)
 app.include_router(matching_router, prefix=settings.API_V1_STR)
 app.include_router(review_router, prefix=settings.API_V1_STR)
+app.include_router(admin_router, prefix=settings.API_V1_STR)
+app.include_router(promoter_verification_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")

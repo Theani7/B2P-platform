@@ -5,6 +5,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, String, Boolean, DateTime, Enum, Integer
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from ..db.base import Base
 
@@ -33,3 +34,6 @@ class User(Base):
     last_login_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    business_profile = relationship("BusinessProfile", back_populates="user", uselist=False)
+    promoter_profile = relationship("PromoterProfile", back_populates="user", uselist=False)

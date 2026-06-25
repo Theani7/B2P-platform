@@ -39,6 +39,6 @@ class PromoterProfile(Base):
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    user = relationship("User", backref="promoter_profile")
+    user = relationship("User", back_populates="promoter_profile")
     portfolio_items = relationship("PortfolioItem", back_populates="promoter_profile", cascade="all, delete-orphan")
     social_links = relationship("SocialLink", back_populates="promoter_profile", cascade="all, delete-orphan")

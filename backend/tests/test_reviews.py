@@ -1,9 +1,10 @@
 """Tests for Sprint 7 Review & Rating System."""
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.db.base import Base
 from app.db.session import engine
+from app.middleware.rate_limit import reset_rate_limit_store
 from datetime import datetime, timezone, timedelta
 
 
@@ -11,13 +12,14 @@ from datetime import datetime, timezone, timedelta
 def _setup_db():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    reset_rate_limit_store()
     yield
     Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
 def client():
-    return AsyncClient(app=app, base_url="http://test")
+    return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
 
 
 async def _register_business(client: AsyncClient, suffix: str = "") -> tuple[str, str]:
@@ -28,7 +30,9 @@ async def _register_business(client: AsyncClient, suffix: str = "") -> tuple[str
         "password": "StrongPass1!",
         "role": "BUSINESS",
     })
-    return reg.json()["access_token"], reg.json()["user"]["id"]
+    token = reg.json()["access_token"]
+    me = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+    return token, me.json()["id"]
 
 
 async def _register_promoter(client: AsyncClient, suffix: str = "") -> str:

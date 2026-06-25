@@ -1,9 +1,10 @@
 """Tests for Sprint 3 campaign management."""
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.db.base import Base
 from app.db.session import engine
+from app.middleware.rate_limit import reset_rate_limit_store
 from datetime import datetime, timezone, timedelta
 
 
@@ -11,13 +12,14 @@ from datetime import datetime, timezone, timedelta
 def _setup_db():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    reset_rate_limit_store()
     yield
     Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
 def client():
-    return AsyncClient(app=app, base_url="http://test")
+    return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
 
 
 def _campaign_payload(overrides=None):
@@ -47,7 +49,8 @@ async def _register_business(client: AsyncClient) -> tuple[str, str]:
         "role": "BUSINESS",
     })
     token = reg.json()["access_token"]
-    uid = reg.json()["user"]["id"]
+    me = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+    uid = me.json()["id"]
     return token, uid
 
 

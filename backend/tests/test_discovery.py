@@ -1,21 +1,23 @@
 """Tests for Sprint 4 discovery functionality."""
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.db.base import Base
 from app.db.session import engine
+from app.middleware.rate_limit import reset_rate_limit_store
 
 
 @pytest.fixture(autouse=True)
 def _setup_db():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    reset_rate_limit_store()
     yield
 
 
 @pytest.fixture
 def client():
-    return AsyncClient(app=app, base_url="http://test")
+    return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
 
 
 def _register(client, username: str, email: str, role: str, password: str = "StrongPass1!"):
@@ -146,6 +148,9 @@ async def test_public_profile_view(client: AsyncClient):
 async def test_save_and_remove_promoter(client: AsyncClient):
     biz = await _register(client, "biz5", "biz5@test.com", "BUSINESS")
     biz_headers = {"Authorization": f"Bearer {biz.json()['access_token']}"}
+    await client.post("/api/v1/business/profile", json={
+        "company_name": "Test Corp", "industry": "TECH",
+    }, headers=biz_headers)
 
     prom = await _register(client, "prom8", "prom8@test.com", "PROMOTER")
     await client.post("/api/v1/promoter/profile", json={
@@ -173,6 +178,9 @@ async def test_save_and_remove_promoter(client: AsyncClient):
 async def test_duplicate_save_returns_409(client: AsyncClient):
     biz = await _register(client, "biz6", "biz6@test.com", "BUSINESS")
     biz_headers = {"Authorization": f"Bearer {biz.json()['access_token']}"}
+    await client.post("/api/v1/business/profile", json={
+        "company_name": "Test Corp", "industry": "TECH",
+    }, headers=biz_headers)
 
     prom = await _register(client, "prom9", "prom9@test.com", "PROMOTER")
     await client.post("/api/v1/promoter/profile", json={

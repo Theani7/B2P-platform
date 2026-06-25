@@ -24,7 +24,7 @@ class PromoterDirectoryItem(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PromoterDirectoryResponse(BaseModel):
@@ -54,7 +54,7 @@ class PromoterPublicProfileRead(BaseModel):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SavedPromoterRead(BaseModel):
@@ -65,4 +65,4 @@ class SavedPromoterRead(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
