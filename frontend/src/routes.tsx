@@ -25,6 +25,7 @@ const BusinessApplicationsPage = lazy(() => import("./pages/BusinessApplications
 const BusinessInvitationsPage = lazy(() => import("./pages/BusinessInvitationsPage"));
 const PromoterInvitationsPage = lazy(() => import("./pages/PromoterInvitationsPage"));
 const CollaborationsPage = lazy(() => import("./pages/CollaborationsPage"));
+const CampaignMatchesPage = lazy(() => import("./pages/CampaignMatchesPage"));
 
 function ProtectedRoute({ role, children }: { role?: Role; children: JSX.Element }) {
   const { user, isLoading: authLoading } = useAuth();
@@ -74,6 +75,7 @@ export default function AppRoutes() {
       <Route path="/business/collaborations" element={<ProtectedRoute><CollaborationsPage /></ProtectedRoute>} />
       <Route path="/business/invitations" element={<ProtectedRoute role={Role.BUSINESS}><BusinessInvitationsPage /></ProtectedRoute>} />
       <Route path="/business/campaigns/:campaignId/applications" element={<ProtectedRoute role={Role.BUSINESS}><BusinessApplicationsPage /></ProtectedRoute>} />
+      <Route path="/business/campaigns/:campaignId/matches" element={<ProtectedRoute role={Role.BUSINESS}><CampaignMatchesPage /></ProtectedRoute>} />
       <Route path="/promoter/marketplace" element={<ProtectedRoute role={Role.PROMOTER}><CampaignMarketplacePage /></ProtectedRoute>} />
       <Route path="/promoter/applications" element={<ProtectedRoute role={Role.PROMOTER}><MyApplicationsPage /></ProtectedRoute>} />
       <Route path="/promoter/invitations" element={<ProtectedRoute role={Role.PROMOTER}><PromoterInvitationsPage /></ProtectedRoute>} />

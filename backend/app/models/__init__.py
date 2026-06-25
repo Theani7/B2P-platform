@@ -9,6 +9,7 @@ from .saved_promoter import SavedPromoter
 from .campaign_application import CampaignApplication, ApplicationStatus
 from .campaign_invitation import CampaignInvitation, InvitationStatus
 from .collaboration import Collaboration, CollaborationStatus
+from .match_result import MatchResult
 
 __all__ = [
     "User",
@@ -30,4 +31,5 @@ __all__ = [
     "InvitationStatus",
     "Collaboration",
     "CollaborationStatus",
+    "MatchResult",
 ]

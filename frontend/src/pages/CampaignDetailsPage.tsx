@@ -166,6 +166,24 @@ export default function CampaignDetailsPage() {
           </div>
         </div>
       </div>
+
+      <div className="rounded-lg border p-6">
+        <h2 className="text-lg font-semibold text-text">Promoters</h2>
+        <div className="mt-4 flex space-x-4">
+          <Link
+            to={`/business/campaigns/${campaign.id}/matches`}
+            className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
+          >
+            Recommended Promoters
+          </Link>
+          <Link
+            to={`/business/campaigns/${campaign.id}/applications`}
+            className="rounded border px-4 py-2 text-sm font-medium text-text hover:bg-gray-50"
+          >
+            View Applications
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

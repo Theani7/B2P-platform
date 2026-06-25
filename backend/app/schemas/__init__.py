@@ -52,6 +52,13 @@ from .discovery import (
     PromoterPublicProfileRead,
     SavedPromoterRead,
 )
+from .matching import (
+    ScoreBreakdown,
+    MatchResultPromoter,
+    MatchResultRead,
+    MatchResultListResponse,
+    MatchGenerateResponse,
+)
 from .collaboration import (
     ApplicationStatus,
     InvitationStatus,
@@ -128,4 +135,9 @@ __all__ = [
     "CampaignInvitationListResponse",
     "CollaborationRead",
     "CollaborationListResponse",
+    "ScoreBreakdown",
+    "MatchResultPromoter",
+    "MatchResultRead",
+    "MatchResultListResponse",
+    "MatchGenerateResponse",
 ]
