@@ -129,9 +129,7 @@ export default function MyApplicationsPage() {
           <p className="text-sm text-gray-500 mt-2 max-w-xl">Track every campaign you've applied for, monitor progress, and manage your creator pipeline.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 h-11 px-5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">
-            <BarChart3 size={16} /> Analytics
-          </button>
+
           <Link
             to="/promoter/marketplace"
             className="inline-flex items-center gap-2 bg-primary-600 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm"

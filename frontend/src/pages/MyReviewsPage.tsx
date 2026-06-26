@@ -56,9 +56,7 @@ export default function MyReviewsPage() {
           <p className="text-sm text-gray-500 mt-2 max-w-xl">Manage your creator reputation, track your performance, and review past client feedback.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 h-11 px-5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">
-            <BarChart3 size={16} /> Review Analytics
-          </button>
+
           <Link
             to={`/profile/${user?.id}`}
             className="inline-flex items-center gap-2 bg-gray-900 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm"

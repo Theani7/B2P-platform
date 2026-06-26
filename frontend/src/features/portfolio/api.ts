@@ -12,7 +12,7 @@ export const portfolioKeys = {
 
 // API calls
 export const getMyPortfolio = async () => {
-  const { data } = await apiClient.get<PortfolioItem[]>("/portfolio/me");
+  const { data } = await apiClient.get<PortfolioItem[]>("/portfolio/");
   return data;
 };
 

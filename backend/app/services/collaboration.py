@@ -93,6 +93,7 @@ def list_marketplace_campaigns(
     page: int = 1,
     limit: int = 20,
     sort: str = "created_at",
+    user: Optional[User] = None,
 ) -> Tuple[List[CampaignMarketplaceItem], int]:
     query = db.query(Campaign).options(joinedload(Campaign.business_profile)).filter(
         Campaign.visibility == CampaignVisibility.PUBLIC,
@@ -116,6 +117,34 @@ def list_marketplace_campaigns(
     total = query.count()
     campaigns = query.offset((page - 1) * limit).limit(limit).all()
 
+    applied_campaign_ids = set()
+    bookmarked_campaign_ids = set()
+    if user and user.role == RoleEnum.PROMOTER:
+        promoter = db.query(PromoterProfile).filter(PromoterProfile.user_id == user.id).first()
+        if promoter:
+            apps = db.query(CampaignApplication.campaign_id).filter(
+                CampaignApplication.promoter_profile_id == promoter.id
+            ).all()
+            applied_campaign_ids = {a[0] for a in apps}
+
+            from ..models.saved_campaign import SavedCampaign
+            bookmarks = db.query(SavedCampaign.campaign_id).filter(
+                SavedCampaign.promoter_profile_id == promoter.id
+            ).all()
+            bookmarked_campaign_ids = {b[0] for b in bookmarks}
+
+    campaign_ids = [c.id for c in campaigns]
+    
+    from sqlalchemy import func
+    app_counts = db.query(
+        CampaignApplication.campaign_id,
+        func.count(CampaignApplication.id)
+    ).filter(
+        CampaignApplication.campaign_id.in_(campaign_ids)
+    ).group_by(CampaignApplication.campaign_id).all()
+    
+    applicant_counts = {c_id: count for c_id, count in app_counts}
+
     items = []
     for c in campaigns:
         business = c.business_profile
@@ -133,9 +162,42 @@ def list_marketplace_campaigns(
             end_date=c.end_date,
             created_at=c.created_at,
             business_name=business.company_name if business else "",
+            has_applied=c.id in applied_campaign_ids,
+            is_bookmarked=c.id in bookmarked_campaign_ids,
+            applicant_count=applicant_counts.get(c.id, 0),
         ))
 
     return items, total
+
+
+def toggle_bookmark(db: Session, user: User, campaign_id: str, bookmarked: bool):
+    from ..models.promoter_profile import PromoterProfile
+    from ..models.saved_campaign import SavedCampaign
+    from fastapi import HTTPException
+    
+    if user.role != RoleEnum.PROMOTER:
+        raise HTTPException(status_code=403, detail="Only promoters can bookmark campaigns")
+        
+    promoter = db.query(PromoterProfile).filter(PromoterProfile.user_id == user.id).first()
+    if not promoter:
+        raise HTTPException(status_code=404, detail="Promoter profile not found")
+        
+    existing = db.query(SavedCampaign).filter(
+        SavedCampaign.promoter_profile_id == promoter.id,
+        SavedCampaign.campaign_id == campaign_id
+    ).first()
+    
+    if bookmarked:
+        if not existing:
+            new_bookmark = SavedCampaign(promoter_profile_id=promoter.id, campaign_id=campaign_id)
+            db.add(new_bookmark)
+            db.commit()
+    else:
+        if existing:
+            db.delete(existing)
+            db.commit()
+            
+    return {"success": True, "bookmarked": bookmarked}
 
 
 # --- Applications (Promoter) ---
@@ -484,6 +546,8 @@ def get_business_collaborations(
             campaign_title=campaign.title if campaign else "",
             campaign_category=campaign.category if campaign else "",
             campaign_budget=campaign.budget if campaign else 0.0,
+            campaign_start_date=campaign.start_date if campaign else None,
+            campaign_end_date=campaign.end_date if campaign else None,
             partner_name=promoter.username if promoter else "",
             partner_username=promoter.username if promoter else "",
             partner_avatar_url=promoter.avatar_url if promoter else None,
@@ -524,6 +588,8 @@ def get_promoter_collaborations(
             campaign_title=campaign.title if campaign else "",
             campaign_category=campaign.category if campaign else "",
             campaign_budget=campaign.budget if campaign else 0.0,
+            campaign_start_date=campaign.start_date if campaign else None,
+            campaign_end_date=campaign.end_date if campaign else None,
             partner_name=business.company_name if business else "",
             partner_username=business.company_name if business else "",
             partner_avatar_url=business.logo_url if business else None,

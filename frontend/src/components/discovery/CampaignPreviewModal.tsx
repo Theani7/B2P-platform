@@ -66,10 +66,10 @@ export default function CampaignPreviewModal({ campaign, onClose, onApply }: Cam
             {/* Key Metrics */}
             <div className="flex flex-wrap items-center gap-3 mb-8">
               <span className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg text-sm font-bold ring-1 ring-emerald-600/20 shadow-sm">
-                <DollarSign size={16} className="-mr-1"/> {formatNepaliCurrency(campaign.budget)}
+                {formatNepaliCurrency(campaign.budget)}
               </span>
               <span className="flex items-center gap-1.5 text-gray-700 bg-gray-50 px-3 py-1.5 rounded-lg text-sm font-semibold ring-1 ring-gray-200 shadow-sm">
-                <Clock size={16}/> 2 weeks duration
+                <Clock size={16}/> {Math.max(1, Math.ceil((new Date(campaign.end_date).getTime() - new Date(campaign.start_date).getTime()) / (1000 * 60 * 60 * 24)))} days duration
               </span>
               <span className="flex items-center gap-1.5 text-gray-700 bg-gray-50 px-3 py-1.5 rounded-lg text-sm font-semibold ring-1 ring-gray-200 shadow-sm">
                 <MapPin size={16}/> {campaign.location || 'Remote'}
@@ -129,12 +129,23 @@ export default function CampaignPreviewModal({ campaign, onClose, onApply }: Cam
             </button>
             <button 
               onClick={() => {
-                onClose();
-                onApply(campaign.id, campaign.title);
+                if (!campaign.has_applied) {
+                  onClose();
+                  onApply(campaign.id, campaign.title);
+                }
               }}
-              className="h-11 px-8 rounded-xl bg-gray-900 text-white text-sm font-bold hover:bg-primary-600 transition-colors shadow-sm flex items-center gap-2"
+              disabled={campaign.has_applied}
+              className={`h-11 px-8 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 transition-colors ${
+                campaign.has_applied
+                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-900 text-white hover:bg-primary-600'
+              }`}
             >
-              <Send size={16} /> Apply Now
+              {campaign.has_applied ? (
+                <>Applied</>
+              ) : (
+                <><Send size={16} /> Apply Now</>
+              )}
             </button>
           </div>
         </motion.div>

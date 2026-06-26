@@ -32,6 +32,7 @@ export interface CampaignMarketplaceItem {
   end_date: string;
   created_at: string;
   business_name: string;
+  has_applied?: boolean;
 }
 
 export interface CampaignMarketplaceResponse {

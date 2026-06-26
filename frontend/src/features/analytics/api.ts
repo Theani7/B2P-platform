@@ -24,8 +24,12 @@ export function usePromoterAnalytics() {
   return useQuery({
     queryKey: analyticsKeys.promoter(),
     queryFn: async () => {
-      const { data } = await apiClient.get<PromoterAnalyticsResponse>("/analytics/promoter");
-      return data;
+      try {
+        const { data } = await apiClient.get<PromoterAnalyticsResponse>("/analytics/promoter");
+        return data;
+      } catch (err) {
+        return { summary: { total_earnings: 0, pending_payouts: 0, active_collaborations: 0, completed_collaborations: 0, average_rating: 0, reviews_received: 0, invitations_pending: 0, applications_pending: 0 } } as any;
+      }
     },
     staleTime: 5 * 60 * 1000,
   });

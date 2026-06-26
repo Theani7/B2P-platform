@@ -135,6 +135,9 @@ export default function CollaborationsPage() {
   const collabs = data?.items || [];
   const activeCount = collabs.filter((c:any) => c.status === 'ACTIVE').length;
   const completedCount = collabs.filter((c:any) => c.status === 'COMPLETED').length;
+  const pendingReviewCount = collabs.filter((c:any) => c.status === 'COMPLETED').length; // Simplified for now
+  const totalEarnings = collabs.filter((c:any) => c.status === 'COMPLETED').reduce((sum: number, c: any) => sum + (c.campaign_budget || 0), 0);
+  const activeThisWeek = collabs.filter((c:any) => c.status === 'ACTIVE' && new Date(c.started_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000).length;
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
@@ -148,9 +151,7 @@ export default function CollaborationsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 h-11 px-5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">
-            <TrendingUp size={16} /> Analytics
-          </button>
+
           <Link
             to={isBusiness ? "/business/directory" : "/promoter/marketplace"}
             className="inline-flex items-center gap-2 bg-primary-600 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm"
@@ -168,7 +169,7 @@ export default function CollaborationsPage() {
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><Clock size={14}/></div>
           </div>
           <div className="text-2xl font-bold text-gray-900">{activeCount}</div>
-          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ 2 started this week</p>
+          <p className="text-xs font-semibold text-emerald-600 mt-1">{activeThisWeek > 0 ? `↑ ${activeThisWeek} started this week` : 'No new projects this week'}</p>
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
@@ -183,16 +184,16 @@ export default function CollaborationsPage() {
             <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Pending Reviews</h3>
             <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><Star size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">1</div>
+          <div className="text-2xl font-bold text-gray-900">{pendingReviewCount}</div>
           <p className="text-xs text-gray-400 font-medium mt-1">Awaiting your feedback</p>
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Total Earnings</h3>
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Total Value</h3>
             <div className="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"><Wallet size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">रु 45K</div>
-          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ 15% vs last month</p>
+          <div className="text-2xl font-bold text-gray-900">{formatNepaliCurrency(totalEarnings)}</div>
+          <p className="text-xs font-semibold text-emerald-600 mt-1">From completed projects</p>
         </div>
       </div>
 
@@ -312,7 +313,9 @@ export default function CollaborationsPage() {
                         </div>
                         <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
                           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Timeline</p>
-                          <p className="text-sm font-bold text-gray-900">2 Weeks left</p>
+                          <p className="text-sm font-bold text-gray-900">
+                            {isCompleted ? 'Completed' : c.campaign_end_date ? `${Math.max(0, Math.ceil((new Date(c.campaign_end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days left` : 'Ongoing'}
+                          </p>
                         </div>
                       </div>
 
@@ -321,11 +324,30 @@ export default function CollaborationsPage() {
                         <div className="flex items-center justify-between text-xs font-semibold mb-2">
                           <span className="text-gray-900">Project Progress</span>
                           <span className={isCompleted ? 'text-emerald-600' : 'text-blue-600'}>
-                            {isCompleted ? '100%' : '60%'}
+                            {isCompleted ? '100%' : (() => {
+                               if (!c.campaign_start_date || !c.campaign_end_date) return '50%';
+                               const start = new Date(c.campaign_start_date).getTime();
+                               const end = new Date(c.campaign_end_date).getTime();
+                               const now = Date.now();
+                               const p = Math.max(0, Math.min(100, Math.round(((now - start) / (end - start)) * 100)));
+                               return `${p}%`;
+                            })()}
                           </span>
                         </div>
                         <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500 w-full' : 'bg-blue-500 w-[60%]'}`}></div>
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-blue-500'}`}
+                            style={{ 
+                              width: isCompleted ? '100%' : (() => {
+                                 if (!c.campaign_start_date || !c.campaign_end_date) return '50%';
+                                 const start = new Date(c.campaign_start_date).getTime();
+                                 const end = new Date(c.campaign_end_date).getTime();
+                                 const now = Date.now();
+                                 const p = Math.max(0, Math.min(100, Math.round(((now - start) / (end - start)) * 100)));
+                                 return `${p}%`;
+                              })()
+                            }}
+                          ></div>
                         </div>
                         <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">
                           <span className="text-gray-700">Agreement</span>

@@ -20,7 +20,7 @@ def marketplace(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items, total = list_marketplace_campaigns(db, search=search, page=page, limit=limit, sort=sort)
+    items, total = list_marketplace_campaigns(db, search=search, page=page, limit=limit, sort=sort, user=user)
     return CampaignMarketplaceResponse(
         items=items,
         total=total,
@@ -28,3 +28,15 @@ def marketplace(
         limit=limit,
         pages=max(1, (total + limit - 1) // limit),
     )
+
+
+@router.post("/{campaign_id}/bookmark", status_code=200)
+def bookmark_campaign(campaign_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    from ....services.collaboration import toggle_bookmark
+    return toggle_bookmark(db, user, campaign_id, bookmarked=True)
+
+
+@router.delete("/{campaign_id}/bookmark", status_code=200)
+def remove_campaign_bookmark(campaign_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    from ....services.collaboration import toggle_bookmark
+    return toggle_bookmark(db, user, campaign_id, bookmarked=False)

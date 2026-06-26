@@ -6,6 +6,7 @@ from .portfolio_item import PortfolioItem
 from .social_link import SocialLink, PlatformEnum
 from .campaign import Campaign, CampaignStatus, CampaignVisibility
 from .saved_promoter import SavedPromoter
+from .saved_campaign import SavedCampaign
 from .campaign_application import CampaignApplication, ApplicationStatus
 from .campaign_invitation import CampaignInvitation, InvitationStatus
 from .collaboration import Collaboration, CollaborationStatus

@@ -31,6 +31,23 @@ export const useApplyToCampaign = () => {
   });
 };
 
+export const useToggleBookmark = () => {
+  const qc = useQueryClient();
+  return useMutation<void, Error, { campaignId: string; bookmarked: boolean }>({
+    mutationFn: ({ campaignId, bookmarked }) => {
+      if (bookmarked) {
+        return api.post(`/campaign-marketplace/${campaignId}/bookmark`);
+      } else {
+        return api.delete(`/campaign-marketplace/${campaignId}/bookmark`);
+      }
+    },
+    onSuccess: () => {
+      // Opt to not invalidate instantly to prevent harsh re-renders,
+      // but invalidate in the background if we want true sync.
+    },
+  });
+};
+
 export const useWithdrawApplication = () => {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({

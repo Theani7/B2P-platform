@@ -23,8 +23,10 @@ if config.config_file_name is not None:
 sys.path.append("..")  # make app importable
 from app.db.base import Base  # noqa: E402
 from app.core.config import settings  # noqa: E402
+import app.models  # load all models so they register with Base.metadata
 
 target_metadata = Base.metadata
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 
 def run_migrations_offline() -> None:

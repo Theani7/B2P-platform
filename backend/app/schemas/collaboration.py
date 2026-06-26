@@ -25,6 +25,9 @@ class CampaignMarketplaceItem(BaseModel):
     end_date: datetime
     created_at: datetime
     business_name: str = ""
+    has_applied: bool = False
+    is_bookmarked: bool = False
+    applicant_count: int = 0
 
     class Config:
         from_attributes = True
@@ -167,6 +170,8 @@ class CollaborationRead(BaseModel):
     campaign_title: str = ""
     campaign_category: str = ""
     campaign_budget: float = 0.0
+    campaign_start_date: Optional[datetime] = None
+    campaign_end_date: Optional[datetime] = None
     partner_name: str = ""
     partner_username: str = ""
     partner_avatar_url: Optional[str] = None

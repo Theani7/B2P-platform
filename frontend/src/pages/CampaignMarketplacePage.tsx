@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, } from "react-router-dom";
-import { useCampaignMarketplace, useApplyToCampaign } from "../features/collaboration/api";
+import { useCampaignMarketplace, useApplyToCampaign, useToggleBookmark } from "../features/collaboration/api";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
@@ -73,6 +73,7 @@ export default function CampaignMarketplacePage() {
   const [selectedCampaignTitle, setSelectedCampaignTitle] = useState("");
   const [applyMessage, setApplyMessage] = useState("");
   const [previewCampaign, setPreviewCampaign] = useState<any | null>(null);
+  const [bookmarkedCampaigns, setBookmarkedCampaigns] = useState<Set<string>>(new Set());
 
   const { data, isLoading } = useCampaignMarketplace({
     search: search || undefined,
@@ -81,7 +82,32 @@ export default function CampaignMarketplacePage() {
     sort,
   });
 
+  // Sync bookmarks from backend when data loads
+  useEffect(() => {
+    if (data?.items) {
+      setBookmarkedCampaigns(prev => {
+        const newSet = new Set(prev);
+        data.items.forEach(c => {
+          if (c.is_bookmarked) {
+            newSet.add(c.id);
+          } else {
+            // only sync backend explicit false if it wasn't toggled locally
+            // actually simpler: just reset local state to match backend on load
+            // to avoid local/remote desync after refresh
+          }
+        });
+        // We will just initialize all bookmarked IDs from data
+        const backendSet = new Set<string>();
+        data.items.forEach(c => {
+          if (c.is_bookmarked) backendSet.add(c.id);
+        });
+        return backendSet;
+      });
+    }
+  }, [data]);
+
   const applyMutation = useApplyToCampaign();
+  const toggleBookmarkMutation = useToggleBookmark();
 
   const handleApplyOpen = (id: string, title: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -118,9 +144,8 @@ export default function CampaignMarketplacePage() {
           <p className="text-sm text-gray-500 mt-1.5 max-w-md">Discover premium campaigns matched perfectly to your creator profile and audience demographics.</p>
           <div className="flex items-center gap-4 mt-4">
             <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full ring-1 ring-emerald-600/20">
-              <Sparkles size={12} /> 85% Profile Match
+              <Sparkles size={12} /> {data?.total || 0} Available Campaigns
             </span>
-            <span className="text-xs font-semibold text-gray-500 flex items-center gap-1"><Briefcase size={12}/> 12 Recommended</span>
           </div>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
@@ -199,8 +224,32 @@ export default function CampaignMarketplacePage() {
                   
                   {/* Absolute Top Right Actions */}
                   <div className="absolute top-5 right-5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); notifySuccess("Bookmarked"); }} className="w-8 h-8 rounded-full bg-white shadow-sm ring-1 ring-gray-200 flex items-center justify-center text-gray-400 hover:text-primary-600 hover:bg-gray-50">
-                      <Bookmark size={14} />
+                    <button 
+                      onClick={(e) => { 
+                        e.preventDefault(); 
+                        e.stopPropagation();
+                        const isCurrentlyBookmarked = bookmarkedCampaigns.has(c.id);
+                        if (isCurrentlyBookmarked) {
+                          setBookmarkedCampaigns(prev => {
+                            const newSet = new Set(prev);
+                            newSet.delete(c.id);
+                            return newSet;
+                          });
+                          toggleBookmarkMutation.mutate({ campaignId: c.id, bookmarked: false });
+                          notifySuccess("Bookmark removed");
+                        } else {
+                          setBookmarkedCampaigns(prev => new Set(prev).add(c.id));
+                          toggleBookmarkMutation.mutate({ campaignId: c.id, bookmarked: true });
+                          notifySuccess("Bookmarked");
+                        }
+                      }} 
+                      className={`w-8 h-8 rounded-full shadow-sm ring-1 ring-gray-200 flex items-center justify-center transition-colors ${
+                        bookmarkedCampaigns.has(c.id) 
+                          ? 'bg-primary-50 text-primary-600' 
+                          : 'bg-white text-gray-400 hover:text-primary-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Bookmark size={14} className={bookmarkedCampaigns.has(c.id) ? "fill-current" : ""} />
                     </button>
                     <CardMenu />
                   </div>
@@ -223,29 +272,35 @@ export default function CampaignMarketplacePage() {
                   
                   <div className="flex items-center gap-4 text-sm font-bold text-gray-900 mb-4">
                     <span className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
-                      <DollarSign size={14} className="-mr-1"/> {formatNepaliCurrency(c.budget)}
+                      {formatNepaliCurrency(c.budget)}
                     </span>
                     <span className="flex items-center gap-1.5 text-gray-500">
-                      <Clock size={14}/> 2 weeks
+                      <Clock size={14}/> {Math.max(1, Math.ceil((new Date(c.end_date).getTime() - new Date(c.start_date).getTime()) / (1000 * 60 * 60 * 24)))} days
                     </span>
                   </div>
 
                   {/* Requirements Chips instead of description */}
                   <div className="flex flex-wrap gap-2 mb-6">
-                    <span className="px-2.5 py-1 rounded bg-gray-50 text-gray-600 text-xs font-semibold ring-1 ring-gray-200/60">Instagram</span>
-                    <span className="px-2.5 py-1 rounded bg-gray-50 text-gray-600 text-xs font-semibold ring-1 ring-gray-200/60">10k+ Followers</span>
-                    <span className="px-2.5 py-1 rounded bg-gray-50 text-gray-600 text-xs font-semibold ring-1 ring-gray-200/60">US Only</span>
+                    <span className="px-2.5 py-1 rounded bg-gray-50 text-gray-600 text-xs font-semibold ring-1 ring-gray-200/60">{c.category}</span>
+                    {c.requirements && c.requirements.split(',').slice(0, 2).map((req, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded bg-gray-50 text-gray-600 text-xs font-semibold ring-1 ring-gray-200/60">
+                        {req.trim().substring(0, 20)}{req.trim().length > 20 ? '...' : ''}
+                      </span>
+                    ))}
                   </div>
 
                   <div className="mt-auto border-t border-gray-100 pt-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="flex -space-x-2">
-                        {[1,2,3].map(i => <div key={i} className="w-6 h-6 rounded-full bg-gray-200 border-2 border-white"></div>)}
+                        {/* Only show circles if there are applicants, up to 3 */}
+                        {Array.from({length: Math.min(3, c.applicant_count || 0)}, (_, i) => (
+                          <div key={i} className="w-6 h-6 rounded-full bg-gray-200 border-2 border-white"></div>
+                        ))}
                       </div>
-                      <span className="text-xs font-medium text-gray-400">12 applied</span>
+                      <span className="text-xs font-medium text-gray-400">{c.applicant_count || 0} applied</span>
                     </div>
                     <span className="text-xs font-semibold text-gray-400 flex items-center gap-1">
-                      <Calendar size={12}/> Ends in 3d
+                      <Calendar size={12}/> Ends in {Math.max(0, Math.ceil((new Date(c.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}d
                     </span>
                   </div>
 
@@ -254,10 +309,17 @@ export default function CampaignMarketplacePage() {
                 {/* Card Footer Actions */}
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-3">
                   <button 
-                    onClick={(e) => handleApplyOpen(c.id, c.title, e)}
-                    className="flex-1 h-10 rounded-xl bg-gray-900 text-white text-sm font-bold hover:bg-primary-600 transition-colors shadow-sm"
+                    onClick={(e) => {
+                      if (!c.has_applied) handleApplyOpen(c.id, c.title, e);
+                    }}
+                    disabled={c.has_applied}
+                    className={`flex-1 h-10 rounded-xl text-sm font-bold transition-colors shadow-sm ${
+                      c.has_applied 
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                        : 'bg-gray-900 text-white hover:bg-primary-600'
+                    }`}
                   >
-                    Apply Now
+                    {c.has_applied ? 'Applied' : 'Apply Now'}
                   </button>
                   <div className="flex-1 h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-center shadow-sm">
                     View Details
