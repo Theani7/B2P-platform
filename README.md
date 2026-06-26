@@ -76,17 +76,17 @@ A full-stack SaaS platform connecting brands (businesses) with social media prom
 
 ```bash
 git clone <repo-url>
-cd B2P
+cd byparsathy
 ```
 
 ### 2. PostgreSQL Setup
 
 ```bash
 # Option A: Local PostgreSQL
-createdb b2p_db
+createdb byparsathy_db
 
 # Option B: Docker (standalone)
-docker run -d --name b2p-db -e POSTGRES_DB=b2p_db \
+docker run -d --name byparsathy-db -e POSTGRES_DB=byparsathy_db \
   -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
   -p 5432:5432 postgres:16-alpine
 ```
@@ -125,7 +125,7 @@ Default password for all seeded accounts: `SeedPass123!`
 
 | Role | Example Login |
 |------|---------------|
-| Admin | `admin@b2pconnect.com` |
+| Admin | `admin@byparsathy.com` |
 | Business | `hello@techvibe.io` |
 | Promoter | `starlight_emma@example.com` |
 
@@ -142,7 +142,7 @@ docker compose up -d
 ## Project Structure
 
 ```
-B2P/
+byparsathy/
 ├── backend/
 │   ├── app/
 │   │   ├── api/v1/              # Route handlers
@@ -398,10 +398,10 @@ All endpoints are prefixed with `/api/v1`.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `postgresql+psycopg2://postgres:postgres@localhost/b2p_db` | PostgreSQL connection string |
+| `DATABASE_URL` | `postgresql+psycopg2://postgres:postgres@localhost/byparsathy_db` | PostgreSQL connection string |
 | `SECRET_KEY` | `CHANGE_ME_IN_PROD` | JWT signing secret |
-| `JWT_AUDIENCE` | `api.b2p.com` | JWT audience claim |
-| `JWT_ISSUER` | `auth.b2p.com` | JWT issuer claim |
+| `JWT_AUDIENCE` | `api.byparsathy.com` | JWT audience claim |
+| `JWT_ISSUER` | `auth.byparsathy.com` | JWT issuer claim |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime (minutes) |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | `7` | Refresh token lifetime (days) |
 | `RATE_LIMIT_AUTH` | `30` | Auth endpoint rate limit (requests/minute) |

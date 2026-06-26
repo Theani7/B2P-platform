@@ -1,7 +1,7 @@
 # Production Hardening Sprint PH-1.9 Report
 
 ## Executive Summary
-During this sprint, the B2P Connect frontend codebase underwent a strict architectural audit. Several monolithic components were split to improve maintainability, dead code (unused variables, disjointed imports, and unused features) was stripped, and strict TypeScript configurations were enforced globally. 
+During this sprint, the Byparsathy frontend codebase underwent a strict architectural audit. Several monolithic components were split to improve maintainability, dead code (unused variables, disjointed imports, and unused features) was stripped, and strict TypeScript configurations were enforced globally. 
 
 ## Files Modified
 - `frontend/src/pages/SavedPromotersPage.tsx`

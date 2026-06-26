@@ -38,7 +38,7 @@ def seed_data():
         # Create Admin
         admin = User(
             id=uuid.uuid4(),
-            email="admin@b2pconnect.com",
+            email="admin@byparsathy.com",
             hashed_password=get_password_hash("Admin123!"),
             full_name="System Admin",
             role=RoleEnum.ADMIN,

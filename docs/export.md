@@ -1,7 +1,7 @@
 # Export & Reporting Center Architecture
 
 ## 1. Overview
-The Export & Reporting Center (PH-2.11) provides robust data extraction capabilities across B2P Connect, allowing Businesses and Promoters to download their datasets securely as CSV files. 
+The Export & Reporting Center (PH-2.11) provides robust data extraction capabilities across Byparsathy, allowing Businesses and Promoters to download their datasets securely as CSV files. 
 
 ## 2. API Endpoints
 - `POST /api/v1/export`: Receives an `ExportRequest` describing the module (e.g. `campaigns`, `promoters`), format, filters, and column definitions. Returns an `ExportResponse` pointing to a local static download URL (`/exports/filename.csv`).

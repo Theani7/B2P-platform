@@ -1,7 +1,7 @@
 # Global Activity & Event System
 
 ## Overview
-The B2P Connect Global Activity & Event System serves as the centralized source of truth for tracking user interactions, system events, and platform activity. This system eliminates hardcoded mock timelines and replaces them with a paginated, database-backed activity stream that populates the Business, Promoter, and Admin dashboards.
+The Byparsathy Global Activity & Event System serves as the centralized source of truth for tracking user interactions, system events, and platform activity. This system eliminates hardcoded mock timelines and replaces them with a paginated, database-backed activity stream that populates the Business, Promoter, and Admin dashboards.
 
 ## Database Schema (`activity_logs`)
 - `id` (UUID) - Primary Key

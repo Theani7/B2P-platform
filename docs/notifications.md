@@ -1,7 +1,7 @@
 # Unified Notification Center
 
 ## Overview
-The **Unified Notification Center** (PH-2.7) serves as the central hub for alerting users across the B2P Connect platform. Instead of maintaining siloed notification logic across various modules (like chat, reviews, or applications), everything channels through a single, standardized, database-backed engine.
+The **Unified Notification Center** (PH-2.7) serves as the central hub for alerting users across the Byparsathy platform. Instead of maintaining siloed notification logic across various modules (like chat, reviews, or applications), everything channels through a single, standardized, database-backed engine.
 
 ## Architecture
 

@@ -8,11 +8,11 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "CHANGE_ME_IN_PROD"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost/b2p_db"
+    DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost/byparsathy_db"
 
     # JWT claims
-    JWT_AUDIENCE: str = "api.b2p.com"
-    JWT_ISSUER: str = "auth.b2p.com"
+    JWT_AUDIENCE: str = "api.byparsathy.com"
+    JWT_ISSUER: str = "auth.byparsathy.com"
 
     # Rate limiting
     RATE_LIMIT_AUTH: int = 30

@@ -448,7 +448,7 @@ def seed_default_settings(db: Session) -> None:
         ("max_portfolio_items", "20", "Maximum portfolio items per promoter"),
         ("max_upload_size_mb", "10", "Maximum file upload size in MB"),
         ("platform_name", "Byparsathy", "Platform display name"),
-        ("support_email", "support@b2pconnect.com", "Platform support email address"),
+        ("support_email", "support@byparsathy.com", "Platform support email address"),
     ]
     for key, value, desc in defaults:
         existing = db.query(PlatformSetting).filter(PlatformSetting.setting_key == key).first()

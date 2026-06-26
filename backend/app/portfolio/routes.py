@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..db.session import get_db
 from ..core.role import RoleEnum
-from ..exceptions.handlers import require_role
+from ..dependencies.auth import require_role
 from .schemas import PortfolioItemCreate, PortfolioItemUpdate, PortfolioItemResponse, PortfolioMediaResponse
 from .service import PortfolioService
 from .upload import save_upload_file

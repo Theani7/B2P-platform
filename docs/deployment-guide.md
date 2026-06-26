@@ -1,4 +1,4 @@
-# B2P Connect - Deployment Guide
+# Byparsathy - Deployment Guide
 
 ## 1. Environment Preparation
 Ensure you have the following installed on your target server:
@@ -9,7 +9,7 @@ Ensure you have the following installed on your target server:
 ## 2. Environment Variables
 Create a `.env` file in the root backend directory:
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/b2p_db
+DATABASE_URL=postgresql://user:password@localhost:5432/byparsathy_db
 SECRET_KEY=your_secure_random_string
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30

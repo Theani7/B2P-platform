@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.api.dependencies import get_current_user
+from app.dependencies.auth import get_current_user
 from app.models.user import User, RoleEnum
 from app.profile_completion.schemas import ProfileCompletionResponse
 from app.profile_completion.service import ProfileCompletionService

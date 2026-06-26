@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 from time import time
 from datetime import datetime, timezone
 
@@ -53,7 +54,7 @@ logging.basicConfig(
     format='%(asctime)s | %(levelname)s | %(name)s | %(message)s',
     stream=sys.stdout,
 )
-logger = logging.getLogger("b2p")
+logger = logging.getLogger("byparsathy")
 
 app = FastAPI(title=settings.PROJECT_NAME)
 

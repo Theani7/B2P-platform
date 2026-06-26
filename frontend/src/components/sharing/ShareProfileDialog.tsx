@@ -22,7 +22,7 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
     if (shareInfo?.public_url && navigator.share) {
       try {
         await navigator.share({
-          title: `Check out ${shareInfo.username}'s profile on B2P Connect`,
+          title: `Check out ${shareInfo.username}'s profile on Byparsathy`,
           url: shareInfo.public_url,
         });
       } catch (err) {
@@ -57,7 +57,7 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
         ctx.font = 'bold 16px Inter, sans-serif';
         ctx.fillStyle = '#111827';
         ctx.textAlign = 'center';
-        ctx.fillText('B2P Connect', canvas.width / 2, canvas.height - 30);
+        ctx.fillText('Byparsathy', canvas.width / 2, canvas.height - 30);
         
         ctx.font = '12px Inter, sans-serif';
         ctx.fillStyle = '#6B7280';

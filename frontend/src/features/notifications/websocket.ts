@@ -11,7 +11,7 @@ export function useNotificationWebSocket() {
 
   const connect = useCallback(() => {
     // Retrieve token directly from localStorage since getAuthToken is missing
-    const token = localStorage.getItem('b2p_token');
+    const token = localStorage.getItem('byparsathy_token');
     if (!token) {
       console.error('WebSocket connection failed: No auth token');
       return;

@@ -9,3 +9,5 @@ class Role(str, Enum):
     BUSINESS = "BUSINESS"
     PROMOTER = "PROMOTER"
     ADMIN = "ADMIN"
+
+RoleEnum = Role

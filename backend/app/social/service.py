@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.social.schemas import SocialLinkCreate, SocialLinkUpdate
 from app.social.repository import SocialLinkRepository
 from app.social.validators import validate_platform_url
-from app.exceptions.custom import NotFoundError, ForbiddenError
+from app.exceptions.app_error import AppError
 
 class SocialLinkService:
     def __init__(self, db: Session):
@@ -21,9 +21,9 @@ class SocialLinkService:
     def update_link(self, user_id: UUID, link_id: UUID, schema: SocialLinkUpdate):
         link = self.repo.get_by_id(link_id)
         if not link:
-            raise NotFoundError("Social link not found")
+            raise AppError("Social link not found", status_code=404)
         if link.user_id != user_id:
-            raise ForbiddenError("You can only modify your own social links")
+            raise AppError("You can only modify your own social links", status_code=403)
         
         update_data = schema.model_dump(exclude_unset=True)
         if "url" in update_data:
@@ -34,9 +34,9 @@ class SocialLinkService:
     def delete_link(self, user_id: UUID, link_id: UUID):
         link = self.repo.get_by_id(link_id)
         if not link:
-            raise NotFoundError("Social link not found")
+            raise AppError("Social link not found", status_code=404)
         if link.user_id != user_id:
-            raise ForbiddenError("You can only delete your own social links")
+            raise AppError("You can only delete your own social links", status_code=403)
             
         self.repo.delete(link)
         return {"success": True, "message": "Social link deleted successfully"}

@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.models.social_link import SocialLink
-from app.exceptions.custom import NotFoundError, ValidationError
+from app.exceptions.app_error import AppError
 
 class SocialLinkRepository:
     def __init__(self, db: Session):
@@ -19,7 +19,7 @@ class SocialLinkRepository:
             return link
         except IntegrityError:
             self.db.rollback()
-            raise ValidationError("You have already linked this platform.")
+            raise AppError("You have already linked this platform.", status_code=400)
 
     def get_by_id(self, link_id: UUID) -> Optional[SocialLink]:
         return self.db.query(SocialLink).filter(SocialLink.id == link_id).first()

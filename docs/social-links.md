@@ -1,7 +1,7 @@
 # Social Links & Creator Identity
 
 ## Overview
-The **Social Links & Creator Identity** module (PH-2.5) provides a structured and professional way for Businesses and Promoters to link their external platforms (Instagram, TikTok, YouTube, Website, etc.) to their B2P Connect profiles. It replaces simple unstructured text fields with a robust system that validates URLs, prevents duplicates, and tracks followers and verification status.
+The **Social Links & Creator Identity** module (PH-2.5) provides a structured and professional way for Businesses and Promoters to link their external platforms (Instagram, TikTok, YouTube, Website, etc.) to their Byparsathy profiles. It replaces simple unstructured text fields with a robust system that validates URLs, prevents duplicates, and tracks followers and verification status.
 
 ## Supported Platforms
 - **Instagram** (`https://instagram.com/...`)

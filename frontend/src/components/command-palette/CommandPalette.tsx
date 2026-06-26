@@ -290,7 +290,7 @@ export function CommandPalette() {
                 <span className="flex items-center gap-1"><kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 font-mono shadow-sm">esc</kbd> to close</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-gray-400">B2P Connect Palette</span>
+                <span className="font-semibold text-gray-400">Byparsathy Palette</span>
               </div>
             </div>
           </div>

@@ -8,29 +8,29 @@ from app.dependencies.auth import get_current_user
 from app.models.user import User
 from app.social.schemas import SocialLinkCreate, SocialLinkUpdate, SocialLinkResponse, SocialLinkReorder
 from app.social.service import SocialLinkService
-from app.schemas.response import SuccessResponse
+
 
 router = APIRouter(prefix="/social", tags=["Social Links"])
 
-@router.get("/me", response_model=SuccessResponse)
+@router.get("/me", response_model=List[SocialLinkResponse])
 def get_my_social_links(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     service = SocialLinkService(db)
     links = service.get_user_links(current_user.id)
-    return SuccessResponse(data=[SocialLinkResponse.model_validate(link).model_dump() for link in links])
+    return links
 
-@router.get("/user/{user_id}", response_model=SuccessResponse)
+@router.get("/user/{user_id}", response_model=List[SocialLinkResponse])
 def get_user_social_links(
     user_id: UUID,
     db: Session = Depends(get_db)
 ):
     service = SocialLinkService(db)
     links = service.get_user_links(user_id)
-    return SuccessResponse(data=[SocialLinkResponse.model_validate(link).model_dump() for link in links])
+    return links
 
-@router.post("", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=SocialLinkResponse, status_code=status.HTTP_201_CREATED)
 def create_social_link(
     schema: SocialLinkCreate,
     db: Session = Depends(get_db),
@@ -38,9 +38,9 @@ def create_social_link(
 ):
     service = SocialLinkService(db)
     link = service.create_link(current_user.id, schema)
-    return SuccessResponse(data=SocialLinkResponse.model_validate(link).model_dump())
+    return link
 
-@router.put("/{link_id}", response_model=SuccessResponse)
+@router.put("/{link_id}", response_model=SocialLinkResponse)
 def update_social_link(
     link_id: UUID,
     schema: SocialLinkUpdate,
@@ -49,9 +49,9 @@ def update_social_link(
 ):
     service = SocialLinkService(db)
     link = service.update_link(current_user.id, link_id, schema)
-    return SuccessResponse(data=SocialLinkResponse.model_validate(link).model_dump())
+    return link
 
-@router.delete("/{link_id}", response_model=SuccessResponse)
+@router.delete("/{link_id}")
 def delete_social_link(
     link_id: UUID,
     db: Session = Depends(get_db),
@@ -59,9 +59,9 @@ def delete_social_link(
 ):
     service = SocialLinkService(db)
     result = service.delete_link(current_user.id, link_id)
-    return SuccessResponse(data=result)
+    return result
 
-@router.put("/reorder", response_model=SuccessResponse)
+@router.put("/reorder")
 def reorder_social_links(
     schema: SocialLinkReorder,
     db: Session = Depends(get_db),
@@ -70,4 +70,4 @@ def reorder_social_links(
     # This route has to be before /{link_id} if it were generic, but reorder is a specific path
     service = SocialLinkService(db)
     result = service.reorder_links(current_user.id, schema.link_ids)
-    return SuccessResponse(data=result)
+    return result

@@ -558,7 +558,7 @@ def seed_users(db: Session) -> tuple[list[User], list[User]]:
         id=uuid.uuid4(),
         username="admin",
         full_name="Platform Admin",
-        email="admin@b2pconnect.com",
+        email="admin@byparsathy.com",
         password_hash=PASSWORD_HASH,
         role=RoleEnum.ADMIN,
         is_active=True,
@@ -1158,6 +1158,137 @@ def seed_match_results(
     db.flush()
     print(f"    Created {count} match results")
     return count
+
+
+# ---------------------------------------------------------------------------
+# Dedicated test accounts (easy-to-remember credentials)
+# ---------------------------------------------------------------------------
+
+TEST_BUSINESS_EMAIL = "test@byparsathy.com"
+TEST_BUSINESS_PASSWORD = "TestPass123!"
+TEST_PROMOTER_EMAIL = "promoter@byparsathy.com"
+TEST_PROMOTER_PASSWORD = "TestPass123!"
+
+
+def seed_test_accounts(db: Session) -> None:
+    """Create dedicated test accounts with complete profiles."""
+    print("  Creating test accounts...")
+
+    # --- Test Business Account ---
+    biz_user = User(
+        id=uuid.uuid4(),
+        username="test_business",
+        full_name="Test Business",
+        email=TEST_BUSINESS_EMAIL,
+        password_hash=get_password_hash(TEST_BUSINESS_PASSWORD),
+        role=RoleEnum.BUSINESS,
+        is_active=True,
+        is_verified=True,
+        created_at=NOW - timedelta(days=90),
+        updated_at=NOW,
+    )
+    db.add(biz_user)
+    db.flush()
+
+    biz_profile = BusinessProfile(
+        id=uuid.uuid4(),
+        user_id=biz_user.id,
+        company_name="Test Corp",
+        industry="TECH",
+        description="A demo business account for testing the Byparsathy platform. Create campaigns, invite promoters, and explore all business features.",
+        location="Kathmandu, Nepal",
+        website="https://byparsathy.com",
+        logo_url="https://picsum.photos/seed/testbiz/200/200",
+        company_size="10-50",
+        created_at=biz_user.created_at,
+        updated_at=biz_user.updated_at,
+    )
+    db.add(biz_profile)
+    db.flush()
+
+    # Create a test campaign for the business
+    test_campaign = Campaign(
+        id=uuid.uuid4(),
+        business_profile_id=biz_profile.id,
+        title="Test Campaign - Tech Product Launch",
+        description="This is a test campaign created for demo purposes. Apply to test the application flow, or get matched using the smart matching engine.",
+        category="TECH",
+        budget=5000.0,
+        location="Kathmandu, Nepal",
+        target_audience="Tech enthusiasts aged 18-35 in Nepal",
+        requirements="Must have 5000+ followers. Must create at least 1 post and 1 story.",
+        start_date=NOW + timedelta(days=7),
+        end_date=NOW + timedelta(days=37),
+        status=CampaignStatus.OPEN,
+        visibility=CampaignVisibility.PUBLIC,
+        created_at=NOW - timedelta(days=5),
+        updated_at=NOW,
+    )
+    db.add(test_campaign)
+
+    # --- Test Promoter Account ---
+    prom_user = User(
+        id=uuid.uuid4(),
+        username="test_promoter",
+        full_name="Test Promoter",
+        email=TEST_PROMOTER_EMAIL,
+        password_hash=get_password_hash(TEST_PROMOTER_PASSWORD),
+        role=RoleEnum.PROMOTER,
+        is_active=True,
+        is_verified=True,
+        created_at=NOW - timedelta(days=60),
+        updated_at=NOW,
+    )
+    db.add(prom_user)
+    db.flush()
+
+    prom_profile = PromoterProfile(
+        id=uuid.uuid4(),
+        user_id=prom_user.id,
+        username="test_promoter",
+        headline="Tech & Lifestyle Creator | 50K Followers",
+        bio="This is a demo promoter account for testing the Byparsathy platform. Apply to campaigns, build your portfolio, and explore all promoter features.",
+        niche=NicheEnum.TECH.value,
+        location="Kathmandu, Nepal",
+        avatar_url="https://picsum.photos/seed/testprom/400/400",
+        followers_count=50000,
+        engagement_rate=4.5,
+        years_experience=3,
+        verified=True,
+        created_at=prom_user.created_at,
+        updated_at=prom_user.updated_at,
+    )
+    db.add(prom_profile)
+    db.flush()
+
+    # Add social links for promoter
+    for i, (platform, url_template) in enumerate(SOCIAL_PLATFORMS[:3]):
+        link = SocialLink(
+            id=uuid.uuid4(),
+            user_id=prom_user.id,
+            promoter_profile_id=prom_profile.id,
+            platform=platform.value,
+            url=url_template.format("test_promoter"),
+            display_order=i,
+            created_at=prom_profile.created_at,
+        )
+        db.add(link)
+
+    # Add portfolio items for promoter
+    for i, title in enumerate(PORTFOLIO_TITLES[:3]):
+        item = PortfolioItem(
+            id=uuid.uuid4(),
+            promoter_profile_id=prom_profile.id,
+            title=title,
+            description=f"Demo portfolio project: {title}. Created for brand partnerships.",
+            cover_image=f"https://picsum.photos/seed/portfolio{i}/800/600",
+            featured=(i == 0),
+            created_at=prom_profile.created_at + timedelta(days=i * 10),
+        )
+        db.add(item)
+
+    db.flush()
+    print(f"    Created test business ({TEST_BUSINESS_EMAIL}) and test promoter ({TEST_PROMOTER_EMAIL})")
 
 
 # ---------------------------------------------------------------------------

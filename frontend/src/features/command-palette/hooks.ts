@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { RecentPage } from './types';
 
-const RECENT_PAGES_KEY = 'b2p_recent_pages';
-const RECENT_COMMANDS_KEY = 'b2p_recent_commands';
+const RECENT_PAGES_KEY = 'byparsathy_recent_pages';
+const RECENT_COMMANDS_KEY = 'byparsathy_recent_commands';
 const MAX_ITEMS = 10;
 
 export function useRecentPages() {

@@ -13,7 +13,7 @@ from app.models.chat import Conversation, Message, MessageType
 from app.models.collaboration import Collaboration, CollaborationStatus
 from app.chat.schemas import ConversationRead, MessageRead
 from app.chat.connection_manager import manager as chat_manager
-from app.schemas.response import SuccessResponse
+
 from app.activity.service import ActivityService
 from app.notifications.service import NotificationService
 from app.notifications.schemas import NotificationCreate
@@ -24,7 +24,7 @@ router = APIRouter()
 
 # --- REST ENDPOINTS ---
 
-@router.get("/conversations", response_model=SuccessResponse)
+@router.get("/conversations")
 def get_conversations(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -81,9 +81,9 @@ def get_conversations(
         
         result.append(conv_data)
         
-    return SuccessResponse(data=result)
+    return result
 
-@router.get("/collaborations/{collaboration_id}/history", response_model=SuccessResponse)
+@router.get("/collaborations/{collaboration_id}/history")
 def get_conversation_history(
     collaboration_id: UUID,
     page: int = Query(1, ge=1),
@@ -126,9 +126,9 @@ def get_conversation_history(
         "messages": [MessageRead.model_validate(m).model_dump() for m in messages],
         "next_page": page + 1 if has_next else None
     }
-    return SuccessResponse(data=data)
+    return data
 
-@router.post("/conversations/{conversation_id}/read", response_model=SuccessResponse)
+@router.post("/conversations/{conversation_id}/read")
 def mark_read(
     conversation_id: UUID,
     db: Session = Depends(get_db),
@@ -142,7 +142,7 @@ def mark_read(
         Message.read_at == None
     ).update({"read_at": datetime.utcnow()})
     db.commit()
-    return SuccessResponse(message="Conversation marked as read")
+    return {"message": "Conversation marked as read"}
 
 
 # --- WEBSOCKET ENDPOINT ---

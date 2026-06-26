@@ -14,7 +14,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-createdb b2p_db
+createdb byparsathy_db
 alembic upgrade head
 uvicorn app.main:app --reload
 ```

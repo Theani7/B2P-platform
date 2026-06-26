@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Professional Portfolio Management System (PH-2.4) allows Promoters to showcase their past work, client collaborations, and content quality directly on their B2P Connect profiles. It replaces simple text fields with a dynamic grid layout of projects, rich metrics, and rich media items.
+The Professional Portfolio Management System (PH-2.4) allows Promoters to showcase their past work, client collaborations, and content quality directly on their Byparsathy profiles. It replaces simple text fields with a dynamic grid layout of projects, rich metrics, and rich media items.
 
 ## Architecture
 

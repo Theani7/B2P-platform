@@ -24,8 +24,7 @@ function Nav() {
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
       <div className="max-w-6xl mx-auto flex items-center justify-between h-16 px-6">
         <Link to="/" className="flex items-center gap-0.5 text-lg font-medium">
-          <span className="text-[#7F77DD]">B2P</span>
-          <span className="text-gray-900">Connect</span>
+          <span className="text-[#7F77DD]">Byparsathy</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -494,8 +493,7 @@ function Footer() {
     <footer className="py-8 border-t border-gray-100 bg-white">
       <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-0.5 text-lg font-medium">
-          <span className="text-[#7F77DD]">B2P</span>
-          <span className="text-gray-900">Connect</span>
+          <span className="text-[#7F77DD]">Byparsathy</span>
         </Link>
 
         <div className="flex items-center gap-5 text-xs text-gray-400">

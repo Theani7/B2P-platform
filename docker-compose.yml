@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: b2p_db
+      POSTGRES_DB: byparsathy_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -26,7 +26,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/b2p_db
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/byparsathy_db
       SECRET_KEY: change-me-in-production-use-a-real-secret
       ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000,http://localhost
     ports:

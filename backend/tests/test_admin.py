@@ -347,7 +347,7 @@ async def test_admin_update_setting(client: AsyncClient):
 
     resp = await client.put(
         "/api/v1/admin/settings/platform_name",
-        json={"setting_value": "B2P Platform"},
+        json={"setting_value": "Byparsathy Platform"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert resp.status_code == 200

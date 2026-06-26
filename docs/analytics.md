@@ -1,7 +1,7 @@
 # Analytics Module Documentation
 
 ## Overview
-The B2P Connect Analytics module provides a unified, production-grade aggregation layer for calculating key performance indicators (KPIs), charts, and growth metrics across the platform.
+The Byparsathy Analytics module provides a unified, production-grade aggregation layer for calculating key performance indicators (KPIs), charts, and growth metrics across the platform.
 
 It ensures that no dashboard relies on hardcoded data, and uses efficient SQL aggregations to calculate real-time stats directly from the database.
 

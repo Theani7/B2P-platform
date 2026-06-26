@@ -1,7 +1,7 @@
 # Universal Command Palette Architecture
 
 ## 1. Overview
-The Universal Command Palette (PH-2.10) provides a fast, keyboard-first navigation and execution interface for B2P Connect, integrating seamlessly with the Global Search API.
+The Universal Command Palette (PH-2.10) provides a fast, keyboard-first navigation and execution interface for Byparsathy, integrating seamlessly with the Global Search API.
 
 ## 2. Keyboard Shortcuts
 - `Cmd + K` or `Ctrl + K`: Opens the command palette globally.
@@ -12,7 +12,7 @@ The Universal Command Palette (PH-2.10) provides a fast, keyboard-first navigati
 ## 3. Reuse Strategy
 The Command Palette leverages the existing `/api/v1/search` REST API built in PH-2.9. No new backend endpoints were created.
 - Search logic, database indexing, and ranking are preserved.
-- Local Storage is utilized exclusively for `b2p_recent_pages` (Recent Pages) and `b2p_recent_commands` (Recent Commands).
+- Local Storage is utilized exclusively for `byparsathy_recent_pages` (Recent Pages) and `byparsathy_recent_commands` (Recent Commands).
 
 ## 4. Implemented Commands
 - Navigation to all primary dashboards and settings pages.

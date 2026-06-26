@@ -29,8 +29,7 @@ export default function Login() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <span className="text-brand-purple font-medium text-xl">B2P</span>
-          <span className="text-gray-900 font-medium text-xl">Connect</span>
+          <span className="text-brand-purple font-medium text-xl">Byparsathy</span>
         </div>
         <div className="bg-white border border-gray-100 rounded-2xl p-8">
           <h1 className="text-xl font-medium text-gray-900 mb-6">Sign in</h1>

@@ -5,7 +5,7 @@ from uuid import UUID
 from typing import Optional, Dict, Any
 from ..models.activity_log import ActivityLog
 from ..models.user import User
-from ..core.role import RoleEnum
+from ..core.role import Role
 
 class ActivityService:
     @staticmethod

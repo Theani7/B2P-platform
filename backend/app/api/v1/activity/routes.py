@@ -4,8 +4,8 @@ from uuid import UUID
 import math
 
 from app.db.session import get_db
-from app.core.security import get_current_user
-from app.core.role import RoleEnum, require_role
+from app.dependencies.auth import get_current_user, require_role
+from app.core.role import RoleEnum
 from app.models.user import User
 from app.activity.service import ActivityService
 from app.activity.schemas import PaginatedActivityResponse
