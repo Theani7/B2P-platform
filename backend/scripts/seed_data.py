@@ -14,13 +14,13 @@ from app.models.user import User, RoleEnum
 from app.models.business_profile import BusinessProfile
 from app.models.promoter_profile import PromoterProfile
 from app.models.campaign import Campaign
-from app.models.application import Application
+from app.models.campaign_application import CampaignApplication
 from app.models.collaboration import Collaboration
 
 def clear_db(db: Session):
     print("Clearing existing data...")
     db.query(Collaboration).delete()
-    db.query(Application).delete()
+    db.query(CampaignApplication).delete()
     db.query(Campaign).delete()
     db.query(BusinessProfile).delete()
     db.query(PromoterProfile).delete()
@@ -135,7 +135,7 @@ def seed_data():
         for c in campaigns:
             # Randomly select a promoter
             p = random.choice(promoters)
-            app = Application(
+            app = CampaignApplication(
                 id=uuid.uuid4(),
                 campaign_id=c.id,
                 promoter_profile_id=p.id,
