@@ -9,8 +9,6 @@ export { Input } from "./Input";
 export { Label } from "./Label";
 export { MessageBubble } from "./MessageBubble";
 export { PageHeader } from "./PageHeader";
-export * from "./EmptyState";
-export * from "./LoadingSpinner";
 export * from "./ActivityCard";
 export * from "./ProfileCompletionWidget";
 export { ProgressBar } from "./ProgressBar";

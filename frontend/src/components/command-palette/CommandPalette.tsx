@@ -8,9 +8,9 @@ import {
   Settings, LogOut, Shield,
   Plus, History, Clock, Globe
 } from 'lucide-react';
-import { useAuth } from '../../../providers/AuthProvider';
+import { useAuth } from '../../providers/AuthProvider';
 import { useSearch } from '../../features/search';
-import { useDebounce } from '../../../hooks/useDebounce';
+import { useDebounce } from '../../hooks/useDebounce';
 import { useRecentPages, useRecentCommands, Command, CommandType } from '../../features/command-palette';
 
 const ICON_MAP: Record<string, React.ReactNode> = {

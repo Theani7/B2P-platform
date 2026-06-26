@@ -1,18 +1,21 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { notificationKeys } from './api';
-import { useAuth } from '../auth';
 import { notifyAchievement } from '../../hooks/useToast';
 import { achievementKeys } from '../achievements';
 
 export function useNotificationWebSocket() {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
 
   const connect = useCallback(() => {
-    if (!token) return;
+    // Retrieve token directly from localStorage since getAuthToken is missing
+    const token = localStorage.getItem('b2p_token');
+    if (!token) {
+      console.error('WebSocket connection failed: No auth token');
+      return;
+    }
 
     const wsUrl = `ws://localhost:8000/ws/notifications?token=${token}`;
     const ws = new WebSocket(wsUrl);

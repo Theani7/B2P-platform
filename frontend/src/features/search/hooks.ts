@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { searchApi } from "./api";
 import type { SearchQuery } from "./types";
-import { useAuth } from "../auth";
+import { useAuth } from "../../providers/AuthProvider";
 
 export const searchKeys = {
   all: ["search"] as const,
