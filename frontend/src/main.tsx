@@ -16,7 +16,8 @@ const queryClient = new QueryClient({
         return failureCount < 1;
       },
       refetchOnWindowFocus: false,
-      staleTime: 5000,
+      staleTime: 30000,
+      gcTime: 5 * 60 * 1000,
     },
   },
 });

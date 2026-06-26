@@ -16,9 +16,11 @@ from app.models.promoter_profile import PromoterProfile
 from app.models.campaign import Campaign
 from app.models.campaign_application import CampaignApplication
 from app.models.collaboration import Collaboration
+from app.models.review import Review
 
 def clear_db(db: Session):
     print("Clearing existing data...")
+    db.query(Review).delete()
     db.query(Collaboration).delete()
     db.query(CampaignApplication).delete()
     db.query(Campaign).delete()
