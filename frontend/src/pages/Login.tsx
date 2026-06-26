@@ -7,7 +7,7 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 
 const schema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(6, "Min 6 characters"),
   remember: z.boolean().optional(),
 });
 

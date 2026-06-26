@@ -8,7 +8,7 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 const schema = z.object({
   full_name: z.string().min(1, "Name required"),
   email: z.string().email(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   confirm_password: z.string(),
   role: z.enum(["BUSINESS", "PROMOTER"]),
   username: z.string().min(3, "Username must be at least 3 characters"),

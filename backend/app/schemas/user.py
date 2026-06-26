@@ -18,22 +18,8 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=12)
+    password: str = Field(..., min_length=6)
     role: RoleEnum
-
-    @validator("password")
-    def strong_password(cls, v: str) -> str:
-        if not re.search(r"[A-Z]", v):
-            raise ValueError("Password must include at least one uppercase letter")
-        if not re.search(r"[a-z]", v):
-            raise ValueError("Password must include at least one lowercase letter")
-        if not re.search(r"\d", v):
-            raise ValueError("Password must include at least one digit")
-        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", v):
-            raise ValueError("Password must include at least one special character")
-        if " " in v:
-            raise ValueError("Password cannot contain spaces")
-        return v
 
     @validator("username")
     def username_alphanumeric(cls, v: str) -> str:
@@ -71,7 +57,7 @@ class TokenSchema(BaseModel):
 
 class LoginSchema(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=8)
+    password: str = Field(..., min_length=6)
 
 
 class ForgotPasswordSchema(BaseModel):
@@ -80,19 +66,7 @@ class ForgotPasswordSchema(BaseModel):
 
 class ResetPasswordSchema(BaseModel):
     token: str
-    new_password: str = Field(..., min_length=12)
-
-    @validator("new_password")
-    def strong_password(cls, v: str) -> str:
-        if not re.search(r"[A-Z]", v):
-            raise ValueError("Password must include at least one uppercase letter")
-        if not re.search(r"[a-z]", v):
-            raise ValueError("Password must include at least one lowercase letter")
-        if not re.search(r"\d", v):
-            raise ValueError("Password must include at least one digit")
-        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", v):
-            raise ValueError("Password must include at least one special character")
-        return v
+    new_password: str = Field(..., min_length=6)
 
 
 class VerifyEmailSchema(BaseModel):
