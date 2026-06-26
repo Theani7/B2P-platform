@@ -50,6 +50,10 @@ export function PortfolioSettings() {
           isOwner={true} 
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onAdd={() => {
+            setEditingItem(null);
+            setIsEditorOpen(true);
+          }}
         />
       )}
 

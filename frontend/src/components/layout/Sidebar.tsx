@@ -14,8 +14,10 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Zap
+  Zap,
+  Lock
 } from "lucide-react";
+import { notifyError } from "../../hooks/useToast";
 
 interface SidebarProps {
   role: string;
@@ -81,6 +83,25 @@ export function Sidebar({ role }: SidebarProps) {
           </div>
           {links.map((link) => {
             const Icon = link.icon;
+            const isLocked = !user?.has_profile && role !== Role.ADMIN;
+
+            if (isLocked) {
+              return (
+                <button
+                  key={link.to}
+                  onClick={() => notifyError("Please complete and save your profile to unlock this section.")}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:bg-gray-50 cursor-not-allowed transition-all duration-200 group"
+                  title="Complete profile to unlock"
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon size={18} className="text-gray-300 group-hover:text-gray-400" />
+                    {link.label}
+                  </div>
+                  <Lock size={14} className="text-gray-300 group-hover:text-amber-500 transition-colors" />
+                </button>
+              );
+            }
+
             return (
               <NavLink
                 key={link.to}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { usePromoterDirectory, useSavePromoter } from "../features/discovery/api";
+import { usePromoterDirectory, useSavePromoter, useRemoveSavedPromoter, useSavedPromoters } from "../features/discovery/api";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { StatCard, Avatar } from "../components/ui";
 import {
@@ -9,7 +9,7 @@ import {
   ChevronLeft, ChevronRight, CheckCircle2, Play
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import ProfilePreviewModal from "../components/discovery/ProfilePreviewModal";
 const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS"];
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest Profiles" },
@@ -18,122 +18,6 @@ const SORT_OPTIONS = [
   { value: "years_experience", label: "Most Experienced" },
 ];
 
-function ProfileDrawer({ isOpen, onClose, promoter, onSave }: any) {
-  useEffect(() => {
-    if (isOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = ""; };
-  }, [isOpen]);
-
-  if (!isOpen || !promoter) return null;
-
-  return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex justify-end">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
-          onClick={onClose}
-        />
-        <motion.div
-          initial={{ x: "100%", boxShadow: "-10px 0 30px rgba(0,0,0,0)" }}
-          animate={{ x: 0, boxShadow: "-10px 0 30px rgba(0,0,0,0.1)" }}
-          exit={{ x: "100%", boxShadow: "-10px 0 30px rgba(0,0,0,0)" }}
-          transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="relative w-full max-w-md bg-white h-full flex flex-col z-50 shadow-2xl"
-        >
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900">Profile Preview</h2>
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
-              <X size={20} />
-            </button>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            <div className="flex items-start gap-4">
-              <div className="relative">
-                {promoter.avatar_url ? (
-                  <img src={promoter.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover ring-4 ring-gray-50" />
-                ) : (
-                  <Avatar initials={promoter.username?.[0]?.toUpperCase() ?? "?"} size="lg" colorIndex={promoter.id?.charCodeAt(0) || 0} />
-                )}
-                {promoter.verified && (
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary-600 flex items-center justify-center ring-4 ring-white">
-                    <BadgeCheck size={14} className="text-white" />
-                  </div>
-                )}
-              </div>
-              <div className="pt-2">
-                <h3 className="text-xl font-bold text-gray-900 leading-none">{promoter.username}</h3>
-                <p className="text-sm text-gray-500 mt-1.5">{promoter.headline || "No headline provided"}</p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                    <MapPin size={12} className="text-gray-500" /> {promoter.location || "Remote"}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
-                    <Briefcase size={12} className="text-primary-500" /> {promoter.niche || "General"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
-                <Users size={16} className="text-gray-400 mb-1" />
-                <span className="text-lg font-bold text-gray-900">{(promoter.followers_count || 0).toLocaleString()}</span>
-                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Followers</span>
-              </div>
-              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
-                <TrendingUp size={16} className="text-emerald-500 mb-1" />
-                <span className="text-lg font-bold text-gray-900">{(promoter.engagement_rate || 0).toFixed(1)}%</span>
-                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Engagement</span>
-              </div>
-              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
-                <Star size={16} className="text-amber-400 mb-1" />
-                <span className="text-lg font-bold text-gray-900">4.9</span>
-                <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Rating</span>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">About</h4>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {promoter.bio || "This promoter hasn't added a bio yet. They mainly focus on creating high-quality content for their audience."}
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-3">Recent Portfolio</h4>
-              <div className="grid grid-cols-3 gap-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="aspect-square rounded-lg bg-gray-100 flex flex-col items-center justify-center border border-gray-200/60 overflow-hidden relative group">
-                    <ImageIcon size={20} className="text-gray-300" />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                      <Play size={20} className="text-white ml-1" fill="currentColor" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3">
-
-            <button 
-              onClick={() => onSave(promoter.id)}
-              className="w-11 h-11 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center transition-colors shadow-sm"
-            >
-              <Bookmark size={18} />
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    </AnimatePresence>
-  );
-}
 
 export default function PromoterDirectoryPage() {
   const [search, setSearch] = useState("");
@@ -153,14 +37,31 @@ export default function PromoterDirectoryPage() {
     limit: 12,
   });
 
+  const { data: savedData } = useSavedPromoters({ limit: 100 });
+  const savedPromoterIds = new Set(savedData?.items?.map((p: any) => p.id) || []);
+
   const savePromoter = useSavePromoter();
+  const removePromoter = useRemoveSavedPromoter();
 
   const handleSave = (id: string, e?: any) => {
     if (e) { e.preventDefault(); e.stopPropagation(); }
-    savePromoter.mutate(id, {
-      onSuccess: () => notifySuccess("Promoter saved to shortlist!"),
-      onError: (err) => notifyError(err.message),
-    });
+    if (savedPromoterIds.has(id)) {
+      removePromoter.mutate(id, {
+        onSuccess: () => notifySuccess("Promoter removed from shortlist"),
+        onError: (err: any) => notifyError(err.message),
+      });
+    } else {
+      savePromoter.mutate(id, {
+        onSuccess: () => notifySuccess("Promoter saved to shortlist!"),
+        onError: (err: any) => {
+          if (err.response?.status === 409) {
+            notifyError("Promoter is already saved.");
+          } else {
+            notifyError(err.message || "Failed to save promoter.");
+          }
+        },
+      });
+    }
   };
 
   const clearFilters = () => {
@@ -324,9 +225,9 @@ export default function PromoterDirectoryPage() {
                         <h3 className="text-base font-bold text-gray-900 truncate group-hover:text-primary-600 transition-colors">{p.username}</h3>
                         <button 
                           onClick={(e) => handleSave(p.id, e)}
-                          className="text-gray-300 hover:text-primary-500 transition-colors"
+                          className={savedPromoterIds.has(p.id) ? "text-primary-600 hover:text-primary-700 transition-colors" : "text-gray-300 hover:text-primary-500 transition-colors"}
                         >
-                          <Bookmark size={18} />
+                          <Bookmark size={18} className={savedPromoterIds.has(p.id) ? "fill-current" : ""} />
                         </button>
                       </div>
                       <p className="text-xs text-gray-500 mt-0.5 truncate flex items-center gap-1.5">
@@ -398,11 +299,12 @@ export default function PromoterDirectoryPage() {
         )}
       </div>
 
-      <ProfileDrawer 
+      <ProfilePreviewModal 
         isOpen={!!drawerPromoter} 
         onClose={() => setDrawerPromoter(null)} 
         promoter={drawerPromoter}
-        onSave={(id: string) => { handleSave(id); setDrawerPromoter(null); }}
+        isSaved={drawerPromoter ? savedPromoterIds.has(drawerPromoter.id) : false}
+        onSave={(id: string) => { handleSave(id); }}
       />
     </div>
   );

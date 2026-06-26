@@ -15,16 +15,32 @@ def calculate_business_completion(user: User):
         "social_links": 5
     }
     
+    def format_item(key, label, route=None):
+        return {"key": key, "label": label, "route": route}
+        
+    labels = {
+        "company_name": "Add Company Name",
+        "logo": "Upload Company Logo",
+        "industry": "Select Industry",
+        "description": "Add Company Description",
+        "website": "Add Company Website",
+        "location": "Add Headquarters Location",
+        "contact": "Add Contact Information",
+        "published_campaign": "Publish a Campaign",
+        "verification": "Verify your Business",
+        "social_links": "Add Social Links"
+    }
+
     completed = []
     missing = []
-    
+
     bp = user.business_profile
     if not bp:
         return {
             "percentage": 0,
             "completed_items": [],
-            "missing_items": list(weights.keys()),
-            "next_best_action": "company_name"
+            "missing_items": [format_item(k, labels[k]) for k in weights.keys()],
+            "next_best_action": {"title": labels["company_name"], "description": "Add your company name to get started.", "weight": weights["company_name"]}
         }
         
     if bp.company_name: completed.append("company_name")
@@ -55,24 +71,22 @@ def calculate_business_completion(user: User):
     if user.is_verified: completed.append("verification")
     else: missing.append("verification")
     
-    # Social links for business isn't directly in the model. We can just add it to missing, or check if they exist somehow.
     if hasattr(user, 'social_links') and user.social_links:
         completed.append("social_links")
     else:
         missing.append("social_links")
 
-    # Calculate percentage
     percentage = sum(weights[item] for item in completed)
     
-    # Next best action is the highest value missing item
     next_best_action = None
     if missing:
-        next_best_action = max(missing, key=lambda item: weights[item])
+        nba_key = max(missing, key=lambda item: weights[item])
+        next_best_action = {"title": labels[nba_key], "description": f"Please {labels[nba_key].lower()} to improve your profile.", "weight": weights[nba_key]}
         
     return {
         "percentage": percentage,
-        "completed_items": completed,
-        "missing_items": missing,
+        "completed_items": [format_item(k, labels[k]) for k in completed],
+        "missing_items": [format_item(k, labels[k]) for k in missing],
         "next_best_action": next_best_action
     }
 
@@ -90,16 +104,31 @@ def calculate_promoter_completion(user: User):
         "contact": 5
     }
     
+    def format_item(key, label, route=None):
+        return {"key": key, "label": label, "route": route}
+        
+    labels = {
+        "profile_photo": "Upload Profile Photo",
+        "headline": "Add Headline",
+        "bio": "Add Bio",
+        "primary_niche": "Select Primary Niche",
+        "location": "Add Location",
+        "experience": "Add Years of Experience",
+        "portfolio": "Add Portfolio Items",
+        "social_links": "Add Social Links",
+        "contact": "Add Contact Information"
+    }
+
     completed = []
     missing = []
-    
+
     pp = user.promoter_profile
     if not pp:
         return {
             "percentage": 0,
             "completed_items": [],
-            "missing_items": list(weights.keys()),
-            "next_best_action": "portfolio"
+            "missing_items": [format_item(k, labels[k]) for k in weights.keys()],
+            "next_best_action": {"title": labels["portfolio"], "description": "Add portfolio items to get started.", "weight": weights["portfolio"]}
         }
         
     if pp.avatar_url: completed.append("profile_photo")
@@ -133,11 +162,12 @@ def calculate_promoter_completion(user: User):
     
     next_best_action = None
     if missing:
-        next_best_action = max(missing, key=lambda item: weights[item])
+        nba_key = max(missing, key=lambda item: weights[item])
+        next_best_action = {"title": labels[nba_key], "description": f"Please {labels[nba_key].lower()} to improve your profile.", "weight": weights[nba_key]}
         
     return {
         "percentage": percentage,
-        "completed_items": completed,
-        "missing_items": missing,
+        "completed_items": [format_item(k, labels[k]) for k in completed],
+        "missing_items": [format_item(k, labels[k]) for k in missing],
         "next_best_action": next_best_action
     }

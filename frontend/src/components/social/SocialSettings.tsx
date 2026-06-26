@@ -47,9 +47,18 @@ export function SocialSettings() {
       ) : (
         <div className="space-y-3">
           {items?.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <div className="flex flex-col items-center justify-center p-12 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
               <p className="text-sm font-medium text-gray-900">No social links yet.</p>
-              <p className="text-xs text-gray-500 mt-1">Add your platforms to build credibility.</p>
+              <p className="text-xs text-gray-500 mt-1 mb-4">Add your platforms to build credibility.</p>
+              <button 
+                onClick={() => {
+                  setEditingItem(null);
+                  setIsEditorOpen(true);
+                }}
+                className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 h-9 px-4 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                <Plus size={16} /> Add Social Link
+              </button>
             </div>
           ) : (
             items?.map(item => (

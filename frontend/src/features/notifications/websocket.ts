@@ -48,7 +48,7 @@ export function useNotificationWebSocket() {
       reconnectTimeoutRef.current = setTimeout(connect, 3000);
     };
 
-  }, [token, queryClient]);
+  }, [queryClient]);
 
   useEffect(() => {
     connect();

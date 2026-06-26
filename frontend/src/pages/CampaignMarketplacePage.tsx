@@ -8,6 +8,7 @@ import {
   Search, Calendar, Clock, DollarSign, Bookmark, Share2, 
   Filter, Sparkles, CheckCircle, Briefcase, X, Send, MoreVertical, Flag, Link as LinkIcon
 } from "lucide-react";
+import CampaignPreviewModal from "../components/discovery/CampaignPreviewModal";
 
 // Quick filters removed as backend does not currently support these specific string matches
 // Recommended campaigns removed due to lack of recommendation engine in backend
@@ -71,6 +72,7 @@ export default function CampaignMarketplacePage() {
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [selectedCampaignTitle, setSelectedCampaignTitle] = useState("");
   const [applyMessage, setApplyMessage] = useState("");
+  const [previewCampaign, setPreviewCampaign] = useState<any | null>(null);
 
   const { data, isLoading } = useCampaignMarketplace({
     search: search || undefined,
@@ -188,16 +190,16 @@ export default function CampaignMarketplacePage() {
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {data.items.map((c: any) => (
-              <Link
+              <div
                 key={c.id}
-                to={`/campaigns/${c.id}`}
-                className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 hover:shadow-xl hover:ring-primary-300 hover:-translate-y-1 transition-all duration-200 flex flex-col overflow-hidden group"
+                onClick={() => setPreviewCampaign(c)}
+                className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 hover:shadow-xl hover:ring-primary-300 hover:-translate-y-1 transition-all duration-200 flex flex-col overflow-hidden group cursor-pointer"
               >
                 <div className="p-6 flex-1 flex flex-col relative">
                   
                   {/* Absolute Top Right Actions */}
                   <div className="absolute top-5 right-5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={(e) => { e.preventDefault(); notifySuccess("Bookmarked"); }} className="w-8 h-8 rounded-full bg-white shadow-sm ring-1 ring-gray-200 flex items-center justify-center text-gray-400 hover:text-primary-600 hover:bg-gray-50">
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); notifySuccess("Bookmarked"); }} className="w-8 h-8 rounded-full bg-white shadow-sm ring-1 ring-gray-200 flex items-center justify-center text-gray-400 hover:text-primary-600 hover:bg-gray-50">
                       <Bookmark size={14} />
                     </button>
                     <CardMenu />
@@ -261,7 +263,7 @@ export default function CampaignMarketplacePage() {
                     View Details
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 
@@ -310,6 +312,19 @@ export default function CampaignMarketplacePage() {
             </div>
           </motion.div>
         </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewCampaign && (
+        <CampaignPreviewModal 
+          campaign={previewCampaign} 
+          onClose={() => setPreviewCampaign(null)} 
+          onApply={(id, title) => {
+            setSelectedCampaignId(id);
+            setSelectedCampaignTitle(title);
+            setShowApplyModal(true);
+          }}
+        />
       )}
     </div>
   );

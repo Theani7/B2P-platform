@@ -11,13 +11,15 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 import { ActionMenu } from "../components/promoters/SavedPromoterActionMenu";
-import { ProfileDrawer } from "../components/promoters/SavedPromoterProfileDrawer";
+import ProfilePreviewModal from "../components/discovery/ProfilePreviewModal";
+import CompareMatrixModal from "../components/discovery/CompareMatrixModal";
 
 export default function SavedPromotersPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [drawerPromoter, setDrawerPromoter] = useState<any>(null);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   
 
   const { data, isLoading, error } = useSavedPromoters({
@@ -180,7 +182,7 @@ export default function SavedPromotersPage() {
                     whileHover={{ y: -4, scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     onClick={() => setDrawerPromoter(p)}
-                    className={`bg-white rounded-2xl p-6 ring-1 transition-all cursor-pointer flex flex-col group relative overflow-hidden ${
+                    className={`bg-white rounded-2xl p-6 ring-1 transition-all cursor-pointer flex flex-col group relative hover:z-50 ${
                       isSelected ? "ring-primary-500 shadow-md bg-primary-50/10" : "ring-gray-200 hover:ring-primary-300 shadow-sm hover:shadow-xl hover:shadow-primary-900/5"
                     }`}
                   >
@@ -196,7 +198,7 @@ export default function SavedPromotersPage() {
                       <CheckCircle2 size={14} className={isSelected ? "opacity-100" : "opacity-0"} />
                     </button>
 
-                    <div className="flex items-start gap-4 relative z-10 pl-6">
+                    <div className="flex items-start gap-4 relative z-30 pl-6">
                       <div className="relative">
                         {p.avatar_url ? (
                           <img src={p.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-50" />
@@ -204,7 +206,7 @@ export default function SavedPromotersPage() {
                           <Avatar initials={p.username?.[0]?.toUpperCase() ?? "?"} size="md" colorIndex={p.id?.charCodeAt(0) || 0} />
                         )}
                         {p.verified && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-white shadow-sm">
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-white shadow-sm">
                             <BadgeCheck size={12} className="text-white" />
                           </div>
                         )}
@@ -229,22 +231,18 @@ export default function SavedPromotersPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 mt-5 mb-4 z-10">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Users size={14} className="text-gray-400" />
-                        <span className="font-semibold">{(p.followers_count || 0).toLocaleString()}</span> <span className="text-xs text-gray-500">followers</span>
+                    <div className="grid grid-cols-3 gap-2 mt-auto pt-6 z-10">
+                      <div className="flex flex-col items-center p-2 rounded-xl bg-gray-50/80 border border-gray-100 group-hover:border-primary-100 transition-colors">
+                        <span className="text-sm font-bold text-gray-900">{(p.followers_count || 0).toLocaleString()}</span>
+                        <span className="text-[10px] text-gray-500 font-medium mt-0.5">Followers</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <TrendingUp size={14} className="text-gray-400" />
-                        <span className="font-semibold">{(p.engagement_rate || 0).toFixed(1)}%</span> <span className="text-xs text-gray-500">eng</span>
+                      <div className="flex flex-col items-center p-2 rounded-xl bg-gray-50/80 border border-gray-100 group-hover:border-primary-100 transition-colors">
+                        <span className="text-sm font-bold text-gray-900">{(p.engagement_rate || 0).toFixed(1)}%</span>
+                        <span className="text-[10px] text-gray-500 font-medium mt-0.5">Engagement</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Star size={14} className="text-gray-400" />
-                        <span className="font-semibold">4.9</span> <span className="text-xs text-gray-500">rating</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Briefcase size={14} className="text-gray-400" />
-                        <span className="font-semibold">12</span> <span className="text-xs text-gray-500">collabs</span>
+                      <div className="flex flex-col items-center p-2 rounded-xl bg-gray-50/80 border border-gray-100 group-hover:border-primary-100 transition-colors">
+                        <span className="text-sm font-bold text-gray-900 flex items-center gap-0.5">4.9 <Star size={10} className="text-amber-400 fill-amber-400" /></span>
+                        <span className="text-[10px] text-gray-500 font-medium mt-0.5">Rating</span>
                       </div>
                     </div>
 
@@ -317,7 +315,7 @@ export default function SavedPromotersPage() {
                   Clear
                 </button>
                 <button
-                  onClick={() => notifySuccess("Opening comparison matrix...")}
+                  onClick={() => setIsCompareModalOpen(true)}
                   className="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-semibold shadow-lg shadow-primary-500/20 transition-all"
                 >
                   Compare Profiles
@@ -328,11 +326,12 @@ export default function SavedPromotersPage() {
         )}
       </AnimatePresence>
 
-      <ProfileDrawer 
+      <ProfilePreviewModal 
         isOpen={!!drawerPromoter} 
         onClose={() => setDrawerPromoter(null)} 
         promoter={drawerPromoter}
-        onRemove={handleRemove}
+        isSaved={true}
+        onSave={(id: string) => handleRemove(id, drawerPromoter?.username || "Promoter")}
       />
 
       <ConfirmDialog
@@ -341,6 +340,12 @@ export default function SavedPromotersPage() {
         onConfirm={confirmRemove}
         title="Remove Promoter"
         message={removeConfirm ? `Remove ${removeConfirm.username} from your shortlist?` : ""}
+      />
+
+      <CompareMatrixModal 
+        isOpen={isCompareModalOpen} 
+        onClose={() => setIsCompareModalOpen(false)} 
+        promoters={data?.items?.filter((p: any) => selectedIds.includes(p.id)) || []} 
       />
     </div>
   );
