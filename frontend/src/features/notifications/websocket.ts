@@ -17,7 +17,8 @@ export function useNotificationWebSocket() {
       return;
     }
 
-    const wsUrl = `ws://localhost:8000/ws/notifications?token=${token}`;
+    const base = import.meta.env.VITE_WS_URL || "ws://localhost:8000";
+    const wsUrl = `${base}/ws/notifications?token=${token}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
