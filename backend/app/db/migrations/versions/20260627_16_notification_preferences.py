@@ -30,6 +30,40 @@ def upgrade():
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_notification_pref_user_type', 'notification_preferences', ['user_id', 'type'], unique=True)
+    seed_existing_users()
+
+
+def seed_existing_users():
+    bind = op.get_bind()
+    users = bind.execute(sa.text("SELECT id FROM users")).fetchall()
+    rows = []
+    for user in users:
+        for nt in [
+            "APPLICATION_RECEIVED",
+            "APPLICATION_ACCEPTED",
+            "APPLICATION_REJECTED",
+            "INVITATION_RECEIVED",
+            "INVITATION_ACCEPTED",
+            "INVITATION_DECLINED",
+            "NEW_MESSAGE",
+            "REVIEW_RECEIVED",
+            "COLLABORATION_STARTED",
+            "COLLABORATION_COMPLETED",
+            "CAMPAIGN_MATCH_READY",
+            "SYSTEM",
+        ]:
+            rows.append(
+                {"user_id": user.id, "type": nt, "enabled": True}
+            )
+    if rows:
+        bind.execute(
+            sa.text(
+                "INSERT INTO notification_preferences (user_id, type, enabled) "
+                "VALUES (:user_id, :type, :enabled) "
+                "ON CONFLICT (user_id, type) DO NOTHING"
+            ),
+            rows,
+        )
 
 
 def downgrade():
