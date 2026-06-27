@@ -58,6 +58,21 @@ logger = logging.getLogger("byparsathy")
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
+@app.on_event("startup")
+def _log_startup():
+    db_url = settings.DATABASE_URL
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(db_url)
+        logger.info(
+            "DB connected: host=%s db=%s",
+            parsed.hostname or "?",
+            parsed.path.lstrip("/") or "?",
+        )
+    except Exception:
+        logger.info("DB URL: %s", db_url)
+
+
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start = time()

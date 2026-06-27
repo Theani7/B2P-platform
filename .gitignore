@@ -1,4 +1,18 @@
-# Project-specific
+# AI Agent files
+opencode.json
+.kimchi/
+.superpowers/
+.kilocode/
+kilo.json
+
+# Test files
+backend/tests/
+
+# Documentation (generated/agent docs)
+docs/*.md
+docs/superpowers/
+
+# Setup/config files (project-specific)
 .pre-commit-config.yaml
 AGENTS.md
 B2P_FRONTEND_DESIGN.md

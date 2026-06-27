@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost/byparsathy_db"
+    DATABASE_TEST_URL: str = "postgresql+psycopg2://postgres:postgres@localhost/b2p_test_db"
 
     # JWT claims
     JWT_AUDIENCE: str = "api.byparsathy.com"

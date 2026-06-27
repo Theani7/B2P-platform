@@ -40,18 +40,18 @@ def seed_existing_users():
         SELECT gen_random_uuid(), u.id, t.type, true, now()
         FROM users u
         CROSS JOIN (VALUES
-            'APPLICATION_RECEIVED',
-            'APPLICATION_ACCEPTED',
-            'APPLICATION_REJECTED',
-            'INVITATION_RECEIVED',
-            'INVITATION_ACCEPTED',
-            'INVITATION_DECLINED',
-            'NEW_MESSAGE',
-            'REVIEW_RECEIVED',
-            'COLLABORATION_STARTED',
-            'COLLABORATION_COMPLETED',
-            'CAMPAIGN_MATCH_READY',
-            'SYSTEM'
+            ('APPLICATION_RECEIVED'),
+            ('APPLICATION_ACCEPTED'),
+            ('APPLICATION_REJECTED'),
+            ('INVITATION_RECEIVED'),
+            ('INVITATION_ACCEPTED'),
+            ('INVITATION_DECLINED'),
+            ('NEW_MESSAGE'),
+            ('REVIEW_RECEIVED'),
+            ('COLLABORATION_STARTED'),
+            ('COLLABORATION_COMPLETED'),
+            ('CAMPAIGN_MATCH_READY'),
+            ('SYSTEM')
         ) AS t(type)
         ON CONFLICT (user_id, type) DO NOTHING
     """))
