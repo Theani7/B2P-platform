@@ -122,8 +122,10 @@ def list_marketplace_campaigns(
     if user and user.role == RoleEnum.PROMOTER:
         promoter = db.query(PromoterProfile).filter(PromoterProfile.user_id == user.id).first()
         if promoter:
+            from ..models.collaboration import ApplicationStatus
             apps = db.query(CampaignApplication.campaign_id).filter(
-                CampaignApplication.promoter_profile_id == promoter.id
+                CampaignApplication.promoter_profile_id == promoter.id,
+                CampaignApplication.status != ApplicationStatus.WITHDRAWN
             ).all()
             applied_campaign_ids = {a[0] for a in apps}
 
@@ -218,7 +220,16 @@ def apply_to_campaign(db: Session, user: User, campaign_id, payload) -> Campaign
         CampaignApplication.promoter_profile_id == promoter.id,
     ).first()
     if existing:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You have already applied to this campaign")
+        from ..models.collaboration import ApplicationStatus
+        if existing.status == ApplicationStatus.WITHDRAWN:
+            existing.status = ApplicationStatus.PENDING
+            existing.message = payload.message
+            existing.created_at = datetime.now(timezone.utc)
+            db.commit()
+            db.refresh(existing)
+            return existing
+        else:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You have already applied to this campaign")
 
     application = CampaignApplication(
         campaign_id=campaign_id,
