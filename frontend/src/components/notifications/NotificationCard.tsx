@@ -1,9 +1,9 @@
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Bell, MessageSquare, Briefcase, Star, CheckCircle, XCircle } from "lucide-react";
+import { Bell, MessageSquare, Briefcase, Star, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import type { Notification } from "../../features/notifications";
 import { Link } from "react-router-dom";
-import { useMarkNotificationRead } from "../../features/notifications";
+import { useMarkNotificationRead, useDeleteNotification } from "../../features/notifications";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -12,6 +12,7 @@ interface NotificationCardProps {
 
 export function NotificationCard({ notification, onClick }: NotificationCardProps) {
   const markRead = useMarkNotificationRead();
+  const deleteNotif = useDeleteNotification();
 
   const getIcon = () => {
     switch (notification.type) {
@@ -62,9 +63,22 @@ export function NotificationCard({ notification, onClick }: NotificationCardProp
           {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
         </span>
       </div>
-      {!notification.is_read && (
-        <div className="w-2.5 h-2.5 rounded-full bg-primary-500 mt-2 shrink-0"></div>
-      )}
+      <div className="flex items-center gap-2 shrink-0">
+        {!notification.is_read && (
+          <div className="w-2.5 h-2.5 rounded-full bg-primary-500 mt-2 shrink-0"></div>
+        )}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            deleteNotif.mutate(notification.id);
+          }}
+          className="text-gray-400 hover:text-red-500 transition-colors ml-auto shrink-0"
+          aria-label="Delete notification"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
     </Link>
   );
 }
