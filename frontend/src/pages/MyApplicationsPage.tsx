@@ -146,8 +146,8 @@ export default function MyApplicationsPage() {
             <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Submitted</h3>
             <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><Send size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{data?.total ?? "—"}</div>
-          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ 12% this month</p>
+          <div className="text-2xl font-bold text-gray-900">{data?.total ?? 0}</div>
+          <p className="text-xs text-gray-500 mt-1">All time</p>
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
@@ -155,7 +155,7 @@ export default function MyApplicationsPage() {
             <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><Clock size={14}/></div>
           </div>
           <div className="text-2xl font-bold text-gray-900">{pendingCount}</div>
-          <p className="text-xs text-gray-400 font-medium mt-1">Awaiting response</p>
+          <p className="text-xs text-amber-600 font-medium mt-1">Awaiting response</p>
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
@@ -163,7 +163,7 @@ export default function MyApplicationsPage() {
             <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><CheckCircle size={14}/></div>
           </div>
           <div className="text-2xl font-bold text-gray-900">{acceptedCount}</div>
-          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ 3 new</p>
+          <p className="text-xs text-gray-500 mt-1">Current page</p>
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
@@ -171,15 +171,17 @@ export default function MyApplicationsPage() {
             <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"><XCircle size={14}/></div>
           </div>
           <div className="text-2xl font-bold text-gray-900">{rejectedCount}</div>
-          <p className="text-xs text-gray-400 font-medium mt-1">Keep trying!</p>
+          <p className="text-xs text-gray-500 mt-1">Current page</p>
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200 md:col-span-1 col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Accept Rate</h3>
             <div className="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"><TrendingUp size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">42%</div>
-          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ Top 10% of creators</p>
+          <div className="text-2xl font-bold text-gray-900">
+            {applications.length > 0 ? Math.round((acceptedCount / applications.length) * 100) : 0}%
+          </div>
+          <p className="text-xs text-gray-400 font-medium mt-1">Current page</p>
         </div>
       </div>
 
@@ -350,7 +352,7 @@ export default function MyApplicationsPage() {
                           <div className="min-w-0">
                             <p className="text-xs font-bold text-gray-700 mb-1">Your Cover Message</p>
                             <p className="text-sm text-gray-500 line-clamp-2 italic pr-4">
-                              "{app.message || "I am very interested in this campaign and have the right audience."}"
+                              {app.message ? `"${app.message}"` : "No cover message provided."}
                             </p>
                           </div>
                           {/* Hover Tooltip for full message */}

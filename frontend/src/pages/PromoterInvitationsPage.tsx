@@ -91,8 +91,8 @@ export default function PromoterInvitationsPage() {
             <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Total Received</h3>
             <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><Mail size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{data?.total ?? "—"}</div>
-          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ 22% vs last month</p>
+          <div className="text-2xl font-bold text-gray-900">{data?.total ?? 0}</div>
+          <p className="text-xs text-gray-500 mt-1">All time</p>
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
@@ -108,22 +108,24 @@ export default function PromoterInvitationsPage() {
             <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><CheckCircle2 size={14}/></div>
           </div>
           <div className="text-2xl font-bold text-gray-900">{acceptedCount}</div>
-          <p className="text-xs font-semibold text-emerald-600 mt-1">↑ 4 new collabs</p>
+          <p className="text-xs font-semibold text-emerald-600 mt-1">Converted to collab</p>
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Accept Rate</h3>
             <div className="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"><Star size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">82%</div>
-          <p className="text-xs text-gray-400 font-medium mt-1">Excellent fit</p>
+          <div className="text-2xl font-bold text-gray-900">
+            {invites.length > 0 ? Math.round((acceptedCount / invites.length) * 100) : 0}%
+          </div>
+          <p className="text-xs text-gray-400 font-medium mt-1">Based on current page</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* MAIN COLUMN (9 cols) */}
-        <div className="lg:col-span-9 space-y-6">
+        {/* MAIN COLUMN (12 cols) */}
+        <div className="lg:col-span-12 space-y-6">
           
           {/* 3. STICKY FILTER TOOLBAR */}
           <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -217,11 +219,8 @@ export default function PromoterInvitationsPage() {
                       </span>
                     </div>
 
-                    {/* Match & Earnings */}
+                    {/* Earnings */}
                     <div className="flex items-center gap-3 mb-5">
-                      <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold px-2 py-1 rounded border border-emerald-100">
-                        <Sparkles size={12}/> 94% Match
-                      </span>
                       <span className="text-sm font-bold text-gray-900 flex items-center gap-1">
                         {formatNepaliCurrency(inv.campaign_budget)} <span className="text-xs text-gray-400 font-medium">budget</span>
                       </span>
@@ -244,7 +243,6 @@ export default function PromoterInvitationsPage() {
                           {inv.message || "We loved your recent content and would like to invite you to collaborate on our upcoming campaign. We think your audience is a perfect fit!"}
                         </p>
                       </div>
-                      <button className="text-[10px] font-bold text-primary-600 uppercase tracking-widest mt-2 hover:underline">Read Full Invitation</button>
                     </div>
 
                     {/* Footer Actions */}
@@ -279,7 +277,6 @@ export default function PromoterInvitationsPage() {
                       
                       <div className="flex items-center justify-between mt-4">
                         <span className="text-[10px] text-gray-400 font-semibold">Received: {new Date(inv.created_at).toLocaleDateString()}</span>
-                        {isPending && <span className="text-[10px] text-amber-600 font-bold flex items-center gap-1"><Clock size={10}/> Expires in 48h</span>}
                       </div>
 
                     </div>
@@ -304,40 +301,6 @@ export default function PromoterInvitationsPage() {
               <button onClick={() => setPage(p => Math.min(data.pages, p+1))} disabled={page === data.pages} className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50">Next</button>
             </div>
           )}
-        </div>
-
-        {/* SIDEBAR COLUMN (3 cols) */}
-        <div className="lg:col-span-3 space-y-6">
-          <div className="bg-gradient-to-br from-indigo-50 to-white rounded-2xl shadow-sm ring-1 ring-indigo-100 p-5">
-            <h2 className="text-sm font-bold text-indigo-900 mb-2 flex items-center gap-2"><Sparkles size={16} className="text-indigo-500"/> Inbox Insights</h2>
-            <p className="text-xs text-gray-600 leading-relaxed mb-4">
-              You are currently responding to invitations faster than 85% of creators on the platform. Keep it up!
-            </p>
-            <div className="bg-white rounded-xl p-3 border border-indigo-50 flex items-center justify-between">
-              <span className="text-xs font-bold text-gray-700">Avg. Response Time</span>
-              <span className="text-sm font-bold text-indigo-600">2.4 hours</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-5">
-            <h2 className="text-sm font-bold text-gray-900 mb-5">Recent Activity</h2>
-            <div className="space-y-5">
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5"><Mail size={14} className="text-blue-500"/></div>
-                <div>
-                  <p className="text-sm text-gray-900 font-medium leading-snug">Invitation received</p>
-                  <p className="text-xs text-gray-400 mt-1">2h ago from Nike</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-0.5"><CheckCircle2 size={14} className="text-emerald-500"/></div>
-                <div>
-                  <p className="text-sm text-gray-900 font-medium leading-snug">Collaboration started</p>
-                  <p className="text-xs text-gray-400 mt-1">1d ago with Adidas</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
       </div>

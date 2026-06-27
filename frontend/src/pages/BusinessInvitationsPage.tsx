@@ -152,10 +152,15 @@ export default function BusinessInvitationsPage() {
 
       {/* KPI Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Invitations Sent" value={data?.total ?? "—"} icon={Send} trend={{ value: "12%", positive: true }} subtitle="vs last month" />
-        <StatCard label="Pending Responses" value={data?.items?.filter((i: any) => i.status === "PENDING").length || 0} icon={Clock} />
-        <StatCard label="Accepted Invitations" value={data?.items?.filter((i: any) => i.status === "ACCEPTED").length || 0} icon={CheckCircle2} trend={{ value: "3", positive: true }} subtitle="new this week" />
-        <StatCard label="Response Rate" value="68%" icon={MessageSquare} trend={{ value: "5%", positive: true }} subtitle="vs last month" />
+        <StatCard label="Invitations Sent" value={data?.total ?? 0} icon={Send} subtitle="All time" />
+        <StatCard label="Pending Responses" value={data?.items?.filter((i: any) => i.status === "PENDING").length || 0} icon={Clock} subtitle="Current page" />
+        <StatCard label="Accepted Invitations" value={data?.items?.filter((i: any) => i.status === "ACCEPTED").length || 0} icon={CheckCircle2} subtitle="Current page" />
+        <StatCard 
+          label="Response Rate" 
+          value={`${data?.items?.length ? Math.round((data.items.filter((i: any) => i.status !== "PENDING").length / data.items.length) * 100) : 0}%`} 
+          icon={MessageSquare} 
+          subtitle="Current page" 
+        />
       </div>
 
       {/* Filter Toolbar */}
