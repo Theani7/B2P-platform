@@ -93,10 +93,6 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
           <img src={otherParticipant?.avatar || "/default-avatar.png"} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
           <div>
             <h2 className="text-sm font-bold text-gray-900">{otherParticipant?.name || "Unknown"}</h2>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-emerald-500" : "bg-gray-300"}`}></span>
-              <span className="text-xs font-medium text-gray-500">{isConnected ? "Online" : "Connecting..."}</span>
-            </div>
           </div>
         </div>
         <div className="flex items-center gap-3 text-gray-400">

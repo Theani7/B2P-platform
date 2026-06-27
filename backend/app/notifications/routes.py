@@ -5,6 +5,7 @@ from typing import List, Optional
 from jose import jwt, JWTError
 
 from app.core.config import settings
+from app.core import security
 from app.db.session import get_db
 from app.dependencies.auth import get_current_user
 from app.models.user import User
@@ -82,12 +83,12 @@ def delete_notification(
 
 def get_user_from_token(token: str, db: Session) -> Optional[User]:
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = security.decode_token(token)
         user_id: str = payload.get("sub")
         if user_id is None:
             return None
         return db.query(User).filter(User.id == UUID(user_id)).first()
-    except JWTError:
+    except Exception:
         return None
 
 @ws_router.websocket("/ws/notifications")

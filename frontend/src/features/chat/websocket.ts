@@ -8,9 +8,19 @@ export function useChatWebSocket(conversationId: string | undefined, token: stri
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
 
   const connect = useCallback(() => {
-    if (!conversationId || !token) return;
+    if (!conversationId) return;
+    const storedToken = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+    if (!storedToken) return;
 
-    const wsUrl = `ws://localhost:8000/ws/chat/${conversationId}?token=${token}`;
+    const apiBase = (import.meta.env.VITE_API_URL as string | undefined) || "/api/v1";
+    const wsHost =
+      apiBase.startsWith("http")
+        ? new URL(apiBase).host
+        : (import.meta.env.VITE_BACKEND_URL as string | undefined)
+          ? new URL((import.meta.env.VITE_BACKEND_URL as string)).host
+          : "localhost:8000";
+    const wsProtocol = typeof window !== "undefined" && window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${wsProtocol}//${wsHost}/api/v1/chat/ws/chat/${conversationId}?token=${storedToken}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {

@@ -6,6 +6,7 @@ import { LogoutConfirmDialog } from "../components/common/LogoutConfirmDialog";
 
 type AuthContextType = {
   user?: User;
+  token: string | null;
   isLoading: boolean;
   logout: () => void;
   openLogoutDialog: () => void;
@@ -14,15 +15,19 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("access_token"));
   const { data: user, isLoading } = useCurrentUser();
   const logoutMutation = useLogout();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
-  const logout = () => logoutMutation.mutate();
+  const logout = () => {
+    logoutMutation.mutate();
+    setToken(null);
+  };
   const openLogoutDialog = () => setIsLogoutDialogOpen(true);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, logout, openLogoutDialog }}>
+    <AuthContext.Provider value={{ user, token, isLoading, logout, openLogoutDialog }}>
       {children}
       <LogoutConfirmDialog 
         isOpen={isLogoutDialogOpen} 

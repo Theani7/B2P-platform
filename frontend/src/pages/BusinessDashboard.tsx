@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 
-import { useBusinessInvitations } from "../features/collaboration/api";
+import { useBusinessInvitations, useBusinessApplications } from "../features/collaboration/api";
 import { InvitationStatus } from "../features/collaboration/types";
 import { StatCard } from "../components/ui";
 import {
@@ -33,10 +33,12 @@ export default function BusinessDashboard() {
   const { user } = useAuth();
   const { data: analytics, isLoading: statsLoading } = useBusinessAnalytics();
   const { data: invitations } = useBusinessInvitations({ limit: 5 });
+  const { data: applicationsData, isLoading: recentApplicationsLoading } = useBusinessApplications({ limit: 5 });
   const { data: activityData, isLoading: activityLoading } = useBusinessActivity({ size: 5 });
   const { data: profileCompletion, isLoading: completionLoading } = useBusinessProfileCompletion();
 
   const pendingInvitations = invitations?.items?.filter((i) => i.status === InvitationStatus.PENDING) ?? [];
+  const recentApplications = applicationsData?.items ?? [];
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -158,45 +160,48 @@ export default function BusinessDashboard() {
         <div className="space-y-8">
           <ProfileCompletionWidget data={profileCompletion} isLoading={completionLoading} />
           
-          {/* Pending Invitations */}
+          {/* Recent Applications */}
           <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <Mail size={16} className="text-gray-500" />
-                <h2 className="text-sm font-semibold text-gray-900">Pending Invitations</h2>
+                <CheckCircle2 size={16} className="text-gray-500" />
+                <h2 className="text-sm font-semibold text-gray-900">Recent Applications</h2>
               </div>
-              <Link to="/business/invitations" className="text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors">
-                View all
-              </Link>
             </div>
-            {pendingInvitations.length === 0 ? (
-              <div className="p-8 text-center">
-                <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-3">
-                  <Mail size={20} className="text-gray-400" />
+            {recentApplicationsLoading ? (
+              <div className="p-6 flex justify-center"><LoadingSpinner /></div>
+            ) : !recentApplications?.length ? (
+              <div className="p-8 flex flex-col items-center justify-center text-center">
+                <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+                  <CheckCircle2 size={20} className="text-gray-400" />
                 </div>
-                <p className="text-sm font-medium text-gray-900">No pending invitations</p>
-                <p className="text-xs text-gray-500 mt-1">Invite promoters to collaborate.</p>
+                <p className="text-sm font-medium text-gray-900">No recent applications</p>
+                <p className="text-xs text-gray-500 mt-1">When promoters apply, they'll appear here.</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100 flex-1">
-                {pendingInvitations.map((inv) => (
-                  <Link
-                    key={inv.id}
-                    to="/business/invitations"
-                    className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-sm font-medium flex-shrink-0">
-                      {inv.business_name?.slice(0, 2).toUpperCase() || "??"}
+              <div className="divide-y divide-gray-100 flex-1 overflow-y-auto">
+                {recentApplications.map((app: any) => (
+                  <div key={app.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 border border-gray-200">
+                        {app.promoter_avatar_url ? (
+                          <img src={app.promoter_avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
+                        ) : (
+                          <span className="text-xs font-bold text-gray-500">{app.promoter_username?.charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-gray-900">{app.promoter_username}</h4>
+                        <p className="text-xs text-gray-500 mt-0.5">Applied for <span className="font-medium text-gray-700">{app.campaign_title}</span></p>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">{inv.business_name || "Unknown Business"}</p>
-                      <p className="text-xs text-gray-500 truncate mt-0.5">Campaign: {inv.campaign_title}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-amber-50 text-xs font-medium text-amber-700">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                      Pending
-                    </div>
-                  </Link>
+                    <Link
+                      to={`/business/campaigns/${app.campaign_id}/applications`}
+                      className="text-xs font-semibold text-brand-purple hover:text-brand-indigo"
+                    >
+                      Review
+                    </Link>
+                  </div>
                 ))}
               </div>
             )}

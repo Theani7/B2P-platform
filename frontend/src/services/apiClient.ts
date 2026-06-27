@@ -15,14 +15,14 @@ api.interceptors.response.use(
   (r) => r,
   async (error) => {
     const original = error.config;
-    if (error.response?.status === 401 && !original._retry) {
+    if (error.response?.status === 401 && !original._retry && original.url !== '/auth/refresh' && original.url !== '/auth/login') {
       const refresh = localStorage.getItem("refresh_token");
       if (refresh) {
         try {
-          const resp = await api.post("/auth/refresh", { refresh_token: refresh });
+          original._retry = true;
+          const resp = await axios.post((import.meta.env.VITE_API_URL ?? "/api/v1") + "/auth/refresh", { refresh_token: refresh });
           localStorage.setItem("access_token", resp.data.access_token);
           localStorage.setItem("refresh_token", resp.data.refresh_token);
-          original._retry = true;
           original.headers.Authorization = `Bearer ${resp.data.access_token}`;
           return api(original);
         } catch {

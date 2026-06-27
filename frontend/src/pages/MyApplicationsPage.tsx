@@ -301,7 +301,7 @@ export default function MyApplicationsPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredApplications.map((app: any) => {
+              {filteredApplications.map((app: any, index: number) => {
                 const conf = STATUS_CONFIG[app.status] || STATUS_CONFIG.PENDING;
                 const StatusIcon = conf.icon;
                 
@@ -315,6 +315,7 @@ export default function MyApplicationsPage() {
                     key={app.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
+                    style={{ zIndex: 100 - index, position: 'relative' }}
                     className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-200 hover:shadow-md hover:ring-primary-200 transition-all group flex flex-col"
                   >
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">

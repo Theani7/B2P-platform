@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import { Role } from "../constants/roles";
 import { useBusinessCollaborations, usePromoterCollaborations } from "../features/collaboration/api";
@@ -17,7 +17,7 @@ import {
 
 
 
-function CardMenu({ collab, isBusiness, onComplete, onReview }: any) {
+function CardMenu({ collab, isBusiness, onComplete, onReview, onOpenChat }: any) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +53,7 @@ function CardMenu({ collab, isBusiness, onComplete, onReview }: any) {
             >
               <Eye size={16} className="text-gray-400"/> View Details
             </Link>
-            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+            <button onClick={(e) => { e.stopPropagation(); onOpenChat(); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
               <MessageCircle size={16} className="text-gray-400"/> Open Chat
             </button>
             <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
@@ -89,6 +89,7 @@ function CardMenu({ collab, isBusiness, onComplete, onReview }: any) {
 
 export default function CollaborationsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -130,6 +131,10 @@ export default function CollaborationsPage() {
       onSuccess: () => { notifySuccess("Review submitted successfully!"); setReviewingCollabId(null); },
       onError: () => notifyError("Failed to submit review"),
     });
+  };
+
+  const handleOpenChat = (collabId: string) => {
+    navigate("/messages", { state: { collaborationId: collabId } });
   };
 
   const collabs = data?.items || [];
@@ -301,7 +306,7 @@ export default function CollaborationsPage() {
                           }`}>
                             {c.status}
                           </span>
-                          <CardMenu collab={c} isBusiness={isBusiness} onComplete={handleComplete} onReview={setReviewingCollabId} />
+                          <CardMenu collab={c} isBusiness={isBusiness} onComplete={handleComplete} onReview={setReviewingCollabId} onOpenChat={() => handleOpenChat(c.id)} />
                         </div>
                       </div>
 

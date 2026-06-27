@@ -78,16 +78,27 @@ export const useCampaignApplications = (
     queryKey: ["campaign-applications", campaignId, params],
     queryFn: () =>
       api
-        .get(`/campaigns/${campaignId}/applications`, { params })
+        .get(`/business/campaigns/${campaignId}/applications`, { params })
         .then((r) => r.data),
     enabled: !!campaignId,
+  });
+
+export const useBusinessApplications = (
+  params?: { page?: number; limit?: number }
+) =>
+  useQuery<CampaignApplicationListResponse>({
+    queryKey: ["business-applications", params],
+    queryFn: () =>
+      api
+        .get(`/business/applications`, { params })
+        .then((r) => r.data),
   });
 
 export const useAcceptApplication = () => {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (applicationId) =>
-      api.post(`/applications/${applicationId}/accept`),
+      api.post(`/business/applications/${applicationId}/accept`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["campaign-applications"] });
       qc.invalidateQueries({ queryKey: ["business-collaborations"] });
@@ -99,7 +110,7 @@ export const useRejectApplication = () => {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (applicationId) =>
-      api.post(`/applications/${applicationId}/reject`),
+      api.post(`/business/applications/${applicationId}/reject`),
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ["campaign-applications"] }),
   });

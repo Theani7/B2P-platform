@@ -98,7 +98,25 @@ def campaign_applications(
 ):
     items, total = get_campaign_applications(db, user, campaign_id, page=page, limit=limit)
     return CampaignApplicationListResponse(
-        items=[item.model_dump() for item in items],
+        items=items,
+        total=total,
+        page=page,
+        limit=limit,
+        pages=max(1, (total + limit - 1) // limit),
+    )
+
+
+@business_router.get("/business/applications", response_model=CampaignApplicationListResponse)
+def all_business_applications(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    from ....services.collaboration import get_business_applications
+    items, total = get_business_applications(db, user, page=page, limit=limit)
+    return CampaignApplicationListResponse(
+        items=items,
         total=total,
         page=page,
         limit=limit,

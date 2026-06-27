@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Share2, Copy, Download, Check, ExternalLink, X, QrCode } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useShareProfile } from '../../features/sharing';
@@ -9,6 +10,8 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
   const qrRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
+  
+  // existing handle methods...
 
   const handleCopy = async () => {
     if (shareInfo?.public_url) {
@@ -34,7 +37,6 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
   const handleDownloadQR = () => {
     if (!qrRef.current || !shareInfo) return;
     
-    // Convert SVG to Canvas then to PNG
     const svg = qrRef.current.querySelector('svg');
     if (!svg) return;
     
@@ -44,7 +46,6 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
     const img = new Image();
     
     img.onload = () => {
-      // Add padding and background for the downloaded image
       canvas.width = img.width + 40;
       canvas.height = img.height + 80;
       
@@ -53,7 +54,6 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 20, 20);
         
-        // Add branding text
         ctx.font = 'bold 16px Inter, sans-serif';
         ctx.fillStyle = '#111827';
         ctx.textAlign = 'center';
@@ -73,8 +73,8 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
 
-  return (
-    <div className="fixed inset-y-0 right-0 left-0 md:left-[280px] z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-gray-900/60 backdrop-blur-sm transition-all">
+  return createPortal(
+    <div className="fixed inset-y-0 right-0 left-0 md:left-[280px] z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-gray-900/60 backdrop-blur-sm transition-all">
       <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="share-profile-title">
         
         <button 
@@ -170,6 +170,7 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

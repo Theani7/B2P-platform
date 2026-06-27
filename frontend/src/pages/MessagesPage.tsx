@@ -1,12 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChatSidebar, ChatWindow } from "../components/chat";
 import { useAuth } from "../providers/AuthProvider";
+import { useLocation } from "react-router-dom";
 import type { Conversation } from "../features/chat";
+import { useConversations } from "../features/chat";
 import { MessageSquare } from "lucide-react";
 
 export default function MessagesPage() {
   const { user } = useAuth();
+  const location = useLocation();
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const { data: conversations } = useConversations();
+
+  useEffect(() => {
+    const state = location.state as { collaborationId?: string } | null;
+    if (state?.collaborationId && conversations?.length) {
+      const match = conversations.find(c => c.collaboration_id === state.collaborationId);
+      if (match) setActiveConversation(match);
+    }
+  }, [location.state, conversations]);
 
   if (!user) return null;
 

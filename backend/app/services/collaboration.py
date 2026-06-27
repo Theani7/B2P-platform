@@ -17,6 +17,7 @@ from ..schemas.collaboration import (
     CampaignApplicationRead,
     CampaignApplicationWithPromoterRead,
     CampaignApplicationWithCampaignRead,
+    CampaignApplicationFullRead,
     CampaignInvitationRead,
     CampaignInvitationWithCampaignRead,
     CollaborationRead,
@@ -382,6 +383,51 @@ def get_campaign_applications(
             promoter_engagement_rate=promoter.engagement_rate if promoter else 0.0,
             promoter_years_experience=promoter.years_experience if promoter else None,
             promoter_verified=promoter.verified if promoter else False,
+        ))
+
+    return items, total
+
+
+def get_business_applications(
+    db: Session,
+    user: User,
+    page: int = 1,
+    limit: int = 20,
+) -> Tuple[List[CampaignApplicationFullRead], int]:
+    business = _get_business_profile(db, user)
+
+    count_stmt = select(func.count(CampaignApplication.id)).join(Campaign).where(
+        Campaign.business_profile_id == business.id
+    )
+    total = db.scalar(count_stmt)
+
+    applications = (
+        db.query(CampaignApplication)
+        .join(Campaign)
+        .options(joinedload(CampaignApplication.promoter_profile), joinedload(CampaignApplication.campaign))
+        .filter(Campaign.business_profile_id == business.id)
+        .order_by(CampaignApplication.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
+    from ..schemas.collaboration import CampaignApplicationFullRead
+    items = []
+    for app in applications:
+        promoter = app.promoter_profile
+        campaign = app.campaign
+        items.append(CampaignApplicationFullRead(
+            id=app.id,
+            campaign_id=app.campaign_id,
+            promoter_profile_id=app.promoter_profile_id,
+            message=app.message,
+            status=app.status,
+            created_at=app.created_at,
+            updated_at=app.updated_at,
+            promoter_username=promoter.username if promoter else "",
+            promoter_avatar_url=promoter.avatar_url if promoter else None,
+            campaign_title=campaign.title if campaign else "",
         ))
 
     return items, total

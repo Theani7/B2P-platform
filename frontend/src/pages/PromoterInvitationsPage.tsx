@@ -187,7 +187,7 @@ export default function PromoterInvitationsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {invites.map((inv: any) => {
+              {invites.map((inv: any, index: number) => {
                 const conf = STATUS_CONFIG[inv.status] || STATUS_CONFIG.PENDING;
                 const StatusIcon = conf.icon;
                 const isPending = inv.status === 'PENDING';
@@ -198,6 +198,7 @@ export default function PromoterInvitationsPage() {
                     key={inv.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
+                    style={{ zIndex: 100 - index, position: 'relative' }}
                     className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-200 hover:shadow-lg hover:ring-primary-200 transition-all flex flex-col"
                   >
                     

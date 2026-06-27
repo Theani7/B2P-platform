@@ -101,6 +101,26 @@ class CampaignApplicationWithCampaignRead(BaseModel):
         from_attributes = True
 
 
+class CampaignApplicationFullRead(BaseModel):
+    id: uuid.UUID
+    campaign_id: uuid.UUID
+    promoter_profile_id: uuid.UUID
+    message: Optional[str] = None
+    status: ApplicationStatus
+    created_at: datetime
+    updated_at: datetime
+    
+    # Promoter details
+    promoter_username: str = ""
+    promoter_avatar_url: Optional[str] = None
+    
+    # Campaign details
+    campaign_title: str = ""
+
+    class Config:
+        from_attributes = True
+
+
 class CampaignApplicationListResponse(BaseModel):
     items: List
     total: int

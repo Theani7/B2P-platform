@@ -250,13 +250,14 @@ export default function BusinessInvitationsPage() {
                   <div className="text-right">Actions</div>
                 </div>
 
-                {data.items.map((inv: any) => (
+                {data.items.map((inv: any, index: number) => (
                   <motion.div
                     key={inv.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     whileHover={{ y: -2 }}
                     transition={{ duration: 0.15 }}
+                    style={{ zIndex: 100 - index, position: 'relative' }}
                     className="grid grid-cols-[minmax(260px,2.5fr)_minmax(220px,2fr)_minmax(180px,1.5fr)_minmax(320px,2.5fr)_140px] gap-8 items-center p-6 bg-white rounded-xl shadow-sm ring-1 ring-gray-200 hover:ring-primary-300 hover:shadow-md transition-all group"
                   >
                     {/* Campaign Column */}

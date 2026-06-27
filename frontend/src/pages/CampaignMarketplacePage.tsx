@@ -32,7 +32,7 @@ function CardMenu({ campaignId, campaignTitle }: { campaignId: string; campaignT
     e.preventDefault();
     e.stopPropagation();
     setOpen(false);
-    const shareUrl = `${window.location.origin}/promoter/marketplace?campaign=${campaignId}`;
+    const shareUrl = `${window.location.origin}/promoter/marketplace?campaignId=${campaignId}`;
     if (navigator.share) {
       navigator.share({
         title: campaignTitle,
@@ -49,7 +49,7 @@ function CardMenu({ campaignId, campaignTitle }: { campaignId: string; campaignT
     e.preventDefault();
     e.stopPropagation();
     setOpen(false);
-    const shareUrl = `${window.location.origin}/promoter/marketplace?campaign=${campaignId}`;
+    const shareUrl = `${window.location.origin}/promoter/marketplace?campaignId=${campaignId}`;
     navigator.clipboard.writeText(shareUrl);
     notifySuccess("Campaign link copied to clipboard!");
   };

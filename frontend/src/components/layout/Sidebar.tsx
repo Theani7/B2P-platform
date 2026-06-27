@@ -8,6 +8,7 @@ import {
   Handshake,
   Bookmark,
   Mail,
+  MessageSquare,
   Store,
   FileText,
   ShieldCheck,
@@ -31,6 +32,7 @@ const businessLinks = [
   { to: "/business/collaborations", label: "Collaborations", icon: Handshake },
   { to: "/business/saved-promoters", label: "Saved Promoters", icon: Bookmark },
   { to: "/business/invitations", label: "Invitations", icon: Mail },
+  { to: "/messages", label: "Messages", icon: MessageSquare },
 ];
 
 const promoterLinks = [
@@ -40,6 +42,7 @@ const promoterLinks = [
   { to: "/promoter/collaborations", label: "Collaborations", icon: Handshake },
   { to: "/promoter/invitations", label: "Invitations", icon: Mail },
   { to: "/my/reviews", label: "Reviews", icon: BarChart3 },
+  { to: "/messages", label: "Messages", icon: MessageSquare },
 ];
 
 const adminLinks = [

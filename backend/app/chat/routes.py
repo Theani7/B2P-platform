@@ -13,13 +13,16 @@ from app.models.chat import Conversation, Message, MessageType
 from app.models.collaboration import Collaboration, CollaborationStatus
 from app.chat.schemas import ConversationRead, MessageRead
 from app.chat.connection_manager import manager as chat_manager
+from app.core import security
 
 from app.activity.service import ActivityService
 from app.notifications.service import NotificationService
 from app.notifications.schemas import NotificationCreate
 from app.notifications.models import NotificationType
 import asyncio
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # --- REST ENDPOINTS ---
@@ -45,6 +48,20 @@ def get_conversations(
     collab_ids = [c.id for c in collaborations]
     
     conversations = db.query(Conversation).filter(Conversation.collaboration_id.in_(collab_ids)).all()
+    
+    existing_collab_ids = {c.collaboration_id for c in conversations}
+    missing_collab_ids = [cid for cid in collab_ids if cid not in existing_collab_ids]
+    
+    for missing_id in missing_collab_ids:
+        new_conv = Conversation(collaboration_id=missing_id)
+        db.add(new_conv)
+        conversations.append(new_conv)
+    
+    if missing_collab_ids:
+        db.commit()
+        for new_conv in conversations:
+            if new_conv.id is None:
+                db.refresh(new_conv)
     
     result = []
     for conv in conversations:
@@ -149,28 +166,33 @@ def mark_read(
 
 def get_user_from_token(token: str, db: Session) -> Optional[User]:
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = security.decode_token(token)
         user_id: str = payload.get("sub")
         if user_id is None:
             return None
         return db.query(User).filter(User.id == UUID(user_id)).first()
-    except JWTError:
+    except Exception as e:
+        logger.error(f"Error decoding token: {e}")
         return None
 
 @router.websocket("/ws/chat/{conversation_id}")
 async def websocket_endpoint(
     websocket: WebSocket, 
     conversation_id: UUID, 
-    token: str, 
+    token: str = Query(...), 
     db: Session = Depends(get_db)
 ):
     user = get_user_from_token(token, db)
     if not user:
+        logger.error(f"Chat WS failed: user not found for token {token}")
+        print(f"Chat WS failed: user not found for token {token}")
         await websocket.close(code=1008)
         return
         
     conv = db.query(Conversation).filter(Conversation.id == conversation_id).first()
     if not conv:
+        logger.error(f"Chat WS failed: conv not found for {conversation_id}")
+        print(f"Chat WS failed: conv not found for {conversation_id}")
         await websocket.close(code=1008)
         return
         
@@ -183,9 +205,12 @@ async def websocket_endpoint(
         is_participant = True
         
     if not is_participant and user.role.value != "ADMIN":
+        logger.error(f"Chat WS failed: user {user.id} not participant in collab {collab.id}. BP: {collab.business_profile_id}, PP: {collab.promoter_profile_id}")
+        print(f"Chat WS failed: user {user.id} not participant in collab {collab.id}. BP: {collab.business_profile_id}, PP: {collab.promoter_profile_id}")
         await websocket.close(code=1008)
         return
         
+    logger.info(f"Chat WS accepted for {conversation_id}")
     await chat_manager.connect(websocket, conversation_id)
     
     try:
@@ -228,7 +253,7 @@ async def websocket_endpoint(
                 # Broadcast
                 await chat_manager.broadcast({
                     "type": "MESSAGE",
-                    "payload": MessageRead.model_validate(msg).model_dump()
+                    "payload": MessageRead.model_validate(msg).model_dump(mode="json")
                 }, conversation_id)
                 
                 # Notifications: Find the other participant and check if they're connected
