@@ -17,5 +17,6 @@ export { Select } from "./Select";
 export { Skeleton } from "./Skeleton";
 export { SlideOver } from "./SlideOver";
 export { StatCard } from "./StatCard";
+export { Switch } from "./Switch";
 export { Table } from "./Table";
 export { Textarea } from "./Textarea";
