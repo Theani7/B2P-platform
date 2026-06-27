@@ -6,7 +6,8 @@ import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Calendar, Clock, DollarSign, Bookmark, Share2, 
-  Filter, Sparkles, CheckCircle, Briefcase, X, Send, MoreVertical, Flag, Link as LinkIcon
+  Filter, Sparkles, CheckCircle, Briefcase, X, Send, MoreVertical, Flag, Link as LinkIcon,
+  Globe, Laptop, Heart, Utensils, Plane, Dumbbell, Gamepad2, GraduationCap, Film, Coins, Package
 } from "lucide-react";
 import CampaignPreviewModal from "../components/discovery/CampaignPreviewModal";
 
@@ -193,23 +194,24 @@ export default function CampaignMarketplacePage() {
                 : 'border-gray-100 hover:border-gray-300 bg-gray-50 text-gray-700'
             }`}
           >
-            <span className="text-xl">🌐</span>
+            <Globe size={20} className={selectedCategory === null ? 'text-primary-600' : 'text-gray-400'} />
             <span className="text-xs">All Categories</span>
           </button>
           {MARKETPLACE_CATEGORIES.map((cat) => {
             const getIcon = (c: string) => {
+              const className = selectedCategory === c ? 'text-primary-600' : 'text-gray-400';
               switch (c) {
-                case "Fashion": return "✨";
-                case "Tech": return "💻";
-                case "Beauty": return "💄";
-                case "Food": return "🍔";
-                case "Travel": return "✈️";
-                case "Fitness": return "💪";
-                case "Gaming": return "🎮";
-                case "Education": return "📚";
-                case "Entertainment": return "🎬";
-                case "Finance": return "💰";
-                default: return "📦";
+                case "Fashion": return <Sparkles size={20} className={className} />;
+                case "Tech": return <Laptop size={20} className={className} />;
+                case "Beauty": return <Heart size={20} className={className} />;
+                case "Food": return <Utensils size={20} className={className} />;
+                case "Travel": return <Plane size={20} className={className} />;
+                case "Fitness": return <Dumbbell size={20} className={className} />;
+                case "Gaming": return <Gamepad2 size={20} className={className} />;
+                case "Education": return <GraduationCap size={20} className={className} />;
+                case "Entertainment": return <Film size={20} className={className} />;
+                case "Finance": return <Coins size={20} className={className} />;
+                default: return <Package size={20} className={className} />;
               }
             };
             return (
@@ -225,7 +227,7 @@ export default function CampaignMarketplacePage() {
                     : 'border-gray-100 hover:border-gray-300 bg-gray-50 text-gray-700'
                 }`}
               >
-                <span className="text-xl">{getIcon(cat)}</span>
+                {getIcon(cat)}
                 <span className="text-xs">{cat}</span>
               </button>
             );
