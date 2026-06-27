@@ -122,7 +122,7 @@ def list_marketplace_campaigns(
     if user and user.role == RoleEnum.PROMOTER:
         promoter = db.query(PromoterProfile).filter(PromoterProfile.user_id == user.id).first()
         if promoter:
-            from ..models.collaboration import ApplicationStatus
+            from ..models.campaign_application import ApplicationStatus
             apps = db.query(CampaignApplication.campaign_id).filter(
                 CampaignApplication.promoter_profile_id == promoter.id,
                 CampaignApplication.status != ApplicationStatus.WITHDRAWN
@@ -220,7 +220,7 @@ def apply_to_campaign(db: Session, user: User, campaign_id, payload) -> Campaign
         CampaignApplication.promoter_profile_id == promoter.id,
     ).first()
     if existing:
-        from ..models.collaboration import ApplicationStatus
+        from ..models.campaign_application import ApplicationStatus
         if existing.status == ApplicationStatus.WITHDRAWN:
             existing.status = ApplicationStatus.PENDING
             existing.message = payload.message

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCampaigns, useDeleteCampaign, useArchiveCampaign, useReopenCampaign, useCampaignDashboardStats } from "../features/campaigns/api";
+import { useCampaigns, useDeleteCampaign, useArchiveCampaign, useReopenCampaign, usePublishCampaign, useCampaignDashboardStats } from "../features/campaigns/api";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { StatCard } from "../components/ui";
@@ -8,7 +8,7 @@ import { ExportButton } from "../components/export";
 import {
   Megaphone, Plus, Search, Edit3, Archive, Trash2, MapPin, 
   Filter, MoreVertical, Eye, SlidersHorizontal,
-  FolderDot, FolderOpen, CheckCircle2, ChevronLeft, ChevronRight
+  FolderDot, FolderOpen, CheckCircle2, ChevronLeft, ChevronRight, Rocket
 } from "lucide-react";
 import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,7 +24,7 @@ function useClickOutside(ref: any, handler: () => void) {
   }, [ref, handler]);
 }
 
-function ActionMenu({ campaign, onArchive, onReopen, onDelete }: any) {
+function ActionMenu({ campaign, onPublish, onArchive, onReopen, onDelete }: any) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   useClickOutside(menuRef, () => setOpen(false));
@@ -61,7 +61,14 @@ function ActionMenu({ campaign, onArchive, onReopen, onDelete }: any) {
             </button>
 
             <div className="h-px bg-gray-100 my-1" />
-            {campaign.status !== "ARCHIVED" && campaign.status !== "CANCELLED" ? (
+            {campaign.status === "DRAFT" ? (
+              <button
+                onClick={(e) => { e.stopPropagation(); setOpen(false); onPublish(campaign.id); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary-600 hover:bg-primary-50"
+              >
+                <Rocket size={16} className="text-primary-500" /> Publish
+              </button>
+            ) : campaign.status !== "ARCHIVED" && campaign.status !== "CANCELLED" ? (
               <button
                 onClick={(e) => { e.stopPropagation(); setOpen(false); onArchive(campaign.id); }}
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-amber-600 hover:bg-amber-50"
@@ -114,6 +121,7 @@ export default function CampaignListPage() {
   const deleteCampaign = useDeleteCampaign();
   const archiveCampaign = useArchiveCampaign();
   const reopenCampaign = useReopenCampaign();
+  const publishCampaign = usePublishCampaign();
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
   const navigate = useNavigate();
 
@@ -135,6 +143,12 @@ export default function CampaignListPage() {
     reopenCampaign.mutate(id, {
       onSuccess: () => notifySuccess("Campaign reopened"),
       onError: () => notifyError("Failed to reopen campaign"),
+    });
+  };
+  const handlePublish = async (id: string) => {
+    publishCampaign.mutate(id, {
+      onSuccess: () => notifySuccess("Campaign published! It's now visible in the marketplace."),
+      onError: (e) => notifyError(e.message || "Failed to publish campaign"),
     });
   };
 
@@ -293,14 +307,24 @@ export default function CampaignListPage() {
                   </div>
 
                   <div className="col-span-1 md:col-span-2 flex items-center justify-end gap-2">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); navigate(`/business/campaigns/${c.id}`); }}
-                      className="hidden lg:flex items-center justify-center h-8 px-3 rounded-md text-xs font-medium bg-white ring-1 ring-gray-200 text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
-                    >
-                      View
-                    </button>
+                    {c.status === "DRAFT" ? (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handlePublish(c.id); }}
+                        className="hidden lg:flex items-center justify-center h-8 px-3 rounded-md text-xs font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-sm gap-1.5"
+                      >
+                        <Rocket size={12} /> Publish
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/business/campaigns/${c.id}`); }}
+                        className="hidden lg:flex items-center justify-center h-8 px-3 rounded-md text-xs font-medium bg-white ring-1 ring-gray-200 text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                      >
+                        View
+                      </button>
+                    )}
                     <ActionMenu
                       campaign={c}
+                      onPublish={handlePublish}
                       onArchive={handleArchive}
                       onReopen={handleReopen}
                       onDelete={handleDelete}

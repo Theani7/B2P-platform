@@ -73,6 +73,28 @@ export const useReopenCampaign = () => {
   });
 };
 
+export const usePublishCampaign = () => {
+  const qc = useQueryClient();
+  return useMutation<CampaignRead, Error, string>({
+    mutationFn: (id) => api.post(`/campaigns/${id}/publish`).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["campaigns"] });
+      qc.invalidateQueries({ queryKey: ["campaign"] });
+    },
+  });
+};
+
+export const useUnpublishCampaign = () => {
+  const qc = useQueryClient();
+  return useMutation<CampaignRead, Error, string>({
+    mutationFn: (id) => api.post(`/campaigns/${id}/unpublish`).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["campaigns"] });
+      qc.invalidateQueries({ queryKey: ["campaign"] });
+    },
+  });
+};
+
 export const useCampaignDashboardStats = () =>
   useQuery<CampaignDashboardStats>({
     queryKey: ["campaign-dashboard-stats"],

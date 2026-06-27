@@ -14,6 +14,8 @@ from ....services.campaign import (
     delete_campaign,
     archive_campaign,
     reopen_campaign,
+    publish_campaign,
+    unpublish_campaign,
     get_dashboard_stats,
 )
 from ....db.session import get_db
@@ -69,6 +71,16 @@ def update(campaign_id: str, payload: CampaignUpdate, db: Session = Depends(get_
 def delete(campaign_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
     delete_campaign(db, user, campaign_id)
     return None
+
+
+@router.post("/{campaign_id}/publish", response_model=CampaignRead)
+def publish(campaign_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return publish_campaign(db, user, campaign_id)
+
+
+@router.post("/{campaign_id}/unpublish", response_model=CampaignRead)
+def unpublish(campaign_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return unpublish_campaign(db, user, campaign_id)
 
 
 @router.post("/{campaign_id}/archive", response_model=CampaignRead)

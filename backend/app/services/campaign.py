@@ -121,11 +121,43 @@ def delete_campaign(db: Session, user: User, campaign_id) -> None:
     db.commit()
 
 
+def publish_campaign(db: Session, user: User, campaign_id) -> Campaign:
+    """Transition a DRAFT campaign to OPEN so it appears in the marketplace."""
+    profile = _get_business_profile(db, user)
+    campaign = _get_campaign(db, campaign_id, profile.id)
+    if campaign.status != CampaignStatus.DRAFT:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Only DRAFT campaigns can be published (current status: {campaign.status.value})",
+        )
+    campaign.status = CampaignStatus.OPEN
+    campaign.updated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(campaign)
+    return campaign
+
+
 def archive_campaign(db: Session, user: User, campaign_id) -> Campaign:
     return update_campaign(
         db, user, campaign_id,
         CampaignUpdate(status=CampaignStatus.ARCHIVED),
     )
+
+
+def unpublish_campaign(db: Session, user: User, campaign_id) -> Campaign:
+    """Transition an OPEN campaign back to DRAFT (remove from marketplace)."""
+    profile = _get_business_profile(db, user)
+    campaign = _get_campaign(db, campaign_id, profile.id)
+    if campaign.status != CampaignStatus.OPEN:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Only OPEN campaigns can be unpublished (current status: {campaign.status.value})",
+        )
+    campaign.status = CampaignStatus.DRAFT
+    campaign.updated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(campaign)
+    return campaign
 
 
 def reopen_campaign(db: Session, user: User, campaign_id) -> Campaign:
