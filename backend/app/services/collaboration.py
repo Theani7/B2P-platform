@@ -12,6 +12,9 @@ from ..models.campaign import Campaign, CampaignStatus, CampaignVisibility
 from ..models.campaign_application import CampaignApplication, ApplicationStatus
 from ..models.campaign_invitation import CampaignInvitation, InvitationStatus
 from ..models.collaboration import Collaboration, CollaborationStatus
+from app.notifications.service import NotificationService
+from app.notifications.schemas import NotificationCreate
+from app.notifications.models import NotificationType
 from ..schemas.collaboration import (
     CampaignMarketplaceItem,
     CampaignApplicationRead,
@@ -233,9 +236,9 @@ def apply_to_campaign(db: Session, user: User, campaign_id, payload) -> Campaign
             db.commit()
             db.refresh(existing)
 
-            from app.notifications.models import Notification, NotificationType
             business_user_id = campaign.business_profile.user_id
-            notification = Notification(
+            notification_service = NotificationService(db)
+            notification_create = NotificationCreate(
                 recipient_id=business_user_id,
                 actor_id=user.id,
                 type=NotificationType.APPLICATION_RECEIVED,
@@ -244,8 +247,7 @@ def apply_to_campaign(db: Session, user: User, campaign_id, payload) -> Campaign
                 entity_type="campaign_application",
                 entity_id=existing.id,
             )
-            db.add(notification)
-            db.commit()
+            notification_service.create_notification(notification_create)
 
             return existing
         else:
@@ -260,9 +262,9 @@ def apply_to_campaign(db: Session, user: User, campaign_id, payload) -> Campaign
     db.commit()
     db.refresh(application)
 
-    from app.notifications.models import Notification, NotificationType
     business_user_id = campaign.business_profile.user_id
-    notification = Notification(
+    notification_service = NotificationService(db)
+    notification_create = NotificationCreate(
         recipient_id=business_user_id,
         actor_id=user.id,
         type=NotificationType.APPLICATION_RECEIVED,
@@ -271,8 +273,7 @@ def apply_to_campaign(db: Session, user: User, campaign_id, payload) -> Campaign
         entity_type="campaign_application",
         entity_id=application.id,
     )
-    db.add(notification)
-    db.commit()
+    notification_service.create_notification(notification_create)
 
     return application
 
@@ -451,9 +452,9 @@ def accept_application(db: Session, user: User, application_id) -> Collaboration
 
     collab = _create_collaboration_from_application(db, application)
 
-    from app.notifications.models import Notification, NotificationType
     promoter_user_id = application.promoter_profile.user_id
-    notification = Notification(
+    notification_service = NotificationService(db)
+    notification_create = NotificationCreate(
         recipient_id=promoter_user_id,
         actor_id=business.user_id,
         type=NotificationType.APPLICATION_ACCEPTED,
@@ -462,8 +463,7 @@ def accept_application(db: Session, user: User, application_id) -> Collaboration
         entity_type="collaboration",
         entity_id=collab.id,
     )
-    db.add(notification)
-    db.commit()
+    notification_service.create_notification(notification_create)
 
     return collab
 
@@ -484,19 +484,18 @@ def reject_application(db: Session, user: User, application_id) -> None:
     application.updated_at = datetime.now(timezone.utc)
     db.commit()
 
-    from app.notifications.models import Notification, NotificationType
     promoter_user_id = application.promoter_profile.user_id
-    notification = Notification(
+    notification_service = NotificationService(db)
+    notification_create = NotificationCreate(
         recipient_id=promoter_user_id,
         actor_id=business.user_id,
         type=NotificationType.APPLICATION_REJECTED,
         title="Application rejected",
         message=f"Your application for '{campaign.title}' has been rejected.",
-        entity_type="campaign_application",
+        entity_type="campaign_invitation",
         entity_id=application.id,
     )
-    db.add(notification)
-    db.commit()
+    notification_service.create_notification(notification_create)
 
 
 # --- Invitations (Business) ---
