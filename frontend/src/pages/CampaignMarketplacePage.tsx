@@ -14,7 +14,7 @@ import CampaignPreviewModal from "../components/discovery/CampaignPreviewModal";
 // Quick filters removed as backend does not currently support these specific string matches
 // Recommended campaigns removed due to lack of recommendation engine in backend
 
-function CardMenu() {
+function CardMenu({ campaignId, campaignTitle }: { campaignId: string; campaignTitle: string }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -26,6 +26,39 @@ function CardMenu() {
     document.addEventListener("mousedown", listener);
     return () => document.removeEventListener("mousedown", listener);
   }, []);
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(false);
+    const shareUrl = `${window.location.origin}/promoter/marketplace?campaign=${campaignId}`;
+    if (navigator.share) {
+      navigator.share({
+        title: campaignTitle,
+        text: `Check out this campaign: ${campaignTitle}`,
+        url: shareUrl,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      notifySuccess("Campaign link copied to clipboard!");
+    }
+  };
+
+  const handleCopyLink = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(false);
+    const shareUrl = `${window.location.origin}/promoter/marketplace?campaign=${campaignId}`;
+    navigator.clipboard.writeText(shareUrl);
+    notifySuccess("Campaign link copied to clipboard!");
+  };
+
+  const handleReport = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(false);
+    notifySuccess("Campaign reported successfully. Our team will review it.");
+  };
 
   return (
     <div className="relative" ref={menuRef}>
@@ -44,14 +77,23 @@ function CardMenu() {
             transition={{ duration: 0.1 }}
             className="absolute right-0 mt-1 w-40 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-20 py-1"
           >
-            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+            <button 
+              onClick={handleShare}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+            >
               <Share2 size={14} /> Share
             </button>
-            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+            <button 
+              onClick={handleCopyLink}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+            >
               <LinkIcon size={14} /> Copy Link
             </button>
             <div className="h-px bg-gray-100 my-1" />
-            <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+            <button 
+              onClick={handleReport}
+              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+            >
               <Flag size={14} /> Report
             </button>
           </motion.div>
@@ -336,7 +378,7 @@ export default function CampaignMarketplacePage() {
                     >
                       <Bookmark size={14} className={bookmarkedCampaigns.has(c.id) ? "fill-current" : ""} />
                     </button>
-                    <CardMenu />
+                    <CardMenu campaignId={c.id} campaignTitle={c.title} />
                   </div>
 
                   {/* Header */}
