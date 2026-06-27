@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List, Optional
 from jose import jwt, JWTError
+from pydantic import BaseModel
 
 from app.core.config import settings
 from app.core import security
@@ -14,10 +15,18 @@ from .schemas import NotificationResponse, UnreadCountResponse
 from .repository import NotificationRepository
 from .connection_manager import manager
 
+
+class PaginatedNotificationsResponse(BaseModel):
+    items: list
+    total: int
+    page: int
+    pages: int
+
+
 router = APIRouter()
 ws_router = APIRouter()
 
-@router.get("", response_model=dict)
+@router.get("", response_model=PaginatedNotificationsResponse)
 def get_notifications(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100),
