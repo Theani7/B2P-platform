@@ -164,9 +164,6 @@ export default function CampaignMarketplacePage() {
           </div>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-          <Link to="/promoter/profile" className="flex-1 md:flex-none h-11 px-6 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-            Complete Profile
-          </Link>
           <button 
             onClick={() => setShowCategories(!showCategories)}
             className={`flex-1 md:flex-none h-11 px-6 rounded-xl flex items-center justify-center text-sm font-semibold transition-colors shadow-sm ${
