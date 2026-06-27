@@ -15,3 +15,7 @@ def send_verification_email(to_email: str, token: str):
 def send_password_reset_email(to_email: str, token: str):
     logger.info(f"[EMAIL] password reset for {to_email} token={token}")
     # TODO: integrate real SMTP provider
+
+
+def send_email(to: str, subject: str, body: str):
+    logger.info(f"[EMAIL] to={to} subject={subject} body={body}")

@@ -32,7 +32,7 @@ class NotificationRepository:
         query = self.session.query(Notification).filter(Notification.recipient_id == recipient_id)
         
         if unread_only:
-            query = query.filter(Notification.is_read == False)
+            query = query.filter(Notification.is_read.isnot(True))
             
         total = query.count()
         items = query.order_by(Notification.created_at.desc()).offset(skip).limit(limit).all()
@@ -42,7 +42,7 @@ class NotificationRepository:
     def get_unread_count(self, recipient_id: UUID) -> int:
         return (
             self.session.query(Notification)
-            .filter(Notification.recipient_id == recipient_id, Notification.is_read == False)
+            .filter(Notification.recipient_id == recipient_id, Notification.is_read.isnot(True))
             .count()
         )
 
@@ -62,7 +62,7 @@ class NotificationRepository:
     def mark_all_as_read(self, recipient_id: UUID) -> int:
         updated = (
             self.session.query(Notification)
-            .filter(Notification.recipient_id == recipient_id, Notification.is_read == False)
+            .filter(Notification.recipient_id == recipient_id, Notification.is_read.isnot(True))
             .update({"is_read": True, "read_at": datetime.utcnow()})
         )
         self.session.commit()
@@ -86,3 +86,16 @@ class NotificationRepository:
             .filter(NotificationPreference.user_id == user_id, NotificationPreference.type == type.value)
             .first()
         )
+
+    def get_unread_since(self, since: datetime):
+        return self.session.query(Notification).filter(
+            Notification.is_read.isnot(True),
+            Notification.created_at >= since,
+        ).all()
+
+    def get_unread_since_by_recipient(self, user_id: UUID, since: datetime):
+        return self.session.query(Notification).filter(
+            Notification.recipient_id == user_id,
+            Notification.is_read.isnot(True),
+            Notification.created_at >= since,
+        ).all()

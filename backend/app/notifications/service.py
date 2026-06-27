@@ -1,11 +1,13 @@
 from uuid import UUID
 from typing import Optional
 from sqlalchemy.orm import Session
+import asyncio
 from .repository import NotificationRepository
 from .schemas import NotificationCreate, NotificationResponse
 from .connection_manager import manager
 from .models import NotificationType
 from .preferences import NotificationPreference
+from .email_digest import send_daily_digest
 
 class NotificationService:
     def __init__(self, session: Session):
@@ -42,5 +44,7 @@ class NotificationService:
             "data": response_obj.model_dump(mode="json")
         }
         await manager.send_personal_message(payload, obj_in.recipient_id)
+        
+        asyncio.create_task(send_daily_digest(self.repository.session, obj_in.recipient_id))
         
         return response_obj
