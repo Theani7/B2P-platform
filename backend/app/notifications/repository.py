@@ -4,7 +4,9 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from .models import Notification
+from .preferences import NotificationPreference
 from .schemas import NotificationCreate
+from .models import NotificationType
 
 class NotificationRepository:
     def __init__(self, session: Session):
@@ -77,3 +79,10 @@ class NotificationRepository:
             self.session.commit()
             return True
         return False
+
+    def get_preference(self, user_id: UUID, type: NotificationType) -> Optional[NotificationPreference]:
+        return (
+            self.session.query(NotificationPreference)
+            .filter(NotificationPreference.user_id == user_id, NotificationPreference.type == type.value)
+            .first()
+        )
