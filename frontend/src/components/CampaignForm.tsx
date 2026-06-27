@@ -42,11 +42,7 @@ const visibilityOptions = [
 
 const statusOptions = [
   { value: CampaignStatus.DRAFT, label: "Draft" },
-  { value: CampaignStatus.OPEN, label: "Open" },
-  { value: CampaignStatus.ACTIVE, label: "Active" },
-  { value: CampaignStatus.COMPLETED, label: "Completed" },
-  { value: CampaignStatus.CANCELLED, label: "Cancelled" },
-  { value: CampaignStatus.ARCHIVED, label: "Archived" },
+  { value: CampaignStatus.OPEN, label: "Open for applications" },
 ];
 
 export default function CampaignForm({
@@ -55,6 +51,8 @@ export default function CampaignForm({
   isSubmitting,
   submitLabel,
 }: CampaignFormProps) {
+  const today = new Date().toISOString().split("T")[0];
+
   const {
     register,
     handleSubmit,
@@ -142,6 +140,7 @@ export default function CampaignForm({
           <Input
             label="Start Date"
             type="date"
+            min={today}
             error={errors.start_date?.message}
             {...register("start_date")}
           />

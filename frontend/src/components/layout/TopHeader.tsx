@@ -1,4 +1,4 @@
-import { Bell, Search, Plus, User } from "lucide-react";
+import { Plus, User } from "lucide-react";
 import { useAuth } from "../../providers/AuthProvider";
 import { Link } from "react-router-dom";
 import { NotificationBell } from "../notifications";
@@ -7,6 +7,7 @@ import { ShareProfileDialog } from "../sharing";
 import { useState } from "react";
 import { notifyError } from "../../hooks/useToast";
 import { Role } from "../../constants/roles";
+import { Badge } from "../ui";
 
 export function TopHeader() {
   const { user } = useAuth();
@@ -56,8 +57,18 @@ export function TopHeader() {
           </button>
         )}
         <NotificationBell />
-        <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-medium border border-primary-200">
-          {user?.full_name?.charAt(0) || <User size={14} />}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex flex-col items-end">
+            <span className="text-xs font-medium text-gray-900">{user?.full_name || "User"}</span>
+            {user?.role && (
+              <Badge variant={user.role === Role.BUSINESS ? "business" : "promoter"} className="scale-[0.85] origin-right">
+                {user.role === Role.BUSINESS ? "Business" : "Promoter"}
+              </Badge>
+            )}
+          </div>
+          <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-medium border border-primary-200">
+            {user?.full_name?.charAt(0) || <User size={14} />}
+          </div>
         </div>
       </div>
       <ShareProfileDialog isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />

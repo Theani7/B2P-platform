@@ -6,7 +6,9 @@ type BadgeVariant =
   | "pending"
   | "completed"
   | "rejected"
-  | "draft";
+  | "draft"
+  | "business"
+  | "promoter";
 
 interface BadgeProps {
   variant: BadgeVariant;
@@ -21,6 +23,8 @@ const variantClasses: Record<BadgeVariant, string> = {
   completed: "bg-green-50 text-green-800",
   rejected: "bg-brand-coral-50 text-brand-coral-900",
   draft: "bg-gray-100 text-gray-500",
+  business: "bg-brand-purple-50 text-brand-purple-900",
+  promoter: "bg-brand-teal-50 text-brand-teal-900",
 };
 
 export function Badge({ variant, children, className = "" }: BadgeProps) {

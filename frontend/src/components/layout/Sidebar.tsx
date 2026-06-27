@@ -18,6 +18,7 @@ import {
   Lock
 } from "lucide-react";
 import { notifyError } from "../../hooks/useToast";
+import { Badge } from "../ui";
 
 interface SidebarProps {
   role: string;
@@ -154,6 +155,11 @@ export function Sidebar({ role }: SidebarProps) {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-gray-900 truncate">{user?.full_name || "User"}</p>
             <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            {user?.role && (
+              <Badge variant={user.role === Role.BUSINESS ? "business" : "promoter"} className="mt-1">
+                {user.role === Role.BUSINESS ? "Business" : "Promoter"}
+              </Badge>
+            )}
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { useAuth } from "../providers/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import AuthLayout from "../layouts/AuthLayout";
+import { Input } from "../components/ui/Input";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -46,33 +47,29 @@ export default function LoginPage() {
 
   return (
     <AuthLayout>
-      <h1 className="text-xl font-medium text-gray-900 text-center">Welcome back</h1>
-      <p className="text-sm text-gray-500 text-center mt-1 mb-8">Log in to your Byparsathy account</p>
+      <div className="mb-8">
+        <h1 className="text-xl font-medium text-gray-900 text-center">Welcome back</h1>
+        <p className="text-sm text-gray-500 text-center mt-1">Continue managing your collaborations</p>
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         {serverError && (
           <div className="bg-brand-coral-50 border border-brand-coral/20 text-brand-coral-900 px-3 py-2.5 rounded-lg text-sm flex items-start gap-2.5">
-            <AlertCircle size={16} className="mt-0.5 text-brand-coral" />
+            <AlertCircle size={16} className="mt-0.5 text-brand-coral flex-shrink-0" />
             <span className="flex-1">{serverError}</span>
           </div>
         )}
 
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1.5">Email address</label>
-          <input
-            {...register("email")}
-            type="email"
-            id="email"
-            placeholder="you@company.com"
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple"
-          />
-          {errors.email && <p className="text-xs text-brand-coral mt-1">{errors.email.message}</p>}
-        </div>
+        <Input
+          label="Email address"
+          type="email"
+          placeholder="you@company.com"
+          error={errors.email?.message}
+          {...register("email")}
+        />
 
-        {/* Password */}
         <div>
-          <div className="flex justify-between items-center mb-1.5">
+          <div className="flex items-center justify-between mb-1.5">
             <label htmlFor="password" className="text-xs font-medium text-gray-700">Password</label>
             <Link to="/forgot-password" className="text-xs text-brand-purple hover:underline">Forgot password?</Link>
           </div>
@@ -82,13 +79,14 @@ export default function LoginPage() {
               type={showPassword ? "text" : "password"}
               id="password"
               placeholder="••••••••"
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple pr-10"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo pr-10"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               tabIndex={-1}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -96,20 +94,26 @@ export default function LoginPage() {
           {errors.password && <p className="text-xs text-brand-coral mt-1">{errors.password.message}</p>}
         </div>
 
-        {/* Submit */}
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-brand-indigo focus:ring-brand-indigo" />
+            <span className="text-xs text-gray-600">Remember me</span>
+          </label>
+        </div>
+
         <button
           type="submit"
           disabled={loginMutation.isPending}
-          className="w-full mt-2 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full mt-1 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:bg-brand-indigo-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
         >
           {loginMutation.isPending && <Loader2 size={16} className="animate-spin" />}
-          {loginMutation.isPending ? "Logging in..." : "Log in"}
+          {loginMutation.isPending ? "Logging in..." : "Sign in"}
         </button>
       </form>
 
       <p className="text-sm text-gray-500 text-center mt-6">
         Don't have an account?{" "}
-        <Link to="/register" className="text-brand-purple hover:underline">Sign up</Link>
+        <Link to="/register" className="text-brand-purple hover:underline font-medium">Create account</Link>
       </p>
     </AuthLayout>
   );

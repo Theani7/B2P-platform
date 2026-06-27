@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRegister } from "../features/auth/api";
 import { useAuth } from "../providers/AuthProvider";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Loader2, Building2, UserCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import AuthLayout from "../layouts/AuthLayout";
+import { Input } from "../components/ui/Input";
+import RoleSelector from "../components/auth/RoleSelector";
 
 const schema = z.object({
   username: z.string().min(3, "Min 3 characters").max(30),
@@ -16,6 +18,7 @@ const schema = z.object({
     .min(6, "Password must be at least 6 characters")
     .refine((val) => !val.includes(" "), "Password cannot contain spaces"),
   confirmPassword: z.string(),
+  terms: z.literal(true, { errorMap: () => ({ message: "You must accept the terms" }) }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -23,29 +26,43 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+function getPasswordStrength(password: string): { level: "weak" | "medium" | "strong"; score: number } {
+  let score = 0;
+  if (password.length >= 6) score++;
+  if (password.length >= 10) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (score <= 2) return { level: "weak", score };
+  if (score <= 4) return { level: "medium", score };
+  return { level: "strong", score };
+}
+
+const requirements = [
+  { label: "At least 6 characters", test: (v: string) => v.length >= 6 },
+  { label: "One uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
+  { label: "One lowercase letter", test: (v: string) => /[a-z]/.test(v) },
+  { label: "One number", test: (v: string) => /[0-9]/.test(v) },
+];
+
 export default function RegisterPage() {
   const { user, isLoading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const [role, setRole] = useState<"BUSINESS" | "PROMOTER" | null>(null);
   const [roleError, setRoleError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
 
-  const registerMutation = useRegister();
+  const password = watch("password", "");
+  const strength = useMemo(() => getPasswordStrength(password), [password]);
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (user) {
-      if (user.role === "BUSINESS") navigate("/business/dashboard", { replace: true });
-      else if (user.role === "PROMOTER") navigate("/promoter/dashboard", { replace: true });
-      else if (user.role === "ADMIN") navigate("/admin", { replace: true });
-    }
-  }, [user, authLoading, navigate]);
+  const registerMutation = useRegister();
 
   if (authLoading) return null;
   if (user) return null;
@@ -53,7 +70,7 @@ export default function RegisterPage() {
   const onSubmit = (data: FormValues) => {
     if (!role) { setRoleError(true); return; }
     setServerError(null);
-    const { confirmPassword, ...payload } = data;
+    const { confirmPassword, terms, ...payload } = data;
     registerMutation.mutate({ ...payload, role }, {
       onError: (err: any) => {
         const msg = err?.response?.data?.message || err?.message || "Registration failed. Please try again.";
@@ -64,81 +81,44 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout>
-      <h1 className="text-xl font-medium text-gray-900 text-center">Create your account</h1>
-      <p className="text-sm text-gray-500 text-center mt-1 mb-6">Join Nepal's promoter marketplace</p>
-
-      {/* Role selector */}
-      <label className="block text-xs font-medium text-gray-700 mb-3">I am a...</label>
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <button
-          type="button"
-          onClick={() => { setRole("BUSINESS"); setRoleError(false); }}
-          className={`flex flex-col items-center rounded-xl border p-4 cursor-pointer transition-colors ${
-            role === "BUSINESS"
-              ? "border-brand-purple bg-brand-purple-50"
-              : "border-gray-100 hover:bg-gray-50"
-          }`}
-        >
-          <Building2 size={24} className={role === "BUSINESS" ? "text-brand-purple" : "text-gray-400"} />
-          <span className={`text-sm font-medium mt-2 ${role === "BUSINESS" ? "text-brand-purple" : "text-gray-900"}`}>Business</span>
-          <span className="text-xs text-gray-400 mt-1">I want to run campaigns</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => { setRole("PROMOTER"); setRoleError(false); }}
-          className={`flex flex-col items-center rounded-xl border p-4 cursor-pointer transition-colors ${
-            role === "PROMOTER"
-              ? "border-brand-teal bg-brand-teal-50"
-              : "border-gray-100 hover:bg-gray-50"
-          }`}
-        >
-          <UserCircle size={24} className={role === "PROMOTER" ? "text-brand-teal" : "text-gray-400"} />
-          <span className={`text-sm font-medium mt-2 ${role === "PROMOTER" ? "text-brand-teal" : "text-gray-900"}`}>Promoter</span>
-          <span className="text-xs text-gray-400 mt-1">I want to get discovered</span>
-        </button>
+      <div className="mb-8">
+        <h1 className="text-xl font-medium text-gray-900 text-center">Create your account</h1>
+        <p className="text-sm text-gray-500 text-center mt-1">Join Nepal's promoter marketplace</p>
       </div>
-      {roleError && <p className="text-xs text-brand-coral mb-4">Please select a role</p>}
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        {/* Username */}
-        <div>
-          <label htmlFor="username" className="block text-xs font-medium text-gray-700 mb-1.5">Username</label>
-          <input
-            {...register("username")}
-            id="username"
-            placeholder="@yourhandle"
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple"
-          />
-          <p className="text-[11px] text-gray-400 mt-1">This will be your public handle</p>
-          {errors.username && <p className="text-xs text-brand-coral mt-1">{errors.username.message}</p>}
-        </div>
+        {serverError && (
+          <div className="bg-brand-coral-50 border border-brand-coral/20 text-brand-coral-900 px-3 py-2.5 rounded-lg text-sm flex items-start gap-2.5">
+            <AlertCircle size={16} className="mt-0.5 text-brand-coral flex-shrink-0" />
+            <span className="flex-1">{serverError}</span>
+          </div>
+        )}
 
-        {/* Full name */}
-        <div>
-          <label htmlFor="full_name" className="block text-xs font-medium text-gray-700 mb-1.5">Full name</label>
-          <input
-            {...register("full_name")}
-            id="full_name"
-            placeholder="Your full name"
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple"
-          />
-          {errors.full_name && <p className="text-xs text-brand-coral mt-1">{errors.full_name.message}</p>}
-        </div>
+        <RoleSelector role={role} onSelect={(r) => { setRole(r); setRoleError(false); }} error={roleError} />
 
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1.5">Email address</label>
-          <input
-            {...register("email")}
-            type="email"
-            id="email"
-            placeholder="you@example.com"
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple"
-          />
-          {errors.email && <p className="text-xs text-brand-coral mt-1">{errors.email.message}</p>}
-        </div>
+        <Input
+          label="Username"
+          placeholder="@yourhandle"
+          error={errors.username?.message}
+          helperText={!errors.username ? "This will be your public handle" : undefined}
+          {...register("username")}
+        />
 
-        {/* Password */}
+        <Input
+          label="Full name"
+          placeholder="Your full name"
+          error={errors.full_name?.message}
+          {...register("full_name")}
+        />
+
+        <Input
+          label="Email address"
+          type="email"
+          placeholder="you@example.com"
+          error={errors.email?.message}
+          {...register("email")}
+        />
+
         <div>
           <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1.5">Password</label>
           <div className="relative">
@@ -147,22 +127,54 @@ export default function RegisterPage() {
               type={showPassword ? "text" : "password"}
               id="password"
               placeholder="••••••••"
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple pr-10"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo pr-10"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               tabIndex={-1}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <p className="text-[11px] text-gray-400 mt-1">Min 6 characters, cannot contain spaces</p>
-          {errors.password && <p className="text-xs text-brand-coral mt-1">{errors.password.message}</p>}
+          {password && (
+            <div className="mt-2">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-300 ${
+                      strength.level === "weak" ? "bg-brand-coral w-1/3" :
+                      strength.level === "medium" ? "bg-brand-amber w-2/3" :
+                      "bg-brand-teal w-full"
+                    }`}
+                  />
+                </div>
+                <span className={`text-[10px] font-medium uppercase tracking-wide ${
+                  strength.level === "weak" ? "text-brand-coral" :
+                  strength.level === "medium" ? "text-brand-amber" :
+                  "text-brand-teal"
+                }`}>
+                  {strength.level}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {requirements.map((req) => {
+                  const met = req.test(password);
+                  return (
+                    <span key={req.label} className={`flex items-center gap-1.5 text-[11px] ${met ? "text-brand-teal" : "text-gray-400"}`}>
+                      {met ? <CheckCircle2 size={12} /> : <span className="w-3 h-3 rounded-full border border-gray-200" />}
+                      {req.label}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {errors.password && <p className="text-xs text-brand-coral mt-1.5">{errors.password.message}</p>}
         </div>
 
-        {/* Confirm password */}
         <div>
           <label htmlFor="confirmPassword" className="block text-xs font-medium text-gray-700 mb-1.5">Confirm password</label>
           <div className="relative">
@@ -171,13 +183,14 @@ export default function RegisterPage() {
               type={showConfirm ? "text" : "password"}
               id="confirmPassword"
               placeholder="••••••••"
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple pr-10"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo pr-10"
             />
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               tabIndex={-1}
+              aria-label={showConfirm ? "Hide password" : "Show password"}
             >
               {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -185,29 +198,34 @@ export default function RegisterPage() {
           {errors.confirmPassword && <p className="text-xs text-brand-coral mt-1">{errors.confirmPassword.message}</p>}
         </div>
 
-        {/* Submit */}
+        <label className="flex items-start gap-2.5 cursor-pointer">
+          <input
+            type="checkbox"
+            {...register("terms")}
+            className="mt-0.5 w-4 h-4 rounded border-gray-300 text-brand-indigo focus:ring-brand-indigo"
+          />
+          <span className="text-xs text-gray-600 leading-relaxed">
+            I agree to the{" "}
+            <Link to="/terms" className="text-brand-purple hover:underline">Terms of Service</Link>
+            {" "}and{" "}
+            <Link to="/privacy" className="text-brand-purple hover:underline">Privacy Policy</Link>
+          </span>
+        </label>
+        {errors.terms && <p className="text-xs text-brand-coral -mt-2">{errors.terms.message}</p>}
+
         <button
           type="submit"
           disabled={registerMutation.isPending || !role}
-          className="w-full mt-2 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full mt-1 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:bg-brand-indigo-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
         >
           {registerMutation.isPending && <Loader2 size={16} className="animate-spin" />}
           {registerMutation.isPending ? "Creating account..." : "Create account"}
         </button>
-
-        {serverError && <p className="text-xs text-brand-coral text-center mt-2">{serverError}</p>}
       </form>
 
-      <p className="text-[11px] text-gray-400 text-center mt-3">
-        By creating an account you agree to our{" "}
-        <Link to="/terms" className="text-brand-purple hover:underline">Terms</Link>
-        {" "}and{" "}
-        <Link to="/privacy" className="text-brand-purple hover:underline">Privacy Policy</Link>
-      </p>
-
-      <p className="text-sm text-gray-500 text-center mt-4">
+      <p className="text-sm text-gray-500 text-center mt-6">
         Already have an account?{" "}
-        <Link to="/login" className="text-brand-purple hover:underline">Log in</Link>
+        <Link to="/login" className="text-brand-purple hover:underline font-medium">Sign in</Link>
       </p>
     </AuthLayout>
   );
