@@ -90,6 +90,7 @@ def _create_collaboration_from_invitation(db: Session, invitation: CampaignInvit
 def list_marketplace_campaigns(
     db: Session,
     search: Optional[str] = None,
+    category: Optional[str] = None,
     page: int = 1,
     limit: int = 20,
     sort: str = "created_at",
@@ -99,6 +100,9 @@ def list_marketplace_campaigns(
         Campaign.visibility == CampaignVisibility.PUBLIC,
         Campaign.status == CampaignStatus.OPEN,
     )
+
+    if category:
+        query = query.filter(Campaign.category.ilike(category))
 
     if search:
         like = f"%{search}%"

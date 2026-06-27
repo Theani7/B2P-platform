@@ -60,13 +60,26 @@ function CardMenu() {
   );
 }
 
-export default function CampaignMarketplacePage() {
-  
-  
+const MARKETPLACE_CATEGORIES = [
+  "Fashion",
+  "Tech",
+  "Beauty",
+  "Food",
+  "Travel",
+  "Fitness",
+  "Gaming",
+  "Education",
+  "Entertainment",
+  "Finance"
+];
 
+export default function CampaignMarketplacePage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("created_at");
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showCategories, setShowCategories] = useState(false);
 
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
@@ -77,6 +90,7 @@ export default function CampaignMarketplacePage() {
 
   const { data, isLoading } = useCampaignMarketplace({
     search: search || undefined,
+    category: selectedCategory || undefined,
     page,
     limit: 12,
     sort,
@@ -152,12 +166,72 @@ export default function CampaignMarketplacePage() {
           <Link to="/promoter/profile" className="flex-1 md:flex-none h-11 px-6 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
             Complete Profile
           </Link>
-          <button className="flex-1 md:flex-none h-11 px-6 rounded-xl bg-primary-600 flex items-center justify-center text-sm font-semibold text-white hover:bg-primary-700 transition-colors shadow-sm">
+          <button 
+            onClick={() => setShowCategories(!showCategories)}
+            className={`flex-1 md:flex-none h-11 px-6 rounded-xl flex items-center justify-center text-sm font-semibold transition-colors shadow-sm ${
+              showCategories 
+                ? 'bg-primary-50 text-primary-600 border border-primary-200' 
+                : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
+          >
             Browse Categories
           </button>
         </div>
       </div>
 
+      {/* 2. CATEGORIES PANEL */}
+      {showCategories && (
+        <div className="bg-white p-6 rounded-2xl shadow-sm ring-1 ring-gray-200 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 transition-all duration-200">
+          <button
+            onClick={() => {
+              setSelectedCategory(null);
+              setPage(1);
+            }}
+            className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${
+              selectedCategory === null
+                ? 'bg-primary-50 border-primary-300 text-primary-600 font-semibold'
+                : 'border-gray-100 hover:border-gray-300 bg-gray-50 text-gray-700'
+            }`}
+          >
+            <span className="text-xl">🌐</span>
+            <span className="text-xs">All Categories</span>
+          </button>
+          {MARKETPLACE_CATEGORIES.map((cat) => {
+            const getIcon = (c: string) => {
+              switch (c) {
+                case "Fashion": return "✨";
+                case "Tech": return "💻";
+                case "Beauty": return "💄";
+                case "Food": return "🍔";
+                case "Travel": return "✈️";
+                case "Fitness": return "💪";
+                case "Gaming": return "🎮";
+                case "Education": return "📚";
+                case "Entertainment": return "🎬";
+                case "Finance": return "💰";
+                default: return "📦";
+              }
+            };
+            return (
+              <button
+                key={cat}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setPage(1);
+                }}
+                className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-primary-50 border-primary-300 text-primary-600 font-semibold'
+                    : 'border-gray-100 hover:border-gray-300 bg-gray-50 text-gray-700'
+                }`}
+              >
+                <span className="text-xl">{getIcon(cat)}</span>
+                <span className="text-xs">{cat}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* 3. STICKY SEARCH TOOLBAR & QUICK FILTERS */}
       <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -185,11 +259,23 @@ export default function CampaignMarketplacePage() {
                 <option value="budget">Highest Budget</option>
                 <option value="title">Alphabetical</option>
               </select>
-              <button className="h-10 px-4 rounded-xl bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors flex items-center gap-2">
-                <Filter size={16}/> Filters
-              </button>
             </div>
           </div>
+          
+          {selectedCategory && (
+            <div className="flex items-center gap-2 px-2 pb-1">
+              <span className="text-xs text-gray-500 font-medium">Active Category:</span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 border border-primary-200 text-xs font-bold text-primary-600">
+                {selectedCategory}
+                <button 
+                  onClick={() => setSelectedCategory(null)}
+                  className="hover:bg-primary-100 p-0.5 rounded-full"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            </div>
+          )}
           
 
         </div>

@@ -14,13 +14,14 @@ router = APIRouter(prefix="/campaign-marketplace", tags=["campaign-marketplace"]
 @router.get("", response_model=CampaignMarketplaceResponse)
 def marketplace(
     search: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     sort: str = Query("created_at"),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items, total = list_marketplace_campaigns(db, search=search, page=page, limit=limit, sort=sort, user=user)
+    items, total = list_marketplace_campaigns(db, search=search, category=category, page=page, limit=limit, sort=sort, user=user)
     return CampaignMarketplaceResponse(
         items=items,
         total=total,

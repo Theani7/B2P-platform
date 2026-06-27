@@ -9,6 +9,7 @@ import {
 
 export const useCampaignMarketplace = (params?: {
   search?: string;
+  category?: string;
   page?: number;
   limit?: number;
   sort?: string;
