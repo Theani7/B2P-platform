@@ -1,8 +1,21 @@
 from datetime import datetime
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict, List
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 from .models import NotificationType
+
+class NotificationPreferenceRead(BaseModel):
+    id: UUID
+    type: str
+    enabled: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+class NotificationPreferencesResponse(BaseModel):
+    preferences: List[NotificationPreferenceRead]
+
+class NotificationPreferencesUpdate(BaseModel):
+    preferences: List[dict]
 
 class NotificationBase(BaseModel):
     type: NotificationType

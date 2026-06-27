@@ -11,9 +11,10 @@ from app.db.session import get_db
 from app.dependencies.auth import get_current_user
 from app.models.user import User
 
-from .schemas import NotificationResponse, UnreadCountResponse
+from .schemas import NotificationResponse, UnreadCountResponse, NotificationPreferencesResponse, NotificationPreferencesUpdate
 from .repository import NotificationRepository
 from .connection_manager import manager
+from .preferences import NotificationPreference
 
 
 class PaginatedNotificationsResponse(BaseModel):
@@ -89,6 +90,36 @@ def delete_notification(
     deleted = repo.delete(notification_id=notification_id, recipient_id=current_user.id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found")
+
+@router.get("/preferences", response_model=NotificationPreferencesResponse)
+def get_preferences(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get notification preferences for the current user."""
+    prefs = db.query(NotificationPreference).filter(NotificationPreference.user_id == current_user.id).all()
+    return {"preferences": prefs}
+
+@router.put("/preferences", response_model=NotificationPreferencesResponse)
+def update_preferences(
+    payload: NotificationPreferencesUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update notification preferences for the current user."""
+    user_prefs = {p.type: p for p in db.query(NotificationPreference).filter(NotificationPreference.user_id == current_user.id).all()}
+    for item in payload.preferences:
+        type_val = item.get("type")
+        enabled = item.get("enabled", True)
+        existing = user_prefs.get(type_val)
+        if existing:
+            existing.enabled = enabled
+        else:
+            new_pref = NotificationPreference(user_id=current_user.id, type=type_val, enabled=enabled)
+            db.add(new_pref)
+    db.commit()
+    updated = db.query(NotificationPreference).filter(NotificationPreference.user_id == current_user.id).all()
+    return {"preferences": updated}
 
 def get_user_from_token(token: str, db: Session) -> Optional[User]:
     try:
