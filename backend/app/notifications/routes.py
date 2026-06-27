@@ -1,11 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status, WebSocket, WebSocketDisconnect, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
-from typing import List, Optional
-from jose import jwt, JWTError
+from typing import Optional
 from pydantic import BaseModel
 
-from app.core.config import settings
 from app.core import security
 from app.db.session import get_db
 from app.dependencies.auth import get_current_user

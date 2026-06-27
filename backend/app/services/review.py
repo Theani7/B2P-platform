@@ -1,5 +1,5 @@
 """Review & Rating System service."""
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 from fastapi import HTTPException, status
 from sqlalchemy import desc
 from sqlalchemy.orm import Session, joinedload
