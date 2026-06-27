@@ -152,12 +152,12 @@ def mark_read(
     current_user: User = Depends(get_current_user)
 ):
     # Update all unread messages in conversation not from current user
-    from datetime import datetime
+    from datetime import datetime, timezone
     db.query(Message).filter(
         Message.conversation_id == conversation_id,
         Message.sender_id != current_user.id,
         Message.read_at == None
-    ).update({"read_at": datetime.utcnow()})
+    ).update({"read_at": datetime.now(timezone.utc)})
     db.commit()
     return {"message": "Conversation marked as read"}
 

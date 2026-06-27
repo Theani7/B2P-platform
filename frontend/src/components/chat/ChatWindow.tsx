@@ -31,6 +31,13 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
     }
   }, [data]);
 
+  // Mark as read when opened if there are unread messages
+  useEffect(() => {
+    if (conversation.unread_count > 0) {
+      markRead.mutate(conversation.id);
+    }
+  }, [conversation.id, conversation.unread_count]);
+
   // Handle incoming WS messages
   useEffect(() => {
     if (!lastMessage) return;

@@ -17,11 +17,9 @@ from app.notifications.schemas import NotificationCreate
 from app.notifications.models import NotificationType
 from ..schemas.collaboration import (
     CampaignMarketplaceItem,
-    CampaignApplicationRead,
     CampaignApplicationWithPromoterRead,
     CampaignApplicationWithCampaignRead,
     CampaignApplicationFullRead,
-    CampaignInvitationRead,
     CampaignInvitationWithCampaignRead,
     CollaborationRead,
 )
@@ -502,7 +500,7 @@ def reject_application(db: Session, user: User, application_id) -> None:
 
 def invite_promoter(db: Session, user: User, campaign_id, promoter_id, payload) -> CampaignInvitation:
     business = _get_business_profile(db, user)
-    campaign = _get_campaign_for_business(db, campaign_id, business.id)
+    _get_campaign_for_business(db, campaign_id, business.id)
 
     promoter = db.query(PromoterProfile).filter(PromoterProfile.id == promoter_id).first()
     if not promoter:
