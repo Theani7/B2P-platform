@@ -124,8 +124,6 @@ class AchievementService:
                 # Here we just use the NotificationService which will broadcast NEW_NOTIFICATION.
                 # In websocket we check ACHIEVEMENT_UNLOCKED.
                 await self.notification_service.create_notification(notification)
-                
-
 
             elif not user_ach.earned_at and progress > user_ach.progress:
                 user_ach.progress = progress
