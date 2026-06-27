@@ -521,6 +521,19 @@ def invite_promoter(db: Session, user: User, campaign_id, promoter_id, payload) 
     db.add(invitation)
     db.commit()
     db.refresh(invitation)
+
+    notification_service = NotificationService(db)
+    invitation_notification = NotificationCreate(
+        recipient_id=promoter.user_id,
+        actor_id=user.id,
+        type=NotificationType.INVITATION_RECEIVED,
+        title="New campaign invitation",
+        message=f"You have been invited to promote '{campaign.title}'",
+        entity_type="campaign_invitation",
+        entity_id=invitation.id,
+    )
+    notification_service.create_notification(invitation_notification)
+
     return invitation
 
 
@@ -647,6 +660,28 @@ def accept_invitation(db: Session, user: User, invitation_id) -> Collaboration:
     db.flush()
 
     collab = _create_collaboration_from_invitation(db, invitation)
+
+    business_user_id = invitation.campaign.business_profile.user_id
+    notification_service = NotificationService(db)
+    notification_service.create_notification(NotificationCreate(
+        recipient_id=business_user_id,
+        actor_id=user.id,
+        type=NotificationType.INVITATION_ACCEPTED,
+        title="Invitation accepted",
+        message=f"{user.username} accepted your invitation to promote '{invitation.campaign.title}'",
+        entity_type="campaign_invitation",
+        entity_id=invitation.id,
+    ))
+    notification_service.create_notification(NotificationCreate(
+        recipient_id=user.id,
+        actor_id=business_user_id,
+        type=NotificationType.COLLABORATION_STARTED,
+        title="Collaboration started",
+        message=f"You are now collaborating with {invitation.campaign.business_profile.company_name} on '{invitation.campaign.title}'",
+        entity_type="collaboration",
+        entity_id=collab.id,
+    ))
+
     return collab
 
 
@@ -664,6 +699,18 @@ def reject_invitation(db: Session, user: User, invitation_id) -> None:
     invitation.status = InvitationStatus.REJECTED
     invitation.updated_at = datetime.now(timezone.utc)
     db.commit()
+
+    business_user_id = invitation.campaign.business_profile.user_id
+    notification_service = NotificationService(db)
+    notification_service.create_notification(NotificationCreate(
+        recipient_id=business_user_id,
+        actor_id=user.id,
+        type=NotificationType.INVITATION_DECLINED,
+        title="Invitation declined",
+        message=f"{user.username} declined your invitation to promote '{invitation.campaign.title}'",
+        entity_type="campaign_invitation",
+        entity_id=invitation.id,
+    ))
 
 
 # --- Collaborations ---

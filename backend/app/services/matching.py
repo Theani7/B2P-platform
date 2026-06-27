@@ -14,6 +14,9 @@ from ..models.match_result import MatchResult
 from ..models.business_profile import BusinessProfile
 from ..models.user import User
 from ..schemas.matching import MatchResultRead, MatchResultPromoter
+from app.notifications.service import NotificationService
+from app.notifications.schemas import NotificationCreate
+from app.notifications.models import NotificationType
 
 MAX_SCORE = 100
 
@@ -172,6 +175,18 @@ def generate_matches(db: Session, user: User, campaign_id: str) -> int:
         count += 1
 
     db.commit()
+
+    notification_service = NotificationService(db)
+    notification_service.create_notification(NotificationCreate(
+        recipient_id=user.id,
+        actor_id=user.id,
+        type=NotificationType.CAMPAIGN_MATCH_READY,
+        title="Match analysis ready",
+        message=f"We found {count} potential promoters for your campaign '{campaign.title}'",
+        entity_type="campaign",
+        entity_id=campaign.id,
+    ))
+
     return count
 
 

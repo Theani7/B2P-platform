@@ -9,6 +9,9 @@ from ..models.collaboration import Collaboration, CollaborationStatus
 from ..models.review import Review
 from ..models.user import User
 from ..schemas.review import ReviewRead, ReviewerInfo, RatingSummary, RatingDistribution
+from app.notifications.service import NotificationService
+from app.notifications.schemas import NotificationCreate
+from app.notifications.models import NotificationType
 
 
 def _get_user_info(user: User) -> ReviewerInfo:
@@ -39,6 +42,19 @@ def complete_collaboration(db: Session, user: User, collaboration_id: str) -> Co
     collab.completed_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(collab)
+
+    notification_service = NotificationService(db)
+    other_party_id = collab.promoter_profile.user_id if user.business_profile else collab.business_profile.user_id
+    notification_service.create_notification(NotificationCreate(
+        recipient_id=other_party_id,
+        actor_id=user.id,
+        type=NotificationType.COLLABORATION_COMPLETED,
+        title="Collaboration completed",
+        message=f"{user.username} completed the collaboration on '{collab.campaign.title}'",
+        entity_type="collaboration",
+        entity_id=collab.id,
+    ))
+
     return collab
 
 
@@ -90,6 +106,18 @@ def create_review(db: Session, user: User, collaboration_id: str, rating: int, c
     db.add(review)
     db.commit()
     db.refresh(review)
+
+    notification_service = NotificationService(db)
+    notification_service.create_notification(NotificationCreate(
+        recipient_id=reviewee_id,
+        actor_id=user.id,
+        type=NotificationType.REVIEW_RECEIVED,
+        title="New review received",
+        message=f"You received a {rating}-star review from {user.username}",
+        entity_type="review",
+        entity_id=review.id,
+    ))
+
     return review
 
 
