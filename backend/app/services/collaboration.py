@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import or_
+from sqlalchemy import or_, select, func
 
 from ..models.user import User, RoleEnum
 from ..models.business_profile import BusinessProfile
@@ -231,6 +231,21 @@ def apply_to_campaign(db: Session, user: User, campaign_id, payload) -> Campaign
             existing.created_at = datetime.now(timezone.utc)
             db.commit()
             db.refresh(existing)
+
+            from app.notifications.models import Notification, NotificationType
+            business_user_id = campaign.business_profile.user_id
+            notification = Notification(
+                recipient_id=business_user_id,
+                actor_id=user.id,
+                type=NotificationType.APPLICATION_RECEIVED,
+                title="New application received",
+                message=f"{user.username} applied to your campaign '{campaign.title}'",
+                entity_type="campaign_application",
+                entity_id=existing.id,
+            )
+            db.add(notification)
+            db.commit()
+
             return existing
         else:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You have already applied to this campaign")
@@ -243,6 +258,21 @@ def apply_to_campaign(db: Session, user: User, campaign_id, payload) -> Campaign
     db.add(application)
     db.commit()
     db.refresh(application)
+
+    from app.notifications.models import Notification, NotificationType
+    business_user_id = campaign.business_profile.user_id
+    notification = Notification(
+        recipient_id=business_user_id,
+        actor_id=user.id,
+        type=NotificationType.APPLICATION_RECEIVED,
+        title="New application received",
+        message=f"{user.username} applied to your campaign '{campaign.title}'",
+        entity_type="campaign_application",
+        entity_id=application.id,
+    )
+    db.add(notification)
+    db.commit()
+
     return application
 
 
@@ -268,13 +298,20 @@ def get_promoter_applications(
     limit: int = 20,
 ) -> Tuple[List[CampaignApplicationWithCampaignRead], int]:
     promoter = _get_promoter_profile(db, user)
-    query = db.query(CampaignApplication).options(
-        joinedload(CampaignApplication.campaign).joinedload(Campaign.business_profile)
-    ).filter(
-        CampaignApplication.promoter_profile_id == promoter.id,
+    count_stmt = select(func.count(CampaignApplication.id)).where(
+        CampaignApplication.promoter_profile_id == promoter.id
     )
-    total = query.count()
-    applications = query.order_by(CampaignApplication.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
+    total = db.scalar(count_stmt)
+
+    applications = (
+        db.query(CampaignApplication)
+        .options(joinedload(CampaignApplication.campaign).joinedload(Campaign.business_profile))
+        .filter(CampaignApplication.promoter_profile_id == promoter.id)
+        .order_by(CampaignApplication.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
 
     items = []
     for app in applications:
@@ -310,11 +347,20 @@ def get_campaign_applications(
     business = _get_business_profile(db, user)
     campaign = _get_campaign_for_business(db, campaign_id, business.id)
 
-    query = db.query(CampaignApplication).options(joinedload(CampaignApplication.promoter_profile)).filter(
-        CampaignApplication.campaign_id == campaign.id,
+    count_stmt = select(func.count(CampaignApplication.id)).where(
+        CampaignApplication.campaign_id == campaign.id
     )
-    total = query.count()
-    applications = query.order_by(CampaignApplication.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
+    total = db.scalar(count_stmt)
+
+    applications = (
+        db.query(CampaignApplication)
+        .options(joinedload(CampaignApplication.promoter_profile))
+        .filter(CampaignApplication.campaign_id == campaign.id)
+        .order_by(CampaignApplication.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
 
     items = []
     for app in applications:
@@ -358,6 +404,21 @@ def accept_application(db: Session, user: User, application_id) -> Collaboration
     db.flush()
 
     collab = _create_collaboration_from_application(db, application)
+
+    from app.notifications.models import Notification, NotificationType
+    promoter_user_id = application.promoter_profile.user_id
+    notification = Notification(
+        recipient_id=promoter_user_id,
+        actor_id=business.user_id,
+        type=NotificationType.APPLICATION_ACCEPTED,
+        title="Application accepted",
+        message=f"Your application for '{campaign.title}' has been accepted!",
+        entity_type="collaboration",
+        entity_id=collab.id,
+    )
+    db.add(notification)
+    db.commit()
+
     return collab
 
 
@@ -371,10 +432,24 @@ def reject_application(db: Session, user: User, application_id) -> None:
     if application.status != ApplicationStatus.PENDING:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Application is not pending")
 
-    _get_campaign_for_business(db, application.campaign_id, business.id)
+    campaign = _get_campaign_for_business(db, application.campaign_id, business.id)
 
     application.status = ApplicationStatus.REJECTED
     application.updated_at = datetime.now(timezone.utc)
+    db.commit()
+
+    from app.notifications.models import Notification, NotificationType
+    promoter_user_id = application.promoter_profile.user_id
+    notification = Notification(
+        recipient_id=promoter_user_id,
+        actor_id=business.user_id,
+        type=NotificationType.APPLICATION_REJECTED,
+        title="Application rejected",
+        message=f"Your application for '{campaign.title}' has been rejected.",
+        entity_type="campaign_application",
+        entity_id=application.id,
+    )
+    db.add(notification)
     db.commit()
 
 
@@ -431,11 +506,20 @@ def get_business_invitations(
     business = _get_business_profile(db, user)
     campaign_ids = db.query(Campaign.id).filter(Campaign.business_profile_id == business.id)
 
-    query = db.query(CampaignInvitation).options(joinedload(CampaignInvitation.campaign)).filter(
-        CampaignInvitation.campaign_id.in_(campaign_ids),
+    count_stmt = select(func.count(CampaignInvitation.id)).where(
+        CampaignInvitation.campaign_id.in_(campaign_ids)
     )
-    total = query.count()
-    invitations = query.order_by(CampaignInvitation.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
+    total = db.scalar(count_stmt)
+
+    invitations = (
+        db.query(CampaignInvitation)
+        .options(joinedload(CampaignInvitation.campaign))
+        .filter(CampaignInvitation.campaign_id.in_(campaign_ids))
+        .order_by(CampaignInvitation.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
 
     items = []
     for inv in invitations:
@@ -467,11 +551,20 @@ def get_promoter_invitations(
     limit: int = 20,
 ) -> Tuple[List[CampaignInvitationWithCampaignRead], int]:
     promoter = _get_promoter_profile(db, user)
-    query = db.query(CampaignInvitation).options(joinedload(CampaignInvitation.campaign).joinedload(Campaign.business_profile)).filter(
-        CampaignInvitation.promoter_profile_id == promoter.id,
+    count_stmt = select(func.count(CampaignInvitation.id)).where(
+        CampaignInvitation.promoter_profile_id == promoter.id
     )
-    total = query.count()
-    invitations = query.order_by(CampaignInvitation.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
+    total = db.scalar(count_stmt)
+
+    invitations = (
+        db.query(CampaignInvitation)
+        .options(joinedload(CampaignInvitation.campaign).joinedload(Campaign.business_profile))
+        .filter(CampaignInvitation.promoter_profile_id == promoter.id)
+        .order_by(CampaignInvitation.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
 
     items = []
     for inv in invitations:
@@ -539,11 +632,20 @@ def get_business_collaborations(
     limit: int = 20,
 ) -> Tuple[List[CollaborationRead], int]:
     business = _get_business_profile(db, user)
-    query = db.query(Collaboration).options(joinedload(Collaboration.campaign), joinedload(Collaboration.promoter_profile)).filter(
-        Collaboration.business_profile_id == business.id,
+    count_stmt = select(func.count(Collaboration.id)).where(
+        Collaboration.business_profile_id == business.id
     )
-    total = query.count()
-    collaborations = query.order_by(Collaboration.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
+    total = db.scalar(count_stmt)
+
+    collaborations = (
+        db.query(Collaboration)
+        .options(joinedload(Collaboration.campaign), joinedload(Collaboration.promoter_profile))
+        .filter(Collaboration.business_profile_id == business.id)
+        .order_by(Collaboration.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
 
     items = []
     for collab in collaborations:
@@ -581,11 +683,20 @@ def get_promoter_collaborations(
     limit: int = 20,
 ) -> Tuple[List[CollaborationRead], int]:
     promoter = _get_promoter_profile(db, user)
-    query = db.query(Collaboration).options(joinedload(Collaboration.campaign), joinedload(Collaboration.business_profile)).filter(
-        Collaboration.promoter_profile_id == promoter.id,
+    count_stmt = select(func.count(Collaboration.id)).where(
+        Collaboration.promoter_profile_id == promoter.id
     )
-    total = query.count()
-    collaborations = query.order_by(Collaboration.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
+    total = db.scalar(count_stmt)
+
+    collaborations = (
+        db.query(Collaboration)
+        .options(joinedload(Collaboration.campaign), joinedload(Collaboration.business_profile))
+        .filter(Collaboration.promoter_profile_id == promoter.id)
+        .order_by(Collaboration.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
 
     items = []
     for collab in collaborations:

@@ -25,9 +25,10 @@ export const useApplyToCampaign = () => {
   return useMutation<void, Error, { campaignId: string; message?: string }>({
     mutationFn: ({ campaignId, message }) =>
       api.post(`/campaigns/${campaignId}/apply`, { message }),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: ["promoter-applications"] });
       qc.invalidateQueries({ queryKey: ["campaign-marketplace"] });
+      qc.invalidateQueries({ queryKey: ["campaign-applications", variables.campaignId] });
     },
   });
 };

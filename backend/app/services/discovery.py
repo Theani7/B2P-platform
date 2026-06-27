@@ -87,7 +87,10 @@ def search_promoters(
 def get_public_profile(db: Session, username: str) -> PromoterProfile:
     profile = (
         db.query(PromoterProfile)
-        .options(joinedload(PromoterProfile.portfolio_items), joinedload(PromoterProfile.social_links))
+        .options(
+            joinedload(PromoterProfile.portfolio_items),
+            joinedload(PromoterProfile.user).joinedload(User.social_links),
+        )
         .filter(PromoterProfile.username == username)
         .first()
     )

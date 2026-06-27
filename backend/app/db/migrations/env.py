@@ -3,6 +3,7 @@
 It pulls the SQLAlchemy engine from the application settings.
 """
 import sys
+from pathlib import Path
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -20,7 +21,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-sys.path.append("..")  # make app importable
+sys.path.append(str(Path(__file__).resolve().parents[3]))
 from app.db.base import Base  # noqa: E402
 from app.core.config import settings  # noqa: E402
 import app.models  # load all models so they register with Base.metadata
