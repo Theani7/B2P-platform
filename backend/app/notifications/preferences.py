@@ -11,7 +11,7 @@ class NotificationPreference(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     type = Column(String(50), nullable=False)
     enabled = Column(Boolean, nullable=False, server_default="true")
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), server_default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), onupdate=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="notification_preferences")

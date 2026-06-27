@@ -25,32 +25,11 @@ def upgrade():
         sa.Column('type', sa.String(length=50), nullable=False),
         sa.Column('enabled', sa.Boolean(), nullable=False, server_default=sa.true()),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+        sa.Column('updated_at', sa.DateTime(timezone=True), onupdate=sa.func.now()),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_notification_pref_user_type', 'notification_preferences', ['user_id', 'type'], unique=True)
-
-    op.execute("""
-    INSERT INTO notification_preferences (id, user_id, type, enabled, created_at, updated_at)
-    SELECT gen_random_uuid(), u.id, t.type, true, now(), now()
-    FROM users u
-    CROSS JOIN (VALUES
-        ('APPLICATION_RECEIVED'),
-        ('APPLICATION_ACCEPTED'),
-        ('APPLICATION_REJECTED'),
-        ('INVITATION_RECEIVED'),
-        ('INVITATION_ACCEPTED'),
-        ('INVITATION_DECLINED'),
-        ('NEW_MESSAGE'),
-        ('REVIEW_RECEIVED'),
-        ('COLLABORATION_STARTED'),
-        ('COLLABORATION_COMPLETED'),
-        ('CAMPAIGN_MATCH_READY'),
-        ('SYSTEM')
-    ) AS t(type)
-    ON CONFLICT (user_id, type) DO NOTHING
-    """)
 
 
 def downgrade():
