@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from uuid import UUID
-from typing import List, Dict, Any
+from typing import List
 from datetime import datetime
 from .models import Achievement, UserAchievement
 from .repository import AchievementRepository
@@ -125,14 +125,7 @@ class AchievementService:
                 # In websocket we check ACHIEVEMENT_UNLOCKED.
                 await self.notification_service.create_notification(notification)
                 
-                from app.notifications.connection_manager import manager as ws_manager
-                from .schemas import AchievementRead
-                await ws_manager.send_personal_message({
-                    "type": "ACHIEVEMENT_UNLOCKED",
-                    "data": {
-                        "achievement": AchievementRead.model_validate(achievement).model_dump(mode="json")
-                    }
-                }, user.id)
+
 
             elif not user_ach.earned_at and progress > user_ach.progress:
                 user_ach.progress = progress
