@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useCampaignMarketplace, useApplyToCampaign, useToggleBookmark } from "../features/collaboration/api";
+import { useCampaign } from "../features/campaigns/api";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
@@ -117,6 +118,9 @@ const MARKETPLACE_CATEGORIES = [
 ];
 
 export default function CampaignMarketplacePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const campaignIdParam = searchParams.get("campaignId");
+
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("created_at");
@@ -129,6 +133,14 @@ export default function CampaignMarketplacePage() {
   const [selectedCampaignTitle, setSelectedCampaignTitle] = useState("");
   const [applyMessage, setApplyMessage] = useState("");
   const [previewCampaign, setPreviewCampaign] = useState<any | null>(null);
+
+  const { data: campaignDetails } = useCampaign(campaignIdParam || "");
+
+  useEffect(() => {
+    if (campaignDetails) {
+      setPreviewCampaign(campaignDetails);
+    }
+  }, [campaignDetails]);
   const [bookmarkedCampaigns, setBookmarkedCampaigns] = useState<Set<string>>(new Set());
 
   const { data, isLoading } = useCampaignMarketplace({
@@ -507,7 +519,10 @@ export default function CampaignMarketplacePage() {
       {previewCampaign && (
         <CampaignPreviewModal 
           campaign={previewCampaign} 
-          onClose={() => setPreviewCampaign(null)} 
+          onClose={() => {
+            setPreviewCampaign(null);
+            setSearchParams({});
+          }} 
           onApply={(id, title) => {
             setSelectedCampaignId(id);
             setSelectedCampaignTitle(title);

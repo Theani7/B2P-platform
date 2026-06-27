@@ -268,7 +268,9 @@ def get_promoter_applications(
     limit: int = 20,
 ) -> Tuple[List[CampaignApplicationWithCampaignRead], int]:
     promoter = _get_promoter_profile(db, user)
-    query = db.query(CampaignApplication).options(joinedload(CampaignApplication.campaign)).filter(
+    query = db.query(CampaignApplication).options(
+        joinedload(CampaignApplication.campaign).joinedload(Campaign.business_profile)
+    ).filter(
         CampaignApplication.promoter_profile_id == promoter.id,
     )
     total = query.count()
@@ -290,6 +292,7 @@ def get_promoter_applications(
             campaign_budget=campaign.budget if campaign else 0.0,
             campaign_location=campaign.location if campaign else "",
             campaign_status=campaign.status.value if campaign else "",
+            business_name=campaign.business_profile.company_name if (campaign and campaign.business_profile) else "",
         ))
 
     return items, total

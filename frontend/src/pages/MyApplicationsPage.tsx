@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { usePromoterApplications, useWithdrawApplication } from "../features/collaboration/api";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
+import { Dialog } from "../components/ui/Dialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,7 +19,7 @@ const STATUS_CONFIG: Record<string, { color: string; icon: any; label: string }>
   WITHDRAWN: { color: "bg-gray-50 text-gray-600 ring-gray-600/20", icon: CircleDashed, label: "Withdrawn" },
 };
 
-function ApplicationMenu({ app, onWithdraw }: any) {
+function ApplicationMenu({ app, onWithdraw, onViewBusiness }: any) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -50,19 +51,33 @@ function ApplicationMenu({ app, onWithdraw }: any) {
             className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-20 py-1"
           >
             <button 
-              onClick={(e) => { e.stopPropagation(); setOpen(false); navigate(`/campaigns/${app.campaign_id}`); }}
+              onClick={(e) => { e.stopPropagation(); setOpen(false); navigate(`/promoter/marketplace?campaignId=${app.campaign_id}`); }}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
             >
               <Eye size={16} className="text-gray-400"/> View Campaign
             </button>
             <button 
-              onClick={(e) => { e.stopPropagation(); setOpen(false); notifySuccess("Business profile copied"); }}
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onViewBusiness(app); }}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
             >
               <Building2 size={16} className="text-gray-400"/> View Business
             </button>
             <button 
-              onClick={(e) => { e.stopPropagation(); setOpen(false); notifySuccess("Link copied"); }}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                setOpen(false); 
+                const shareUrl = `${window.location.origin}/promoter/marketplace?campaignId=${app.campaign_id}`;
+                if (navigator.share) {
+                  navigator.share({
+                    title: app.campaign_title,
+                    text: `Check out the campaign: ${app.campaign_title}`,
+                    url: shareUrl,
+                  }).catch(() => {});
+                } else {
+                  navigator.clipboard.writeText(shareUrl);
+                  notifySuccess("Campaign link copied to clipboard!");
+                }
+              }}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
             >
               <Share2 size={16} className="text-gray-400"/> Share
@@ -92,6 +107,7 @@ export default function MyApplicationsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
   const [withdrawConfirm, setWithdrawConfirm] = useState<string | null>(null);
+  const [selectedBusiness, setSelectedBusiness] = useState<any | null>(null);
 
   const navigate = useNavigate();
 
@@ -338,7 +354,11 @@ export default function MyApplicationsPage() {
                               View Collab
                             </button>
                           )}
-                          <ApplicationMenu app={app} onWithdraw={setWithdrawConfirm} />
+                          <ApplicationMenu 
+                            app={app} 
+                            onWithdraw={setWithdrawConfirm} 
+                            onViewBusiness={setSelectedBusiness} 
+                          />
                         </div>
                       </div>
                     </div>
@@ -433,6 +453,38 @@ export default function MyApplicationsPage() {
         title="Withdraw Application"
         message="Are you sure you want to withdraw this application? The business will be notified that you are no longer interested."
       />
+
+      {selectedBusiness && (
+        <Dialog
+          isOpen={!!selectedBusiness}
+          onClose={() => setSelectedBusiness(null)}
+          title="About the Business"
+          size="sm"
+        >
+          <div className="space-y-4">
+            <div>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Business Name</span>
+              <p className="text-sm font-semibold text-gray-900 mt-0.5">{selectedBusiness.business_name || "Business Profile"}</p>
+            </div>
+            <div>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Associated Campaign</span>
+              <p className="text-sm font-medium text-gray-700 mt-0.5">{selectedBusiness.campaign_title}</p>
+            </div>
+            <div>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Location</span>
+              <p className="text-sm text-gray-600 mt-0.5">{selectedBusiness.campaign_location || "Remote"}</p>
+            </div>
+            <div className="pt-4 border-t border-gray-100 flex justify-end">
+              <button 
+                onClick={() => setSelectedBusiness(null)}
+                className="h-10 px-5 rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </Dialog>
+      )}
     </div>
   );
 }

@@ -95,6 +95,7 @@ class CampaignApplicationWithCampaignRead(BaseModel):
     campaign_budget: float = 0.0
     campaign_location: str = ""
     campaign_status: str = ""
+    business_name: str = ""
 
     class Config:
         from_attributes = True
