@@ -12,10 +12,11 @@ import { NotificationCard } from "./NotificationCard";
 export function NotificationBell() {
   useNotificationWebSocket(); // Initialize websocket
   const [isOpen, setIsOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const { data: unreadCount } = useUnreadNotificationCount();
-  const { data: notificationsData, isLoading } = useNotifications(1, 10);
+  const { data: notificationsData, isLoading } = useNotifications(page, 10);
   const markAllRead = useMarkAllNotificationsRead();
 
   useEffect(() => {
@@ -80,6 +81,14 @@ export function NotificationBell() {
                     onClick={() => setIsOpen(false)}
                   />
                 ))}
+                {notifications.length >= 10 && page < 5 && (
+                  <button
+                    onClick={() => setPage(p => p + 1)}
+                    className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Show more
+                  </button>
+                )}
               </div>
             )}
           </div>
