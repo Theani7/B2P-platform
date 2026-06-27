@@ -7,6 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+from app.notifications.preferences import NotificationPreference  # noqa: F401
 
 class NotificationType(str, enum.Enum):
     APPLICATION_RECEIVED = "APPLICATION_RECEIVED"

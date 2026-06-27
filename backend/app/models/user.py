@@ -39,6 +39,7 @@ class User(Base):
     promoter_profile = relationship("PromoterProfile", back_populates="user", uselist=False)
     social_links = relationship("SocialLink", back_populates="user", cascade="all, delete-orphan", order_by="SocialLink.display_order")
     user_achievements = relationship("UserAchievement", back_populates="user", cascade="all, delete-orphan")
+    notification_preferences = relationship("NotificationPreference", back_populates="user", cascade="all, delete-orphan")
 
     @property
     def has_profile(self) -> bool:
