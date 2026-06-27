@@ -13,7 +13,7 @@ export function TopHeader() {
   const [isShareOpen, setIsShareOpen] = useState(false);
 
   return (
-    <header className="h-16 px-6 border-b border-gray-200 bg-white flex items-center justify-between sticky top-0 z-30">
+    <header className="h-16 px-6 border-b border-gray-200 bg-white flex items-center justify-between sticky top-0 z-40">
       <div className="flex-1 max-w-lg flex items-center">
         <CommandPalette />
       </div>
