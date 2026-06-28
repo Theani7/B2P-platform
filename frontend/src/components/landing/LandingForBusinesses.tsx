@@ -24,8 +24,8 @@ const item = {
 
 export default function LandingForBusinesses() {
   return (
-    <section id="businesses" className="py-20 lg:py-28 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="businesses" className="py-20 lg:py-28 bg-sky-wash">
+      <div className="max-w-[1200px] mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -33,22 +33,22 @@ export default function LandingForBusinesses() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p className="text-[11px] font-medium uppercase tracking-widest text-brand-indigo mb-4">
+            <p className="text-[11px] font-medium uppercase tracking-widest text-signal-blue mb-4">
               For businesses
             </p>
-            <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight mb-5">
+            <h2 className="text-2xl sm:text-3xl font-medium text-midnight-ink tracking-[-0.22px] mb-5">
               Launch campaigns that actually perform
             </h2>
-            <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-md">
+            <p className="text-sm text-slate leading-relaxed mb-8 max-w-md">
               Create a campaign in minutes, get matched with verified promoters, and manage the entire
               collaboration from a single dashboard. No more spreadsheets, no more WhatsApp groups.
             </p>
 
             <motion.ul variants={container} initial="hidden" whileInView="show" viewport={{ once: true }} className="flex flex-col gap-3 mb-8">
               {benefits.map((b) => (
-                <motion.li key={b} variants={item} className="flex items-start gap-3 text-sm text-gray-700">
-                  <span className="mt-0.5 w-5 h-5 rounded-full bg-brand-teal-50 border border-brand-teal-200 flex items-center justify-center flex-shrink-0">
-                    <Check size={12} className="text-brand-teal" />
+                <motion.li key={b} variants={item} className="flex items-start gap-3 text-sm text-graphite">
+                  <span className="mt-0.5 w-5 h-5 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center flex-shrink-0">
+                    <Check size={12} className="text-teal" />
                   </span>
                   {b}
                 </motion.li>
@@ -56,7 +56,7 @@ export default function LandingForBusinesses() {
             </motion.ul>
 
             <Link to="/register">
-              <Button size="lg" className="h-11 px-6">
+              <Button size="lg" variant="primary" className="h-11 px-6 border border-primary-action-accent text-primary-action-accent bg-white hover:bg-gray-50">
                 Start as a business
                 <ArrowRight size={16} className="ml-2" />
               </Button>
@@ -81,8 +81,8 @@ export default function LandingForBusinesses() {
 function BusinessMockup() {
   return (
     <div className="relative">
-      <div className="absolute -inset-4 bg-gradient-to-bl from-brand-indigo/5 to-brand-purple/5 rounded-3xl blur-2xl opacity-60" />
-      <div className="relative bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className="absolute -inset-4 bg-[rgba(20,90,255,0.1)] rounded-3xl blur-2xl opacity-60" />
+      <div className="relative bg-white border border-gray-200 rounded-2xl shadow-[rgba(0,0,0,0.1)_0px_0px_4px_-2px] overflow-hidden">
         <div className="flex items-center gap-1.5 px-4 py-3 border-b border-gray-100 bg-gray-50/50">
           <span className="w-3 h-3 rounded-full bg-gray-200" />
           <span className="w-3 h-3 rounded-full bg-gray-200" />
@@ -98,7 +98,7 @@ function BusinessMockup() {
             ].map((s) => (
               <div key={s.label} className="bg-white border border-gray-200 rounded-xl p-3">
                 <p className="text-[10px] text-gray-400 mb-1">{s.label}</p>
-                <p className="text-sm font-medium text-gray-900">{s.value}</p>
+                <p className="text-sm font-medium text-midnight-ink">{s.value}</p>
               </div>
             ))}
           </div>
@@ -111,16 +111,16 @@ function BusinessMockup() {
               ].map((a) => (
                 <div key={a.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-brand-purple-50 text-brand-purple-900 flex items-center justify-center text-[10px] font-medium">
+                    <div className="w-7 h-7 rounded-full bg-purple-50 text-purple-900 flex items-center justify-center text-[10px] font-medium">
                       {a.name.split(" ").map((n) => n[0]).join("")}
                     </div>
-                    <span className="text-xs text-gray-900">{a.name}</span>
+                    <span className="text-xs text-midnight-ink">{a.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-amber-50 text-brand-amber-900 border border-brand-amber-200">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-900 border border-amber-200">
                       {a.status}
                     </span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-teal-50 text-brand-teal-900 border border-brand-teal-200">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-teal-50 text-teal-900 border border-teal-200">
                       {a.match}%
                     </span>
                   </div>

@@ -22,21 +22,21 @@ const item = {
 
 export default function LandingTrust() {
   return (
-    <section className="py-16 bg-white border-y border-gray-100">
+    <section className="py-16 bg-white border-y border-gray-200">
       <motion.div
         variants={container}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: "-60px" }}
-        className="max-w-6xl mx-auto px-6"
+        className="max-w-[1200px] mx-auto px-6"
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat) => (
             <motion.div key={stat.label} variants={item} className="text-center">
-              <p className="text-3xl sm:text-4xl font-medium text-brand-purple mb-2 tracking-tight">
+              <p className="text-3xl sm:text-4xl font-medium text-midnight-ink mb-2 tracking-[-0.22px]">
                 {stat.value}
               </p>
-              <p className="text-xs text-gray-500 font-normal">{stat.label}</p>
+              <p className="text-[10px] text-slate font-normal">{stat.label}</p>
             </motion.div>
           ))}
         </div>

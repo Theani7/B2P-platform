@@ -10,11 +10,9 @@ import LandingShowcase from "../components/landing/LandingShowcase";
 import LandingCTA from "../components/landing/LandingCTA";
 import LandingFooter from "../components/landing/LandingFooter";
 
-import "./Landing.css";
-
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-linen-canvas">
       <LandingNav />
       <main>
         <LandingHero />
