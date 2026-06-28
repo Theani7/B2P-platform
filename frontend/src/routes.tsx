@@ -29,7 +29,6 @@ const CollaborationsPage = lazy(() => import("./pages/CollaborationsPage"));
 const CampaignMatchesPage = lazy(() => import("./pages/CampaignMatchesPage"));
 const MyReviewsPage = lazy(() => import("./pages/MyReviewsPage"));
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
-const PromoterSettingsPage = lazy(() => import("./pages/PromoterSettingsPage"));
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 
@@ -83,9 +82,9 @@ export default function AppRoutes() {
       <Route path="/business/dashboard" element={<ProtectedRoute role={Role.BUSINESS}><BusinessDashboard /></ProtectedRoute>} />
       <Route path="/business/profile" element={<ProtectedRoute role={Role.BUSINESS}><BusinessProfilePage /></ProtectedRoute>} />
       <Route path="/promoter/dashboard" element={<ProtectedRoute role={Role.PROMOTER}><PromoterDashboard /></ProtectedRoute>} />
-      <Route path="/promoter/profile" element={<ProtectedRoute role={Role.PROMOTER}><PromoterProfilePage /></ProtectedRoute>} />
-      <Route path="/promoters/:username" element={<PublicPromoterProfilePage />} />
-      <Route path="/business/campaigns" element={<ProtectedRoute role={Role.BUSINESS}><CampaignListPage /></ProtectedRoute>} />
+<Route path="/promoter/profile" element={<ProtectedRoute role={Role.PROMOTER}><PromoterProfilePage /></ProtectedRoute>} />
+       <Route path="/promoters/:username" element={<PublicPromoterProfilePage />} />
+       <Route path="/business/campaigns" element={<ProtectedRoute role={Role.BUSINESS}><CampaignListPage /></ProtectedRoute>} />
       <Route path="/business/campaigns/create" element={<ProtectedRoute role={Role.BUSINESS}><CreateCampaignPage /></ProtectedRoute>} />
       <Route path="/business/campaigns/:id" element={<ProtectedRoute role={Role.BUSINESS}><CampaignDetailsPage /></ProtectedRoute>} />
       <Route path="/business/campaigns/:id/edit" element={<ProtectedRoute role={Role.BUSINESS}><EditCampaignPage /></ProtectedRoute>} />
@@ -98,11 +97,10 @@ export default function AppRoutes() {
       <Route path="/promoter/marketplace" element={<ProtectedRoute role={Role.PROMOTER}><CampaignMarketplacePage /></ProtectedRoute>} />
       <Route path="/promoter/applications" element={<ProtectedRoute role={Role.PROMOTER}><MyApplicationsPage /></ProtectedRoute>} />
       <Route path="/promoter/invitations" element={<ProtectedRoute role={Role.PROMOTER}><PromoterInvitationsPage /></ProtectedRoute>} />
-      <Route path="/promoter/collaborations" element={<ProtectedRoute><CollaborationsPage /></ProtectedRoute>} />
-      <Route path="/my/reviews" element={<ProtectedRoute><MyReviewsPage /></ProtectedRoute>} />
-      <Route path="/users/:userId/reviews" element={<ProtectedRoute><UserReviewsPage /></ProtectedRoute>} />
-      <Route path="/promoter/settings" element={<ProtectedRoute role={Role.PROMOTER}><PromoterSettingsPage /></ProtectedRoute>} />
-      <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+<Route path="/promoter/collaborations" element={<ProtectedRoute><CollaborationsPage /></ProtectedRoute>} />
+<Route path="/my/reviews" element={<ProtectedRoute><MyReviewsPage /></ProtectedRoute>} />
+       <Route path="/users/:userId/reviews" element={<ProtectedRoute><UserReviewsPage /></ProtectedRoute>} />
+       <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
       <Route path="*" element={<RoleRedirect />} />
     </Routes>

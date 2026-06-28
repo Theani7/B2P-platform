@@ -9,7 +9,7 @@ interface SocialEditorProps {
   onClose: () => void;
 }
 
-const PLATFORMS = ["Instagram", "TikTok", "YouTube", "Facebook", "LinkedIn", "X", "Website", "Behance", "Dribbble", "GitHub"];
+const PLATFORMS = ["INSTAGRAM", "TIKTOK", "YOUTUBE", "FACEBOOK", "LINKEDIN", "X", "GITHUB", "WEBSITE"];
 
 export function SocialEditor({ item, onClose }: SocialEditorProps) {
   const isEditing = !!item;

@@ -15,6 +15,8 @@ class PlatformEnum(str, Enum):
     FACEBOOK = "FACEBOOK"
     LINKEDIN = "LINKEDIN"
     X = "X"
+    GITHUB = "GITHUB"
+    WEBSITE = "WEBSITE"
 
 
 class SocialLinkBase(BaseModel):
@@ -42,7 +44,7 @@ class SocialLinkUpdate(BaseModel):
 
 class SocialLinkRead(SocialLinkBase):
     id: uuid.UUID
-    promoter_profile_id: uuid.UUID
+    user_id: uuid.UUID
     created_at: datetime
 
     class Config:

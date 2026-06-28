@@ -65,4 +65,4 @@ export const usePublicPromoterProfile = (username: string) =>
 
 // Directory
 export const usePromoterDirectory = () =>
-  useQuery<{ items: PromoterProfileRead[] }>({ queryKey: ["promoter-directory"], queryFn: () => api.get("/directory/promoters").then(r => r.data) });
+  useQuery<{ items: PromoterProfileRead[] }>({ queryKey: ["promoter-directory"], queryFn: () => api.get("/promoters").then(r => r.data) });

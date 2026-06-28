@@ -1,6 +1,7 @@
 """Promoter profile routes."""
 from typing import Optional
-
+from datetime import datetime, timezone
+from sqlalchemy import func
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 
@@ -19,6 +20,11 @@ from ....services.promoter_profile import (
 )
 from ....services.discovery import search_promoters, get_public_profile
 from ....db.session import get_db
+from ....models.campaign_application import CampaignApplication
+from ....models.collaboration import Collaboration, CollaborationStatus
+from ....models.review import Review
+from ....models.portfolio_item import PortfolioItem
+
 
 router = APIRouter(prefix="/promoter", tags=["promoter"], dependencies=[Depends(require_role(Role.PROMOTER))])
 
@@ -42,6 +48,106 @@ def update_profile(payload: PromoterProfileUpdate, db: Session = Depends(get_db)
 def delete_profile_endpoint(db: Session = Depends(get_db), user=Depends(get_current_user)):
     delete_profile(db, user)
     return None
+
+
+@router.get("/analytics")
+def promoter_analytics(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    profile = user.promoter_profile
+    if not profile:
+        return {
+            "summary": {
+                "total_earnings": 0,
+                "pending_payouts": 0,
+                "active_collaborations": 0,
+                "completed_collaborations": 0,
+                "average_rating": 0,
+                "reviews_received": 0,
+                "invitations_pending": 0,
+                "applications_pending": 0,
+            },
+            "charts": {
+                "monthly_applications": [],
+                "monthly_collaborations": [],
+                "monthly_reviews": [],
+                "invitation_acceptance_trend": [],
+                "application_success_trend": [],
+                "rating_trend": [],
+                "category_breakdown": [],
+            },
+            "growth": {
+                "application_growth": 0,
+                "collaboration_growth": 0,
+            },
+            "recent": {},
+            "metadata": {
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "period": "30d",
+            },
+        }
+
+    total_applications = db.query(CampaignApplication).join(
+        Collaboration, CampaignApplication.collaboration_id == Collaboration.id
+    ).filter(Collaboration.promoter_profile_id == profile.id).count()
+
+    accepted_apps = db.query(CampaignApplication).join(
+        Collaboration, CampaignApplication.collaboration_id == Collaboration.id
+    ).filter(
+        Collaboration.promoter_profile_id == profile.id,
+        CampaignApplication.status == "ACCEPTED"
+    ).count()
+
+    pending_apps = db.query(CampaignApplication).join(
+        Collaboration, CampaignApplication.collaboration_id == Collaboration.id
+    ).filter(
+        Collaboration.promoter_profile_id == profile.id,
+        CampaignApplication.status == "PENDING"
+    ).count()
+
+    active_collabs = db.query(Collaboration).filter(
+        Collaboration.promoter_profile_id == profile.id,
+        Collaboration.status == CollaborationStatus.ACTIVE
+    ).count()
+
+    completed_collabs = db.query(Collaboration).filter(
+        Collaboration.promoter_profile_id == profile.id,
+        Collaboration.status == CollaborationStatus.COMPLETED
+    ).count()
+
+    reviews_received = db.query(Review).filter(Review.reviewee_id == user.id).count()
+    avg_rating = db.query(func.avg(Review.rating)).filter(Review.reviewee_id == user.id).scalar() or 0
+
+    portfolio_items = db.query(PortfolioItem).filter(PortfolioItem.promoter_profile_id == profile.id).count()
+
+    return {
+        "summary": {
+            "total_earnings": 0,
+            "pending_payouts": 0,
+            "active_collaborations": active_collabs,
+            "completed_collaborations": completed_collabs,
+            "average_rating": round(float(avg_rating), 1),
+            "reviews_received": reviews_received,
+            "invitations_pending": 0,
+            "applications_pending": pending_apps,
+        },
+        "charts": {
+            "monthly_applications": [],
+            "monthly_collaborations": [],
+            "monthly_reviews": [],
+            "invitation_acceptance_trend": [],
+            "application_success_trend": [],
+            "rating_trend": [],
+            "category_breakdown": [],
+        },
+        "growth": {
+            "application_growth": 0,
+            "collaboration_growth": 0,
+        },
+        "recent": {},
+        "metadata": {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "period": "30d",
+        },
+    }
 
 
 # Public profile endpoint (no auth required)

@@ -20,8 +20,7 @@ from .db.session import get_db
 from .api.v1.auth.routes import router as auth_router
 from .api.v1.business.routes import router as business_router
 from .api.v1.promoter.routes import router as promoter_router, public_router, directory_router
-from .api.v1.portfolio.routes import router as portfolio_router
-from .api.v1.social_links.routes import router as social_links_router
+from .portfolio.routes import router as portfolio_router
 from .api.v1.upload.routes import router as upload_router
 from .api.v1.campaign.routes import router as campaign_router
 from .api.v1.marketplace.routes import router as marketplace_router
@@ -32,13 +31,11 @@ from .api.v1.invitations.routes import promoter_router as promoter_invitation_ro
 from .api.v1.collaborations.routes import business_router as business_collab_router
 from .api.v1.collaborations.routes import promoter_router as promoter_collab_router
 from .api.v1.matching.routes import router as matching_router
-from .api.v1.reviews.routes import router as review_router
-from .api.v1.admin.routes import router as admin_router
-from .api.v1.promoter_verification.routes import router as promoter_verification_router
-from .api.v1.activity.routes import router as activity_router
-from .api.v1.profile_completion.routes import router as profile_completion_router
-from .api.v1.profile_completion.routes import router as profile_completion_router
-from .portfolio.routes import router as portfolio_router
+from .reviews.routes import router as review_router
+from .admin.routes import router as admin_router
+from .promoter_verification.routes import router as promoter_verification_router
+from .activity.routes import router as activity_router
+from .profile_completion.routes import router as profile_completion_router
 from .social.routes import router as social_router
 from .chat.routes import router as chat_router
 from .notifications.routes import router as notifications_router
@@ -112,7 +109,6 @@ app.include_router(promoter_router, prefix=settings.API_V1_STR)
 app.include_router(public_router, prefix=settings.API_V1_STR)
 app.include_router(directory_router, prefix=settings.API_V1_STR)
 app.include_router(portfolio_router, prefix=settings.API_V1_STR)
-app.include_router(social_links_router, prefix=settings.API_V1_STR)
 app.include_router(upload_router, prefix=settings.API_V1_STR)
 app.include_router(campaign_router, prefix=settings.API_V1_STR)
 app.include_router(marketplace_router, prefix=settings.API_V1_STR)
@@ -128,8 +124,7 @@ app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(promoter_verification_router, prefix=settings.API_V1_STR)
 app.include_router(activity_router, prefix=f"{settings.API_V1_STR}/activity", tags=["activity"])
 app.include_router(profile_completion_router, prefix=f"{settings.API_V1_STR}/profile-completion", tags=["profile-completion"])
-app.include_router(portfolio_router, prefix=f"{settings.API_V1_STR}/portfolio", tags=["portfolio"])
-app.include_router(social_router, prefix=f"{settings.API_V1_STR}")
+app.include_router(social_router, prefix=settings.API_V1_STR, tags=["social-links"])
 app.include_router(chat_router, prefix=f"{settings.API_V1_STR}/chat", tags=["chat"])
 app.include_router(notifications_router, prefix=f"{settings.API_V1_STR}/notifications", tags=["notifications"])
 app.include_router(achievements_router, prefix=f"{settings.API_V1_STR}/achievements", tags=["achievements"])

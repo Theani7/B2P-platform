@@ -46,7 +46,7 @@ export default function PublicPromoterProfilePage() {
   if (!profile) {
     return (
       <div className="mx-auto max-w-3xl p-6 text-center">
-        <h1 className="text-2xl font-bold text-text">Promoter not found</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Promoter not found</h1>
         <Link to="/business/promoters" className="mt-4 inline-block text-primary hover:underline">
           Back to directory
         </Link>
@@ -73,7 +73,7 @@ export default function PublicPromoterProfilePage() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-text">{profile.username}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">{profile.username}</h1>
                   {profile.verified && (
                     <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
                       Verified
@@ -120,10 +120,10 @@ export default function PublicPromoterProfilePage() {
 
       {ratingSummary && ratingSummary.total_reviews > 0 && (
         <div className="rounded-lg border bg-white p-6">
-          <h2 className="mb-3 text-lg font-semibold text-text">Rating & Reviews</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-900">Rating & Reviews</h2>
           <div className="flex items-center space-x-4">
             <div className="text-center">
-              <div className="text-3xl font-bold text-text">{ratingSummary.average_rating}</div>
+              <div className="text-3xl font-bold text-gray-900">{ratingSummary.average_rating}</div>
               <RatingStars rating={ratingSummary.average_rating} size="sm" />
               <p className="mt-1 text-sm text-gray-500">{ratingSummary.total_reviews} review{ratingSummary.total_reviews !== 1 ? "s" : ""}</p>
             </div>
@@ -150,7 +150,7 @@ export default function PublicPromoterProfilePage() {
         <div className="rounded-lg border bg-white p-6">
           <div className="flex items-center gap-2 mb-6">
             <Trophy size={20} className="text-primary-600" />
-            <h2 className="text-lg font-semibold text-text">Creator Achievements</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Creator Achievements</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {achievementsData.achievements.filter(a => a.earned_at).slice(0, 4).map(ua => (
@@ -162,7 +162,7 @@ export default function PublicPromoterProfilePage() {
 
       {profile.bio && (
         <div className="rounded-lg border bg-white p-6">
-          <h2 className="mb-3 text-lg font-semibold text-text">About</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-900">About</h2>
           <p className="whitespace-pre-wrap text-gray-700">{profile.bio}</p>
         </div>
       )}
@@ -176,7 +176,7 @@ export default function PublicPromoterProfilePage() {
 
       {profile.social_links && profile.social_links.length > 0 && (
         <div className="rounded-lg border bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-text">Social Links</h2>
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">Social Links</h2>
           <div className="flex flex-wrap gap-3">
             {profile.social_links.map((link) => (
               <a
