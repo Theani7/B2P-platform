@@ -11,7 +11,7 @@ import { formatNepaliCurrency } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2, XCircle, Clock, Star, TrendingUp,
-  Wallet, MessageCircle, Eye, Download, Filter,
+  Wallet, MessageCircle, Download, Filter,
   Building2, Briefcase, UserCheck, MoreVertical, Search as SearchIcon
 } from "lucide-react";
 
