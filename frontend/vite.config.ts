@@ -16,6 +16,22 @@ export default defineConfig({
         target: "http://localhost:8000",
         changeOrigin: true,
       },
+      "/avatars": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "/portfolio": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "/exports": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "/uploads": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
     },
   },
   test: {

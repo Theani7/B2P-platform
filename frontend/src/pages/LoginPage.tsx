@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLogin } from "../features/auth/api";
 import { useAuth } from "../providers/AuthProvider";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import AuthLayout from "../layouts/AuthLayout";
 import { Input } from "../components/ui/Input";
@@ -31,9 +31,9 @@ export default function LoginPage() {
   // Redirect if already logged in or after login
   if (authLoading) return null;
   if (user) {
-    if (user.role === "BUSINESS") { navigate("/business/dashboard", { replace: true }); return null; }
-    if (user.role === "PROMOTER") { navigate("/promoter/dashboard", { replace: true }); return null; }
-    if (user.role === "ADMIN") { navigate("/admin", { replace: true }); return null; }
+    if (user.role === "BUSINESS") return <Navigate to="/business/dashboard" replace />;
+    if (user.role === "PROMOTER") return <Navigate to="/promoter/dashboard" replace />;
+    if (user.role === "ADMIN") return <Navigate to="/admin" replace />;
   }
 
   const onSubmit = (data: FormValues) => {

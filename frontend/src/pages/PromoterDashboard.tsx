@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../providers/AuthProvider";
 import { usePromoterInvitations, usePromoterCollaborations } from "../features/collaboration/api";
 import { usePromoterAnalytics } from "../features/analytics/api";
-import { useUploadAvatar, useUpsertPromoterProfile } from "../features/profile";
+import { usePromoterProfile, useUploadAvatar, useUpsertPromoterProfile } from "../features/profile";
 
 import { Avatar, StatCard } from "../components/ui";
 import { formatNepaliCurrency } from "../utils/currency";
@@ -42,6 +42,7 @@ export default function PromoterDashboard() {
   const { data: analytics } = usePromoterAnalytics();
   const { data: activityData, isLoading: activityLoading } = useMyActivity({ size: 5 });
   const { data: profileCompletion, isLoading: completionLoading } = usePromoterProfileCompletion();
+  const { data: profile } = usePromoterProfile();
 
   const pendingInvites = analytics?.summary?.invitations_pending ?? 0;
   const activeCollabs = analytics?.summary?.active_collaborations ?? 0;
@@ -82,7 +83,7 @@ export default function PromoterDashboard() {
                      <LoadingSpinner />
                    </div>
                  ) : (
-                   <Avatar initials={user?.full_name?.[0]?.toUpperCase() ?? "P"} size="lg" className="w-24 h-24 text-2xl ring-4 ring-white shadow-sm bg-white" colorIndex={2} />
+                   <Avatar src={profile?.avatar_url} initials={user?.full_name?.[0]?.toUpperCase() ?? "P"} size="lg" className="w-24 h-24 text-2xl ring-4 ring-white shadow-sm bg-white" colorIndex={2} />
                  )}
                  <button
                    type="button"

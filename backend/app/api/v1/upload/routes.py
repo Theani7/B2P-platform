@@ -7,7 +7,7 @@ from ....core.role import Role
 from ....db.session import get_db
 from ....utils.upload import save_upload
 
-router = APIRouter(prefix="/upload", tags=["upload"], dependencies=[Depends(require_role(Role.PROMOTER))])
+router = APIRouter(prefix="/upload", tags=["upload"])
 
 
 @router.post("/avatar")

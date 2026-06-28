@@ -9,7 +9,7 @@ export const uploadAvatar = async (file: File): Promise<string> => {
   const { data } = await api.post("/upload/avatar", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-  return data.url;
+  return data.data?.url || data.url;
 };
 
 export const uploadLogo = async (file: File): Promise<string> => {
@@ -18,7 +18,7 @@ export const uploadLogo = async (file: File): Promise<string> => {
   const { data } = await api.post("/upload/logo", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-  return data.url;
+  return data.data?.url || data.url;
 };
 
 // Business profile hooks
@@ -55,6 +55,11 @@ export const useUpsertPromoterProfile = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["promoter-profile"] });
       qc.invalidateQueries({ queryKey: ["me"] });
+    },
+    onError: (err: any) => {
+      import("../../hooks/useToast").then(({ notifyError }) => {
+        notifyError(err?.response?.data?.detail || err?.response?.data?.message || "Failed to update profile");
+      });
     },
   });
   return updateProfile;

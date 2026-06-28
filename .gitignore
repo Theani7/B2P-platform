@@ -11,6 +11,8 @@ backend/tests/
 # Documentation (generated/agent docs)
 docs/*.md
 docs/superpowers/
+DESIGN.md
+B2P_FRONTEND_DESIGN.md
 
 # Setup/config files (project-specific)
 .pre-commit-config.yaml
