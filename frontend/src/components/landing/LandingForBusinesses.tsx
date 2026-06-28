@@ -57,8 +57,10 @@ export default function LandingForBusinesses() {
 
             <Link to="/register">
               <Button size="lg" className="h-11 px-6">
-                Start as a business
-                <ArrowRight size={16} className="ml-2" />
+                <span className="flex items-center gap-2">
+                  <span>Start as a business</span>
+                  <ArrowRight size={16} />
+                </span>
               </Button>
             </Link>
           </motion.div>

@@ -75,9 +75,11 @@ export default function LandingFeatures() {
           className="text-center mt-12"
         >
           <Link to="/register">
-            <Button variant="secondary" size="md" className="gap-2">
-              Explore the platform
-              <ArrowRight size={14} />
+            <Button variant="secondary" size="md" className="gap-1">
+              <span className="flex items-center">
+                <span>Explore the platform</span>
+                <ArrowRight size={14} className="ml-1" />
+              </span>
             </Button>
           </Link>
         </motion.div>

@@ -15,11 +15,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
-  cta: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
-  secondary: "bg-white border border-stone-100 text-stone-900 rounded-lg px-4 py-2 text-sm hover:bg-stone-100 transition-colors",
-  "ghost-teal": "bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors",
-  "ghost-destructive": "bg-brand-coral-50 text-brand-coral-900 border border-coral-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-coral-100 transition-colors",
+  primary: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity inline-flex items-center whitespace-nowrap",
+  cta: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity inline-flex items-center whitespace-nowrap",
+  secondary: "bg-white border border-stone-100 text-stone-900 rounded-lg px-4 py-2 text-sm hover:bg-stone-100 transition-colors inline-flex items-center whitespace-nowrap",
+  "ghost-teal": "bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors inline-flex items-center whitespace-nowrap",
+  "ghost-destructive": "bg-brand-coral-50 text-brand-coral-900 border border-coral-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-coral-100 transition-colors inline-flex items-center whitespace-nowrap",
   icon: "p-2 rounded-lg hover:bg-stone-100 text-stone-900 hover:text-brand-purple transition-colors",
 };
 

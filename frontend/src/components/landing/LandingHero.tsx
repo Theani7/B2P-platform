@@ -38,8 +38,10 @@ export default function LandingHero() {
             <div className="flex flex-wrap items-center gap-4">
               <Link to="/register">
                 <Button size="lg" className="h-12 px-6 text-base">
-                  Get started
-                  <ArrowRight size={16} className="ml-2" />
+                  <span className="flex items-center gap-2">
+                    <span>Get started</span>
+                    <ArrowRight size={16} />
+                  </span>
                 </Button>
               </Link>
             </div>
