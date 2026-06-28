@@ -20,6 +20,43 @@ export function MessageBubble({ message, isOwn, senderAvatar }: MessageBubblePro
     );
   }
 
+  if (message.message_type === "IMAGE") {
+    return (
+      <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-4`}>
+        {!isOwn && (
+          <div className="w-7 h-7 rounded-full mr-2 mt-1 flex-shrink-0 overflow-hidden bg-gray-100">
+            {senderAvatar ? (
+              <img src={senderAvatar} alt="" className="w-full h-full rounded-full object-cover" />
+            ) : (
+              <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-medium" />
+            )}
+          </div>
+        )}
+        <div className="flex flex-col max-w-[75%] items-end">
+          <div 
+            className={`px-2 py-2 rounded-2xl ${
+              isOwn 
+                ? "bg-primary-600 text-white rounded-br-sm" 
+                : "bg-gray-100 text-gray-900 rounded-bl-sm"
+            }`}
+          >
+            <img src={message.message} alt="Shared image" className="max-w-64 max-h-48 rounded-lg object-cover" />
+          </div>
+          <div className="flex items-center gap-1 mt-1 px-1">
+            <span className="text-[10px] text-gray-400 font-medium">
+              {format(new Date(message.created_at), "h:mm a")}
+            </span>
+            {isOwn && (
+              <span className="text-gray-400">
+                {message.read_at ? <CheckCheck size={14} className="text-primary-500" /> : <Check size={14} />}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-4`}>
       {!isOwn && (

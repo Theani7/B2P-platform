@@ -53,7 +53,7 @@ export function ChatSidebar({ activeId, onSelect, currentUserId }: ChatSidebarPr
                   )}
                 </div>
                 <p className={`text-xs truncate mt-0.5 ${conv.unread_count > 0 ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
-                  {conv.last_message?.message || "No messages yet"}
+                  {conv.last_message?.message_type === "IMAGE" ? "📷 Image" : (conv.last_message?.message || "No messages yet")}
                 </p>
               </div>
             </button>

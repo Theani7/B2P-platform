@@ -4,7 +4,7 @@ import { MessageBubble } from "./MessageBubble";
 import { MessageComposer } from "./MessageComposer";
 import { TypingIndicator } from "./TypingIndicator";
 import { useChatWebSocket, useConversationHistory, useMarkConversationRead, Conversation, Message } from "../../features/chat";
-import { Phone, Video, Info, Search } from "lucide-react";
+import { Phone, Video, Info, Search, WifiOff, AlertTriangle } from "lucide-react";
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -16,7 +16,7 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
   const markRead = useMarkConversationRead();
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  const { isConnected, lastMessage, sendMessage } = useChatWebSocket(conversation.id, token || undefined);
+  const { isConnected, lastMessage, sendMessage, error: wsError } = useChatWebSocket(conversation.id, token || undefined);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isOtherTyping, setIsOtherTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
@@ -33,7 +33,7 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
   // Load history
   useEffect(() => {
     if (data?.pages) {
-      const allMessages = data.pages.flatMap(page => page.messages).reverse(); // Oldest to newest
+      const allMessages = data.pages.flatMap(page => page.messages).reverse();
       setMessages(allMessages);
     }
   }, [data]);
@@ -92,6 +92,13 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
     });
   };
 
+  const handleTypingStop = () => {
+    sendMessage({
+      type: "TYPING_STOP",
+      payload: {}
+    });
+  };
+
   // Scroll to fetch more
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (e.currentTarget.scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
@@ -107,6 +114,11 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
           <img src={otherParticipant?.avatar || "/default-avatar.png"} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
           <div>
             <h2 className="text-sm font-bold text-gray-900">{otherParticipant?.name || "Unknown"}</h2>
+            {!isConnected && (
+              <div className="flex items-center gap-1 text-xs text-gray-400">
+                <WifiOff size={12} /> Reconnecting...
+              </div>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-3 text-gray-400">
@@ -121,17 +133,23 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
         onScroll={handleScroll}
         ref={scrollRef}
       >
+        {wsError && (
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-lg text-xs mb-4 flex items-center gap-2">
+            <AlertTriangle size={14} />
+            Connection issue: {wsError}
+          </div>
+        )}
         {isFetchingNextPage && <div className="text-center text-xs text-gray-400 my-2">Loading older messages...</div>}
         
-{messages.map((msg) => (
-           <MessageBubble key={msg.id} message={msg} isOwn={msg.sender_id === user?.id} senderAvatar={senderAvatars[msg.sender_id] || (msg as any).sender_avatar} />
-         ))}
+        {messages.map((msg) => (
+          <MessageBubble key={msg.id} message={msg} isOwn={msg.sender_id === user?.id} senderAvatar={senderAvatars[msg.sender_id] || (msg as any).sender_avatar} />
+        ))}
         
         {isOtherTyping && <TypingIndicator />}
       </div>
 
       {/* Input */}
-      <MessageComposer onSend={handleSend} onTyping={handleTyping} />
+      <MessageComposer onSend={handleSend} onTyping={handleTyping} onTypingStop={handleTypingStop} disabled={!isConnected} />
     </div>
   );
 }
