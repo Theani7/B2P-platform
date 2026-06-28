@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 interface DialogProps {
   isOpen: boolean;
@@ -20,8 +21,8 @@ const sizeClasses = {
 export function Dialog({ isOpen, onClose, title, description, children, footer, size = "md" }: DialogProps) {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4" role="dialog" aria-modal="true" aria-labelledby={description ? undefined : title}>
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/20 p-4" role="dialog" aria-modal="true" aria-labelledby={description ? undefined : title}>
       <div
         className={`w-full ${sizeClasses[size]} bg-white rounded-2xl`}
         onClick={(e) => e.stopPropagation()}
@@ -44,6 +45,7 @@ export function Dialog({ isOpen, onClose, title, description, children, footer, 
         <div className="p-5">{children}</div>
         {footer && <div className="flex gap-3 justify-end p-5 border-t border-gray-100">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

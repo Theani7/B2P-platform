@@ -198,7 +198,6 @@ export default function PromoterInvitationsPage() {
                     key={inv.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    style={{ zIndex: 100 - index, position: 'relative' }}
                     className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-200 hover:shadow-lg hover:ring-primary-200 transition-all flex flex-col"
                   >
                     
