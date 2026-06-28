@@ -63,3 +63,5 @@ frontend/playwright-report/
 *.ntvs*
 *.njsproj
 *.sln
+# Uploads
+uploads/

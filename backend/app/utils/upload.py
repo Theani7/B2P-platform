@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import UploadFile, HTTPException, status
 
 
-UPLOAD_BASE = Path(__file__).resolve().parent.parent.parent.parent / "uploads"
+UPLOAD_BASE = Path(__file__).resolve().parent.parent.parent / "uploads"
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 
@@ -26,6 +26,8 @@ def save_upload(file: UploadFile, subfolder: str) -> str:
     path = folder / filename
     content = file.file.read()
     path.write_bytes(content)
+    if subfolder == "avatars":
+        return f"/avatars/{filename}"
     return f"/uploads/{subfolder}/{filename}"
 
 

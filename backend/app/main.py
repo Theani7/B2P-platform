@@ -96,8 +96,9 @@ app.add_middleware(
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware, limit=settings.RATE_LIMIT_AUTH, window=60)
 
-# Serve static files (Portfolio Media & Exports)
+# Serve static files (Portfolio Media, Exports, Avatars)
 app.mount("/portfolio/media", StaticFiles(directory="uploads/portfolio"), name="portfolio_media")
+app.mount("/avatars", StaticFiles(directory="uploads/avatars"), name="avatars")
 os.makedirs("uploads/exports", exist_ok=True)
 app.mount("/exports", StaticFiles(directory="uploads/exports"), name="exports")
 
