@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from ..models.collaboration import Collaboration, CollaborationStatus
 from ..models.review import Review
 from ..models.user import User
-from ..schemas.review import ReviewRead, ReviewerInfo, RatingSummary, RatingDistribution
+from ..schemas.review import ReviewRead, ReviewerInfo, RatingSummary, RatingDistribution, ReceivedReviewRead
 from app.notifications.service import NotificationService
 from app.notifications.schemas import NotificationCreate
 from app.notifications.models import NotificationType
@@ -168,6 +168,37 @@ def get_my_reviews(db: Session, user: User, page: int = 1, limit: int = 20) -> T
             comment=r.comment,
             created_at=r.created_at,
             updated_at=r.updated_at,
+        ))
+    return items, total
+
+
+def get_received_reviews(db: Session, user_id: str, page: int = 1, limit: int = 20) -> Tuple[List[ReceivedReviewRead], int]:
+    """Get reviews received by a user (where they are the reviewee)."""
+    query = db.query(Review).options(
+        joinedload(Review.reviewer),
+        joinedload(Review.collaboration).joinedload(Collaboration.campaign),
+        joinedload(Review.collaboration).joinedload(Collaboration.business_profile)
+    ).filter(Review.reviewee_id == user_id)
+
+    total = query.count()
+    reviews = query.order_by(desc(Review.created_at)).offset((page - 1) * limit).limit(limit).all()
+
+    items = []
+    for r in reviews:
+        if not r.reviewer:
+            continue
+        business_profile = r.collaboration.business_profile if r.collaboration else None
+        campaign = r.collaboration.campaign if r.collaboration else None
+        items.append(ReceivedReviewRead(
+            id=r.id,
+            collaboration_id=r.collaboration_id,
+            reviewer=_get_user_info(r.reviewer),
+            rating=r.rating,
+            comment=r.comment,
+            created_at=r.created_at,
+            updated_at=r.updated_at,
+            business_name=business_profile.company_name if business_profile else "Unknown Business",
+            campaign_title=campaign.title if campaign else "Unknown Campaign",
         ))
     return items, total
 

@@ -47,6 +47,29 @@ class ReviewListResponse(BaseModel):
     pages: int
 
 
+class ReceivedReviewRead(BaseModel):
+    id: uuid.UUID
+    collaboration_id: uuid.UUID
+    reviewer: ReviewerInfo
+    rating: int
+    comment: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    business_name: str
+    campaign_title: str
+
+    class Config:
+        from_attributes = True
+
+
+class ReceivedReviewListResponse(BaseModel):
+    items: List[ReceivedReviewRead]
+    total: int
+    page: int
+    limit: int
+    pages: int
+
+
 class RatingDistribution(BaseModel):
     star_1: int = 0
     star_2: int = 0
@@ -59,3 +82,6 @@ class RatingSummary(BaseModel):
     average_rating: float = 0.0
     total_reviews: int = 0
     distribution: RatingDistribution
+
+    class Config:
+        from_attributes = True

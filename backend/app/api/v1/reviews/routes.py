@@ -11,12 +11,15 @@ from ....schemas.review import (
     ReviewRead,
     ReviewListResponse,
     RatingSummary,
+    ReceivedReviewRead,
+    ReceivedReviewListResponse,
 )
 from ....services.review import (
     create_review,
     update_review,
     delete_review,
     get_my_reviews,
+    get_received_reviews,
     get_user_reviews,
     get_rating_summary,
     complete_collaboration,
@@ -65,6 +68,23 @@ def my_reviews(
 ):
     items, total = get_my_reviews(db, user, page=page, limit=limit)
     return ReviewListResponse(
+        items=items,
+        total=total,
+        page=page,
+        limit=limit,
+        pages=max(1, (total + limit - 1) // limit),
+    )
+
+
+@router.get("/my/received-reviews", response_model=ReceivedReviewListResponse)
+def my_received_reviews(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    items, total = get_received_reviews(db, str(user.id), page=page, limit=limit)
+    return ReceivedReviewListResponse(
         items=items,
         total=total,
         page=page,
