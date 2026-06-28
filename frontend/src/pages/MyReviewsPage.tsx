@@ -1,30 +1,33 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
-import { useMyReviews, useDeleteReview, useUpdateReview, useUserRating } from "../features/reviews/api";
+import { useMyReviews, useDeleteReview, useUpdateReview, useMyReceivedReviews, useUserRating } from "../features/reviews/api";
 import ReviewFormDialog from "../components/reviews/ReviewFormDialog";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 
 import { motion } from "framer-motion";
 import {
-  Star, BadgeCheck, Calendar, Award, Medal, Sparkles, MessageSquare, Eye, Edit, Trash2,
-  BarChart3, Search, ChevronLeft, ChevronRight, Briefcase, CheckCircle2
+  Star, BadgeCheck, Calendar, BarChart3, ChevronLeft, ChevronRight, Briefcase, Edit, Trash2, MessageSquare, Eye
 } from "lucide-react";
+
+type TabType = "received" | "given";
 
 export default function MyReviewsPage() {
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<TabType>("received");
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const { data: ratingData } = useUserRating(user?.id || "");
-  const { data: reviewsData, isLoading } = useMyReviews({ page, limit: 10 });
+  const { data: receivedData, isLoading: receivedLoading } = useMyReceivedReviews({ page, limit: 10 });
+  const { data: reviewsData, isLoading: reviewsLoading } = useMyReviews({ page, limit: 10 });
   const deleteReview = useDeleteReview();
   const updateReview = useUpdateReview();
+
+  const isLoading = activeTab === "received" ? receivedLoading : reviewsLoading;
+  const currentData = activeTab === "received" ? receivedData : reviewsData;
 
   const handleDelete = () => {
     if (!deleteConfirm) return;
@@ -42,250 +45,276 @@ export default function MyReviewsPage() {
     });
   };
 
-  const currentEditItem = editingId && reviewsData ? reviewsData.items.find((r:any) => r.id === editingId) : null;
+  const currentEditItem = editingId && reviewsData ? reviewsData.items.find((r: any) => r.id === editingId) : null;
 
-  // Mock distribution removed as API doesn't provide it yet
+  const renderStars = (rating: number) => (
+    <div className="flex gap-1 text-amber-400">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star key={i} size={16} className={i <= rating ? "fill-amber-400" : "fill-gray-100 text-gray-100"} />
+      ))}
+    </div>
+  );
+
+  const renderRatingDistribution = (distribution: { star_1: number; star_2: number; star_3: number; star_4: number; star_5: number } | undefined) => {
+    if (!distribution) return null;
+    const total = Object.values(distribution).reduce((sum, v) => sum + v, 0);
+    if (total === 0) return <p className="text-xs text-gray-500">No reviews yet</p>;
+
+    return (
+      <div className="space-y-2">
+        {[5, 4, 3, 2, 1].map((star) => {
+          const count = distribution[`star_${star}` as keyof typeof distribution] as number;
+          const pct = (count / total) * 100;
+          return (
+            <div key={star} className="flex items-center gap-2 text-xs">
+              <span className="w-8 text-gray-600">{star} star</span>
+              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+              </div>
+              <span className="w-8 text-right text-gray-500">{count}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
       
-      {/* 1. PREMIUM HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl shadow-sm ring-1 ring-gray-200 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-50/50 via-white to-white">
+      {/* Page Header with Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl shadow-sm ring-1 ring-gray-200">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">My Reputation</h1>
-          <p className="text-sm text-gray-500 mt-2 max-w-xl">Manage your creator reputation, track your performance, and review past client feedback.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">My Reviews</h1>
+          <p className="text-sm text-gray-500 mt-2 max-w-xl">Manage your creator reputation and review history.</p>
         </div>
-        <div className="flex items-center gap-3">
-
-          <Link
-            to={`/profile/${user?.id}`}
-            className="inline-flex items-center gap-2 bg-gray-900 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm"
-          >
-            <Eye size={16} /> View Public Profile
-          </Link>
-        </div>
+        <Link
+          to={`/profile/${user?.id}`}
+          className="inline-flex items-center gap-2 bg-gray-900 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm"
+        >
+          <Eye size={16} /> View Public Profile
+        </Link>
       </div>
 
-      {/* 2. REPUTATION OVERVIEW & DISTRIBUTION */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Main Score Card */}
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8 flex flex-col items-center justify-center text-center">
-          <h2 className="text-sm font-bold text-gray-900 mb-6">Overall Trust Score</h2>
-          <div className="relative mb-4">
-            <div className="w-32 h-32 rounded-full border-8 border-amber-100 flex items-center justify-center">
-              <span className="text-4xl font-black text-gray-900 tracking-tighter">{ratingData?.average_rating?.toFixed(1) || "0.0"}</span>
+      {/* Tab Navigation */}
+      <div className="flex gap-1 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab("received")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "received"
+              ? "text-brand-purple border-b-2 border-brand-purple"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Ratings Received
+        </button>
+        <button
+          onClick={() => setActiveTab("given")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "given"
+              ? "text-brand-purple border-b-2 border-brand-purple"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Reviews Given
+        </button>
+      </div>
+
+      {/* Stats Overview for Ratings Received Tab */}
+      {activeTab === "received" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Overall Score */}
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8 flex flex-col items-center justify-center text-center">
+            <h2 className="text-sm font-bold text-gray-900 mb-6">Overall Trust Score</h2>
+            <div className="relative mb-4">
+              <div className="w-32 h-32 rounded-full border-8 border-amber-100 flex items-center justify-center">
+                <span className="text-4xl font-black text-gray-900 tracking-tighter">{ratingData?.average_rating?.toFixed(1) || "0.0"}</span>
+              </div>
+              <div className="absolute -bottom-2 -right-2 bg-amber-400 text-white w-10 h-10 rounded-full flex items-center justify-center border-4 border-white shadow-sm">
+                <Star size={18} className="fill-white" />
+              </div>
             </div>
-            <div className="absolute -bottom-2 -right-2 bg-amber-400 text-white w-10 h-10 rounded-full flex items-center justify-center border-4 border-white shadow-sm">
-              <Star size={18} className="fill-white" />
-            </div>
+            {renderStars(Math.round(ratingData?.average_rating || 0))}
+            <p className="text-sm font-medium text-gray-500">Based on {ratingData?.total_reviews || 0} reviews</p>
           </div>
-          <div className="flex gap-1 mb-2 text-amber-400">
-            {[1,2,3,4,5].map(i => (
-              <Star key={i} size={20} className={i <= Math.round(ratingData?.average_rating || 0) ? "fill-amber-400" : "fill-gray-100 text-gray-100"} />
+
+          {/* Rating Distribution */}
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8 flex flex-col items-center justify-center text-center">
+            <BarChart3 size={32} className="text-gray-300 mb-3" />
+            <h2 className="text-sm font-bold text-gray-900 mb-4">Rating Distribution</h2>
+            {ratingData?.distribution ? renderRatingDistribution(ratingData.distribution) : <p className="text-xs text-gray-500">Distribution analytics are currently unavailable.</p>}
+          </div>
+        </div>
+      )}
+
+      {/* Reviews List */}
+      <div className="space-y-4">
+        {isLoading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl h-48 animate-pulse ring-1 ring-gray-100" />
             ))}
           </div>
-          <p className="text-sm font-medium text-gray-500">Based on {ratingData?.total_reviews || 0} reviews</p>
-        </div>
-
-        {/* Rating Distribution */}
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8 flex flex-col items-center justify-center text-center">
-          <BarChart3 size={32} className="text-gray-300 mb-3" />
-          <h2 className="text-sm font-bold text-gray-900 mb-1">Rating Distribution</h2>
-          <p className="text-xs text-gray-500">Distribution analytics are currently unavailable.</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-        
-        {/* MAIN COLUMN (8 cols) */}
-        <div className="xl:col-span-8 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">Reviews You've Written</h2>
+        ) : !currentData || currentData.items.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-4">
+              <MessageSquare size={32} />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              {activeTab === "received" ? "No reviews received yet" : "No reviews written yet"}
+            </h2>
+            <p className="text-sm text-gray-500 max-w-sm mb-6">
+              {activeTab === "received"
+                ? "You haven't received any reviews from businesses yet. Complete collaborations to start building your reputation."
+                : "You haven't reviewed any businesses yet. Complete a collaboration to leave a review."}
+            </p>
+            <Link to="/promoter/collaborations" className="h-11 px-6 flex items-center justify-center rounded-xl bg-brand-indigo text-white text-sm font-bold hover:opacity-90 transition-opacity">
+              View Collaborations
+            </Link>
           </div>
-
-          {/* 3. STICKY FILTER TOOLBAR */}
-          <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-            <div className="bg-white p-2 rounded-2xl shadow-sm ring-1 ring-gray-200 flex flex-col gap-3">
-              <div className="flex flex-col md:flex-row gap-2">
-                <div className="relative flex-1">
-                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search businesses or campaigns..."
-                    value={search}
-                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-gray-400 text-gray-900"
-                  />
-                </div>
-                <div className="hidden md:flex items-center gap-2 pr-2">
-                  <div className="h-8 w-px bg-gray-100 mx-2"></div>
-                  <select className="h-10 pl-4 pr-10 text-sm font-medium text-gray-700 bg-gray-50 border-none rounded-xl focus:ring-0 cursor-pointer">
-                    <option>Newest First</option>
-                    <option>Highest Rating</option>
-                    <option>Lowest Rating</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar px-2 pb-1">
-                {["All", "5 Stars", "4 Stars", "Positive", "Needs Response"].map(status => (
-                  <button 
-                    key={status}
-                    onClick={() => setStatusFilter(status.toLowerCase())}
-                    className={`whitespace-nowrap px-4 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border ${
-                      statusFilter === status.toLowerCase() 
-                      ? 'bg-gray-900 text-white border-gray-900' 
-                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    {status}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* REVIEWS LIST */}
-          {isLoading ? (
-            <div className="space-y-4">
-              {Array.from({length:3}).map((_,i) => <div key={i} className="bg-white rounded-2xl h-48 animate-pulse ring-1 ring-gray-100"></div>)}
-            </div>
-          ) : !reviewsData || reviewsData.items.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
-              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-4"><MessageSquare size={32}/></div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">No reviews written yet</h2>
-              <p className="text-sm text-gray-500 max-w-sm mb-6">You haven't reviewed any businesses yet. Complete a collaboration to leave a review.</p>
-              <Link to="/promoter/collaborations" className="h-11 px-6 flex items-center justify-center rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-sm">
-                View Collaborations
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {reviewsData.items.map((review: any) => (
-                <motion.div
-                  key={review.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-200 hover:shadow-md hover:ring-primary-200 transition-all group"
-                >
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-lg font-bold text-gray-700 ring-1 ring-gray-200">
-                        {review.reviewer?.username?.charAt(0).toUpperCase() || 'B'}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1">
-                          <h3 className="text-base font-bold text-gray-900">{review.target?.full_name || 'Business Name'}</h3>
-                          <BadgeCheck size={14} className="text-blue-500"/>
+        ) : (
+          <div className="space-y-4">
+            {currentData.items.map((review: any) => (
+              <motion.div
+                key={review.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-200 hover:shadow-md hover:ring-primary-200 transition-all group"
+              >
+                {activeTab === "received" ? (
+                  // Received Review (Ratings Received)
+                  <>
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-lg font-bold text-gray-700 ring-1 ring-gray-200">
+                          {review.reviewer?.username?.charAt(0).toUpperCase() || 'B'}
                         </div>
-                        <p className="text-xs text-gray-500 mt-0.5">Reviewed on {new Date(review.created_at).toLocaleDateString()}</p>
+                        <div>
+                          <h3 className="text-base font-medium text-gray-900">{review.reviewer?.full_name || review.reviewer?.username || 'Business'}</h3>
+                          <p className="text-xs text-gray-500 mt-0.5">Reviewed on {new Date(review.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-lg border border-amber-100">
+                        <Star size={14} className="fill-amber-400 text-amber-400" />
+                        <span className="text-sm font-bold text-amber-700">{review.rating}.0</span>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-lg border border-amber-100">
-                      <Star size={14} className="fill-amber-400 text-amber-400"/>
-                      <span className="text-sm font-bold text-amber-700">{review.rating}.0</span>
+
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 mb-4">
+                      <p className="text-sm text-gray-700 leading-relaxed line-clamp-4">
+                        "{review.comment || 'No comment provided.'}"
+                      </p>
+                      {review.comment && review.comment.length > 150 && (
+                        <button className="text-[10px] font-bold text-brand-purple uppercase tracking-widest mt-2 hover:underline">Read More</button>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 mb-4">
-                    <p className="text-sm text-gray-700 leading-relaxed line-clamp-4">
-                      "{review.comment || 'No comment provided.'}"
-                    </p>
-                    {review.comment && review.comment.length > 150 && (
-                      <button className="text-[10px] font-bold text-primary-600 uppercase tracking-widest mt-2 hover:underline">Read More</button>
-                    )}
-                  </div>
+                    <div className="flex flex-wrap items-center gap-2 mb-5">
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-md shadow-sm">
+                        <Briefcase size={12} /> {review.campaign_title}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-md shadow-sm">
+                        <Calendar size={12} /> {new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  // Given Review (Reviews Given)
+                  <>
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-lg font-bold text-gray-700 ring-1 ring-gray-200">
+                          {review.reviewer?.username?.charAt(0).toUpperCase() || 'B'}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1">
+                            <h3 className="text-base font-medium text-gray-900">{review.target?.full_name || review.target?.username || 'Business Name'}</h3>
+                            <BadgeCheck size={14} className="text-blue-500" />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-0.5">Reviewed on {new Date(review.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
 
-                  {/* Collaboration Context */}
-                  <div className="flex flex-wrap items-center gap-2 mb-5">
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-md shadow-sm">
-                      <Briefcase size={12}/> Campaign Name Placeholder
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-md shadow-sm">
-                      <Calendar size={12}/> {new Date(review.created_at).toLocaleDateString('en-US', {month:'short', year:'numeric'})}
-                    </span>
-                  </div>
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-lg border border-amber-100">
+                        <Star size={14} className="fill-amber-400 text-amber-400" />
+                        <span className="text-sm font-bold text-amber-700">{review.rating}.0</span>
+                      </div>
+                    </div>
 
-                  <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                    <button 
-                      onClick={() => setEditingId(review.id)}
-                      className="h-9 px-4 rounded-lg bg-white border border-gray-200 text-gray-700 text-xs font-bold hover:bg-gray-50 transition-colors flex items-center gap-1.5 shadow-sm"
-                    >
-                      <Edit size={14}/> Edit Review
-                    </button>
-                    <button 
-                      onClick={() => setDeleteConfirm(review.id)}
-                      className="h-9 px-4 rounded-lg bg-white border border-gray-200 text-red-600 text-xs font-bold hover:bg-red-50 hover:border-red-200 transition-colors flex items-center gap-1.5 shadow-sm"
-                    >
-                      <Trash2 size={14}/> Delete
-                    </button>
-                    <Link to="/promoter/collaborations" className="h-9 px-4 rounded-lg bg-gray-50 text-gray-600 text-xs font-bold hover:bg-gray-100 transition-colors ml-auto flex items-center justify-center">
-                      View Collaboration
-                    </Link>
-                  </div>
-                </motion.div>
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 mb-4">
+                      <p className="text-sm text-gray-700 leading-relaxed line-clamp-4">
+                        "{review.comment || 'No comment provided.'}"
+                      </p>
+                      {review.comment && review.comment.length > 150 && (
+                        <button className="text-[10px] font-bold text-brand-purple uppercase tracking-widest mt-2 hover:underline">Read More</button>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 mb-5">
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-md shadow-sm">
+                        <Briefcase size={12} /> {review.target?.full_name || 'Campaign Name'}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-md shadow-sm">
+                        <Calendar size={12} /> {new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                      <button
+                        onClick={() => setEditingId(review.id)}
+                        className="h-9 px-4 rounded-lg bg-white border border-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors flex items-center gap-1.5 shadow-sm"
+                      >
+                        <Edit size={14} /> Edit Review
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirm(review.id)}
+                        className="h-9 px-4 rounded-lg bg-white border border-gray-200 text-brand-coral text-xs font-medium hover:bg-brand-coral-50 hover:border-brand-coral-200 transition-colors flex items-center gap-1.5 shadow-sm"
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
+                      <Link to="/promoter/collaborations" className="h-9 px-4 rounded-lg bg-gray-50 text-gray-600 text-xs font-medium hover:bg-gray-100 transition-colors ml-auto flex items-center justify-center">
+                        View Collaboration
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {currentData && currentData.pages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-6">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: currentData.pages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`w-10 h-10 rounded-xl text-sm font-medium transition-colors ${
+                    p === page ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                >
+                  {p}
+                </button>
               ))}
             </div>
-          )}
-
-          {/* Pagination */}
-          {reviewsData && reviewsData.pages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-6">
-              <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1} className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50"><ChevronLeft size={16}/></button>
-              <div className="flex items-center gap-1">
-                {Array.from({length: reviewsData.pages}, (_,i) => i+1).map(p => (
-                  <button key={p} onClick={() => setPage(p)} className={`w-10 h-10 rounded-xl text-sm font-bold ${p === page ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
-                    {p}
-                  </button>
-                ))}
-              </div>
-              <button onClick={() => setPage(p => Math.min(reviewsData.pages, p+1))} disabled={page === reviewsData.pages} className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50"><ChevronRight size={16}/></button>
-            </div>
-          )}
-        </div>
-
-        {/* SIDEBAR COLUMN (4 cols) */}
-        <div className="xl:col-span-4 space-y-6">
-          
-          {/* Recent Achievements */}
-          <div className="bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-2xl shadow-lg p-6 text-white overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <Award size={120} />
-            </div>
-            <h2 className="text-sm font-bold text-indigo-200 mb-6 flex items-center gap-2 relative z-10">
-              <Medal size={16}/> Creator Achievements
-            </h2>
-            <div className="space-y-4 relative z-10">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-amber-400 text-amber-900 flex items-center justify-center ring-4 ring-amber-400/20"><Star size={20} className="fill-amber-900"/></div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">Top Rated Creator</h3>
-                  <p className="text-xs text-indigo-200 mt-0.5">Maintained 4.8+ for 6 months</p>
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-emerald-400 text-emerald-900 flex items-center justify-center ring-4 ring-emerald-400/20"><Sparkles size={20} className="fill-emerald-900"/></div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">Fast Responder</h3>
-                  <p className="text-xs text-indigo-200 mt-0.5">Replies under 2 hours</p>
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={() => setPage((p) => Math.min(currentData.pages, p + 1))}
+              disabled={page === currentData.pages}
+              className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
-
-          {/* Reputation Badges */}
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-6">
-            <h2 className="text-sm font-bold text-gray-900 mb-4">Reputation Tags</h2>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100 flex items-center gap-1.5"><CheckCircle2 size={12}/> Excellent Communication</span>
-              <span className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100 flex items-center gap-1.5"><CheckCircle2 size={12}/> High Quality Content</span>
-              <span className="px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 text-xs font-bold border border-purple-100 flex items-center gap-1.5"><CheckCircle2 size={12}/> Meets Deadlines</span>
-              <span className="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold border border-amber-100 flex items-center gap-1.5"><CheckCircle2 size={12}/> Highly Recommended</span>
-            </div>
-          </div>
-
-        </div>
+        )}
       </div>
 
       {currentEditItem && (

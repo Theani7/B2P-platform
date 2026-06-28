@@ -9,10 +9,10 @@ export function useCreateReview() {
       const res = await api.post(`/collaborations/${collaborationId}/reviews`, body);
       return res.data;
     },
-    onSuccess: () => {
+onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-reviews"] });
-      qc.invalidateQueries({ queryKey: ["business-collaborations"] });
-      qc.invalidateQueries({ queryKey: ["promoter-collaborations"] });
+      qc.invalidateQueries({ queryKey: ["my-received-reviews"] });
+      qc.invalidateQueries({ queryKey: ["user-rating"] });
     },
   });
 }
@@ -26,6 +26,8 @@ export function useUpdateReview() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-reviews"] });
+      qc.invalidateQueries({ queryKey: ["my-received-reviews"] });
+      qc.invalidateQueries({ queryKey: ["user-rating"] });
     },
   });
 }
