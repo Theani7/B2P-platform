@@ -28,6 +28,7 @@ export default function LoginPage() {
 
   const loginMutation = useLogin();
 
+  // Redirect if already logged in or after login
   if (authLoading) return null;
   if (user) {
     if (user.role === "BUSINESS") { navigate("/business/dashboard", { replace: true }); return null; }

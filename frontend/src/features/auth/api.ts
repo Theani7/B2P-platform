@@ -26,7 +26,7 @@ export const useLogin = () => {
     onSuccess: async (res) => {
       localStorage.setItem("access_token", res.access_token);
       localStorage.setItem("refresh_token", res.refresh_token);
-      await qc.invalidateQueries({ queryKey: ["me"] });
+      qc.invalidateQueries({ queryKey: ["me"] });
     },
   });
 };
