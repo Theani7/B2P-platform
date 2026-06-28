@@ -46,12 +46,6 @@ function CardMenu({ collab, isBusiness, onComplete, onReview, onOpenChat }: any)
             transition={{ duration: 0.1 }}
             className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-20 py-1"
           >
-            <Link 
-              to={isBusiness ? "/business/campaigns" : "/promoter/collaborations"}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-            >
-              <Eye size={16} className="text-gray-400"/> View Details
-            </Link>
             <button onClick={(e) => { e.stopPropagation(); onOpenChat(); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
               <MessageCircle size={16} className="text-gray-400"/> Open Chat
             </button>
