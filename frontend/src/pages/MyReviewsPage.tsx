@@ -182,7 +182,7 @@ export default function MyReviewsPage() {
                 className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-200 hover:shadow-md hover:ring-primary-200 transition-all group"
               >
                 {activeTab === "received" ? (
-                  // Received Review (Ratings Received)
+                  // Received Review (Ratings Received) - business reviewed the promoter
                   <>
                     <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="flex items-center gap-3">
@@ -190,7 +190,7 @@ export default function MyReviewsPage() {
                           {review.reviewer?.username?.charAt(0).toUpperCase() || 'B'}
                         </div>
                         <div>
-                          <h3 className="text-base font-medium text-gray-900">{review.reviewer?.full_name || review.reviewer?.username || 'Business'}</h3>
+                          <h3 className="text-base font-medium text-gray-900">{review.business_name}</h3>
                           <p className="text-xs text-gray-500 mt-0.5">Reviewed on {new Date(review.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
@@ -219,7 +219,7 @@ export default function MyReviewsPage() {
                     </div>
                   </>
                 ) : (
-                  // Given Review (Reviews Given)
+                  // Given Review (Reviews Given) - promoter wrote to a business
                   <>
                     <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="flex items-center gap-3">
@@ -228,7 +228,7 @@ export default function MyReviewsPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-1">
-                            <h3 className="text-base font-medium text-gray-900">{review.target?.full_name || review.target?.username || 'Business Name'}</h3>
+                            <h3 className="text-base font-medium text-gray-900">{review.business_name}</h3>
                             <BadgeCheck size={14} className="text-blue-500" />
                           </div>
                           <p className="text-xs text-gray-500 mt-0.5">Reviewed on {new Date(review.created_at).toLocaleDateString()}</p>
@@ -252,7 +252,7 @@ export default function MyReviewsPage() {
 
                     <div className="flex flex-wrap items-center gap-2 mb-5">
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-md shadow-sm">
-                        <Briefcase size={12} /> {review.target?.full_name || 'Campaign Name'}
+                        <Briefcase size={12} /> {review.campaign_title}
                       </span>
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-md shadow-sm">
                         <Calendar size={12} /> {new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}

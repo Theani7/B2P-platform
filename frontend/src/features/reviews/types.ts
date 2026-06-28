@@ -14,6 +14,8 @@ export type ReviewRead = {
   comment: string | null;
   created_at: string;
   updated_at: string;
+  business_name: string;
+  campaign_title: string;
 };
 
 export type ReviewListResponse = {

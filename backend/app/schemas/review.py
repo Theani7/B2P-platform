@@ -34,6 +34,8 @@ class ReviewRead(BaseModel):
     comment: Optional[str] = None
     created_at: datetime
     updated_at: datetime
+    business_name: str = ""
+    campaign_title: str = ""
 
     class Config:
         from_attributes = True

@@ -150,7 +150,11 @@ def delete_review(db: Session, user: User, review_id: str) -> None:
 
 
 def get_my_reviews(db: Session, user: User, page: int = 1, limit: int = 20) -> Tuple[List[ReviewRead], int]:
-    query = db.query(Review).options(joinedload(Review.reviewer)).filter(Review.reviewer_id == user.id)
+    query = db.query(Review).options(
+        joinedload(Review.reviewer),
+        joinedload(Review.collaboration).joinedload(Collaboration.campaign),
+        joinedload(Review.collaboration).joinedload(Collaboration.business_profile)
+    ).filter(Review.reviewer_id == user.id)
     total = query.count()
     reviews = query.order_by(desc(Review.created_at)).offset((page - 1) * limit).limit(limit).all()
 
@@ -159,6 +163,8 @@ def get_my_reviews(db: Session, user: User, page: int = 1, limit: int = 20) -> T
         reviewer = r.reviewer
         if not reviewer:
             continue
+        business_profile = r.collaboration.business_profile if r.collaboration else None
+        campaign = r.collaboration.campaign if r.collaboration else None
         items.append(ReviewRead(
             id=r.id,
             collaboration_id=r.collaboration_id,
@@ -168,6 +174,8 @@ def get_my_reviews(db: Session, user: User, page: int = 1, limit: int = 20) -> T
             comment=r.comment,
             created_at=r.created_at,
             updated_at=r.updated_at,
+            business_name=business_profile.company_name if business_profile else "Unknown Business",
+            campaign_title=campaign.title if campaign else "Unknown Campaign",
         ))
     return items, total
 
