@@ -10,6 +10,7 @@ import {
   CheckCircle2, XCircle, AlertCircle, MessageCircle,
   Search, Filter, Link as BarChart3, Inbox
 } from "lucide-react";
+import CampaignPreviewModal from "../components/discovery/CampaignPreviewModal";
 
 const STATUS_CONFIG: Record<string, { color: string; icon: any; label: string }> = {
   PENDING: { color: "bg-amber-50 text-amber-700 ring-amber-600/20", icon: Clock, label: "Action Required" },
@@ -27,6 +28,7 @@ export default function PromoterInvitationsPage() {
   const acceptMutation = useAcceptInvitation();
   const rejectMutation = useRejectInvitation();
   const [actionConfirm, setActionConfirm] = useState<{ id: string; action: "accept" | "reject" } | null>(null);
+  const [previewCampaign, setPreviewCampaign] = useState<any | null>(null);
 
   const navigate = useNavigate();
 
@@ -270,7 +272,15 @@ export default function PromoterInvitationsPage() {
                           Open Collaboration
                         </button>
                       ) : (
-                        <button className="w-full h-10 rounded-xl bg-gray-100 text-gray-600 text-sm font-bold hover:bg-gray-200 transition-colors">
+                        <button onClick={() => setPreviewCampaign({
+                          id: inv.campaign_id,
+                          business_name: inv.business_name,
+                          title: inv.campaign_title,
+                          category: inv.campaign_category,
+                          budget: inv.campaign_budget,
+                          location: inv.campaign_location,
+                          description: inv.message
+                        })} className="w-full h-10 rounded-xl bg-gray-100 text-gray-600 text-sm font-bold hover:bg-gray-200 transition-colors">
                           View Campaign Details
                         </button>
                       )}
@@ -311,6 +321,12 @@ export default function PromoterInvitationsPage() {
         onConfirm={confirmAction}
         title={actionConfirm?.action === "accept" ? "Accept Offer" : "Decline Offer"}
         message={actionConfirm?.action === "accept" ? "Are you sure you want to accept this invitation? This will instantly start a new collaboration project." : "Are you sure you want to decline? The business will be notified."}
+      />
+
+      <CampaignPreviewModal
+        campaign={previewCampaign}
+        onClose={() => setPreviewCampaign(null)}
+        onApply={() => {}}
       />
     </div>
   );
