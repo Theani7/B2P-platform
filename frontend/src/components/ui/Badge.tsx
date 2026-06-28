@@ -22,7 +22,7 @@ const variantClasses: Record<BadgeVariant, string> = {
   pending: "bg-brand-amber-50 text-brand-amber-900",
   completed: "bg-green-50 text-green-800",
   rejected: "bg-brand-coral-50 text-brand-coral-900",
-  draft: "bg-gray-100 text-gray-500",
+  draft: "bg-stone-100 text-stone-900",
   business: "bg-brand-purple-50 text-brand-purple-900",
   promoter: "bg-brand-teal-50 text-brand-teal-900",
 };

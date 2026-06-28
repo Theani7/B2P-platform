@@ -15,7 +15,7 @@ export function TopHeader() {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   return (
-    <header className="h-16 px-6 border-b border-gray-200 bg-white flex items-center justify-between sticky top-0 z-40">
+    <header className="h-16 px-6 border-b border-stone-100 bg-white flex items-center justify-between sticky top-0 z-40">
       <div className="flex-1 max-w-lg flex items-center">
         <CommandPalette />
       </div>
@@ -29,10 +29,10 @@ export function TopHeader() {
             }
             setIsShareOpen(true);
           }}
-          className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${
+          className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
             !user?.has_profile 
-              ? "text-gray-400 border-gray-100 bg-gray-50 cursor-not-allowed" 
-              : "text-gray-700 hover:bg-gray-100 border-gray-200"
+              ? "text-stone-900 border-stone-100 bg-stone-50 cursor-not-allowed" 
+              : "text-stone-900 hover:bg-stone-50 border-stone-100"
           }`}
         >
           Share Profile
@@ -47,10 +47,10 @@ export function TopHeader() {
               }
               window.location.href = "/business/campaigns/create";
             }}
-            className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors shadow-sm ${
+            className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               !user?.has_profile
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-                : "bg-primary-600 text-white hover:bg-primary-700"
+                ? "bg-stone-100 text-stone-900 cursor-not-allowed"
+                : "bg-brand-indigo text-white hover:opacity-90"
             }`}
           >
             <Plus size={16} />
@@ -62,40 +62,40 @@ export function TopHeader() {
           <button 
             onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
             onBlur={() => setTimeout(() => setIsProfileMenuOpen(false), 200)}
-            className="flex items-center gap-3 p-1 rounded-md hover:bg-gray-50 transition-colors text-left"
+            className="flex items-center gap-3 p-1 rounded-lg hover:bg-stone-50 transition-colors text-left"
           >
             <div className="hidden sm:flex flex-col items-end">
-              <span className="text-xs font-medium text-gray-900">{user?.full_name || "User"}</span>
+              <span className="text-xs font-medium text-stone-900">{user?.full_name || "User"}</span>
               {user?.role && (
                 <Badge variant={user.role === Role.BUSINESS ? "business" : "promoter"} className="scale-[0.85] origin-right">
                   {user.role === Role.BUSINESS ? "Business" : "Promoter"}
                 </Badge>
               )}
             </div>
-            <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-medium border border-primary-200">
+            <div className="w-8 h-8 rounded-full bg-brand-purple-50 text-brand-purple-900 flex items-center justify-center text-xs font-medium border border-purple-200">
               {user?.full_name?.charAt(0) || <User size={14} />}
             </div>
-            <ChevronDown size={14} className="text-gray-400" />
+            <ChevronDown size={14} className="text-stone-900" />
           </button>
 
           {isProfileMenuOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
-              <div className="px-4 py-3 border-b border-gray-50 mb-1">
-                <p className="text-sm font-medium text-gray-900 truncate">{user?.full_name || "User"}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-stone-100 py-1 z-50">
+              <div className="px-4 py-3 border-b border-stone-100 mb-1">
+                <p className="text-sm font-medium text-stone-900 truncate">{user?.full_name || "User"}</p>
+                <p className="text-xs text-stone-900 truncate">{user?.email}</p>
               </div>
               <Link
                 to={user?.role === Role.BUSINESS ? "/business/profile" : "/promoter/profile"}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-sm text-stone-900 hover:bg-stone-50 transition-colors"
               >
-                <Settings size={16} className="text-gray-400" />
+                <Settings size={16} className="text-stone-900" />
                 Settings
               </Link>
               <button
                 onClick={() => openLogoutDialog()}
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-brand-coral hover:bg-brand-coral-50 transition-colors text-left"
               >
-                <LogOut size={16} className="text-red-400" />
+                <LogOut size={16} className="text-brand-coral" />
                 Sign out
               </button>
             </div>

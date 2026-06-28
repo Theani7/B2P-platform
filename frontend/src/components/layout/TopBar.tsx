@@ -13,9 +13,9 @@ export function TopBar({ pageTitle, children }: TopBarProps) {
   const colorIndex = user?.id ? Math.floor(parseInt(user.id) % 5) : 0;
 
   return (
-    <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center justify-between mb-6">
       <div>
-        <h1 className="text-2xl font-medium text-gray-900">{pageTitle}</h1>
+        <h1 className="text-xl font-medium text-stone-900 font-stretch-condensed">{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-3">
         {children}
