@@ -56,14 +56,21 @@ def promoter_analytics(db: Session = Depends(get_db), user=Depends(get_current_u
     if not profile:
         return {
             "summary": {
-                "total_earnings": 0,
-                "pending_payouts": 0,
+                "profile_views": 0,
+                "applications_submitted": 0,
+                "accepted_applications": 0,
+                "pending_applications": 0,
+                "rejected_applications": 0,
+                "invitations_received": 0,
+                "invitations_accepted": 0,
+                "invitations_pending": 0,
                 "active_collaborations": 0,
                 "completed_collaborations": 0,
                 "average_rating": 0,
                 "reviews_received": 0,
-                "invitations_pending": 0,
-                "applications_pending": 0,
+                "recommendation_percent": 0,
+                "portfolio_items": 0,
+                "profile_completion": 0,
             },
             "charts": {
                 "monthly_applications": [],
@@ -85,22 +92,23 @@ def promoter_analytics(db: Session = Depends(get_db), user=Depends(get_current_u
             },
         }
 
-    total_applications = db.query(CampaignApplication).join(
-        Collaboration, CampaignApplication.collaboration_id == Collaboration.id
-    ).filter(Collaboration.promoter_profile_id == profile.id).count()
+    applications_submitted = db.query(CampaignApplication).filter(
+        CampaignApplication.promoter_profile_id == profile.id
+    ).count()
 
-    accepted_apps = db.query(CampaignApplication).join(
-        Collaboration, CampaignApplication.collaboration_id == Collaboration.id
-    ).filter(
-        Collaboration.promoter_profile_id == profile.id,
+    pending_apps = db.query(CampaignApplication).filter(
+        CampaignApplication.promoter_profile_id == profile.id,
+        CampaignApplication.status == "PENDING"
+    ).count()
+
+    accepted_apps = db.query(CampaignApplication).filter(
+        CampaignApplication.promoter_profile_id == profile.id,
         CampaignApplication.status == "ACCEPTED"
     ).count()
 
-    pending_apps = db.query(CampaignApplication).join(
-        Collaboration, CampaignApplication.collaboration_id == Collaboration.id
-    ).filter(
-        Collaboration.promoter_profile_id == profile.id,
-        CampaignApplication.status == "PENDING"
+    rejected_apps = db.query(CampaignApplication).filter(
+        CampaignApplication.promoter_profile_id == profile.id,
+        CampaignApplication.status == "REJECTED"
     ).count()
 
     active_collabs = db.query(Collaboration).filter(
@@ -120,14 +128,21 @@ def promoter_analytics(db: Session = Depends(get_db), user=Depends(get_current_u
 
     return {
         "summary": {
-            "total_earnings": 0,
-            "pending_payouts": 0,
+            "profile_views": 0,
+            "applications_submitted": applications_submitted,
+            "accepted_applications": accepted_apps,
+            "pending_applications": pending_apps,
+            "rejected_applications": rejected_apps,
+            "invitations_received": 0,
+            "invitations_accepted": 0,
+            "invitations_pending": 0,
             "active_collaborations": active_collabs,
             "completed_collaborations": completed_collabs,
             "average_rating": round(float(avg_rating), 1) if avg_rating else 0.0,
             "reviews_received": reviews_received,
-            "invitations_pending": 0,
-            "applications_pending": pending_apps,
+            "recommendation_percent": 0,
+            "portfolio_items": portfolio_items,
+            "profile_completion": 0,
         },
         "charts": {
             "monthly_applications": [],

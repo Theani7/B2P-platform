@@ -49,8 +49,21 @@ export const usePromoterProfile = () =>
 
 export const useUpsertPromoterProfile = () => {
   const qc = useQueryClient();
-  return useMutation({
+  const updateProfile = useMutation({
     mutationFn: (data: { headline?: string; bio?: string; niche?: string; location?: string; avatar_url?: string }) => 
+      api.put("/promoter/profile", data).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["promoter-profile"] });
+      qc.invalidateQueries({ queryKey: ["me"] });
+    },
+  });
+  return updateProfile;
+};
+
+export const useCreatePromoterProfile = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { username: string; headline?: string; bio?: string; niche: string; location?: string; avatar_url?: string }) => 
       api.post("/promoter/profile", data).then(r => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["promoter-profile"] });
