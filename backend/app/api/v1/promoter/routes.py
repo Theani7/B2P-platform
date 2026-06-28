@@ -1,6 +1,7 @@
 """Promoter profile routes."""
 from typing import Optional
 from datetime import datetime, timezone
+from math import round
 from sqlalchemy import func
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session

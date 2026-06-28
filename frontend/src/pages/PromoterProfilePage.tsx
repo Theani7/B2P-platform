@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,14 +6,14 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
-import { usePromoterProfile, useUpsertPromoterProfile } from "../features/profile/api";
+import { usePromoterProfile, useUpsertPromoterProfile, useUploadAvatar } from "../features/profile";
 import { usePromoterProfileCompletion } from "../features/profile-completion";
 import { ProfileCompletionWidget } from "../components/ui";
 import { PortfolioSettings } from "../components/portfolio/PortfolioSettings";
 import { SocialSettings } from "../components/social/SocialSettings";
 import { Avatar } from "../components/ui";
 import {
-  BadgeCheck, Save, Eye, Trophy, AlertTriangle, MapPin, Briefcase
+  BadgeCheck, Save, Eye, Trophy, AlertTriangle, MapPin, Briefcase, Camera
 } from "lucide-react";
 
 const NICHE_OPTIONS = [
@@ -42,7 +42,10 @@ export default function PromoterProfilePage() {
   const { user } = useAuth();
   const { data: profile, isLoading } = usePromoterProfile();
   const updateProfile = useUpsertPromoterProfile();
+  const uploadAvatarMutation = useUploadAvatar();
   const { data: completionData, isLoading: completionLoading } = usePromoterProfileCompletion();
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -82,10 +85,29 @@ export default function PromoterProfilePage() {
     updateProfile.mutate(data, {
       onSuccess: () => {
         notifySuccess("Profile saved successfully");
-        reset(data); // reset to new values to clear isDirty
+        reset(data);
       },
       onError: () => notifyError("Failed to save profile"),
     });
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      const url = await uploadAvatarMutation.mutateAsync(file);
+      updateProfile.mutate({ avatar_url: url });
+    } catch {
+      // error handled by mutation
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  const onCameraClick = () => fileInputRef.current?.click();
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleAvatarUpload(file);
   };
 
   const isComplete = completionData?.percentage === 100;
@@ -207,12 +229,33 @@ export default function PromoterProfilePage() {
                     <BadgeCheck size={14} /> Verified
                   </div>
                 )}
-              </div>
+</div>
               <div className="p-6 pt-0 flex flex-col items-center text-center -mt-12 relative z-10">
                 <div className="relative mb-3">
-                  <div className="w-20 h-20 rounded-full border-4 border-white bg-white shadow-md flex items-center justify-center overflow-hidden">
-                    <Avatar initials={user?.full_name?.[0] || 'U'} size="lg" colorIndex={1} />
-                  </div>
+                  {avatarUploading ? (
+                    <div className="w-20 h-20 rounded-full bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center">
+                      <div className="w-6 h-6 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-full border-4 border-white bg-white shadow-md flex items-center justify-center overflow-hidden">
+                      <Avatar initials={user?.full_name?.[0] || 'U'} src={profile?.avatar_url} size="lg" colorIndex={1} />
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={onCameraClick}
+                    disabled={avatarUploading}
+                    className="absolute bottom-0 right-0 w-7 h-7 bg-white rounded-full flex items-center justify-center ring-1 ring-gray-200 shadow-sm hover:bg-gray-50 transition-colors text-gray-500 disabled:opacity-50"
+                  >
+                    <Camera size={14} />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={onFileChange}
+                    className="hidden"
+                  />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900">
                   {user?.full_name || 'Creator Name'}

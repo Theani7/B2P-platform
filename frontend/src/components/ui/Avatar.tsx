@@ -1,5 +1,6 @@
 interface AvatarProps {
   initials: string;
+  src?: string;
   size?: "sm" | "md" | "lg";
   colorIndex?: number;
   className?: string;
@@ -19,7 +20,16 @@ const sizeClasses = {
   lg: "w-16 h-16 text-xl",
 };
 
-export function Avatar({ initials, size = "md", colorIndex = 0, className = "" }: AvatarProps) {
+export function Avatar({ initials, src, size = "md", colorIndex = 0, className = "" }: AvatarProps) {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={initials}
+        className={`rounded-full object-cover ${sizeClasses[size]} ${className}`}
+      />
+    );
+  }
   return (
     <div
       className={`rounded-full flex items-center justify-center font-medium ${sizeClasses[size]} ${colorClasses[colorIndex % 5]} ${className}`}
