@@ -51,7 +51,7 @@ export default function PromoterDashboard() {
     setAvatarUploading(true);
     try {
       const url = await uploadAvatarMutation.mutateAsync(file);
-      updateProfileMutation.mutate({ avatar_url: url });
+      await updateProfileMutation.mutateAsync({ avatar_url: url });
     } catch {
       // error handled by mutation
     } finally {

@@ -96,7 +96,7 @@ export default function PromoterProfilePage() {
     setAvatarUploading(true);
     try {
       const url = await uploadAvatarMutation.mutateAsync(file);
-      updateProfile.mutate({ avatar_url: url });
+      await updateProfile.mutateAsync({ avatar_url: url });
     } catch {
       // error handled by mutation
     } finally {
