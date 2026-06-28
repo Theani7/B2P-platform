@@ -85,7 +85,7 @@ export function TopHeader() {
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
               </div>
               <Link
-                to={user?.role === Role.BUSINESS ? "/business/profile" : "/promoter/settings"}
+                to={user?.role === Role.BUSINESS ? "/business/profile" : "/promoter/profile"}
                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <Settings size={16} className="text-gray-400" />

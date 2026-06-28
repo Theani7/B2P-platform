@@ -26,12 +26,7 @@ export const useLogin = () => {
     onSuccess: async (res) => {
       localStorage.setItem("access_token", res.access_token);
       localStorage.setItem("refresh_token", res.refresh_token);
-      try {
-        const userRes = await api.get("/auth/me");
-        qc.setQueryData(["me"], userRes.data);
-      } catch (e) {
-        qc.invalidateQueries({ queryKey: ["me"] });
-      }
+      await qc.invalidateQueries({ queryKey: ["me"] });
     },
   });
 };
