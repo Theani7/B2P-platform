@@ -196,6 +196,7 @@ class CollaborationRead(BaseModel):
     partner_name: str = ""
     partner_username: str = ""
     partner_avatar_url: Optional[str] = None
+    has_review: bool = False
 
     class Config:
         from_attributes = True

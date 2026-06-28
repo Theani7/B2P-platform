@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 
 
-
 function CardMenu({ collab, isBusiness, onComplete, onReview, onOpenChat }: any) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -72,13 +71,18 @@ function CardMenu({ collab, isBusiness, onComplete, onReview, onOpenChat }: any)
                 <CheckCircle2 size={16} className="text-emerald-500"/> Mark Complete
               </button>
             )}
-            {collab.status === "COMPLETED" && (
+            {collab.status === "COMPLETED" && !collab.has_review && (
               <button 
                 onClick={(e) => { e.stopPropagation(); setOpen(false); onReview(collab.id); }}
                 className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 font-medium"
               >
                 <Star size={16} className="text-amber-500"/> Write Review
               </button>
+            )}
+            {collab.status === "COMPLETED" && collab.has_review && (
+              <div className="w-full text-left px-4 py-2 text-sm text-emerald-600 flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-emerald-500"/> Reviewed
+              </div>
             )}
           </motion.div>
         )}
@@ -140,7 +144,7 @@ export default function CollaborationsPage() {
   const collabs = data?.items || [];
   const activeCount = collabs.filter((c:any) => c.status === 'ACTIVE').length;
   const completedCount = collabs.filter((c:any) => c.status === 'COMPLETED').length;
-  const pendingReviewCount = collabs.filter((c:any) => c.status === 'COMPLETED').length; // Simplified for now
+  const pendingReviewCount = collabs.filter((c:any) => c.status === 'COMPLETED' && !c.has_review).length;
   const totalEarnings = collabs.filter((c:any) => c.status === 'COMPLETED').reduce((sum: number, c: any) => sum + (c.campaign_budget || 0), 0);
   const activeThisWeek = collabs.filter((c:any) => c.status === 'ACTIVE' && new Date(c.started_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000).length;
 
@@ -370,13 +374,18 @@ export default function CollaborationsPage() {
                           <CheckCircle2 size={16}/> Complete
                         </button>
                       )}
-                      {isCompleted && (
+                      {isCompleted && !c.has_review && (
                         <button onClick={() => setReviewingCollabId(c.id)} className="flex-1 h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 shadow-sm transition-colors flex items-center justify-center gap-2">
                           <Star size={16}/> Write Review
                         </button>
                       )}
-                      <button onClick={() => handleOpenChat(c.id)} className={`h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 shadow-sm transition-colors flex items-center justify-center gap-2 ${isActive || isCompleted ? 'px-4' : 'flex-1'}`}>
-                        <MessageCircle size={16}/> {isActive ? 'Chat' : 'Details'}
+                      {isCompleted && c.has_review && (
+                        <div className="flex-1 h-10 rounded-xl bg-emerald-50 text-emerald-700 text-sm font-bold flex items-center justify-center gap-2">
+                          <CheckCircle2 size={16}/> Reviewed
+                        </div>
+                      )}
+                      <button onClick={() => handleOpenChat(c.id)} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 shadow-sm transition-colors flex items-center justify-center gap-2 flex-1">
+                        <MessageCircle size={16}/> Chat
                       </button>
                     </div>
                   </motion.div>

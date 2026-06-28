@@ -5,7 +5,9 @@ export function useChatWebSocket(conversationId: string | undefined, token: stri
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectAttemptsRef = useRef(0);
 
   const connect = useCallback(() => {
     if (!conversationId) return;
@@ -25,7 +27,9 @@ export function useChatWebSocket(conversationId: string | undefined, token: stri
 
     ws.onopen = () => {
       setIsConnected(true);
+      setError(null);
       setSocket(ws);
+      reconnectAttemptsRef.current = 0;
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
@@ -43,12 +47,18 @@ export function useChatWebSocket(conversationId: string | undefined, token: stri
     ws.onclose = () => {
       setIsConnected(false);
       setSocket(null);
-      // Auto-reconnect after 3 seconds
-      reconnectTimeoutRef.current = setTimeout(connect, 3000);
+      reconnectAttemptsRef.current += 1;
+      const backoff = Math.min(1000 * Math.pow(1.5, reconnectAttemptsRef.current), 30000);
+      reconnectTimeoutRef.current = setTimeout(connect, backoff);
+    };
+
+    ws.onerror = (err) => {
+      setError("Connection failed. Retrying...");
+      console.error("Chat WebSocket error:", err);
     };
 
     return ws;
-  }, [conversationId, token]);
+  }, [conversationId]);
 
   useEffect(() => {
     const ws = connect();
@@ -66,5 +76,5 @@ export function useChatWebSocket(conversationId: string | undefined, token: stri
     }
   }, [socket, isConnected]);
 
-  return { isConnected, lastMessage, sendMessage };
+  return { isConnected, lastMessage, sendMessage, error };
 }

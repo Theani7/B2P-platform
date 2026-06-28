@@ -12,6 +12,7 @@ from ..models.campaign import Campaign, CampaignStatus, CampaignVisibility
 from ..models.campaign_application import CampaignApplication, ApplicationStatus
 from ..models.campaign_invitation import CampaignInvitation, InvitationStatus
 from ..models.collaboration import Collaboration, CollaborationStatus
+from ..models.review import Review
 from app.notifications.service import NotificationService
 from app.notifications.schemas import NotificationCreate
 from app.notifications.models import NotificationType
@@ -770,6 +771,10 @@ def get_business_collaborations(
     for collab in collaborations:
         campaign = collab.campaign
         promoter = collab.promoter_profile
+        has_review = db.query(Review).filter(
+            Review.collaboration_id == collab.id,
+            Review.reviewer_id == user.id
+        ).first() is not None
         items.append(CollaborationRead(
             id=collab.id,
             campaign_id=collab.campaign_id,
@@ -790,7 +795,9 @@ def get_business_collaborations(
             partner_name=promoter.username if promoter else "",
             partner_username=promoter.username if promoter else "",
             partner_avatar_url=promoter.avatar_url if promoter else None,
+            has_review=has_review,
         ))
+
 
     return items, total
 
@@ -831,6 +838,10 @@ def get_promoter_collaborations(
     for collab in collaborations:
         campaign = collab.campaign
         business = collab.business_profile
+        has_review = db.query(Review).filter(
+            Review.collaboration_id == collab.id,
+            Review.reviewer_id == user.id
+        ).first() is not None
         items.append(CollaborationRead(
             id=collab.id,
             campaign_id=collab.campaign_id,
@@ -851,6 +862,8 @@ def get_promoter_collaborations(
             partner_name=business.company_name if business else "",
             partner_username=business.company_name if business else "",
             partner_avatar_url=business.logo_url if business else None,
+            has_review=has_review,
         ))
+
 
     return items, total
