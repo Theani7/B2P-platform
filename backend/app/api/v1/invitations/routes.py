@@ -63,12 +63,13 @@ def cancel(
 
 @business_router.get("/business/invitations", response_model=CampaignInvitationListResponse)
 def business_invitations(
+    status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items, total = get_business_invitations(db, user, page=page, limit=limit)
+    items, total = get_business_invitations(db, user, status=status, page=page, limit=limit)
     return CampaignInvitationListResponse(
         items=[item.model_dump() for item in items],
         total=total,
@@ -89,12 +90,13 @@ promoter_router = APIRouter(
 
 @promoter_router.get("/promoter/invitations", response_model=CampaignInvitationListResponse)
 def promoter_invitations(
+    status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items, total = get_promoter_invitations(db, user, page=page, limit=limit)
+    items, total = get_promoter_invitations(db, user, status=status, page=page, limit=limit)
     return CampaignInvitationListResponse(
         items=[item.model_dump() for item in items],
         total=total,

@@ -23,7 +23,7 @@ export default function PromoterInvitationsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   
-  const { data, isLoading, error } = usePromoterInvitations({ page, limit: 10 });
+  const { data, isLoading, error } = usePromoterInvitations({ page, limit: 10, status: statusFilter !== "all" ? statusFilter.toUpperCase() : undefined });
   const acceptMutation = useAcceptInvitation();
   const rejectMutation = useRejectInvitation();
   const [actionConfirm, setActionConfirm] = useState<{ id: string; action: "accept" | "reject" } | null>(null);

@@ -98,8 +98,8 @@ export default function CollaborationsPage() {
 
   const isBusiness = user?.role === Role.BUSINESS;
 
-  const bizQuery = useBusinessCollaborations({ page, limit: 10 }, isBusiness);
-  const promQuery = usePromoterCollaborations({ page, limit: 10 }, !isBusiness);
+  const bizQuery = useBusinessCollaborations({ page, limit: 10, status: statusFilter !== "all" ? statusFilter.toUpperCase() : undefined }, isBusiness);
+  const promQuery = usePromoterCollaborations({ page, limit: 10, status: statusFilter !== "all" ? statusFilter.toUpperCase() : undefined }, !isBusiness);
   const { data, isLoading, error } = isBusiness ? bizQuery : promQuery;
 
   const completeCollab = useCompleteCollaboration();

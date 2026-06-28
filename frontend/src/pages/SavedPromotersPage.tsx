@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSavedPromoters, useRemoveSavedPromoter } from "../features/discovery/api";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { StatCard, Avatar } from "../components/ui";
 import {
-  Search, MapPin, Users, TrendingUp, Briefcase, BadgeCheck, ArrowRight, BookmarkX,
-  Star, ChevronLeft, ChevronRight, LayoutGrid, List, CheckCircle2
+  Search, MapPin, Users, TrendingUp, BadgeCheck, ArrowRight, BookmarkX,
+  Star, ChevronLeft, ChevronRight, LayoutGrid, List, CheckCircle2, Filter
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -14,14 +14,17 @@ import { ActionMenu } from "../components/promoters/SavedPromoterActionMenu";
 import ProfilePreviewModal from "../components/discovery/ProfilePreviewModal";
 import CompareMatrixModal from "../components/discovery/CompareMatrixModal";
 
+const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS"];
+
 export default function SavedPromotersPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [nicheFilter, setNicheFilter] = useState("");
+  const [sortFilter, setSortFilter] = useState("newest");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [drawerPromoter, setDrawerPromoter] = useState<any>(null);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   
-
   const { data, isLoading, error } = useSavedPromoters({
     search: search || undefined,
     page,
@@ -30,6 +33,25 @@ export default function SavedPromotersPage() {
 
   const removeSaved = useRemoveSavedPromoter();
   const [removeConfirm, setRemoveConfirm] = useState<{ id: string; username: string } | null>(null);
+
+  const filteredPromoters = useMemo(() => {
+    if (!data?.items) return [];
+    let items = [...data.items];
+    
+    if (nicheFilter) {
+      items = items.filter((p: any) => p.niche === nicheFilter);
+    }
+    
+    if (sortFilter === "followers") {
+      items.sort((a: any, b: any) => (b.followers_count || 0) - (a.followers_count || 0));
+    } else if (sortFilter === "engagement") {
+      items.sort((a: any, b: any) => (b.engagement_rate || 0) - (a.engagement_rate || 0));
+    } else {
+      items.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+    }
+    
+    return items;
+  }, [data?.items, nicheFilter, sortFilter]);
 
   if (error) return (
     <div className="flex flex-col items-center justify-center py-16">
@@ -65,6 +87,13 @@ export default function SavedPromotersPage() {
     setSelectedIds(prev => 
       prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
     );
+  };
+
+  const clearFilters = () => {
+    setNicheFilter("");
+    setSortFilter("newest");
+    setSearch("");
+    setPage(1);
   };
 
   return (
@@ -115,12 +144,23 @@ export default function SavedPromotersPage() {
         </div>
         
         <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 border-t lg:border-t-0 lg:border-l border-gray-100 pt-2 lg:pt-0 lg:pl-3">
-          <button className="h-9 px-3 rounded-md text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
-            All Categories
-          </button>
-          <button className="h-9 px-3 rounded-md text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
-            Sort: Newest
-          </button>
+          <select
+            value={nicheFilter}
+            onChange={(e) => { setNicheFilter(e.target.value); setPage(1); }}
+            className="h-9 px-3 rounded-md text-xs font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+          >
+            <option value="">All Categories</option>
+            {NICHE_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
+          </select>
+          <select
+            value={sortFilter}
+            onChange={(e) => { setSortFilter(e.target.value); setPage(1); }}
+            className="h-9 px-3 rounded-md text-xs font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+          >
+            <option value="newest">Newest First</option>
+            <option value="followers">Most Followers</option>
+            <option value="engagement">Highest Engagement</option>
+          </select>
           <div className="h-6 w-px bg-gray-200 mx-1 hidden lg:block" />
           <div className="flex bg-gray-100 p-1 rounded-lg">
             <button className="w-8 h-7 rounded bg-white shadow-sm flex items-center justify-center text-gray-900">
@@ -171,10 +211,26 @@ export default function SavedPromotersPage() {
               <Search size={16} /> Browse Promoters
             </Link>
           </div>
+        ) : filteredPromoters.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-2xl shadow-sm ring-1 ring-gray-100">
+            <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center mb-5 ring-1 ring-gray-900/5">
+              <Filter size={32} className="text-gray-300" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">No results found</h3>
+            <p className="text-sm text-gray-500 mt-2 max-w-md">
+              No saved promoters match your current filters. Try adjusting your search or category filter.
+            </p>
+            <button
+              onClick={clearFilters}
+              className="mt-6 inline-flex items-center gap-2 bg-gray-100 text-gray-700 rounded-lg h-10 px-6 text-sm font-medium hover:bg-gray-200 transition-colors shadow-sm"
+            >
+              <Filter size={16} /> Clear Filters
+            </button>
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {data.items.map((p: any) => {
+              {filteredPromoters.map((p: any) => {
                 const isSelected = selectedIds.includes(p.id);
                 return (
                   <motion.div
@@ -345,7 +401,7 @@ export default function SavedPromotersPage() {
       <CompareMatrixModal 
         isOpen={isCompareModalOpen} 
         onClose={() => setIsCompareModalOpen(false)} 
-        promoters={data?.items?.filter((p: any) => selectedIds.includes(p.id)) || []} 
+        promoters={filteredPromoters.filter((p: any) => selectedIds.includes(p.id)) || []} 
       />
     </div>
   );

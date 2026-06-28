@@ -556,21 +556,30 @@ def cancel_invitation(db: Session, user: User, invitation_id) -> None:
 def get_business_invitations(
     db: Session,
     user: User,
+    status: Optional[str] = None,
     page: int = 1,
     limit: int = 20,
 ) -> Tuple[List[CampaignInvitationWithCampaignRead], int]:
     business = _get_business_profile(db, user)
     campaign_ids = db.query(Campaign.id).filter(Campaign.business_profile_id == business.id)
 
+    query = db.query(CampaignInvitation).filter(CampaignInvitation.campaign_id.in_(campaign_ids))
+    if status:
+        query = query.filter(CampaignInvitation.status == status)
+
     count_stmt = select(func.count(CampaignInvitation.id)).where(
         CampaignInvitation.campaign_id.in_(campaign_ids)
     )
+    if status:
+        count_stmt = select(func.count(CampaignInvitation.id)).where(
+            CampaignInvitation.campaign_id.in_(campaign_ids),
+            CampaignInvitation.status == status
+        )
     total = db.scalar(count_stmt)
 
     invitations = (
-        db.query(CampaignInvitation)
+        query
         .options(joinedload(CampaignInvitation.campaign))
-        .filter(CampaignInvitation.campaign_id.in_(campaign_ids))
         .order_by(CampaignInvitation.created_at.desc())
         .offset((page - 1) * limit)
         .limit(limit)
@@ -603,19 +612,29 @@ def get_business_invitations(
 def get_promoter_invitations(
     db: Session,
     user: User,
+    status: Optional[str] = None,
     page: int = 1,
     limit: int = 20,
 ) -> Tuple[List[CampaignInvitationWithCampaignRead], int]:
     promoter = _get_promoter_profile(db, user)
+
+    query = db.query(CampaignInvitation).filter(CampaignInvitation.promoter_profile_id == promoter.id)
+    if status:
+        query = query.filter(CampaignInvitation.status == status)
+
     count_stmt = select(func.count(CampaignInvitation.id)).where(
         CampaignInvitation.promoter_profile_id == promoter.id
     )
+    if status:
+        count_stmt = select(func.count(CampaignInvitation.id)).where(
+            CampaignInvitation.promoter_profile_id == promoter.id,
+            CampaignInvitation.status == status
+        )
     total = db.scalar(count_stmt)
 
     invitations = (
-        db.query(CampaignInvitation)
+        query
         .options(joinedload(CampaignInvitation.campaign).joinedload(Campaign.business_profile))
-        .filter(CampaignInvitation.promoter_profile_id == promoter.id)
         .order_by(CampaignInvitation.created_at.desc())
         .offset((page - 1) * limit)
         .limit(limit)
@@ -718,19 +737,29 @@ def reject_invitation(db: Session, user: User, invitation_id) -> None:
 def get_business_collaborations(
     db: Session,
     user: User,
+    status: Optional[str] = None,
     page: int = 1,
     limit: int = 20,
 ) -> Tuple[List[CollaborationRead], int]:
     business = _get_business_profile(db, user)
+    query = db.query(Collaboration).filter(Collaboration.business_profile_id == business.id)
+
+    if status:
+        query = query.filter(Collaboration.status == status)
+
     count_stmt = select(func.count(Collaboration.id)).where(
         Collaboration.business_profile_id == business.id
     )
+    if status:
+        count_stmt = select(func.count(Collaboration.id)).where(
+            Collaboration.business_profile_id == business.id,
+            Collaboration.status == status
+        )
     total = db.scalar(count_stmt)
 
     collaborations = (
-        db.query(Collaboration)
+        query
         .options(joinedload(Collaboration.campaign), joinedload(Collaboration.promoter_profile))
-        .filter(Collaboration.business_profile_id == business.id)
         .order_by(Collaboration.created_at.desc())
         .offset((page - 1) * limit)
         .limit(limit)
@@ -769,19 +798,29 @@ def get_business_collaborations(
 def get_promoter_collaborations(
     db: Session,
     user: User,
+    status: Optional[str] = None,
     page: int = 1,
     limit: int = 20,
 ) -> Tuple[List[CollaborationRead], int]:
     promoter = _get_promoter_profile(db, user)
+    query = db.query(Collaboration).filter(Collaboration.promoter_profile_id == promoter.id)
+
+    if status:
+        query = query.filter(Collaboration.status == status)
+
     count_stmt = select(func.count(Collaboration.id)).where(
         Collaboration.promoter_profile_id == promoter.id
     )
+    if status:
+        count_stmt = select(func.count(Collaboration.id)).where(
+            Collaboration.promoter_profile_id == promoter.id,
+            Collaboration.status == status
+        )
     total = db.scalar(count_stmt)
 
     collaborations = (
-        db.query(Collaboration)
+        query
         .options(joinedload(Collaboration.campaign), joinedload(Collaboration.business_profile))
-        .filter(Collaboration.promoter_profile_id == promoter.id)
         .order_by(Collaboration.created_at.desc())
         .offset((page - 1) * limit)
         .limit(limit)

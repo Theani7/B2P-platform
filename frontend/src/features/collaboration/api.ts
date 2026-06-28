@@ -46,8 +46,6 @@ export const useToggleBookmark = () => {
       }
     },
     onSuccess: () => {
-      // Opt to not invalidate instantly to prevent harsh re-renders,
-      // but invalidate in the background if we want true sync.
     },
   });
 };
@@ -145,6 +143,7 @@ export const useCancelInvitation = () => {
 export const useBusinessInvitations = (params?: {
   page?: number;
   limit?: number;
+  status?: string;
 }) =>
   useQuery<CampaignInvitationListResponse>({
     queryKey: ["business-invitations", params],
@@ -155,6 +154,7 @@ export const useBusinessInvitations = (params?: {
 export const usePromoterInvitations = (params?: {
   page?: number;
   limit?: number;
+  status?: string;
 }) =>
   useQuery<CampaignInvitationListResponse>({
     queryKey: ["promoter-invitations", params],
@@ -185,7 +185,7 @@ export const useRejectInvitation = () => {
 };
 
 export const useBusinessCollaborations = (
-  params?: { page?: number; limit?: number },
+  params?: { page?: number; limit?: number; status?: string },
   enabled?: boolean,
 ) =>
   useQuery<CollaborationListResponse>({
@@ -196,7 +196,7 @@ export const useBusinessCollaborations = (
   });
 
 export const usePromoterCollaborations = (
-  params?: { page?: number; limit?: number },
+  params?: { page?: number; limit?: number; status?: string },
   enabled?: boolean,
 ) =>
   useQuery<CollaborationListResponse>({

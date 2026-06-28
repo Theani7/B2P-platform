@@ -8,7 +8,7 @@ import {
   CampaignDashboardStats,
 } from "./types";
 
-export const useCampaigns = (params?: { search?: string; page?: number; limit?: number; sort?: string }) =>
+export const useCampaigns = (params?: { search?: string; status?: string; location?: string; page?: number; limit?: number; sort?: string }) =>
   useQuery<CampaignListRead>({
     queryKey: ["campaigns", params],
     queryFn: () =>

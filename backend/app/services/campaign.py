@@ -75,6 +75,8 @@ def list_campaigns(
     db: Session,
     user: User,
     search: Optional[str] = None,
+    status: Optional[str] = None,
+    location: Optional[str] = None,
     page: int = 1,
     limit: int = 10,
     sort: str = "created_at",
@@ -87,6 +89,12 @@ def list_campaigns(
         query = query.filter(
             Campaign.title.ilike(like) | Campaign.description.ilike(like)
         )
+
+    if status:
+        query = query.filter(Campaign.status == status)
+
+    if location:
+        query = query.filter(Campaign.location.ilike(f"%{location}%"))
 
     sort_field = getattr(Campaign, sort, Campaign.created_at)
     query = query.order_by(sort_field.desc())

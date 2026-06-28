@@ -97,7 +97,7 @@ export default function BusinessInvitationsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   
-  const { data, isLoading, error } = useBusinessInvitations({ page, limit: 10 });
+  const { data, isLoading, error } = useBusinessInvitations({ page, limit: 10, status: statusFilter !== "all" ? statusFilter.toUpperCase() : undefined });
   const cancelMutation = useCancelInvitation();
   const [cancelConfirm, setCancelConfirm] = useState<string | null>(null);
 

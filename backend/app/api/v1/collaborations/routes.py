@@ -1,4 +1,5 @@
 """Collaboration management routes."""
+from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
@@ -20,12 +21,13 @@ business_router = APIRouter(
 
 @business_router.get("", response_model=CollaborationListResponse)
 def business_collaborations(
+    status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items, total = get_business_collaborations(db, user, page=page, limit=limit)
+    items, total = get_business_collaborations(db, user, status=status, page=page, limit=limit)
     return CollaborationListResponse(
         items=items,
         total=total,
@@ -46,12 +48,13 @@ promoter_router = APIRouter(
 
 @promoter_router.get("", response_model=CollaborationListResponse)
 def promoter_collaborations(
+    status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items, total = get_promoter_collaborations(db, user, page=page, limit=limit)
+    items, total = get_promoter_collaborations(db, user, status=status, page=page, limit=limit)
     return CollaborationListResponse(
         items=items,
         total=total,

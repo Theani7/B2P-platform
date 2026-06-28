@@ -6,8 +6,8 @@ import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { StatCard } from "../components/ui";
 import { ExportButton } from "../components/export";
 import {
-  Megaphone, Plus, Search, Edit3, Archive, Trash2, MapPin, 
-  Filter, MoreVertical, Eye, SlidersHorizontal,
+  Megaphone, Plus, Search, Edit3, Archive, Trash2, MapPin,
+  MoreVertical, Eye,
   FolderDot, FolderOpen, CheckCircle2, ChevronLeft, ChevronRight, Rocket
 } from "lucide-react";
 import { formatNepaliCurrency } from "../utils/currency";
@@ -114,9 +114,11 @@ function PremiumBadge({ status }: { status: string }) {
 }
 
 export default function CampaignListPage() {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const { data, isLoading, error } = useCampaigns({ page, limit: 10, search: search || undefined });
+   const [page, setPage] = useState(1);
+   const [search, setSearch] = useState("");
+   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+   const [locationFilter, setLocationFilter] = useState<string | null>(null);
+   const { data, isLoading, error } = useCampaigns({ page, limit: 10, search: search || undefined, status: statusFilter || undefined, location: locationFilter || undefined });
   const { data: stats, isLoading: statsLoading } = useCampaignDashboardStats();
   const deleteCampaign = useDeleteCampaign();
   const archiveCampaign = useArchiveCampaign();
@@ -219,16 +221,30 @@ export default function CampaignListPage() {
             className="w-full pl-9 pr-4 h-9 bg-transparent border-none focus:ring-0 text-sm text-gray-900 placeholder-gray-400"
           />
         </div>
-        <div className="hidden lg:flex items-center gap-2 pr-2 border-l border-gray-100 pl-4">
-          <button className="h-8 px-3 rounded-md text-xs font-medium text-gray-600 hover:bg-gray-50 flex items-center gap-1.5 transition-colors">
-            <Filter size={14} /> Status
-          </button>
-          <button className="h-8 px-3 rounded-md text-xs font-medium text-gray-600 hover:bg-gray-50 flex items-center gap-1.5 transition-colors">
-            <MapPin size={14} /> Location
-          </button>
-          <button className="h-8 px-3 rounded-md text-xs font-medium text-gray-600 hover:bg-gray-50 flex items-center gap-1.5 transition-colors">
-            <SlidersHorizontal size={14} /> More Filters
-          </button>
+        <div className="flex items-center gap-2">
+          <select
+            value={statusFilter || ""}
+            onChange={(e) => { setStatusFilter(e.target.value || null); setPage(1); }}
+            className="h-9 px-3 rounded-md text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors"
+          >
+            <option value="">All Statuses</option>
+            <option value="DRAFT">Draft</option>
+            <option value="OPEN">Open</option>
+            <option value="ACTIVE">Active</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="ARCHIVED">Archived</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+          <select
+            value={locationFilter || ""}
+            onChange={(e) => { setLocationFilter(e.target.value || null); setPage(1); }}
+            className="h-9 px-3 rounded-md text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors"
+          >
+            <option value="">All Locations</option>
+            <option value="Kathmandu">Kathmandu</option>
+            <option value="Pokhara">Pokhara</option>
+            <option value="Remote">Remote</option>
+          </select>
         </div>
       </div>
 

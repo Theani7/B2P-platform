@@ -36,13 +36,15 @@ def create(payload: CampaignCreate, db: Session = Depends(get_db), user=Depends(
 @router.get("", response_model=CampaignListRead)
 def list_all(
     search: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    location: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     sort: str = Query("created_at"),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items, total = list_campaigns(db, user, search=search, page=page, limit=limit, sort=sort)
+    items, total = list_campaigns(db, user, search=search, status=status, location=location, page=page, limit=limit, sort=sort)
     return CampaignListRead(
         items=items,
         total=total,
