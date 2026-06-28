@@ -58,6 +58,19 @@ export interface CampaignApplicationWithCampaign {
   campaign_status: string;
 }
 
+export interface CampaignApplicationFullRead {
+  id: string;
+  campaign_id: string;
+  promoter_profile_id: string;
+  message?: string | null;
+  status: ApplicationStatus;
+  created_at: string;
+  updated_at: string;
+  promoter_username: string;
+  promoter_avatar_url?: string | null;
+  campaign_title: string;
+}
+
 export interface CampaignApplicationWithPromoter {
   id: string;
   campaign_id: string;

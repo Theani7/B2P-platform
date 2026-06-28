@@ -29,14 +29,13 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
   if (!isOpen || !promoter) return null;
 
   const handleShare = () => {
-    // Dummy action for sharing
     navigator.clipboard.writeText(window.location.href);
     notifySuccess("Profile URL copied to clipboard!");
   };
 
   return createPortal(
-    <>
-      <AnimatePresence>
+    <AnimatePresence>
+      {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
           <motion.div
             initial={{ opacity: 0 }}
@@ -51,9 +50,8 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative w-full max-w-[1000px] max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden"
+            className="relative w-full max-w-[1000px] max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col z-[101] overflow-hidden"
           >
-            {/* Header Area */}
             <div className="relative p-6 sm:p-8 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 bg-white">
               <div className="flex items-center gap-5">
                 <div className="relative shrink-0">
@@ -88,7 +86,6 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                 </div>
               </div>
 
-              {/* Top Right Actions */}
               <div className="flex items-center gap-3 shrink-0">
                 <button
                   onClick={handleShare}
@@ -117,12 +114,9 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
               </div>
             </div>
 
-            {/* Modal Content - Two Column Layout */}
             <div className="flex-1 overflow-y-auto bg-gray-50/50 p-6 sm:p-8">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
-                {/* Left Column */}
                 <div className="lg:col-span-5 space-y-8">
-                  {/* Stats Row */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-4 rounded-2xl bg-white border border-gray-100 shadow-sm flex flex-col">
                       <div className="flex items-center gap-2 mb-2">
@@ -140,7 +134,6 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                     </div>
                   </div>
 
-                  {/* About section */}
                   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">About Creator</h3>
                     <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
@@ -148,7 +141,6 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                     </p>
                   </div>
 
-                  {/* Social Links */}
                   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Social Channels</h3>
                     <div className="space-y-3">
@@ -163,16 +155,15 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                           </a>
                         ))
                       ) : (
-                         <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100 text-gray-500 text-sm">
-                           <Mail size={16} />
-                           Contact directly for platforms
-                         </div>
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100 text-gray-500 text-sm">
+                          <Mail size={16} />
+                          Contact directly for platforms
+                        </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Right Column - Portfolio */}
                 <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Recent Portfolio Work</h3>
@@ -195,14 +186,17 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
             </div>
           </motion.div>
         </div>
-      </AnimatePresence>
-
-      <InvitePromoterModal 
-        isOpen={isInviteModalOpen} 
-        onClose={() => setIsInviteModalOpen(false)} 
-        promoter={promoter} 
-      />
-    </>,
+      )}
+      {isInviteModalOpen && (
+        <InvitePromoterModal
+          isOpen={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
+          promoter={promoter}
+        />
+      )}
+    </AnimatePresence>,
     document.body
   );
 }
+
+export { InvitePromoterModal };
