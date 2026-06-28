@@ -1,7 +1,6 @@
 """Promoter profile routes."""
 from typing import Optional
 from datetime import datetime, timezone
-from math import round
 from sqlalchemy import func
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
@@ -125,7 +124,7 @@ def promoter_analytics(db: Session = Depends(get_db), user=Depends(get_current_u
             "pending_payouts": 0,
             "active_collaborations": active_collabs,
             "completed_collaborations": completed_collabs,
-            "average_rating": round(float(avg_rating), 1),
+            "average_rating": round(float(avg_rating), 1) if avg_rating else 0.0,
             "reviews_received": reviews_received,
             "invitations_pending": 0,
             "applications_pending": pending_apps,
