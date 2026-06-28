@@ -27,12 +27,12 @@ export default function LandingNav() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-linen-canvas/80 backdrop-blur-sm border-b border-gray-200" : "bg-transparent"
+        scrolled ? "bg-stone-50/80 backdrop-blur-sm border-b border-stone-100" : "bg-transparent"
       }`}
     >
       <div className="max-w-[1200px] mx-auto flex items-center justify-between h-16 px-6">
-        <Link to="/" className="flex items-center gap-2 text-lg font-medium text-midnight-ink">
-          <span className="w-7 h-7 rounded-lg bg-signal-blue flex items-center justify-center text-white">
+        <Link to="/" className="flex items-center gap-2 text-lg font-medium text-stone-900">
+          <span className="w-7 h-7 rounded-lg bg-brand-purple flex items-center justify-center text-white">
             <Zap size={14} />
           </span>
           Byparsathy
@@ -43,7 +43,7 @@ export default function LandingNav() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-slate hover:text-midnight-ink transition-colors"
+              className="text-sm text-stone-900 hover:text-brand-purple transition-colors"
             >
               {link.label}
             </a>
@@ -53,20 +53,18 @@ export default function LandingNav() {
         <div className="hidden md:flex items-center gap-3">
           <Link
             to="/login"
-            className="text-sm text-slate hover:text-midnight-ink px-3 py-2 transition-colors"
+            className="text-sm text-stone-900 hover:text-brand-purple px-3 py-2 transition-colors"
           >
             Sign in
           </Link>
           <Link to="/register">
-            <Button size="sm" variant="primary" className="border border-primary-action-accent text-primary-action-accent bg-white hover:bg-gray-50">
-              Get started
-            </Button>
+            <Button size="sm">Get started</Button>
           </Link>
         </div>
 
         <button
           onClick={() => setMobileOpen(true)}
-          className="md:hidden p-2 text-slate hover:bg-gray-100 rounded-lg"
+          className="md:hidden p-2 text-stone-900 hover:bg-stone-100 rounded-lg"
           aria-label="Open menu"
         >
           <Menu size={20} />
@@ -89,13 +87,13 @@ export default function LandingNav() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-72 bg-linen-canvas shadow-sm z-50 md:hidden flex flex-col"
+              className="fixed top-0 right-0 bottom-0 w-72 bg-stone-50 shadow-sm z-50 md:hidden flex flex-col"
             >
-              <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-                <span className="text-lg font-medium text-midnight-ink">Byparsathy</span>
+              <div className="flex items-center justify-between h-16 px-6 border-b border-stone-100">
+                <span className="text-lg font-medium text-stone-900">Byparsathy</span>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="p-2 text-slate hover:bg-gray-100 rounded-lg"
+                  className="p-2 text-stone-900 hover:bg-stone-100 rounded-lg"
                   aria-label="Close menu"
                 >
                   <X size={20} />
@@ -107,24 +105,24 @@ export default function LandingNav() {
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="px-3 py-3 rounded-lg text-sm text-slate hover:bg-gray-100 transition-colors"
+                    className="px-3 py-3 rounded-lg text-sm text-stone-900 hover:bg-stone-100 transition-colors"
                   >
                     {link.label}
                   </a>
                 ))}
               </div>
-              <div className="p-6 border-t border-gray-200 flex flex-col gap-3">
+              <div className="p-6 border-t border-stone-100 flex flex-col gap-3">
                 <Link
                   to="/login"
                   onClick={() => setMobileOpen(false)}
-                  className="block text-center text-sm text-slate hover:text-midnight-ink px-4 py-2.5 border border-primary-action-accent rounded-xl transition-colors"
+                  className="block text-center text-sm text-stone-900 hover:text-brand-purple px-4 py-2.5 border border-stone-100 rounded-lg transition-colors"
                 >
                   Sign in
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setMobileOpen(false)}
-                  className="block text-center text-sm text-primary-action-accent bg-white border border-primary-action-accent rounded-xl px-4 py-2.5 transition-colors"
+                  className="block text-center text-sm text-white bg-brand-indigo rounded-lg px-4 py-2.5 transition-colors"
                 >
                   Get started
                 </Link>

@@ -25,7 +25,7 @@ const item = {
 
 export default function LandingProblemSolution() {
   return (
-    <section className="py-20 lg:py-28 bg-sky-wash">
+    <section className="py-20 lg:py-28 bg-stone-100">
       <div className="max-w-[1200px] mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -34,26 +34,26 @@ export default function LandingProblemSolution() {
           transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
-          <p className="text-[11px] font-medium uppercase tracking-widest text-signal-blue mb-3">
+          <p className="text-[11px] font-medium uppercase tracking-widest text-brand-purple mb-3">
             Why Byparsathy
           </p>
-          <h2 className="text-2xl sm:text-3xl font-medium text-midnight-ink tracking-[-0.22px]">
+          <h2 className="text-2xl sm:text-3xl font-medium text-stone-900 font-stretch-condensed">
             Stop running campaigns in the dark
           </h2>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
           <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
-            <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-6">The old way</p>
+            <p className="text-xs font-medium uppercase tracking-widest text-stone-900 mb-6">The old way</p>
             <div className="flex flex-col gap-4">
               {problems.map((p) => (
-                <motion.div key={p.title} variants={item} className="flex gap-4 bg-white border border-gray-200 rounded-xl p-5">
-                  <span className="w-8 h-8 rounded-lg bg-coral-50 border border-coral-200 flex items-center justify-center flex-shrink-0">
-                    <p.icon size={16} className="text-coral" />
+                <motion.div key={p.title} variants={item} className="flex gap-4 bg-white border border-stone-100 rounded-xl p-5">
+                  <span className="w-8 h-8 rounded-lg bg-brand-coral-50 border border-coral-200 flex items-center justify-center flex-shrink-0">
+                    <p.icon size={16} className="text-brand-coral" />
                   </span>
                   <div>
-                    <p className="text-sm font-medium text-midnight-ink mb-1">{p.title}</p>
-                    <p className="text-sm text-slate leading-relaxed">{p.desc}</p>
+                    <p className="text-sm font-medium text-stone-900 mb-1">{p.title}</p>
+                    <p className="text-sm text-stone-900 leading-relaxed">{p.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -61,16 +61,16 @@ export default function LandingProblemSolution() {
           </motion.div>
 
           <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
-            <p className="text-xs font-medium uppercase tracking-widest text-emerald-600 mb-6">With Byparsathy</p>
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-teal mb-6">With Byparsathy</p>
             <div className="flex flex-col gap-4">
               {solutions.map((s) => (
-                <motion.div key={s.title} variants={item} className="flex gap-4 bg-white border border-gray-200 rounded-xl p-5">
-                  <span className="w-8 h-8 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center flex-shrink-0">
-                    <s.icon size={16} className="text-teal" />
+                <motion.div key={s.title} variants={item} className="flex gap-4 bg-white border border-stone-100 rounded-xl p-5">
+                  <span className="w-8 h-8 rounded-lg bg-brand-teal-50 border border-teal-200 flex items-center justify-center flex-shrink-0">
+                    <s.icon size={16} className="text-brand-teal" />
                   </span>
                   <div>
-                    <p className="text-sm font-medium text-midnight-ink mb-1">{s.title}</p>
-                    <p className="text-sm text-slate leading-relaxed">{s.desc}</p>
+                    <p className="text-sm font-medium text-stone-900 mb-1">{s.title}</p>
+                    <p className="text-sm text-stone-900 leading-relaxed">{s.desc}</p>
                   </div>
                 </motion.div>
               ))}

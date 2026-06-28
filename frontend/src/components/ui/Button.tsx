@@ -15,12 +15,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-white border border-primary-action-accent text-primary-action-accent rounded-xl px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors",
-  cta: "bg-white border border-primary-action-accent text-primary-action-accent rounded-xl px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors",
-  secondary: "bg-white border border-gray-200 text-slate rounded-xl px-4 py-2 text-sm hover:bg-gray-50 transition-colors",
-  "ghost-teal": "bg-teal-50 text-teal-900 border border-teal-200 rounded-xl px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors",
-  "ghost-destructive": "bg-coral-50 text-coral-900 border border-coral-200 rounded-xl px-3 py-1.5 text-xs font-medium hover:bg-coral-100 transition-colors",
-  icon: "p-2 rounded-xl hover:bg-gray-100 text-slate hover:text-midnight-ink transition-colors",
+  primary: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
+  cta: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity",
+  secondary: "bg-white border border-stone-100 text-stone-900 rounded-lg px-4 py-2 text-sm hover:bg-stone-100 transition-colors",
+  "ghost-teal": "bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors",
+  "ghost-destructive": "bg-brand-coral-50 text-brand-coral-900 border border-coral-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-coral-100 transition-colors",
+  icon: "p-2 rounded-lg hover:bg-stone-100 text-stone-900 hover:text-brand-purple transition-colors",
 };
 
 const sizeClasses = {

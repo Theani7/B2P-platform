@@ -36,13 +36,13 @@ export default function LandingFeatures() {
           transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
-          <p className="text-[11px] font-medium uppercase tracking-widest text-signal-blue mb-3">
+          <p className="text-[11px] font-medium uppercase tracking-widest text-brand-purple mb-3">
             Platform features
           </p>
-          <h2 className="text-2xl sm:text-3xl font-medium text-midnight-ink tracking-[-0.22px] mb-4">
+          <h2 className="text-2xl sm:text-3xl font-medium text-stone-900 font-stretch-condensed mb-4">
             Everything a campaign needs, in one place
           </h2>
-          <p className="text-sm text-slate leading-relaxed max-w-xl mx-auto">
+          <p className="text-sm text-stone-900 leading-relaxed max-w-xl mx-auto">
             From finding the right promoter to tracking deliverables and collecting reviews —
             Byparsathy handles the full collaboration lifecycle.
           </p>
@@ -59,10 +59,10 @@ export default function LandingFeatures() {
             <motion.div
               key={f.title}
               variants={item}
-              className="group bg-linen-canvas border border-gray-200 rounded-xl p-5 hover:bg-white hover:border-gray-300 hover:shadow-[rgba(0,0,0,0.1)_0px_0px_4px_-2px] transition-all duration-200"
+              className="group bg-white border border-stone-100 rounded-xl p-5 hover:border-brand-purple transition-all duration-150"
             >
-              <h3 className="text-sm font-medium text-midnight-ink mb-2">{f.title}</h3>
-              <p className="text-sm text-slate leading-relaxed">{f.desc}</p>
+              <h3 className="text-sm font-medium text-stone-900 mb-2">{f.title}</h3>
+              <p className="text-sm text-stone-900 leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -75,7 +75,7 @@ export default function LandingFeatures() {
           className="text-center mt-12"
         >
           <Link to="/register">
-            <Button variant="primary" size="md" className="gap-2 border border-primary-action-accent text-primary-action-accent bg-white hover:bg-gray-50">
+            <Button variant="secondary" size="md" className="gap-2">
               Explore the platform
               <ArrowRight size={14} />
             </Button>
