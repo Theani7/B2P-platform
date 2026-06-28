@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../ui/Button";
 
@@ -31,10 +31,7 @@ export default function LandingNav() {
       }`}
     >
       <div className="max-w-[1200px] mx-auto flex items-center justify-between h-16 px-6">
-        <Link to="/" className="flex items-center gap-2 text-lg font-medium text-stone-900">
-          <span className="w-7 h-7 rounded-lg bg-brand-purple flex items-center justify-center text-white">
-            <Zap size={14} />
-          </span>
+        <Link to="/" className="flex items-center gap-2 text-lg font-medium text-brand-purple">
           Byparsathy
         </Link>
 
