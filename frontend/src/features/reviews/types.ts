@@ -37,3 +37,23 @@ export type RatingSummary = {
   total_reviews: number;
   distribution: RatingDistribution;
 };
+
+export type ReceivedReviewRead = {
+  id: string;
+  collaboration_id: string;
+  reviewer: ReviewerInfo;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  updated_at: string;
+  business_name: string;
+  campaign_title: string;
+};
+
+export type ReceivedReviewListResponse = {
+  items: ReceivedReviewRead[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+};

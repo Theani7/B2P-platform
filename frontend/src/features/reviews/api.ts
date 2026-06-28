@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../services/apiClient";
-import type { ReviewListResponse, RatingSummary, ReviewRead } from "./types";
+import type { ReviewListResponse, RatingSummary, ReviewRead, ReceivedReviewListResponse } from "./types";
 
 export function useCreateReview() {
   const qc = useQueryClient();
@@ -50,6 +50,19 @@ export function useMyReviews(params?: { page?: number; limit?: number }) {
       if (params?.page) qs.set("page", String(params.page));
       if (params?.limit) qs.set("limit", String(params.limit));
       const res = await api.get(`/my/reviews${qs.toString() ? `?${qs.toString()}` : ""}`);
+      return res.data;
+    },
+  });
+}
+
+export function useMyReceivedReviews(params?: { page?: number; limit?: number }) {
+  return useQuery<ReceivedReviewListResponse>({
+    queryKey: ["my-received-reviews", params],
+    queryFn: async () => {
+      const qs = new URLSearchParams();
+      if (params?.page) qs.set("page", String(params.page));
+      if (params?.limit) qs.set("limit", String(params.limit));
+      const res = await api.get(`/my/received-reviews${qs.toString() ? `?${qs.toString()}` : ""}`);
       return res.data;
     },
   });
