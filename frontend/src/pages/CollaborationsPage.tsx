@@ -234,7 +234,7 @@ export default function CollaborationsPage() {
                 </div>
               </div>
               <div className="flex gap-2 overflow-x-auto no-scrollbar px-2 pb-1">
-                {["All", "Active", "Completed", "Pending Review", "Cancelled"].map(status => (
+                {["All", "Active", "Completed", "Cancelled"].map(status => (
                   <button 
                     key={status}
                     onClick={() => setStatusFilter(status.toLowerCase())}
@@ -375,9 +375,9 @@ export default function CollaborationsPage() {
                           <Star size={16}/> Write Review
                         </button>
                       )}
-                      <Link to={isBusiness ? "/business/campaigns" : "/promoter/collaborations"} className={`h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 shadow-sm transition-colors flex items-center justify-center gap-2 ${isActive || isCompleted ? 'px-4' : 'flex-1'}`}>
-                        Details
-                      </Link>
+                      <button onClick={() => handleOpenChat(c.id)} className={`h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 shadow-sm transition-colors flex items-center justify-center gap-2 ${isActive || isCompleted ? 'px-4' : 'flex-1'}`}>
+                        <MessageCircle size={16}/> {isActive ? 'Chat' : 'Details'}
+                      </button>
                     </div>
                   </motion.div>
                 );
