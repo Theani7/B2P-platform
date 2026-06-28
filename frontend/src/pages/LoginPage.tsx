@@ -94,13 +94,6 @@ export default function LoginPage() {
           {errors.password && <p className="text-xs text-brand-coral mt-1">{errors.password.message}</p>}
         </div>
 
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-brand-indigo focus:ring-brand-indigo" />
-            <span className="text-xs text-gray-600">Remember me</span>
-          </label>
-        </div>
-
         <button
           type="submit"
           disabled={loginMutation.isPending}

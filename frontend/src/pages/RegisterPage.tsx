@@ -18,7 +18,6 @@ const schema = z.object({
     .min(6, "Password must be at least 6 characters")
     .refine((val) => !val.includes(" "), "Password cannot contain spaces"),
   confirmPassword: z.string(),
-  terms: z.literal(true, { errorMap: () => ({ message: "You must accept the terms" }) }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -70,7 +69,7 @@ export default function RegisterPage() {
   const onSubmit = (data: FormValues) => {
     if (!role) { setRoleError(true); return; }
     setServerError(null);
-    const { confirmPassword, terms, ...payload } = data;
+    const { confirmPassword, ...payload } = data;
     registerMutation.mutate({ ...payload, role }, {
       onError: (err: any) => {
         const msg = err?.response?.data?.message || err?.message || "Registration failed. Please try again.";
@@ -195,25 +194,10 @@ export default function RegisterPage() {
               {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          {errors.confirmPassword && <p className="text-xs text-brand-coral mt-1">{errors.confirmPassword.message}</p>}
-        </div>
+{errors.confirmPassword && <p className="text-xs text-brand-coral mt-1">{errors.confirmPassword.message}</p>}
+         </div>
 
-        <label className="flex items-start gap-2.5 cursor-pointer">
-          <input
-            type="checkbox"
-            {...register("terms")}
-            className="mt-0.5 w-4 h-4 rounded border-gray-300 text-brand-indigo focus:ring-brand-indigo"
-          />
-          <span className="text-xs text-gray-600 leading-relaxed">
-            I agree to the{" "}
-            <Link to="/terms" className="text-brand-purple hover:underline">Terms of Service</Link>
-            {" "}and{" "}
-            <Link to="/privacy" className="text-brand-purple hover:underline">Privacy Policy</Link>
-          </span>
-        </label>
-        {errors.terms && <p className="text-xs text-brand-coral -mt-2">{errors.terms.message}</p>}
-
-        <button
+         <button
           type="submit"
           disabled={registerMutation.isPending || !role}
           className="w-full mt-1 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:bg-brand-indigo-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
