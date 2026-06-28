@@ -31,11 +31,11 @@ from .api.v1.invitations.routes import promoter_router as promoter_invitation_ro
 from .api.v1.collaborations.routes import business_router as business_collab_router
 from .api.v1.collaborations.routes import promoter_router as promoter_collab_router
 from .api.v1.matching.routes import router as matching_router
-from .reviews.routes import router as review_router
-from .admin.routes import router as admin_router
-from .promoter_verification.routes import router as promoter_verification_router
-from .activity.routes import router as activity_router
-from .profile_completion.routes import router as profile_completion_router
+from .api.v1.reviews.routes import router as review_router
+from .api.v1.admin.routes import router as admin_router
+from .api.v1.promoter_verification.routes import router as promoter_verification_router
+from .api.v1.activity.routes import router as activity_router
+from .api.v1.profile_completion.routes import router as profile_completion_router
 from .social.routes import router as social_router
 from .chat.routes import router as chat_router
 from .notifications.routes import router as notifications_router
