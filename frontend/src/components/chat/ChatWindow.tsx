@@ -22,6 +22,13 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
   const otherParticipant = conversation.participants.find(p => p.id !== user?.id) || conversation.participants[0];
+  const senderAvatars = useMemo(() => {
+    const map: Record<string, string> = {};
+    conversation.participants.forEach(p => {
+      map[p.id] = p.avatar;
+    });
+    return map;
+  }, [conversation.participants]);
 
   // Load history
   useEffect(() => {
@@ -116,9 +123,9 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
       >
         {isFetchingNextPage && <div className="text-center text-xs text-gray-400 my-2">Loading older messages...</div>}
         
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} isOwn={msg.sender_id === user?.id} />
-        ))}
+{messages.map((msg) => (
+           <MessageBubble key={msg.id} message={msg} isOwn={msg.sender_id === user?.id} senderAvatar={senderAvatars[msg.sender_id] || (msg as any).sender_avatar} />
+         ))}
         
         {isOtherTyping && <TypingIndicator />}
       </div>

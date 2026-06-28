@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { X, Upload, Plus, Trash2 } from "lucide-react";
 import type { PortfolioItem, PortfolioItemCreate } from "../../features/portfolio";
-import { useCreatePortfolioItem, useUpdatePortfolioItem } from "../../features/portfolio";
+import { useCreatePortfolioItem, useUpdatePortfolioItem, useUploadMedia } from "../../features/portfolio";
+import { notifySuccess, notifyError } from "../../hooks/useToast";
 
 interface PortfolioEditorProps {
   item?: PortfolioItem | null;
@@ -13,7 +14,11 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
   const isEditing = !!item;
   const createMutation = useCreatePortfolioItem();
   const updateMutation = useUpdatePortfolioItem();
-  
+  const uploadMediaMutation = useUploadMedia();
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const { register, handleSubmit, reset, watch, setValue } = useForm<PortfolioItemCreate>({
     defaultValues: {
       title: "",
@@ -23,7 +28,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
       platforms: [],
       tags: [],
       featured: false,
-    }
+    },
   });
 
   useEffect(() => {
@@ -37,17 +42,49 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
         tags: item.tags || [],
         featured: item.featured,
       });
+      if (item.cover_image) {
+        setMediaPreview(item.cover_image);
+      }
     }
   }, [item, reset]);
 
-  const onSubmit = (data: PortfolioItemCreate) => {
+  const handleMediaUpload = async (file: File) => {
+    if (!file) return;
+
+    if (isEditing && item) {
+      setUploadingMedia(true);
+      try {
+        await uploadMediaMutation.mutateAsync({ id: item.id, file });
+        notifySuccess("Media uploaded successfully");
+      } finally {
+        setUploadingMedia(false);
+      }
+    } else {
+      const url = URL.createObjectURL(file);
+      setMediaPreview(url);
+      setValue("cover_image", url);
+    }
+  };
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleMediaUpload(file);
+  };
+
+  const onSubmit = async (data: PortfolioItemCreate) => {
     if (isEditing && item) {
       updateMutation.mutate({ id: item.id, data }, {
         onSuccess: () => onClose()
       });
     } else {
       createMutation.mutate(data, {
-        onSuccess: () => onClose()
+        onSuccess: (newItem) => {
+          if (data.cover_image && data.cover_image.startsWith("blob:")) {
+            setUploadingMedia(true);
+            uploadMediaMutation.mutate({ id: newItem.id, file: fileInputRef.current?.files?.[0] as File });
+          }
+          onClose();
+        }
       });
     }
   };
@@ -111,8 +148,43 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
               />
               <label htmlFor="featured" className="text-sm font-medium text-gray-900">Feature this project on my profile (Max 3)</label>
             </div>
-            
-            {/* Note: Media upload logic would go here in a robust implementation. We focus on CRUD. */}
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-1">Cover Image</label>
+              <div className="border border-gray-200 rounded-xl p-4">
+                {mediaPreview ? (
+                  <div className="relative">
+                    <img src={mediaPreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingMedia}
+                      className="absolute top-2 right-2 px-2 py-1 bg-white rounded text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingMedia}
+                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:border-primary-500 hover:text-primary-500 transition-colors"
+                  >
+                    <Upload size={24} className="mb-2" />
+                    <span className="text-sm font-medium">Click to upload cover image</span>
+                  </button>
+                )}
+                {uploadingMedia && <p className="text-xs text-gray-500 mt-2">Uploading...</p>}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={onFileChange}
+                className="hidden"
+              />
+            </div>
           </form>
         </div>
 

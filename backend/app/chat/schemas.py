@@ -15,6 +15,7 @@ class MessageRead(MessageBase):
     id: UUID
     conversation_id: UUID
     sender_id: UUID
+    sender_avatar: Optional[str] = None
     edited_at: Optional[datetime]
     read_at: Optional[datetime]
     is_deleted: bool

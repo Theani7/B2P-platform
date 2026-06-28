@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { useState } from "react";
 import { usePublicPromoterProfile, useSavePromoter } from "../features/discovery/api";
 import { useUserRating } from "../features/reviews/api";
 import RatingStars from "../components/reviews/RatingStars";
@@ -8,8 +9,9 @@ import { PortfolioGrid } from "../components/portfolio";
 import { SocialLinksDisplay } from "../components/social";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { useUserAchievements } from "../features/achievements";
-import { AchievementCard, ProgressBadge } from "../components/achievements";
-import { MapPin, Users, TrendingUp, Briefcase, Link as LinkIcon, Camera, Music, Video, Globe, MessageSquare, Trophy } from "lucide-react";
+import { AchievementCard } from "../components/achievements";
+import InvitePromoterModal from "../components/discovery/InvitePromoterModal";
+import { MapPin, Users, TrendingUp, Briefcase, Link as LinkIcon, Camera, Music, Video, Globe, MessageSquare, Trophy, Send } from "lucide-react";
 
 const getPlatformIcon = (platform: string) => {
   switch (platform) {
@@ -30,6 +32,7 @@ export default function PublicPromoterProfilePage() {
   const { data: portfolioItems, isLoading: portfolioLoading } = usePublicPortfolio(profile?.id || "");
   const { data: achievementsData } = useUserAchievements(profile?.user_id);
   const savePromoter = useSavePromoter();
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const handleSave = () => {
     if (!profile) return;
@@ -82,13 +85,22 @@ export default function PublicPromoterProfilePage() {
                 )}
                 <SocialLinksDisplay userId={profile.user_id} />
               </div>
-              <button
-                onClick={handleSave}
-                disabled={savePromoter.isPending}
-                className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
-              >
-                Save to Shortlist
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSave}
+                  disabled={savePromoter.isPending}
+                  className="rounded bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+                >
+                  Save to Shortlist
+                </button>
+                <button
+                  onClick={() => setIsInviteModalOpen(true)}
+                  className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 flex items-center gap-2"
+                >
+                  <Send size={16} />
+                  Invite to Campaign
+                </button>
+              </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
@@ -162,7 +174,7 @@ export default function PublicPromoterProfilePage() {
         </div>
       )}
 
-      {profile.social_links.length > 0 && (
+      {profile.social_links && profile.social_links.length > 0 && (
         <div className="rounded-lg border bg-white p-6">
           <h2 className="mb-4 text-lg font-semibold text-text">Social Links</h2>
           <div className="flex flex-wrap gap-3">
@@ -181,6 +193,12 @@ export default function PublicPromoterProfilePage() {
           </div>
         </div>
       )}
+
+      <InvitePromoterModal 
+        isOpen={isInviteModalOpen} 
+        onClose={() => setIsInviteModalOpen(false)} 
+        promoter={profile} 
+      />
     </div>
   );
 }

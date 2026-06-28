@@ -1,7 +1,10 @@
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../providers/AuthProvider";
 import { usePromoterInvitations, usePromoterCollaborations } from "../features/collaboration/api";
 import { usePromoterAnalytics } from "../features/analytics/api";
+import { useUploadAvatar, useUpsertPromoterProfile } from "../features/profile";
 
 import { Avatar, StatCard } from "../components/ui";
 import { formatNepaliCurrency } from "../utils/currency";
@@ -28,8 +31,12 @@ import {
 export default function PromoterDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
-  // Real Data Hooks
+  const queryClient = useQueryClient();
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadAvatarMutation = useUploadAvatar();
+  const updateProfileMutation = useUpsertPromoterProfile();
+
   const { data: invitations, isLoading: invsLoading } = usePromoterInvitations({ limit: 5 });
   const { data: collabs, isLoading: collabsLoading } = usePromoterCollaborations({ limit: 5 });
   const { data: analytics } = usePromoterAnalytics();
@@ -38,6 +45,25 @@ export default function PromoterDashboard() {
 
   const pendingInvites = analytics?.summary?.invitations_pending ?? 0;
   const activeCollabs = analytics?.summary?.active_collaborations ?? 0;
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      const url = await uploadAvatarMutation.mutateAsync(file);
+      updateProfileMutation.mutate({ avatar_url: url });
+    } catch {
+      // error handled by mutation
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  const onCameraClick = () => fileInputRef.current?.click();
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleAvatarUpload(file);
+  };
 
 
 
@@ -49,13 +75,31 @@ export default function PromoterDashboard() {
         <div className="h-24 bg-gradient-to-r from-primary-600 to-indigo-600"></div>
         <div className="px-8 pb-8">
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 -mt-10">
-            <div className="flex items-end gap-5">
-              <div className="relative">
-                <Avatar initials={user?.full_name?.[0]?.toUpperCase() ?? "P"} size="lg" className="w-24 h-24 text-2xl ring-4 ring-white shadow-sm bg-white" colorIndex={2} />
-                <button className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center ring-1 ring-gray-200 shadow-sm hover:bg-gray-50 transition-colors text-gray-500">
-                  <Camera size={14} />
-                </button>
-              </div>
+<div className="flex items-end gap-5">
+               <div className="relative">
+                 {avatarUploading ? (
+                   <div className="w-24 h-24 rounded-full bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center">
+                     <LoadingSpinner />
+                   </div>
+                 ) : (
+                   <Avatar initials={user?.full_name?.[0]?.toUpperCase() ?? "P"} size="lg" className="w-24 h-24 text-2xl ring-4 ring-white shadow-sm bg-white" colorIndex={2} />
+                 )}
+                 <button
+                   type="button"
+                   onClick={onCameraClick}
+                   disabled={avatarUploading}
+                   className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center ring-1 ring-gray-200 shadow-sm hover:bg-gray-50 transition-colors text-gray-500 disabled:opacity-50"
+                 >
+                   <Camera size={14} />
+                 </button>
+                 <input
+                   ref={fileInputRef}
+                   type="file"
+                   accept="image/*"
+                   onChange={onFileChange}
+                   className="hidden"
+                 />
+               </div>
               <div className="mb-1">
                 <div className="flex items-center gap-2">
                   <h1 className="text-2xl font-bold text-gray-900">{user?.full_name ?? "Creator"}</h1>

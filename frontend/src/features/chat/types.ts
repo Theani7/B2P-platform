@@ -4,6 +4,7 @@ export interface Message {
   id: string;
   conversation_id: string;
   sender_id: string;
+  sender_avatar?: string;
   message: string;
   message_type: MessageType;
   edited_at: string | null;

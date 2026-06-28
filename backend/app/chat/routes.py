@@ -139,8 +139,19 @@ def get_conversation_history(
     total = db.query(Message).filter(Message.conversation_id == conv.id).count()
     has_next = (offset + limit) < total
     
+    result_messages = []
+    for m in messages:
+        m_data = MessageRead.model_validate(m).model_dump()
+        sender = db.query(User).filter(User.id == m.sender_id).first()
+        if sender:
+            if hasattr(sender, 'business_profile') and sender.business_profile and sender.business_profile.logo_url:
+                m_data["sender_avatar"] = sender.business_profile.logo_url
+            elif hasattr(sender, 'promoter_profile') and sender.promoter_profile and sender.promoter_profile.avatar_url:
+                m_data["sender_avatar"] = sender.promoter_profile.avatar_url
+        result_messages.append(m_data)
+    
     data = {
-        "messages": [MessageRead.model_validate(m).model_dump() for m in messages],
+        "messages": result_messages,
         "next_page": page + 1 if has_next else None
     }
     return data
@@ -238,6 +249,12 @@ async def websocket_endpoint(
                 db.commit()
                 db.refresh(msg)
                 
+                sender_avatar = None
+                if hasattr(user, 'business_profile') and user.business_profile and user.business_profile.logo_url:
+                    sender_avatar = user.business_profile.logo_url
+                elif hasattr(user, 'promoter_profile') and user.promoter_profile and user.promoter_profile.avatar_url:
+                    sender_avatar = user.promoter_profile.avatar_url
+                
                 # Activity Log
                 ActivityService.record(
                     db=db,
@@ -251,9 +268,11 @@ async def websocket_endpoint(
                 )
                 
                 # Broadcast
+                msg_data = MessageRead.model_validate(msg).model_dump(mode="json")
+                msg_data["sender_avatar"] = sender_avatar
                 await chat_manager.broadcast({
                     "type": "MESSAGE",
-                    "payload": MessageRead.model_validate(msg).model_dump(mode="json")
+                    "payload": msg_data
                 }, conversation_id)
                 
                 # Notifications: Find the other participant and check if they're connected

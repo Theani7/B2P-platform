@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { useBusinessProfile, useUpsertBusinessProfile } from "../features/profile/api";
+import { useBusinessProfile, useUpsertBusinessProfile, uploadLogo } from "../features/profile";
 import { useBusinessProfileCompletion } from "../features/profile-completion";
 import { ProfileCompletionWidget } from "../components/ui";
 import { notifySuccess, notifyError } from "../hooks/useToast";
@@ -41,6 +41,8 @@ export default function BusinessProfilePage() {
   const qc = useQueryClient();
   const { data: profile, isLoading: profileLoading } = useBusinessProfile();
   const [activeTab, setActiveTab] = useState("general");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { register, handleSubmit, reset, formState: { errors, isDirty, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -66,6 +68,34 @@ export default function BusinessProfilePage() {
   }, [profile, reset]);
 
   const mutation = useUpsertBusinessProfile();
+
+  const handleLogoUpload = async (file: File) => {
+    if (!file) return;
+    setLogoUploading(true);
+    try {
+      const url = await uploadLogo(file);
+      mutation.mutate(
+        { ...profile, logo_url: url } as any,
+        {
+          onSuccess: () => {
+            notifySuccess("Logo uploaded successfully.");
+            qc.invalidateQueries({ queryKey: ["business-profile"] });
+          },
+          onError: () => notifyError("Failed to update logo."),
+        }
+      );
+    } catch {
+      notifyError("Failed to upload logo.");
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+  const onLogoClick = () => fileInputRef.current?.click();
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleLogoUpload(file);
+  };
   const { data: completionData, isLoading: completionLoading } = useBusinessProfileCompletion();
 
   const onSubmit = (data: FormValues) => {
@@ -100,23 +130,35 @@ export default function BusinessProfilePage() {
         </div>
       </div>
 
-      {/* Profile Overview Card */}
-      <div className="bg-white rounded-2xl p-6 ring-1 ring-gray-200 shadow-sm flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-50 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        
-        <div className="relative group/avatar cursor-pointer">
-          {profile?.logo_url ? (
-            <img src={profile.logo_url} alt="Logo" className="w-24 h-24 rounded-2xl object-cover ring-4 ring-white shadow-md" />
-          ) : (
-            <div className="w-24 h-24 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 group-hover/avatar:bg-gray-100 group-hover/avatar:border-primary-300 transition-colors shadow-sm">
-              <ImageIcon size={24} className="mb-1" />
-              <span className="text-[10px] font-medium">Upload Logo</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gray-900/60 rounded-2xl opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity">
-            <Upload size={20} className="text-white" />
-          </div>
-        </div>
+{/* Profile Overview Card */}
+       <div className="bg-white rounded-2xl p-6 ring-1 ring-gray-200 shadow-sm flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group">
+         <div className="absolute top-0 right-0 w-64 h-64 bg-primary-50 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+         
+         <div className="relative group/avatar cursor-pointer" onClick={onLogoClick}>
+           {profile?.logo_url ? (
+             <img src={profile.logo_url} alt="Logo" className="w-24 h-24 rounded-2xl object-cover ring-4 ring-white shadow-md" />
+           ) : logoUploading ? (
+             <div className="w-24 h-24 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center">
+               <LoadingSpinner />
+             </div>
+           ) : (
+             <div className="w-24 h-24 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 group-hover/avatar:bg-gray-100 group-hover/avatar:border-primary-300 transition-colors shadow-sm">
+               <ImageIcon size={24} className="mb-1" />
+               <span className="text-[10px] font-medium">Upload Logo</span>
+             </div>
+           )}
+           <div className="absolute inset-0 bg-gray-900/60 rounded-2xl opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity">
+             <Upload size={20} className="text-white" />
+           </div>
+         </div>
+
+         <input
+           ref={fileInputRef}
+           type="file"
+           accept="image/*"
+           onChange={onFileChange}
+           className="hidden"
+         />
 
         <div className="flex-1 text-center md:text-left z-10">
           <div className="flex items-center justify-center md:justify-start gap-2">

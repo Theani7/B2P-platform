@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { X, BadgeCheck, MapPin, Briefcase, Users, TrendingUp, Star, Image as ImageIcon, Play, UserPlus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar } from "../ui";
+import InvitePromoterModal from "../discovery/InvitePromoterModal";
 
 export function ProfileDrawer({ isOpen, onClose, promoter, onRemove }: any) {
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
@@ -28,7 +30,7 @@ export function ProfileDrawer({ isOpen, onClose, promoter, onRemove }: any) {
           animate={{ x: 0, boxShadow: "-10px 0 30px rgba(0,0,0,0.1)" }}
           exit={{ x: "100%", boxShadow: "-10px 0 30px rgba(0,0,0,0)" }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="relative w-full max-w-md bg-white h-full flex flex-col z-50 shadow-2xl"
+          className="relative w-full max-w-md bg-white h-full flex flex-col z-[101] shadow-2xl"
         >
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">Profile Preview</h2>
@@ -106,7 +108,10 @@ export function ProfileDrawer({ isOpen, onClose, promoter, onRemove }: any) {
           </div>
 
           <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3">
-            <button className="flex-1 bg-primary-600 hover:bg-primary-700 text-white h-11 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <button 
+              onClick={() => setIsInviteModalOpen(true)}
+              className="flex-1 bg-primary-600 hover:bg-primary-700 text-white h-11 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm"
+            >
               <UserPlus size={16} /> Invite to Campaign
             </button>
             <button 
@@ -119,6 +124,12 @@ export function ProfileDrawer({ isOpen, onClose, promoter, onRemove }: any) {
           </div>
         </motion.div>
       </div>
+
+      <InvitePromoterModal 
+        isOpen={isInviteModalOpen} 
+        onClose={() => setIsInviteModalOpen(false)} 
+        promoter={promoter} 
+      />
     </AnimatePresence>
   );
 }
