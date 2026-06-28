@@ -14,14 +14,14 @@ export function Input({ label, error, helperText, className = "", id, ...props }
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-gray-900">
+        <label htmlFor={inputId} className="block text-sm font-medium text-stone-900">
           {label}
         </label>
       )}
       <input
         id={inputId}
-        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo ${
-          error ? "border-brand-coral focus:border-brand-indigo focus:ring-brand-indigo" : "border-gray-200"
+        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-stone-900 placeholder-stone-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo ${
+          error ? "border-brand-coral focus:border-brand-indigo focus:ring-brand-indigo" : "border-stone-100"
         } ${className}`}
         aria-invalid={!!error}
         aria-describedby={errorId || helperId}
@@ -33,7 +33,7 @@ export function Input({ label, error, helperText, className = "", id, ...props }
         </p>
       )}
       {helperText && !error && (
-        <p id={helperId} className="text-sm text-gray-500">
+        <p id={helperId} className="text-sm text-stone-900">
           {helperText}
         </p>
       )}
