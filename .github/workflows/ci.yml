@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: cd frontend && npm ci
+      - run: cd frontend && npm ci --legacy-peer-deps
       - run: cd frontend && npx eslint src/
       - run: cd frontend && npx prettier --check src/
 
@@ -54,5 +54,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: cd frontend && npm ci
+      - run: cd frontend && npm ci --legacy-peer-deps
       - run: cd frontend && npm run test -- --run
