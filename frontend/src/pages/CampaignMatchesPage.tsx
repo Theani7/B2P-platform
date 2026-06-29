@@ -60,7 +60,7 @@ export default function CampaignMatchesPage() {
       <div>
         <Link
           to={`/business/campaigns/${campaignId}`}
-          className="text-xs text-brand-purple hover:underline inline-flex items-center gap-1 font-medium"
+          className="text-xs text-signal-blue hover:underline inline-flex items-center gap-1 font-medium"
         >
           &larr; Back to Campaign
         </Link>
@@ -72,22 +72,22 @@ export default function CampaignMatchesPage() {
           <button
             onClick={handleGenerate}
             disabled={generating}
-            className="bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="bg-signal-blue text-white rounded-button px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {generating ? "Generating..." : "Generate Recommendations"}
           </button>
         }
       />
 
-      <div className="flex flex-wrap items-center gap-4 bg-white border border-gray-100 rounded-xl p-5">
+      <div className="flex flex-wrap items-center gap-4 bg-white border border-slate-custom/10 rounded-cards p-5">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+          <label className="text-[11px] font-medium uppercase tracking-wide text-fog">
             Classification
           </label>
           <select
             value={filterClassification}
             onChange={(e) => { setFilterClassification(e.target.value as FilterKey); setPage(1); }}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
+            className="px-3 py-2 text-sm border border-slate-custom/10 rounded-inputs bg-white text-graphite focus:outline-none focus:border-signal-blue focus:ring-signal-blue/10"
           >
             <option value="all">All</option>
             <option value="EXCELLENT_MATCH">Excellent</option>
@@ -97,13 +97,13 @@ export default function CampaignMatchesPage() {
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+          <label className="text-[11px] font-medium uppercase tracking-wide text-fog">
             Min Score
           </label>
           <select
             value={minScore ?? ""}
             onChange={(e) => { setMinScore(e.target.value ? Number(e.target.value) : undefined); setPage(1); }}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo"
+            className="px-3 py-2 text-sm border border-slate-custom/10 rounded-inputs bg-white text-graphite focus:outline-none focus:border-signal-blue focus:ring-signal-blue/10"
           >
             <option value="">Any</option>
             <option value="90">90+</option>
@@ -116,9 +116,9 @@ export default function CampaignMatchesPage() {
             type="checkbox"
             checked={verifiedOnly}
             onChange={(e) => { setVerifiedOnly(e.target.checked); setPage(1); }}
-            className="w-4 h-4 rounded border-gray-300 text-brand-indigo focus:ring-brand-indigo"
+            className="w-4 h-4 rounded-inputs border-slate-custom/10 text-signal-blue focus:ring-signal-blue/10"
           />
-          <span className="text-sm text-gray-900">Verified Only</span>
+          <span className="text-sm text-graphite">Verified Only</span>
         </label>
       </div>
 
@@ -130,7 +130,7 @@ export default function CampaignMatchesPage() {
             <button
               onClick={handleGenerate}
               disabled={generating}
-              className="bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="bg-signal-blue text-white rounded-button px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {generating ? "Generating..." : "Generate Recommendations"}
             </button>
@@ -148,10 +148,10 @@ export default function CampaignMatchesPage() {
                   <button
                     key={p}
                     onClick={() => setPage(p)}
-                    className={`px-3 py-1 text-sm font-medium transition-colors ${
+                    className={`px-3 py-1 text-sm font-medium transition-colors rounded-inputs ${
                       p === page
-                        ? "bg-brand-indigo text-white rounded-lg"
-                        : "text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-900"
+                        ? "bg-signal-blue text-white"
+                        : "text-ash hover:bg-sky-wash hover:text-graphite"
                     }`}
                   >
                     {p}
@@ -170,4 +170,3 @@ export default function CampaignMatchesPage() {
     </div>
   );
 }
-

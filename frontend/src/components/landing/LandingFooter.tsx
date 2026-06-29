@@ -4,39 +4,40 @@ const footerLinks = {
   product: [
     { label: "Features", href: "#features" },
     { label: "How it works", href: "#how-it-works" },
-    { label: "For Businesses", href: "#businesses" },
-    { label: "For Promoters", href: "#promoters" },
+    { label: "For businesses", href: "#businesses" },
+    { label: "For promoters", href: "#promoters" },
   ],
   company: [
-    { label: "About", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "About", href: "/" },
+    { label: "Contact", href: "/" },
+    { label: "Careers", href: "/" },
   ],
   legal: [
-    { label: "Privacy", href: "#" },
-    { label: "Terms", href: "#" },
+    { label: "Privacy", href: "/" },
+    { label: "Terms", href: "/" },
   ],
 };
 
 export default function LandingFooter() {
   return (
-    <footer className="py-12 bg-white border-t border-stone-100">
-      <div className="max-w-[1200px] mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-          <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="inline-block text-lg font-medium text-stone-900 mb-4">
+    <footer className="bg-white border-t border-slate-custom/10">
+      <div className="max-w-[1200px] mx-auto px-6 py-12">
+        <div className="grid md:grid-cols-4 gap-8">
+          <div>
+            <Link to="/" className="flex items-center gap-2 text-lg font-medium text-signal-blue">
               Byparsathy
             </Link>
-            <p className="text-xs text-stone-900 leading-relaxed max-w-[200px]">
-              The collaboration marketplace for businesses and promoters in Nepal.
+            <p className="text-sm text-ash mt-2 max-w-xs">
+              Nepal's brand-to-promoter collaboration platform. Connect, collaborate, and grow.
             </p>
           </div>
 
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-widest text-stone-900 mb-4">Product</p>
-            <ul className="flex flex-col gap-2.5">
+            <h4 className="text-caption font-medium uppercase tracking-wider text-graphite mb-4">Product</h4>
+            <ul className="space-y-2">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-stone-900 hover:text-brand-purple transition-colors">
+                  <a href={link.href} className="text-sm text-ash hover:text-signal-blue transition-colors">
                     {link.label}
                   </a>
                 </li>
@@ -45,39 +46,35 @@ export default function LandingFooter() {
           </div>
 
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-widest text-stone-900 mb-4">Company</p>
-            <ul className="flex flex-col gap-2.5">
+            <h4 className="text-caption font-medium uppercase tracking-wider text-graphite mb-4">Company</h4>
+            <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-stone-900 hover:text-brand-purple transition-colors">
+                  <Link to={link.href} className="text-sm text-ash hover:text-signal-blue transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-widest text-stone-900 mb-4">Legal</p>
-            <ul className="flex flex-col gap-2.5">
+            <h4 className="text-caption font-medium uppercase tracking-wider text-graphite mb-4">Legal</h4>
+            <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-stone-900 hover:text-brand-purple transition-colors">
+                  <Link to={link.href} className="text-sm text-ash hover:text-signal-blue transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-stone-900">© 2026 Byparsathy, Nepal.</p>
-          <div className="flex items-center gap-4">
-            <a href="#" className="text-xs text-stone-900 hover:text-brand-purple transition-colors">Twitter</a>
-            <a href="#" className="text-xs text-stone-900 hover:text-brand-purple transition-colors">LinkedIn</a>
-            <a href="#" className="text-xs text-stone-900 hover:text-brand-purple transition-colors">Instagram</a>
-          </div>
+        <div className="mt-12 pt-8 border-t border-slate-custom/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-ash">© {new Date().getFullYear()} Byparsathy. All rights reserved.</p>
+          <p className="text-xs text-ash">Made in Nepal 🇳🇵</p>
         </div>
       </div>
     </footer>

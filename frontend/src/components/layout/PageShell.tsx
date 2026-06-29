@@ -9,7 +9,7 @@ interface PageShellProps {
 
 export function PageShell({ role, children }: PageShellProps) {
   return (
-    <div className="min-h-screen bg-stone-50 flex">
+    <div className="min-h-screen bg-linen-canvas flex">
       <Sidebar role={role} />
       <div className="flex-1 flex flex-col min-w-0 md:ml-56">
         <TopHeader />

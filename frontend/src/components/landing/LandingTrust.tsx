@@ -22,7 +22,7 @@ const item = {
 
 export default function LandingTrust() {
   return (
-    <section className="py-16 bg-white border-y border-stone-100">
+    <section className="py-16 bg-white">
       <motion.div
         variants={container}
         initial="hidden"
@@ -33,10 +33,10 @@ export default function LandingTrust() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat) => (
             <motion.div key={stat.label} variants={item} className="text-center">
-              <p className="text-3xl sm:text-4xl font-medium text-stone-900 mb-2">
+              <p className="text-heading-lg text-midnight-ink mb-2">
                 {stat.value}
               </p>
-              <p className="text-xs text-stone-900 font-normal">{stat.label}</p>
+              <p className="text-body text-ash">{stat.label}</p>
             </motion.div>
           ))}
         </div>

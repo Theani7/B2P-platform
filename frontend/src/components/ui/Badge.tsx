@@ -8,7 +8,9 @@ type BadgeVariant =
   | "rejected"
   | "draft"
   | "business"
-  | "promoter";
+  | "promoter"
+  | "open"
+  | "archived";
 
 interface BadgeProps {
   variant: BadgeVariant;
@@ -17,20 +19,22 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  active: "bg-brand-purple-50 text-brand-purple-900",
-  verified: "bg-brand-teal-50 text-brand-teal-900",
-  pending: "bg-brand-amber-50 text-brand-amber-900",
-  completed: "bg-green-50 text-green-800",
-  rejected: "bg-brand-coral-50 text-brand-coral-900",
-  draft: "bg-stone-100 text-stone-900",
-  business: "bg-brand-purple-50 text-brand-purple-900",
-  promoter: "bg-brand-teal-50 text-brand-teal-900",
+  active: "bg-emerald-status/10 text-emerald-status",
+  verified: "bg-emerald-status/10 text-emerald-status",
+  pending: "bg-amber-tag/10 text-amber-tag",
+  completed: "bg-emerald-status/10 text-emerald-status",
+  rejected: "bg-coral-alert/10 text-coral-alert",
+  draft: "bg-slate-custom/10 text-slate-custom",
+  business: "bg-signal-blue/10 text-signal-blue",
+  promoter: "bg-emerald-status/10 text-emerald-status",
+  open: "bg-signal-blue/10 text-signal-blue",
+  archived: "bg-amber-tag/10 text-amber-tag",
 };
 
 export function Badge({ variant, children, className = "" }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${variantClasses[variant]} ${className}`}
+      className={`inline-flex items-center px-1.5 py-0.5 rounded-badges text-xs font-medium ${variantClasses[variant]} ${className}`}
     >
       {children}
     </span>

@@ -26,12 +26,12 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog isOpen={isOpen} onClose={onClose} title={title} size="sm">
-      <p className="text-sm text-gray-700">{message}</p>
+      <p className="text-sm text-graphite">{message}</p>
       <div className="flex gap-3 justify-end mt-6">
         <Button variant="secondary" onClick={onClose} disabled={loading}>
           {cancelText}
         </Button>
-        <Button variant={variant === "destructive" ? "ghost-destructive" : "primary"} onClick={onConfirm} loading={loading}>
+        <Button variant={variant === "destructive" ? "ghost-coral" : "primary-filled"} onClick={onConfirm} loading={loading}>
           {confirmText}
         </Button>
       </div>

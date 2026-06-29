@@ -81,10 +81,9 @@ describe("Table", () => {
     expect(aliceRow?.className).toContain("cursor-pointer");
   });
 
-  test("applies rounded-xl and border-gray-100 to wrapper", () => {
+  test("applies rounded-cards to wrapper", () => {
     const { container } = render(<Table columns={columns} data={data} />);
     const wrapper = container.querySelector(".overflow-x-auto");
-    expect(wrapper?.className).toContain("rounded-xl");
-    expect(wrapper?.className).toContain("border-gray-100");
+    expect(wrapper?.className).toContain("rounded-cards");
   });
 });

@@ -28,14 +28,14 @@ describe("StatCard", () => {
     render(<StatCard label="Users" value={100} trend={{ value: "+12%", positive: true }} />);
     const trend = screen.getByText("+12%");
     expect(trend).toBeInTheDocument();
-    expect(trend.className).toContain("text-brand-teal");
+    expect(trend.className).toContain("text-emerald-status");
   });
 
   test("renders negative trend", () => {
     render(<StatCard label="Users" value={100} trend={{ value: "-5%", positive: false }} />);
     const trend = screen.getByText("-5%");
     expect(trend).toBeInTheDocument();
-    expect(trend.className).toContain("text-brand-coral");
+    expect(trend.className).toContain("text-coral-alert");
   });
 
   test("does not render trend when not provided", () => {
@@ -48,8 +48,8 @@ describe("StatCard", () => {
     const el = container.firstChild as HTMLElement;
     expect(el.className).toContain("bg-white");
     expect(el.className).toContain("border");
-    expect(el.className).toContain("border-gray-100");
-    expect(el.className).toContain("rounded-xl");
+    expect(el.className).toContain("border-slate-custom/10");
+    expect(el.className).toContain("rounded-cards");
     expect(el.className).toContain("p-5");
   });
 
@@ -61,9 +61,9 @@ describe("StatCard", () => {
   test("renders label with uppercase tracking styling", () => {
     render(<StatCard label="Metric" value={42} />);
     const label = screen.getByText("Metric");
-    expect(label.className).toContain("text-[11px]");
+    expect(label.className).toContain("text-caption");
     expect(label.className).toContain("uppercase");
-    expect(label.className).toContain("tracking-wide");
-    expect(label.className).toContain("text-gray-400");
+    expect(label.className).toContain("tracking-wider");
+    expect(label.className).toContain("text-ash");
   });
 });

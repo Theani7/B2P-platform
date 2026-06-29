@@ -16,14 +16,14 @@ export function Select({ label, error, helperText, options, placeholder, classNa
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={selectId} className="block text-sm font-medium text-gray-900">
+        <label htmlFor={selectId} className="block text-sm font-medium text-graphite">
           {label}
         </label>
       )}
       <select
         id={selectId}
-        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-gray-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo ${
-          error ? "border-brand-coral focus:border-brand-indigo focus:ring-brand-indigo" : "border-gray-200"
+        className={`w-full px-3 py-2 text-sm border rounded-inputs bg-white text-graphite focus:outline-none focus:border-signal-blue focus:ring-signal-blue/10 ${
+          error ? "border-coral-alert focus:border-signal-blue focus:ring-signal-blue/10" : "border-slate-custom/10"
         } ${className}`}
         aria-invalid={!!error}
         aria-describedby={errorId || helperId}
@@ -37,12 +37,12 @@ export function Select({ label, error, helperText, options, placeholder, classNa
         ))}
       </select>
       {error && (
-        <p id={errorId} className="text-sm text-brand-coral" role="alert">
+        <p id={errorId} className="text-sm text-coral-alert" role="alert">
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p id={helperId} className="text-sm text-gray-500">
+        <p id={helperId} className="text-sm text-ash">
           {helperText}
         </p>
       )}

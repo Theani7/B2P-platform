@@ -6,7 +6,7 @@ import { Users, Building2, Megaphone, CheckCircle, Target, Briefcase, Star, Perc
 export default function AnalyticsPage() {
   const { data, isLoading, error } = useAdminAnalytics();
 
-  if (error) return <div className="text-center py-12"><p className="text-brand-coral">Error loading data</p><p className="text-stone-500 text-sm">{(error as Error).message}</p></div>;
+  if (error) return <div className="text-center py-12"><p className="text-coral-alert">Error loading data</p><p className="text-xs text-ash">{(error as Error).message}</p></div>;
   if (isLoading) return <LoadingSpinner />;
 
   const kpiCards = [
@@ -23,7 +23,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-xl font-medium text-stone-900 font-stretch-condensed">Analytics</h1>
+      <h1 className="text-heading text-graphite">Analytics</h1>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {kpiCards.map((card) => (
@@ -32,19 +32,19 @@ export default function AnalyticsPage() {
       </div>
 
       {data?.top_niches && Object.keys(data.top_niches).length > 0 && (
-        <div className="rounded-xl border border-stone-100 bg-white p-5 border-t-[1px] border-t-brand-purple">
-          <h2 className="text-base font-medium text-stone-900 font-stretch-condensed">Top Niches</h2>
+        <div className="rounded-cards border border-slate-custom/10 bg-white p-5">
+          <h2 className="text-heading text-graphite">Top Niches</h2>
           <div className="mt-4 space-y-2">
             {Object.entries(data.top_niches).slice(0, 10).map(([niche, count]) => {
               const total = Object.values(data.top_niches!).reduce((a, b) => a + b, 0);
               const pct = total > 0 ? (count / total) * 100 : 0;
               return (
                 <div key={niche} className="flex items-center gap-3">
-                  <span className="w-24 text-sm text-stone-600">{niche}</span>
-                  <div className="h-4 flex-1 rounded-full bg-stone-100">
-                    <div className="h-4 rounded-full bg-brand-teal" style={{ width: `${pct}%` }} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} />
+                  <span className="w-24 text-sm text-graphite">{niche}</span>
+                  <div className="h-4 flex-1 rounded-full bg-sky-wash">
+                    <div className="h-4 rounded-full bg-emerald-status" style={{ width: `${pct}%` }} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} />
                   </div>
-                  <span className="w-12 text-right text-sm text-stone-500">{count}</span>
+                  <span className="w-12 text-right text-sm text-ash">{count}</span>
                 </div>
               );
             })}
@@ -53,13 +53,13 @@ export default function AnalyticsPage() {
       )}
 
       {data?.top_locations && Object.keys(data.top_locations).length > 0 && (
-        <div className="rounded-xl border border-stone-100 bg-white p-5 border-t-[1px] border-t-brand-purple">
-          <h2 className="text-base font-medium text-stone-900 font-stretch-condensed">Top Campaign Locations</h2>
+        <div className="rounded-cards border border-slate-custom/10 bg-white p-5">
+          <h2 className="text-heading text-graphite">Top Campaign Locations</h2>
           <div className="mt-4 space-y-2">
             {Object.entries(data.top_locations).slice(0, 10).map(([location, count]) => (
               <div key={location} className="flex items-center justify-between text-sm">
-                <span className="text-stone-600">{location}</span>
-                <span className="font-medium text-stone-900">{count}</span>
+                <span className="text-graphite">{location}</span>
+                <span className="font-medium text-graphite">{count}</span>
               </div>
             ))}
           </div>

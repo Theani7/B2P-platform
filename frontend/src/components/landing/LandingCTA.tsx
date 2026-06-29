@@ -1,35 +1,39 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { Button } from "../ui/Button";
 
 export default function LandingCTA() {
   return (
-    <section className="py-20 lg:py-28 bg-stone-50">
-      <div className="max-w-4xl mx-auto px-6">
+    <section className="py-20 lg:py-28 bg-white">
+      <div className="max-w-[1200px] mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.5 }}
-          className="relative bg-white border border-stone-100 rounded-3xl p-10 sm:p-14 text-center overflow-hidden"
+          className="bg-linen-canvas border border-slate-custom/10 rounded-cards-lg p-12 lg:p-16 text-center shadow-feature-section"
         >
-          <h2 className="text-2xl sm:text-3xl font-medium text-stone-900 font-stretch-condensed mb-4">
-            Ready to grow your next collaboration?
+          <h2 className="text-heading-lg text-midnight-ink mb-4 max-w-2xl mx-auto">
+            Ready to transform your marketing?
           </h2>
-          <p className="text-sm text-stone-900 leading-relaxed max-w-lg mx-auto mb-8">
-            Join hundreds of businesses and creators already using Byparsathy to work smarter.
+          <p className="text-body text-ash mb-8 max-w-xl mx-auto">
+            Join hundreds of businesses and promoters already using Byparsathy to run
+            high-performing campaigns.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link to="/register">
-              <Button size="lg" className="h-12 px-6 text-base">
-                Create your account
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a href="/register" className="inline-flex">
+              <Button size="lg" variant="primary-filled">
+                <span className="flex items-center gap-2">
+                  Get started free
+                  <ArrowRight size={16} />
+                </span>
               </Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="secondary" size="lg" className="h-12 px-6 text-base">
-                Sign in
+            </a>
+            <a href="/login" className="inline-flex">
+              <Button size="lg" variant="primary-outlined">
+                Contact sales
               </Button>
-            </Link>
+            </a>
           </div>
         </motion.div>
       </div>

@@ -7,7 +7,7 @@ describe("Skeleton", () => {
     const { container } = render(<Skeleton />);
     const el = container.firstChild as HTMLElement;
     expect(el.className).toContain("animate-pulse");
-    expect(el.className).toContain("bg-gray-200");
+    expect(el.className).toContain("bg-slate-custom/10");
     expect(el.className).toContain("h-4");
     expect(el.className).toContain("w-full");
     expect(el.className).toContain("rounded");

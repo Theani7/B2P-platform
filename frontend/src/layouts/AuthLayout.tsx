@@ -15,11 +15,12 @@ const features = [
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-stone-50 flex">
-      <div className="hidden lg:flex lg:w-[45%] xl:w-[48%] relative bg-stone-100 overflow-hidden">
-        <div className="absolute inset-0" />
+    <div className="min-h-screen bg-linen-canvas flex">
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[48%] relative overflow-hidden">
+        <div className="absolute inset-0 hero-radial-wash" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-linen-canvas/80" />
         <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
-          <Link to="/" className="flex items-center gap-2 text-lg font-medium text-brand-purple">
+          <Link to="/" className="flex items-center gap-2 text-lg font-medium text-white">
             Byparsathy
           </Link>
 
@@ -28,7 +29,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="text-2xl xl:text-3xl font-medium text-stone-900 font-stretch-condensed leading-snug mb-4"
+              className="text-heading-lg text-white mb-4"
             >
               Where businesses and creators build successful partnerships.
             </motion.h2>
@@ -36,7 +37,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-sm text-stone-900 leading-relaxed mb-10"
+              className="text-body text-white/80 mb-10"
             >
               Byparsathy connects businesses with verified local promoters using smart
               matching. Manage campaigns, collaborate, and track results — all in one platform.
@@ -46,9 +47,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white border border-stone-100 rounded-xl p-5"
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-cards-lg p-5"
             >
-              <p className="text-[11px] font-medium uppercase tracking-widest text-stone-900 mb-4">
+              <p className="text-caption font-medium uppercase tracking-widest text-white/90 mb-4">
                 Platform capabilities
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -60,21 +61,21 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                     transition={{ duration: 0.4, delay: 0.3 + idx * 0.05 }}
                     className="flex items-center gap-2.5"
                   >
-                    <span className="w-5 h-5 rounded-full bg-brand-teal-50 border border-teal-200 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-3 h-3 text-brand-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <span className="w-5 h-5 rounded-full bg-emerald-status/20 border border-emerald-status/30 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3 h-3 text-emerald-status" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </span>
-                    <span className="text-xs text-stone-900">{feature}</span>
+                    <span className="text-xs text-white/90">{feature}</span>
                   </motion.div>
                 ))}
               </div>
             </motion.div>
           </div>
 
-          <div className="flex items-center gap-6 text-xs text-stone-900">
+          <div className="flex items-center gap-6 text-xs text-white/70">
             <span>© 2026 Byparsathy</span>
-            <Link to="/" className="hover:text-brand-purple transition-colors">Back to home</Link>
+            <Link to="/" className="hover:text-white transition-colors">Back to home</Link>
           </div>
         </div>
       </div>
@@ -82,13 +83,13 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <Link to="/" className="flex items-center justify-center gap-2 text-lg font-medium mb-8 lg:hidden">
-            <span className="text-brand-purple">Byparsathy</span>
+            <span className="text-signal-blue">Byparsathy</span>
           </Link>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white border border-stone-100 rounded-xl p-8"
+            className="bg-white border border-slate-custom/10 rounded-cards-lg p-8"
           >
             {children}
           </motion.div>

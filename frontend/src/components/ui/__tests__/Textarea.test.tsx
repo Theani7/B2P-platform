@@ -59,11 +59,11 @@ describe("Textarea", () => {
 
   test("applies error border class", () => {
     render(<Textarea error="Error" />);
-    expect(screen.getByRole("textbox").className).toContain("border-brand-coral");
+    expect(screen.getByRole("textbox").className).toContain("border-coral-alert");
   });
 
   test("applies default border class", () => {
     render(<Textarea />);
-    expect(screen.getByRole("textbox").className).toContain("border-gray-200");
+    expect(screen.getByRole("textbox").className).toContain("border-slate-custom/10");
   });
 });

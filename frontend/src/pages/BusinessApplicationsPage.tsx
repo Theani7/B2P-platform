@@ -28,11 +28,11 @@ export default function BusinessApplicationsPage() {
 
   if (error) return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="w-16 h-16 rounded-2xl bg-brand-coral-50 flex items-center justify-center mb-4 ring-1 ring-brand-coral/10">
-        <XCircle size={32} className="text-brand-coral" />
+      <div className="w-16 h-16 rounded-cards bg-coral-alert/10 flex items-center justify-center mb-4">
+        <XCircle size={32} className="text-coral-alert" />
       </div>
-      <p className="text-lg font-medium text-gray-900">Error loading applications</p>
-      <p className="text-sm text-gray-500 mt-1">{(error as Error).message}</p>
+      <p className="text-lg font-medium text-graphite">Error loading applications</p>
+      <p className="text-sm text-ash mt-1">{(error as Error).message}</p>
     </div>
   );
 
@@ -60,14 +60,14 @@ export default function BusinessApplicationsPage() {
   if (!data || data.items.length === 0) {
     return (
       <div className="space-y-6">
-        <Link to="/business/campaigns" className="text-xs text-brand-purple hover:underline inline-flex items-center gap-1 font-medium mb-3">
+        <Link to="/business/campaigns" className="text-xs text-signal-blue hover:underline inline-flex items-center gap-1 font-medium mb-3">
           &larr; Back to Campaigns
         </Link>
         <EmptyState
           title="No applications yet"
           description="Promoters haven't applied to this campaign yet. Try promoting it more or inviting specific promoters."
           action={
-            <Link to="/business/campaigns" className="inline-flex items-center gap-2 bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
+            <Link to="/business/campaigns" className="inline-flex items-center gap-2 bg-signal-blue text-white rounded-button px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
               <ArrowLeft size={16} />
               Back to Campaigns
             </Link>
@@ -92,23 +92,23 @@ export default function BusinessApplicationsPage() {
               <Avatar initials={app.promoter_username?.[0]?.toUpperCase() ?? "?"} size="md" colorIndex={app.id?.charCodeAt(0) || 0} />
             )}
             {app.promoter_verified && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brand-teal flex items-center justify-center ring-2 ring-white">
+              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-status flex items-center justify-center ring-2 ring-white">
                 <BadgeCheck size={10} className="text-white" />
               </div>
             )}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-medium text-gray-900">{app.promoter_username}</h3>
+              <h3 className="text-sm font-medium text-graphite">{app.promoter_username}</h3>
               {app.promoter_verified && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-teal-50 text-brand-teal-900 ring-1 ring-brand-teal/10">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-badges text-[10px] font-medium bg-emerald-status/10 text-emerald-status">
                   <BadgeCheck size={10} />
                   Verified
                 </span>
               )}
             </div>
             {app.promoter_headline && (
-              <p className="text-xs text-gray-500 mt-0.5">{app.promoter_headline}</p>
+              <p className="text-xs text-ash mt-0.5">{app.promoter_headline}</p>
             )}
           </div>
         </div>
@@ -119,15 +119,15 @@ export default function BusinessApplicationsPage() {
       header: "Stats",
       render: (app) => (
         <div className="flex flex-col gap-1.5">
-          <span className="inline-flex items-center gap-1 text-[11px] text-gray-700">
-            <Briefcase size={10} className="text-brand-purple" />
+          <span className="inline-flex items-center gap-1 text-[11px] text-graphite">
+            <Briefcase size={10} className="text-signal-blue" />
             {app.promoter_niche}
           </span>
-          <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-            <Users size={10} className="text-gray-400" />
+          <span className="inline-flex items-center gap-1 text-xs text-ash">
+            <Users size={10} className="text-fog" />
             {app.promoter_followers_count?.toLocaleString()} followers
           </span>
-          <span className="inline-flex items-center gap-1 text-xs text-brand-teal font-medium">
+          <span className="inline-flex items-center gap-1 text-xs text-emerald-status font-medium">
             <TrendingUp size={10} />
             {app.promoter_engagement_rate?.toFixed(1)}% eng.
           </span>
@@ -157,12 +157,12 @@ export default function BusinessApplicationsPage() {
             render: (app: any) =>
               app.message ? (
                 <div className="max-w-[200px]">
-                  <p className="text-xs text-gray-600 truncate" title={app.message}>
+                  <p className="text-xs text-graphite truncate" title={app.message}>
                     {app.message}
                   </p>
                 </div>
               ) : (
-                <span className="text-xs text-gray-400">-</span>
+                <span className="text-xs text-fog">-</span>
               ),
           },
         ]
@@ -177,7 +177,7 @@ export default function BusinessApplicationsPage() {
               <button
                 onClick={() => handleAccept(app.id)}
                 disabled={acceptMutation.isPending}
-                className="bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors inline-flex items-center gap-1.5"
+                className="bg-emerald-status/10 text-emerald-status border border-emerald-status/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-emerald-status/20 transition-colors inline-flex items-center gap-1.5"
               >
                 <CheckCircle2 size={12} />
                 {acceptMutation.isPending ? "Accepting..." : "Accept"}
@@ -185,7 +185,7 @@ export default function BusinessApplicationsPage() {
               <button
                 onClick={() => handleReject(app.id)}
                 disabled={rejectMutation.isPending}
-                className="bg-brand-coral-50 text-brand-coral-900 border border-red-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition-colors inline-flex items-center gap-1.5"
+                className="bg-coral-alert/10 text-coral-alert border border-coral-alert/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors inline-flex items-center gap-1.5"
               >
                 <XCircle size={12} />
                 {rejectMutation.isPending ? "Rejecting..." : "Reject"}
@@ -194,7 +194,7 @@ export default function BusinessApplicationsPage() {
           )}
           <Link
             to={`/promoters/${app.promoter_username}`}
-            className="text-xs text-brand-purple hover:underline flex items-center gap-1 font-medium ml-auto"
+            className="text-xs text-signal-blue hover:underline flex items-center gap-1 font-medium ml-auto"
           >
             <Eye size={12} />
             View Profile
@@ -208,7 +208,7 @@ export default function BusinessApplicationsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <Link to="/business/campaigns" className="text-xs text-brand-purple hover:underline inline-flex items-center gap-1 font-medium mb-3">
+        <Link to="/business/campaigns" className="text-xs text-signal-blue hover:underline inline-flex items-center gap-1 font-medium mb-3">
           &larr; Back to Campaigns
         </Link>
         <PageHeader
@@ -226,7 +226,7 @@ export default function BusinessApplicationsPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-inputs border border-slate-custom/10 px-3 py-1.5 text-xs font-medium text-graphite hover:bg-sky-wash disabled:opacity-50 transition-colors"
           >
             <ArrowLeft size={12} />
             Previous
@@ -236,10 +236,10 @@ export default function BusinessApplicationsPage() {
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
+                className={`w-8 h-8 rounded-inputs text-xs font-medium transition-colors ${
                   p === page
-                    ? "bg-brand-indigo text-white"
-                    : "text-gray-500 hover:bg-gray-100"
+                    ? "bg-signal-blue text-white"
+                    : "text-ash hover:bg-sky-wash"
                 }`}
               >
                 {p}
@@ -249,7 +249,7 @@ export default function BusinessApplicationsPage() {
           <button
             onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
             disabled={page >= data.pages}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-inputs border border-slate-custom/10 px-3 py-1.5 text-xs font-medium text-graphite hover:bg-sky-wash disabled:opacity-50 transition-colors"
           >
             Next
             <ArrowLeft size={12} className="rotate-180" />

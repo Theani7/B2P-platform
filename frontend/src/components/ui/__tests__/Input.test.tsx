@@ -71,12 +71,12 @@ describe("Input", () => {
 
   test("applies error border class", () => {
     render(<Input error="Error" />);
-    expect(screen.getByRole("textbox").className).toContain("border-brand-coral");
+    expect(screen.getByRole("textbox").className).toContain("border-coral-alert");
   });
 
   test("applies default border class", () => {
     render(<Input />);
-    expect(screen.getByRole("textbox").className).toContain("border-gray-200");
+    expect(screen.getByRole("textbox").className).toContain("border-slate-custom/20");
   });
 
   test("sets aria-describedby for helper text", () => {

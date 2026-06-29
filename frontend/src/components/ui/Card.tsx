@@ -2,6 +2,7 @@ import React from "react";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   padding?: "none" | "sm" | "md" | "lg";
+  variant?: "compact" | "feature";
 }
 
 const paddingClasses = {
@@ -11,13 +12,14 @@ const paddingClasses = {
   lg: "p-6",
 };
 
-export function Card({ padding = "md", className = "", children, ...props }: CardProps) {
+export function Card({ padding = "md", variant = "compact", className = "", children, ...props }: CardProps) {
+  const variantClasses =
+    variant === "feature"
+      ? "bg-linen-canvas rounded-cards-lg border-0"
+      : "bg-white border border-slate-custom/10 shadow-product-card rounded-cards";
+
   return (
-    <div
-      className={`bg-white border border-stone-100 rounded-xl ${paddingClasses[padding]} ${className}`}
-      style={{ borderTop: "1px solid #7F77DD" }}
-      {...props}
-    >
+    <div className={`${paddingClasses[padding]} ${variantClasses} ${className}`} {...props}>
       {children}
     </div>
   );

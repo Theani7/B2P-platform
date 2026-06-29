@@ -69,7 +69,7 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                 <div className="pt-1">
                   <div className="flex items-center gap-3">
                     <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{promoter.username}</h2>
-                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-bold tracking-wide">
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-tag/10 text-amber-tag text-xs font-bold tracking-wide">
                       <Star size={12} className="fill-amber-400 text-amber-400" />
                       4.9
                     </span>
@@ -114,7 +114,7 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-gray-50/50 p-6 sm:p-8">
+            <div className="flex-1 overflow-y-auto bg-linen-canvas/50 p-6 sm:p-8">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
                 <div className="lg:col-span-5 space-y-8">
                   <div className="grid grid-cols-2 gap-3">

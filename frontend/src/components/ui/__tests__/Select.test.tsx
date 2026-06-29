@@ -69,11 +69,11 @@ describe("Select", () => {
 
   test("applies error border class", () => {
     render(<Select label="Category" options={options} error="Error" />);
-    expect(screen.getByRole("combobox").className).toContain("border-brand-coral");
+    expect(screen.getByRole("combobox").className).toContain("border-coral-alert");
   });
 
   test("applies default border class", () => {
     render(<Select label="Category" options={options} />);
-    expect(screen.getByRole("combobox").className).toContain("border-gray-200");
+    expect(screen.getByRole("combobox").className).toContain("border-slate-custom/10");
   });
 });

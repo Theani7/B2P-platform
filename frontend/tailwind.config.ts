@@ -5,45 +5,56 @@ export default {
   theme: {
     extend: {
       colors: {
-        // B2P Connect design tokens
-        stone: {
-          50: "#FAFAF8",
-          100: "#E9E7E3",
-          900: "#292521",
-        },
-        brand: {
-          purple: "#7F77DD",
-          "purple-50": "#EEEDFE",
-          "purple-900": "#3C3489",
-          indigo: "#5B4FCF",
-          "indigo-50": "#EEECFB",
-          "indigo-900": "#2D2580",
-          teal: "#1D9E75",
-          "teal-50": "#E1F5EE",
-          "teal-900": "#085041",
-          coral: "#C44A2A",
-          "coral-50": "#FAECE7",
-          "coral-900": "#712B13",
-          amber: "#BA7517",
-          "amber-50": "#FAEEDA",
-          "amber-900": "#633806",
-        },
-        primary: {
-          50: "#EEEDFE",
-          100: "#E0DEFD",
-          200: "#C7C2FC",
-          300: "#A9A2FA",
-          400: "#8D83F7",
-          500: "#7F77DD", // brand-purple
-          600: "#5B4FCF", // brand-indigo
-          700: "#493FB5",
-          800: "#3C3489",
-          900: "#2D2580",
-          DEFAULT: "#5B4FCF", // maps to primary-600
-        }
+        "linen-canvas": "#fcfcfc",
+        "sky-wash": "#f0f4fe",
+        "midnight-ink": "#020520",
+        "graphite": "#14141e",
+        "slate-custom": "#374151",
+        ash: "#696a72",
+        fog: "#95959b",
+        steel: "#6b7280",
+        "signal-blue": "#145aff",
+        "periwinkle-glow": "#b6cbfd",
+        "hero-blue-fade": "#3b82f6",
+        "emerald-status": "#16ca2e",
+        "coral-alert": "#f26052",
+        "azure-info": "#0099ff",
+        "amber-tag": "#ffa64d",
+        "primary-action": "#0f1f3d",
+      },
+      boxShadow: {
+        "product-card": "rgba(0, 0, 0, 0.1) 0px 0px 4px -2px",
+        "elevated": "rgba(0, 0, 0, 0.25) 0px 0px 4px -2px",
+        "feature-section":
+          "rgba(0, 0, 0, 0.082) 0px 0.36px 1.81px -1.42px, rgba(0, 0, 0, 0.07) 0px 1.37px 6.87px -2.83px, rgba(0, 0, 0, 0.016) 0px 6px 30px -4.25px",
+        "blue-focus": "rgba(20, 90, 255, 0.1) 0px 0px 50px -28px, rgba(0, 0, 0, 0.18) 0px 0px 3px -1px",
+        "hero-glow": "rgba(20, 90, 255, 0.1) 0px 0px 100px -28px",
+      },
+      borderRadius: {
+        "cards": "8px",
+        "cards-lg": "40px",
+        "badges": "4px",
+        "images": "16px",
+        inputs: "12px",
+        modals: "32px",
+        buttons: "12px",
+        pill: "100px",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        inter: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["Roboto Mono", "ui-monospace", "monospace"],
+      },
+      spacing: {
+        "52": "52px",
+        "72": "72px",
+      },
+      fontSize: {
+        "display": ["56px", { lineHeight: "1.05", letterSpacing: "-1.51px" }],
+        "heading-lg": ["40px", { lineHeight: "1.08", letterSpacing: "-0.76px" }],
+        "heading": ["22px", { lineHeight: "1.25", letterSpacing: "-0.22px" }],
+        "heading-sm": ["18px", { lineHeight: "1.4", letterSpacing: "-0.16px" }],
+        "body": ["14px", { lineHeight: "1.43", letterSpacing: "0.06px" }],
+        "caption": ["10px", { lineHeight: "1.2", letterSpacing: "0.13px" }],
       },
     },
   },

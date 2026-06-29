@@ -1,11 +1,12 @@
 import React from "react";
 
 type ButtonVariant =
-  | "primary"
-  | "cta"
+  | "primary-outlined"
+  | "primary-filled"
   | "secondary"
   | "ghost-teal"
-  | "ghost-destructive"
+  | "ghost-coral"
+  | "ghost-amber"
   | "icon";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,12 +16,20 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity inline-flex items-center whitespace-nowrap",
-  cta: "bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity inline-flex items-center whitespace-nowrap",
-  secondary: "bg-white border border-stone-100 text-stone-900 rounded-lg px-4 py-2 text-sm hover:bg-stone-100 transition-colors inline-flex items-center whitespace-nowrap",
-  "ghost-teal": "bg-brand-teal-50 text-brand-teal-900 border border-teal-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-teal-100 transition-colors inline-flex items-center whitespace-nowrap",
-  "ghost-destructive": "bg-brand-coral-50 text-brand-coral-900 border border-coral-200 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-coral-100 transition-colors inline-flex items-center whitespace-nowrap",
-  icon: "p-2 rounded-lg hover:bg-stone-100 text-stone-900 hover:text-brand-purple transition-colors",
+  "primary-outlined":
+    "bg-white/80 border border-primary-action text-primary-action rounded-button px-5 py-2.5 text-sm font-medium hover:bg-linen-canvas transition-colors inline-flex items-center whitespace-nowrap",
+  "primary-filled":
+    "hero-blue-fade text-white rounded-button px-5 py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity inline-flex items-center whitespace-nowrap",
+  secondary:
+    "bg-white border border-slate-custom/20 text-slate-custom rounded-button px-4 py-2 text-sm font-medium hover:bg-sky-wash transition-colors inline-flex items-center whitespace-nowrap",
+  "ghost-teal":
+    "bg-emerald-status/10 text-emerald-status border border-emerald-status/20 rounded-button px-3 py-1.5 text-xs font-medium hover:bg-emerald-status/20 transition-colors inline-flex items-center whitespace-nowrap",
+  "ghost-coral":
+    "bg-coral-alert/10 text-coral-alert border border-coral-alert/20 rounded-button px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors inline-flex items-center whitespace-nowrap",
+  "ghost-amber":
+    "bg-amber-tag/10 text-amber-tag border border-amber-tag/20 rounded-button px-3 py-1.5 text-xs font-medium hover:bg-amber-tag/20 transition-colors inline-flex items-center whitespace-nowrap",
+  icon:
+    "p-2 rounded-button hover:bg-sky-wash text-slate-custom hover:text-signal-blue transition-colors inline-flex items-center",
 };
 
 const sizeClasses = {
@@ -30,7 +39,10 @@ const sizeClasses = {
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = "primary", size = "md", loading, children, className = "", disabled, ...props }, ref) => {
+  (
+    { variant = "primary-outlined", size = "md", loading, children, className = "", disabled, ...props },
+    ref
+  ) => {
     const isDisabled = disabled || loading;
     return (
       <button

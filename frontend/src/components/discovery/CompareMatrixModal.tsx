@@ -124,7 +124,7 @@ export default function CompareMatrixModal({ isOpen, onClose, promoters }: Compa
           className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col z-50 overflow-hidden"
         >
           {/* Header */}
-          <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-linen-canvas/50">
             <div>
               <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <Zap size={20} className="text-amber-500 fill-amber-500" />
@@ -185,7 +185,7 @@ export default function CompareMatrixModal({ isOpen, onClose, promoters }: Compa
                 <tbody>
                   {/* Categorical Row */}
                   <tr>
-                    <td className="p-4 border-b border-gray-100 bg-gray-50/50 rounded-l-xl">
+                    <td className="p-4 border-b border-gray-100 bg-linen-canvas/50 rounded-l-xl">
                       <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                         <Briefcase size={16} className="text-gray-400" />
                         Primary Niche
@@ -205,7 +205,7 @@ export default function CompareMatrixModal({ isOpen, onClose, promoters }: Compa
                     const winners = getWinners(rule.id);
                     return (
                       <tr key={rule.id}>
-                        <td className={`p-4 border-b border-gray-100 bg-gray-50/50 ${idx === rules.length - 1 ? 'rounded-bl-xl' : ''}`}>
+                        <td className={`p-4 border-b border-gray-100 bg-linen-canvas/50 ${idx === rules.length - 1 ? 'rounded-bl-xl' : ''}`}>
                           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                             <rule.icon size={16} className="text-gray-400" />
                             {rule.label}

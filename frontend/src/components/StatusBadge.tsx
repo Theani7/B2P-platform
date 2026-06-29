@@ -1,12 +1,12 @@
 import { CampaignStatus } from "../features/campaigns/types";
 
 const statusConfig: Record<string, { bg: string; text: string; dot: string }> = {
-  DRAFT: { bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400" },
-  OPEN: { bg: "bg-blue-50", text: "text-blue-700", dot: "bg-blue-500" },
-  ACTIVE: { bg: "bg-brand-teal-50", text: "text-brand-teal-900", dot: "bg-brand-teal" },
-  COMPLETED: { bg: "bg-green-50", text: "text-green-700", dot: "bg-green-500" },
-  ARCHIVED: { bg: "bg-brand-amber-50", text: "text-brand-amber-900", dot: "bg-brand-amber" },
-  CANCELLED: { bg: "bg-brand-coral-50", text: "text-brand-coral-900", dot: "bg-brand-coral" },
+  DRAFT: { bg: "bg-sky-wash", text: "text-fog", dot: "bg-ash" },
+  OPEN: { bg: "bg-sky-wash", text: "text-signal-blue", dot: "bg-signal-blue" },
+  ACTIVE: { bg: "bg-emerald-status/10", text: "text-emerald-status", dot: "bg-emerald-status" },
+  COMPLETED: { bg: "bg-emerald-status/10", text: "text-emerald-status", dot: "bg-emerald-status" },
+  ARCHIVED: { bg: "bg-amber-tag/10", text: "text-amber-tag", dot: "bg-amber-tag" },
+  CANCELLED: { bg: "bg-coral-alert/10", text: "text-coral-alert", dot: "bg-coral-alert" },
 };
 
 interface StatusBadgeProps {
@@ -16,7 +16,7 @@ interface StatusBadgeProps {
 export default function StatusBadge({ status }: StatusBadgeProps) {
   const config = statusConfig[status] ?? statusConfig.DRAFT;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${config.bg} ${config.text}`}>
+    <span className={`inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-badges text-xs font-medium ${config.bg} ${config.text}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
       {status}
     </span>

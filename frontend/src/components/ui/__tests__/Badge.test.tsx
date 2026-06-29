@@ -16,43 +16,43 @@ describe("Badge", () => {
   test("applies active variant styles", () => {
     render(<Badge variant="active">Active</Badge>);
     const badge = screen.getByText("Active");
-    expect(badge.className).toContain("bg-brand-purple-50");
-    expect(badge.className).toContain("text-brand-purple-900");
+    expect(badge.className).toContain("bg-emerald-status/10");
+    expect(badge.className).toContain("text-emerald-status");
   });
 
   test("applies verified variant styles", () => {
     render(<Badge variant="verified">Verified</Badge>);
     const badge = screen.getByText("Verified");
-    expect(badge.className).toContain("bg-brand-teal-50");
-    expect(badge.className).toContain("text-brand-teal-900");
+    expect(badge.className).toContain("bg-emerald-status/10");
+    expect(badge.className).toContain("text-emerald-status");
   });
 
   test("applies pending variant styles", () => {
     render(<Badge variant="pending">Pending</Badge>);
     const badge = screen.getByText("Pending");
-    expect(badge.className).toContain("bg-brand-amber-50");
-    expect(badge.className).toContain("text-brand-amber-900");
+    expect(badge.className).toContain("bg-amber-tag/10");
+    expect(badge.className).toContain("text-amber-tag");
   });
 
   test("applies completed variant styles", () => {
     render(<Badge variant="completed">Completed</Badge>);
     const badge = screen.getByText("Completed");
-    expect(badge.className).toContain("bg-green-50");
-    expect(badge.className).toContain("text-green-800");
+    expect(badge.className).toContain("bg-emerald-status/10");
+    expect(badge.className).toContain("text-emerald-status");
   });
 
   test("applies rejected variant styles", () => {
     render(<Badge variant="rejected">Rejected</Badge>);
     const badge = screen.getByText("Rejected");
-    expect(badge.className).toContain("bg-brand-coral-50");
-    expect(badge.className).toContain("text-brand-coral-900");
+    expect(badge.className).toContain("bg-coral-alert/10");
+    expect(badge.className).toContain("text-coral-alert");
   });
 
   test("applies draft variant styles", () => {
     render(<Badge variant="draft">Draft</Badge>);
     const badge = screen.getByText("Draft");
-    expect(badge.className).toContain("bg-gray-100");
-    expect(badge.className).toContain("text-gray-500");
+    expect(badge.className).toContain("bg-slate-custom/10");
+    expect(badge.className).toContain("text-slate-custom");
   });
 
   test("merges custom className", () => {
@@ -64,8 +64,8 @@ describe("Badge", () => {
     render(<Badge variant="active">Base</Badge>);
     const badge = screen.getByText("Base");
     expect(badge.className).toContain("inline-flex");
-    expect(badge.className).toContain("rounded");
-    expect(badge.className).toContain("text-[11px]");
+    expect(badge.className).toContain("rounded-badges");
+    expect(badge.className).toContain("text-xs");
     expect(badge.className).toContain("font-medium");
   });
 });

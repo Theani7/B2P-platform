@@ -12,31 +12,31 @@ export function Input({ label, error, helperText, className = "", id, ...props }
   const helperId = helperText && !error && inputId ? `${inputId}-helper` : undefined;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-stone-900">
+        <label htmlFor={inputId} className="block text-body font-medium text-graphite">
           {label}
         </label>
       )}
       <input
         id={inputId}
-        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-stone-900 placeholder-stone-900 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo ${
-          error ? "border-brand-coral focus:border-brand-indigo focus:ring-brand-indigo" : "border-stone-100"
+        className={`w-full px-3 py-2 text-sm border rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 ${
+          error ? "border-coral-alert" : "border-slate-custom/20"
         } ${className}`}
         aria-invalid={!!error}
         aria-describedby={errorId || helperId}
         {...props}
       />
       {error && (
-        <p id={errorId} className="text-sm text-brand-coral" role="alert">
+        <p id={errorId} className="text-sm text-coral-alert" role="alert">
           {error}
         </p>
       )}
-      {helperText && !error && (
-        <p id={helperId} className="text-sm text-stone-900">
-          {helperText}
-        </p>
-      )}
+{helperText && !error && (
+         <p id={helperId} className="text-sm text-graphite">
+           {helperText}
+         </p>
+       )}
     </div>
   );
 }

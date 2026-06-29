@@ -22,8 +22,8 @@ const breakdownMax: Record<keyof ScoreBreakdown, number> = {
 
 export default function MatchBreakdownCard({ breakdown }: MatchBreakdownCardProps) {
   return (
-    <div className="bg-white border border-gray-100 rounded-xl p-5 space-y-4">
-      <h3 className="text-base font-medium text-gray-900">Score Breakdown</h3>
+    <div className="bg-white border border-slate-custom/10 rounded-cards p-5 space-y-4">
+      <h3 className="text-heading text-graphite">Score Breakdown</h3>
       {(Object.keys(breakdownLabels) as (keyof ScoreBreakdown)[]).map((key) => {
         const score = breakdown[key];
         const max = breakdownMax[key];
@@ -31,14 +31,14 @@ export default function MatchBreakdownCard({ breakdown }: MatchBreakdownCardProp
         return (
           <div key={key}>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-500">{breakdownLabels[key]}</span>
-              <span className="font-medium text-gray-900">
+              <span className="text-ash">{breakdownLabels[key]}</span>
+              <span className="font-medium text-graphite">
                 {score}/{max}
               </span>
             </div>
-            <div className="h-1 w-full rounded-full bg-gray-100">
+            <div className="h-1 w-full rounded-full bg-sky-wash">
               <div
-                className="h-1 rounded-full bg-brand-teal transition-all"
+                className="h-1 rounded-full bg-emerald-status transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>

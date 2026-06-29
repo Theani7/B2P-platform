@@ -4,14 +4,14 @@ interface ScorePillProps {
 }
 
 function getScoreColors(score: number) {
-  if (score >= 85) return "bg-brand-teal-50 text-brand-teal-900";
-  if (score >= 70) return "bg-brand-amber-50 text-brand-amber-900";
-  return "bg-gray-100 text-gray-500";
+  if (score >= 85) return "bg-emerald-status/10 text-emerald-status";
+  if (score >= 70) return "bg-amber-tag/10 text-amber-tag";
+  return "bg-sky-wash text-ash";
 }
 
 export function ScorePill({ score, className = "" }: ScorePillProps) {
   return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getScoreColors(score)} ${className}`}>
+    <span className={`rounded-badges px-1.5 py-0.5 text-xs font-medium ${getScoreColors(score)} ${className}`}>
       {score}
     </span>
   );

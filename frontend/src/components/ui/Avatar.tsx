@@ -1,3 +1,5 @@
+import React from "react";
+
 interface AvatarProps {
   initials: string;
   src?: string;
@@ -7,11 +9,11 @@ interface AvatarProps {
 }
 
 const colorClasses = [
-  "bg-brand-purple-50 text-brand-purple-900",
-  "bg-brand-teal-50 text-brand-teal-900",
-  "bg-brand-amber-50 text-brand-amber-900",
-  "bg-brand-coral-50 text-brand-coral-900",
-  "bg-green-50 text-green-800",
+  "bg-periwinkle-glow/20 text-primary-action",
+  "bg-sky-wash text-signal-blue",
+  "bg-amber-tag/10 text-amber-tag",
+  "bg-coral-alert/10 text-coral-alert",
+  "bg-emerald-status/10 text-emerald-status",
 ];
 
 const sizeClasses = {
@@ -26,7 +28,7 @@ export function Avatar({ initials, src, size = "md", colorIndex = 0, className =
       <img
         src={src}
         alt={initials}
-        className={`rounded-full object-cover ${sizeClasses[size]} ${className}`}
+        className={`rounded-images object-cover ${sizeClasses[size]} ${className}`}
       />
     );
   }

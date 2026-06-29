@@ -8,32 +8,32 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
   });
 
-  test("applies default variant (primary) and size (md) classes", () => {
+  test("applies default variant (primary-outlined) and size (md) classes", () => {
     render(<Button>Default</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("bg-brand-purple");
-    expect(btn.className).toContain("px-4 py-2");
+    expect(btn.className).toContain("bg-white/80");
+    expect(btn.className).toContain("border");
   });
 
-  test("applies cta variant classes", () => {
-    render(<Button variant="cta">CTA</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-brand-indigo");
+  test("applies primary-filled variant classes", () => {
+    render(<Button variant="primary-filled">Filled</Button>);
+    expect(screen.getByRole("button").className).toContain("hero-blue-fade");
   });
 
   test("applies secondary variant classes", () => {
     render(<Button variant="secondary">Secondary</Button>);
     expect(screen.getByRole("button").className).toContain("bg-white");
-    expect(screen.getByRole("button").className).toContain("border-gray-200");
+    expect(screen.getByRole("button").className).toContain("border-slate-custom/20");
   });
 
   test("applies ghost-teal variant classes", () => {
     render(<Button variant="ghost-teal">Ghost Teal</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-brand-teal-50");
+    expect(screen.getByRole("button").className).toContain("bg-emerald-status/10");
   });
 
-  test("applies ghost-destructive variant classes", () => {
-    render(<Button variant="ghost-destructive">Ghost Destructive</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-brand-coral-50");
+  test("applies ghost-coral variant classes", () => {
+    render(<Button variant="ghost-coral">Ghost Coral</Button>);
+    expect(screen.getByRole("button").className).toContain("bg-coral-alert/10");
   });
 
   test("applies icon variant classes", () => {
@@ -43,10 +43,10 @@ describe("Button", () => {
 
   test("applies size classes", () => {
     const { rerender } = render(<Button size="sm">Small</Button>);
-    expect(screen.getByRole("button").className).toContain("px-3 py-1.5");
+    expect(screen.getByRole("button").className).toContain("px-3");
 
     rerender(<Button size="lg">Large</Button>);
-    expect(screen.getByRole("button").className).toContain("px-6 py-3");
+    expect(screen.getByRole("button").className).toContain("px-6");
   });
 
   test("disables button when disabled prop is true", () => {

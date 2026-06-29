@@ -23,18 +23,18 @@ export function PortfolioSettings() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8">
+    <div className="bg-white rounded-cards shadow-product-card-product-card p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Portfolio</h3>
-          <p className="text-sm text-gray-500">Showcase your past work, collaborations, and successful campaigns to brands.</p>
+          <h3 className="text-heading text-graphite mb-2">Portfolio</h3>
+          <p className="text-sm text-fog">Showcase your past work, collaborations, and successful campaigns to brands.</p>
         </div>
         <button 
           onClick={() => {
             setEditingItem(null);
             setIsEditorOpen(true);
           }}
-          className="inline-flex items-center gap-2 bg-primary-600 text-white h-10 px-4 rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 bg-signal-blue text-white h-10 px-4 rounded-button text-sm font-semibold hover:opacity-90 transition-colors shadow-product-card-sm"
         >
           <Plus size={16} /> Add Project
         </button>
@@ -42,7 +42,7 @@ export function PortfolioSettings() {
       
       {isLoading ? (
         <div className="h-64 flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-signal-blue/20 border-t-signal-blue rounded-full animate-spin"></div>
         </div>
       ) : (
         <PortfolioGrid 

@@ -14,9 +14,9 @@ import {
 
 const STATUS_CONFIG: Record<string, { color: string; icon: any; label: string }> = {
   PENDING: { color: "bg-amber-50 text-amber-700 ring-amber-600/20", icon: Clock, label: "Pending Review" },
-  ACCEPTED: { color: "bg-emerald-50 text-emerald-700 ring-emerald-600/20", icon: CheckCircle, label: "Accepted" },
-  REJECTED: { color: "bg-red-50 text-red-700 ring-red-600/20", icon: XCircle, label: "Declined" },
-  WITHDRAWN: { color: "bg-gray-50 text-gray-600 ring-gray-600/20", icon: CircleDashed, label: "Withdrawn" },
+  ACCEPTED: { color: "bg-emerald-status/10 text-emerald-status ring-emerald-status/20", icon: CheckCircle, label: "Accepted" },
+  REJECTED: { color: "bg-coral-alert/10 text-coral-alert ring-red-600/20", icon: XCircle, label: "Declined" },
+  WITHDRAWN: { color: "bg-linen-canvas text-ash ring-gray-600/20", icon: CircleDashed, label: "Withdrawn" },
 };
 
 function ApplicationMenu({ app, onWithdraw, onViewBusiness }: any) {
@@ -37,7 +37,7 @@ function ApplicationMenu({ app, onWithdraw, onViewBusiness }: any) {
     <div className="relative" ref={menuRef}>
       <button 
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
-        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+        className="w-8 h-8 rounded-full flex items-center justify-center text-fog hover:bg-sky-wash hover:text-graphite transition-colors"
       >
         <MoreHorizontal size={18} />
       </button>
@@ -48,19 +48,19 @@ function ApplicationMenu({ app, onWithdraw, onViewBusiness }: any) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.1 }}
-            className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-20 py-1"
+            className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-product-card-product-card shadow-product-card-product-card z-20 py-1"
           >
             <button 
               onClick={(e) => { e.stopPropagation(); setOpen(false); navigate(`/promoter/marketplace?campaignId=${app.campaign_id}`); }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              className="w-full text-left px-4 py-2 text-sm text-graphite hover:bg-linen-canvas flex items-center gap-2"
             >
-              <Eye size={16} className="text-gray-400"/> View Campaign
+              <Eye size={16} className="text-fog"/> View Campaign
             </button>
             <button 
               onClick={(e) => { e.stopPropagation(); setOpen(false); onViewBusiness(app); }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              className="w-full text-left px-4 py-2 text-sm text-graphite hover:bg-linen-canvas flex items-center gap-2"
             >
-              <Building2 size={16} className="text-gray-400"/> View Business
+              <Building2 size={16} className="text-fog"/> View Business
             </button>
             <button 
               onClick={(e) => { 
@@ -78,19 +78,19 @@ function ApplicationMenu({ app, onWithdraw, onViewBusiness }: any) {
                   notifySuccess("Campaign link copied to clipboard!");
                 }
               }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              className="w-full text-left px-4 py-2 text-sm text-graphite hover:bg-linen-canvas flex items-center gap-2"
             >
-              <Share2 size={16} className="text-gray-400"/> Share
+              <Share2 size={16} className="text-fog"/> Share
             </button>
             
             {app.status === "PENDING" && (
               <>
-                <div className="h-px bg-gray-100 my-1" />
+                <div className="h-px bg-sky-wash my-1" />
                 <button 
                   onClick={(e) => { e.stopPropagation(); setOpen(false); onWithdraw(app.id); }}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-coral-alert hover:bg-coral-alert/10 flex items-center gap-2"
                 >
-                  <XCircle size={16} className="text-red-500"/> Withdraw Application
+                  <XCircle size={16} className="text-coral-alert"/> Withdraw Application
                 </button>
               </>
             )}
@@ -113,11 +113,11 @@ export default function MyApplicationsPage() {
 
   if (error) return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mb-4 ring-1 ring-red-500/10">
-        <AlertCircle size={32} className="text-red-500" />
+      <div className="w-16 h-16 rounded-2xl bg-coral-alert/10 flex items-center justify-center mb-4 ring-1 ring-coral-alert/10">
+        <AlertCircle size={32} className="text-coral-alert" />
       </div>
-      <p className="text-lg font-medium text-gray-900">Error loading applications</p>
-      <p className="text-sm text-gray-500 mt-1">{(error as Error).message}</p>
+      <p className="text-lg font-medium text-graphite">Error loading applications</p>
+      <p className="text-sm text-ash mt-1">{(error as Error).message}</p>
     </div>
   );
 
@@ -140,16 +140,16 @@ export default function MyApplicationsPage() {
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
       
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl shadow-sm ring-1 ring-gray-200 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-50/50 via-white to-white">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-50/50 via-white to-white">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">My Applications</h1>
-          <p className="text-sm text-gray-500 mt-2 max-w-xl">Track every campaign you've applied for, monitor progress, and manage your creator pipeline.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-graphite">My Applications</h1>
+          <p className="text-sm text-ash mt-2 max-w-xl">Track every campaign you've applied for, monitor progress, and manage your creator pipeline.</p>
         </div>
         <div className="flex items-center gap-3">
 
           <Link
             to="/promoter/marketplace"
-            className="inline-flex items-center gap-2 bg-primary-600 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 bg-primary-600 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-product-card-sm"
           >
             <Search size={16} /> Browse Marketplace
           </Link>
@@ -158,47 +158,47 @@ export default function MyApplicationsPage() {
 
       {/* SUMMARY CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
+        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Submitted</h3>
+            <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Submitted</h3>
             <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><Send size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{data?.total ?? 0}</div>
-          <p className="text-xs text-gray-500 mt-1">All time</p>
+          <div className="text-2xl font-bold text-graphite">{data?.total ?? 0}</div>
+          <p className="text-xs text-ash mt-1">All time</p>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
+        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Pending</h3>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><Clock size={14}/></div>
+            <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Pending</h3>
+            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-tag flex items-center justify-center"><Clock size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{pendingCount}</div>
-          <p className="text-xs text-amber-600 font-medium mt-1">Awaiting response</p>
+          <div className="text-2xl font-bold text-graphite">{pendingCount}</div>
+          <p className="text-xs text-amber-tag font-medium mt-1">Awaiting response</p>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
+        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Accepted</h3>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><CheckCircle size={14}/></div>
+            <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Accepted</h3>
+            <div className="w-8 h-8 rounded-lg bg-emerald-status/10 text-emerald-status flex items-center justify-center"><CheckCircle size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{acceptedCount}</div>
-          <p className="text-xs text-gray-500 mt-1">Current page</p>
+          <div className="text-2xl font-bold text-graphite">{acceptedCount}</div>
+          <p className="text-xs text-ash mt-1">Current page</p>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200">
+        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Rejected</h3>
-            <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"><XCircle size={14}/></div>
+            <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Rejected</h3>
+            <div className="w-8 h-8 rounded-lg bg-coral-alert/10 text-coral-alert flex items-center justify-center"><XCircle size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{rejectedCount}</div>
-          <p className="text-xs text-gray-500 mt-1">Current page</p>
+          <div className="text-2xl font-bold text-graphite">{rejectedCount}</div>
+          <p className="text-xs text-ash mt-1">Current page</p>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-gray-200 md:col-span-1 col-span-2">
+        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200 md:col-span-1 col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Accept Rate</h3>
-            <div className="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"><TrendingUp size={14}/></div>
+            <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Accept Rate</h3>
+            <div className="w-8 h-8 rounded-lg bg-sky-wash text-signal-blue flex items-center justify-center"><TrendingUp size={14}/></div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-graphite">
             {applications.length > 0 ? Math.round((acceptedCount / applications.length) * 100) : 0}%
           </div>
-          <p className="text-xs text-gray-400 font-medium mt-1">Current page</p>
+          <p className="text-xs text-fog font-medium mt-1">Current page</p>
         </div>
       </div>
 
@@ -215,11 +215,11 @@ export default function MyApplicationsPage() {
               {Array.from({length:4}).map((_,i) => <div key={i} className="bg-white rounded-2xl h-48 animate-pulse ring-1 ring-gray-100"></div>)}
             </div>
           ) : !applications || applications.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
-              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-4"><FileText size={32}/></div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">No applications yet</h2>
-              <p className="text-sm text-gray-500 max-w-sm mb-6">You haven't applied to any campaigns. Browse the marketplace to find collaborations.</p>
-              <Link to="/promoter/marketplace" className="h-11 px-6 flex items-center justify-center rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-sm">
+            <div className="bg-white rounded-2xl shadow-product-card-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
+              <div className="w-20 h-20 bg-linen-canvas rounded-full flex items-center justify-center text-gray-300 mb-4"><FileText size={32}/></div>
+              <h2 className="text-xl font-bold text-graphite mb-2">No applications yet</h2>
+              <p className="text-sm text-ash max-w-sm mb-6">You haven't applied to any campaigns. Browse the marketplace to find collaborations.</p>
+              <Link to="/promoter/marketplace" className="h-11 px-6 flex items-center justify-center rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-product-card-sm">
                 Browse Marketplace
               </Link>
             </div>
@@ -240,7 +240,7 @@ export default function MyApplicationsPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     style={{ zIndex: 100 - index, position: 'relative' }}
-                    className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-200 hover:shadow-md hover:ring-primary-200 transition-all group flex flex-col"
+                    className="bg-white rounded-2xl p-6 shadow-product-card-sm ring-1 ring-gray-200 hover:shadow-product-card-md hover:ring-primary-200 transition-all group flex flex-col"
                   >
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                       
@@ -250,15 +250,15 @@ export default function MyApplicationsPage() {
                           {app.campaign_title?.charAt(0).toUpperCase() || 'C'}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="text-lg font-bold text-gray-900 truncate pr-4">{app.campaign_title}</h3>
-                          <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
+                          <h3 className="text-lg font-bold text-graphite truncate pr-4">{app.campaign_title}</h3>
+                          <div className="flex items-center gap-1.5 text-sm text-ash mt-1">
                             <Building2 size={14}/> {app.business_name || "Business"}
                             <span className="mx-1">•</span>
                             <Briefcase size={14}/> {app.campaign_category}
                           </div>
                           <div className="flex items-center gap-4 mt-3">
-                            <span className="text-sm font-bold text-gray-900 bg-gray-50 px-2 py-0.5 rounded">{formatNepaliCurrency(app.campaign_budget)}</span>
-                            <span className="text-sm font-medium text-gray-500 flex items-center gap-1"><MapPin size={14}/> {app.campaign_location || "Remote"}</span>
+                            <span className="text-sm font-bold text-graphite bg-linen-canvas px-2 py-0.5 rounded">{formatNepaliCurrency(app.campaign_budget)}</span>
+                            <span className="text-sm font-medium text-ash flex items-center gap-1"><MapPin size={14}/> {app.campaign_location || "Remote"}</span>
                           </div>
                         </div>
                       </div>
@@ -270,12 +270,12 @@ export default function MyApplicationsPage() {
                         </span>
                         <div className="flex items-center gap-2">
                           {app.status === 'PENDING' && (
-                            <button onClick={() => setWithdrawConfirm(app.id)} className="h-9 px-4 bg-white border border-gray-200 text-red-600 hover:bg-red-50 hover:border-red-200 rounded-lg text-xs font-bold transition-colors">
+                            <button onClick={() => setWithdrawConfirm(app.id)} className="h-9 px-4 bg-white border border-slate-custom/10 text-coral-alert hover:bg-coral-alert/10 hover:border-coral-alert/20 rounded-lg text-xs font-bold transition-colors">
                               Withdraw
                             </button>
                           )}
                           {app.status === 'ACCEPTED' && (
-                            <button onClick={() => navigate('/promoter/collaborations')} className="h-9 px-4 bg-primary-600 text-white rounded-lg text-xs font-bold transition-colors hover:bg-primary-700 shadow-sm">
+                            <button onClick={() => navigate('/promoter/collaborations')} className="h-9 px-4 bg-primary-600 text-white rounded-lg text-xs font-bold transition-colors hover:bg-primary-700 shadow-product-card-sm">
                               View Collab
                             </button>
                           )}
@@ -288,37 +288,37 @@ export default function MyApplicationsPage() {
                       </div>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col md:flex-row gap-6">
+                    <div className="mt-6 pt-6 border-t border-slate-custom/10 flex flex-col md:flex-row gap-6">
                       
                       {/* Timeline */}
                       <div className="flex-1 w-full flex items-center max-w-sm">
                         <div className="flex flex-col items-center">
-                          <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center ring-4 ring-emerald-50 z-10"><CheckCircle size={12}/></div>
-                          <span className="text-[10px] font-bold text-gray-900 mt-2 uppercase tracking-wider">Submitted</span>
+                          <div className="w-6 h-6 rounded-full bg-emerald-status/100 text-white flex items-center justify-center ring-4 ring-emerald-50 z-10"><CheckCircle size={12}/></div>
+                          <span className="text-[10px] font-bold text-graphite mt-2 uppercase tracking-wider">Submitted</span>
                         </div>
-                        <div className="flex-1 h-0.5 bg-emerald-500 -mx-2 -mt-5 z-0"></div>
+                        <div className="flex-1 h-0.5 bg-emerald-status/100 -mx-2 -mt-5 z-0"></div>
                         
                         <div className="flex flex-col items-center">
-                          <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center ring-4 ring-emerald-50 z-10"><CheckCircle size={12}/></div>
-                          <span className="text-[10px] font-bold text-gray-900 mt-2 uppercase tracking-wider">Viewed</span>
+                          <div className="w-6 h-6 rounded-full bg-emerald-status/100 text-white flex items-center justify-center ring-4 ring-emerald-50 z-10"><CheckCircle size={12}/></div>
+                          <span className="text-[10px] font-bold text-graphite mt-2 uppercase tracking-wider">Viewed</span>
                         </div>
                         
-                        <div className={`flex-1 h-0.5 -mx-2 -mt-5 z-0 ${isAccepted || isRejected ? 'bg-emerald-500' : 'bg-gray-200'}`}></div>
+                        <div className={`flex-1 h-0.5 -mx-2 -mt-5 z-0 ${isAccepted || isRejected ? 'bg-emerald-status/100' : 'bg-gray-200'}`}></div>
                         
                         <div className="flex flex-col items-center">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center ring-4 z-10 ${
                             isAccepted 
-                            ? 'bg-emerald-500 text-white ring-emerald-50' 
+                            ? 'bg-emerald-status/100 text-white ring-emerald-50' 
                             : isRejected 
-                            ? 'bg-red-500 text-white ring-red-50'
+                            ? 'bg-coral-alert/100 text-white ring-red-50'
                             : isWithdrawn
                             ? 'bg-gray-400 text-white ring-gray-50'
-                            : 'bg-white border-2 border-gray-300 text-transparent ring-white'
+                            : 'bg-white border-2 border-slate-custom/20 text-transparent ring-white'
                           }`}>
                             {isRejected ? <XCircle size={12}/> : isWithdrawn ? <CircleDashed size={12}/> : <CheckCircle size={12}/>}
                           </div>
                           <span className={`text-[10px] font-bold mt-2 uppercase tracking-wider ${
-                            isAccepted ? 'text-emerald-700' : isRejected ? 'text-red-600' : isWithdrawn ? 'text-gray-500' : 'text-gray-400'
+                            isAccepted ? 'text-emerald-status' : isRejected ? 'text-coral-alert' : isWithdrawn ? 'text-ash' : 'text-fog'
                           }`}>
                             {isAccepted ? 'Accepted' : isRejected ? 'Declined' : isWithdrawn ? 'Withdrawn' : 'Decision'}
                           </span>
@@ -327,17 +327,17 @@ export default function MyApplicationsPage() {
 
                       {/* Message Preview */}
                       <div className="flex-1 min-w-0">
-                        <div className="bg-gray-50 rounded-xl p-4 h-full border border-gray-100 flex items-start gap-3 relative overflow-hidden group/msg">
-                          <MessageSquare size={16} className="text-gray-400 flex-shrink-0 mt-0.5"/>
+                        <div className="bg-linen-canvas rounded-xl p-4 h-full border border-slate-custom/10 flex items-start gap-3 relative overflow-hidden group/msg">
+                          <MessageSquare size={16} className="text-fog flex-shrink-0 mt-0.5"/>
                           <div className="min-w-0">
-                            <p className="text-xs font-bold text-gray-700 mb-1">Your Cover Message</p>
-                            <p className="text-sm text-gray-500 line-clamp-2 italic pr-4">
+                            <p className="text-xs font-bold text-graphite mb-1">Your Cover Message</p>
+                            <p className="text-sm text-ash line-clamp-2 italic pr-4">
                               {app.message ? `"${app.message}"` : "No cover message provided."}
                             </p>
                           </div>
                           {/* Hover Tooltip for full message */}
                           {app.message && app.message.length > 80 && (
-                            <div className="absolute left-0 bottom-[105%] mb-2 hidden group-hover/msg:block w-full bg-gray-900 text-white text-xs p-3 rounded-lg shadow-xl z-30 whitespace-pre-wrap">
+                            <div className="absolute left-0 bottom-[105%] mb-2 hidden group-hover/msg:block w-full bg-gray-900 text-white text-xs p-3 rounded-lg shadow-product-card-xl z-30 whitespace-pre-wrap">
                               {app.message}
                             </div>
                           )}
@@ -354,15 +354,15 @@ export default function MyApplicationsPage() {
           {/* Pagination */}
           {data && data.pages > 1 && (
             <div className="flex items-center justify-center gap-2 pt-6">
-              <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1} className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50 flex items-center gap-1"><ChevronLeft size={16}/> Prev</button>
+              <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1} className="h-10 px-4 rounded-xl border border-slate-custom/10 text-sm font-semibold hover:bg-linen-canvas disabled:opacity-50 flex items-center gap-1"><ChevronLeft size={16}/> Prev</button>
               <div className="flex items-center gap-1">
                 {Array.from({length: data.pages}, (_,i) => i+1).map(p => (
-                  <button key={p} onClick={() => setPage(p)} className={`w-10 h-10 rounded-xl text-sm font-bold ${p === page ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+                  <button key={p} onClick={() => setPage(p)} className={`w-10 h-10 rounded-xl text-sm font-bold ${p === page ? 'bg-gray-900 text-white' : 'text-ash hover:bg-sky-wash'}`}>
                     {p}
                   </button>
                 ))}
               </div>
-              <button onClick={() => setPage(p => Math.min(data.pages, p+1))} disabled={page === data.pages} className="h-10 px-4 rounded-xl border border-gray-200 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50 flex items-center gap-1">Next <ChevronRight size={16}/></button>
+              <button onClick={() => setPage(p => Math.min(data.pages, p+1))} disabled={page === data.pages} className="h-10 px-4 rounded-xl border border-slate-custom/10 text-sm font-semibold hover:bg-linen-canvas disabled:opacity-50 flex items-center gap-1">Next <ChevronRight size={16}/></button>
             </div>
           )}
         </div>
@@ -388,21 +388,21 @@ export default function MyApplicationsPage() {
         >
           <div className="space-y-4">
             <div>
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Business Name</span>
-              <p className="text-sm font-semibold text-gray-900 mt-0.5">{selectedBusiness.business_name || "Business Profile"}</p>
+              <span className="text-xs font-semibold text-fog uppercase tracking-wider">Business Name</span>
+              <p className="text-sm font-semibold text-graphite mt-0.5">{selectedBusiness.business_name || "Business Profile"}</p>
             </div>
             <div>
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Associated Campaign</span>
-              <p className="text-sm font-medium text-gray-700 mt-0.5">{selectedBusiness.campaign_title}</p>
+              <span className="text-xs font-semibold text-fog uppercase tracking-wider">Associated Campaign</span>
+              <p className="text-sm font-medium text-graphite mt-0.5">{selectedBusiness.campaign_title}</p>
             </div>
             <div>
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Location</span>
-              <p className="text-sm text-gray-600 mt-0.5">{selectedBusiness.campaign_location || "Remote"}</p>
+              <span className="text-xs font-semibold text-fog uppercase tracking-wider">Location</span>
+              <p className="text-sm text-ash mt-0.5">{selectedBusiness.campaign_location || "Remote"}</p>
             </div>
-            <div className="pt-4 border-t border-gray-100 flex justify-end">
+            <div className="pt-4 border-t border-slate-custom/10 flex justify-end">
               <button 
                 onClick={() => setSelectedBusiness(null)}
-                className="h-10 px-5 rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-sm"
+                className="h-10 px-5 rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-product-card-sm"
               >
                 Close
               </button>

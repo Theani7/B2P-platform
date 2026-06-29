@@ -15,7 +15,7 @@ export function TopBar({ pageTitle, children }: TopBarProps) {
   return (
     <div className="flex items-center justify-between mb-6">
       <div>
-        <h1 className="text-xl font-medium text-stone-900 font-stretch-condensed">{pageTitle}</h1>
+        <h1 className="text-heading text-graphite">{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-3">
         {children}

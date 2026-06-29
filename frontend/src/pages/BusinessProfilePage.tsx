@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import {
   Building2, Globe, MapPin, Briefcase, Image as ImageIcon,
   Upload, ShieldCheck, Bell, CreditCard, Trash2, Save,
-  CheckCircle2, AlertCircle, RefreshCw, BadgeCheck
+  CheckCircle2, AlertTriangle, RefreshCw, BadgeCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -37,7 +37,6 @@ const NAV_ITEMS = [
 ];
 
 export default function BusinessProfilePage() {
-  
   const qc = useQueryClient();
   const { data: profile, isLoading: profileLoading } = useBusinessProfile();
   const [activeTab, setActiveTab] = useState("general");
@@ -68,7 +67,6 @@ export default function BusinessProfilePage() {
   }, [profile, reset]);
 
   const upsertProfile = useUpsertBusinessProfile();
-
   const methods = { register, handleSubmit, reset, getValues, formState: { errors, isDirty, isSubmitting } };
   const { markClean } = useUnsavedChanges(methods as any);
 
@@ -120,75 +118,32 @@ export default function BusinessProfilePage() {
     </div>
   );
 
-  // Profile completion removed due to lack of backend support
-
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-32">
-      {/* Top Header & Progress */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Business Profile</h1>
-          <p className="text-sm text-gray-500 mt-1.5">Manage your company information and public presence.</p>
+          <h1 className="text-heading-lg text-midnight-ink">Business Profile</h1>
+          <p className="text-body text-steel mt-2">Manage your company information and public presence.</p>
         </div>
         <div className="flex flex-col items-end gap-2 w-full md:w-72">
-          {/* Action buttons could go here */}
         </div>
       </div>
 
-{/* Profile Overview Card */}
-       <div className="bg-white rounded-2xl p-6 ring-1 ring-gray-200 shadow-sm flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-primary-50 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-         
-         <div className="relative group/avatar cursor-pointer" onClick={onLogoClick}>
-           {profile?.logo_url ? (
-             <img src={profile.logo_url} alt="Logo" className="w-24 h-24 rounded-2xl object-cover ring-4 ring-white shadow-md" />
-           ) : logoUploading ? (
-             <div className="w-24 h-24 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center">
-               <LoadingSpinner />
-             </div>
-           ) : (
-             <div className="w-24 h-24 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 group-hover/avatar:bg-gray-100 group-hover/avatar:border-primary-300 transition-colors shadow-sm">
-               <ImageIcon size={24} className="mb-1" />
-               <span className="text-[10px] font-medium">Upload Logo</span>
-             </div>
-           )}
-           <div className="absolute inset-0 bg-gray-900/60 rounded-2xl opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity">
-             <Upload size={20} className="text-white" />
-           </div>
-         </div>
-
-         <input
-           ref={fileInputRef}
-           type="file"
-           accept="image/*"
-           onChange={onFileChange}
-           className="hidden"
-         />
-
+      <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
         <div className="flex-1 text-center md:text-left z-10">
           <div className="flex items-center justify-center md:justify-start gap-2">
-            <h2 className="text-2xl font-bold text-gray-900">{profile?.company_name || "Your Company"}</h2>
-            <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center" title="Verified Business">
+            <h2 className="text-heading text-graphite">{profile?.company_name || "Your Company"}</h2>
+            <div className="w-5 h-5 rounded-full bg-emerald-status flex items-center justify-center" title="Verified Business">
               <BadgeCheck size={12} className="text-white" />
             </div>
           </div>
-          <p className="text-sm font-medium text-primary-600 mt-1">{profile?.industry || "Industry not set"}</p>
-          
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-3 text-sm text-gray-500">
-            <span className="flex items-center gap-1.5"><MapPin size={14} /> {profile?.location || "Location not set"}</span>
-            <span className="flex items-center gap-1.5"><Globe size={14} /> {profile?.website ? "Website connected" : "No website"}</span>
-          </div>
-        </div>
-
-        <div className="z-10 w-full md:w-auto">
-          {/* View Public Profile button removed because there is no public business profile view yet */}
+          <p className="text-sm font-medium text-signal-blue mt-1">{profile?.industry || "Industry not set"}</p>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Settings Sidebar */}
-        <div className="lg:w-[280px] flex-shrink-0">
-          <div className="sticky top-8 bg-white rounded-2xl ring-1 ring-gray-200 p-3 shadow-sm">
+        <div className="lg:w-72 flex-shrink-0">
+          <div className="sticky top-8 bg-white border border-slate-custom/10 rounded-cards shadow-product-card p-3">
             <nav className="space-y-1">
               {NAV_ITEMS.map((item) => {
                 const isActive = activeTab === item.id;
@@ -197,81 +152,74 @@ export default function BusinessProfilePage() {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      isActive 
-                        ? item.id === 'danger' ? "bg-red-50 text-red-700" : "bg-primary-50 text-primary-700" 
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-button text-sm font-medium transition-all ${
+                      isActive
+                        ? item.id === 'danger' ? "bg-coral-alert/10 text-coral-alert" : "bg-sky-wash text-signal-blue"
+                        : "text-graphite hover:bg-sky-wash hover:text-signal-blue"
                     }`}
                   >
-                    <Icon size={18} className={isActive ? (item.id === 'danger' ? "text-red-500" : "text-primary-600") : "text-gray-400"} />
+                    <Icon size={18} className={isActive ? (item.id === 'danger' ? "text-coral-alert" : "text-signal-blue") : "text-ash"} />
                     {item.label}
-                    {isActive && (
-                      <motion.div layoutId="activeNav" className={`ml-auto w-1.5 h-1.5 rounded-full ${item.id === 'danger' ? 'bg-red-500' : 'bg-primary-600'}`} />
-                    )}
                   </button>
                 );
               })}
             </nav>
           </div>
 
-          {/* Profile Completion Widget */}
           <div className="mt-6">
             <ProfileCompletionWidget data={completionData} isLoading={completionLoading} />
           </div>
         </div>
 
-        {/* Form Content */}
         <div className="flex-1">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            
-            {/* Company Info Card */}
             {activeTab === 'general' && (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                  <h2 className="text-lg font-bold text-gray-900">Company Information</h2>
-                  <p className="text-sm text-gray-500 mt-1">Basic details about your business.</p>
+              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+                  <h2 className="text-heading text-graphite">Company Information</h2>
+                  <p className="text-sm text-ash mt-1">Basic details about your business.</p>
                 </div>
-                <div className="p-8 space-y-6">
+                <div className="p-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-900">Company Name</label>
+                      <label className="text-sm font-medium text-graphite">Company Name</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                          <Building2 size={18} className="text-gray-400" />
+                          <Building2 size={18} className="text-ash" />
                         </div>
                         <input
                           {...register("company_name")}
-                          className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
+                          className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
                           placeholder="Acme Inc."
                         />
                       </div>
-                      {errors.company_name && <p className="text-xs text-red-500">{errors.company_name.message}</p>}
+                      {errors.company_name && <p className="text-xs text-coral-alert">{errors.company_name.message}</p>}
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-900">Industry</label>
+                      <label className="text-sm font-medium text-graphite">Industry</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                          <Briefcase size={18} className="text-gray-400" />
+                          <Briefcase size={18} className="text-ash" />
                         </div>
                         <input
                           {...register("industry")}
-                          className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
+                          className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
                           placeholder="Technology, Fashion..."
                         />
                       </div>
-                      {errors.industry && <p className="text-xs text-red-500">{errors.industry.message}</p>}
+                      {errors.industry && <p className="text-xs text-coral-alert">{errors.industry.message}</p>}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-900">Headquarters Location</label>
+                    <label className="text-sm font-medium text-graphite">Headquarters Location</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <MapPin size={18} className="text-gray-400" />
+                        <MapPin size={18} className="text-ash" />
                       </div>
                       <input
                         {...register("location")}
-                        className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
+                        className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
                         placeholder="San Francisco, CA"
                       />
                     </div>
@@ -280,68 +228,64 @@ export default function BusinessProfilePage() {
               </div>
             )}
 
-            {/* Online Presence Card */}
             {activeTab === 'online' && (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                  <h2 className="text-lg font-bold text-gray-900">Online Presence</h2>
-                  <p className="text-sm text-gray-500 mt-1">Links to your website and social profiles.</p>
+              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+                  <h2 className="text-heading text-graphite">Online Presence</h2>
+                  <p className="text-sm text-ash mt-1">Links to your website and social profiles.</p>
                 </div>
-                <div className="p-8 space-y-6">
+                <div className="p-6 space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-900">Company Website</label>
+                    <label className="text-sm font-medium text-graphite">Company Website</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Globe size={18} className="text-gray-400" />
+                        <Globe size={18} className="text-ash" />
                       </div>
                       <input
                         {...register("website")}
                         type="url"
-                        className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
+                        className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
                         placeholder="https://acme.com"
                       />
                     </div>
-                    {errors.website && <p className="text-xs text-red-500">{errors.website.message}</p>}
+                    {errors.website && <p className="text-xs text-coral-alert">{errors.website.message}</p>}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Description Card */}
             {activeTab === 'about' && (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                  <h2 className="text-lg font-bold text-gray-900">About Company</h2>
-                  <p className="text-sm text-gray-500 mt-1">Tell promoters what your brand is all about.</p>
+              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+                  <h2 className="text-heading text-graphite">About Company</h2>
+                  <p className="text-sm text-ash mt-1">Tell promoters what your brand is all about.</p>
                 </div>
-                <div className="p-8 space-y-4">
+                <div className="p-6 space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <label className="text-sm font-medium text-gray-900">Company Description</label>
+                      <label className="text-sm font-medium text-graphite">Company Description</label>
                     </div>
                     <textarea
                       {...register("description")}
                       rows={6}
-                      className="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none resize-none leading-relaxed"
-                      placeholder="Describe your company mission, values, and what kind of influencers you're looking to partner with. Markdown is supported."
+                      className="w-full p-4 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm leading-relaxed resize-none"
+                      placeholder="Describe your company mission, values, and what kind of influencers you're looking to partner with."
                     />
-                    <p className="text-xs text-gray-400 text-right">Make it compelling to attract better talent.</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Coming Soon Cards */}
             {['notifications', 'security', 'billing', 'danger'].includes(activeTab) && (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col items-center justify-center p-16 text-center">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 mb-4 ring-1 ring-gray-100">
+              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden flex flex-col items-center justify-center p-16 text-center">
+                <div className="w-16 h-16 bg-sky-wash rounded-full flex items-center justify-center text-signal-blue mb-4 border border-slate-custom/10">
                   {activeTab === 'notifications' && <Bell size={32} />}
                   {activeTab === 'security' && <ShieldCheck size={32} />}
                   {activeTab === 'billing' && <CreditCard size={32} />}
                   {activeTab === 'danger' && <Trash2 size={32} />}
                 </div>
-                <h2 className="text-lg font-bold text-gray-900 mb-2 capitalize">{activeTab.replace('danger', 'Danger Zone')} settings</h2>
-                <p className="text-sm text-gray-500 max-w-sm">
+                <h2 className="text-heading text-graphite mb-2 capitalize">{activeTab === 'danger' ? 'Danger Zone' : activeTab} settings</h2>
+                <p className="text-sm text-ash max-w-sm">
                   This feature is currently under development. We're working hard to bring it to you soon!
                 </p>
               </div>
@@ -351,7 +295,6 @@ export default function BusinessProfilePage() {
         </div>
       </div>
 
-      {/* Sticky Save Bar */}
       <AnimatePresence>
         {isDirty && (
           <motion.div
@@ -360,28 +303,28 @@ export default function BusinessProfilePage() {
             exit={{ y: 100, opacity: 0 }}
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4"
           >
-            <div className="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center justify-between ring-1 ring-white/10 backdrop-blur-lg bg-gray-900/95">
+            <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-4 shadow-feature-section flex items-center justify-between ring-1 ring-slate-custom/5">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
-                  <AlertCircle size={16} />
+                <div className="w-8 h-8 rounded-full bg-amber-tag/10 flex items-center justify-center text-amber-tag">
+                  <AlertTriangle size={16} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">Unsaved changes</p>
-                  <p className="text-xs text-gray-400">Please save your profile to apply changes.</p>
+                  <p className="text-sm font-medium text-graphite">Unsaved changes</p>
+                  <p className="text-xs text-ash">Please save your profile to apply changes.</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => reset()}
                   disabled={isSubmitting}
-                  className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-ash hover:text-graphite transition-colors disabled:opacity-50"
                 >
                   Discard
                 </button>
                 <button
                   onClick={handleSubmit(onSubmit)}
                   disabled={isSubmitting}
-                  className="px-6 h-10 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-primary-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+                  className="px-6 h-10 hero-blue-fade text-white rounded-button text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
                   {isSubmitting ? "Saving..." : "Save Changes"}

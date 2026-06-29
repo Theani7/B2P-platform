@@ -216,25 +216,25 @@ export function CommandPalette() {
   return (
     <>
       <div 
-        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg cursor-text hover:bg-gray-200 transition-colors w-full sm:w-96"
+        className="flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-inputs cursor-text hover:bg-slate-custom/5 transition-colors w-full sm:w-96"
         onClick={() => setIsOpen(true)}
       >
-        <Search size={16} className="text-gray-500 flex-shrink-0" />
-        <span className="text-sm text-gray-500 flex-1 text-left truncate">Search or type a command...</span>
-        <div className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border bg-white shadow-sm text-xs text-gray-500 font-mono">
+        <Search size={16} className="text-ash flex-shrink-0" />
+        <span className="text-sm text-ash flex-1 text-left truncate">Search or type a command...</span>
+        <div className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border bg-white shadow-product-card-sm text-xs text-ash font-mono">
           <span className="text-[10px]">⌘</span>K
         </div>
       </div>
 
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4 pb-4">
-          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+          <div className="fixed inset-0 bg-graphite/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
           
-          <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col max-h-[80vh]">
+          <div className="relative w-full max-w-2xl bg-white rounded-cards-lg shadow-product-card-product-card border border-slate-custom/10 overflow-hidden flex flex-col max-h-[80vh]">
             
             {/* Input Header */}
-            <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-100">
-              <Search size={20} className="text-gray-400" />
+            <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-custom/10">
+              <Search size={20} className="text-ash" />
               <input
                 ref={inputRef}
                 type="text"
@@ -242,11 +242,11 @@ export function CommandPalette() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="What do you need?"
-                className="flex-1 bg-transparent border-none outline-none text-lg placeholder:text-gray-400 text-gray-900"
+                className="flex-1 bg-transparent border-none outline-none text-lg placeholder:text-fog text-graphite"
               />
-              {isSearching && <Loader2 size={18} className="text-primary-500 animate-spin" />}
+              {isSearching && <Loader2 size={18} className="text-signal-blue animate-spin" />}
               {query && !isSearching && (
-                <button onClick={() => setQuery('')} className="p-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-semibold px-2">
+                <button onClick={() => setQuery('')} className="p-1 rounded bg-sky-wash hover:bg-slate-custom/10 text-ash text-xs font-semibold px-2">
                   Clear
                 </button>
               )}
@@ -255,7 +255,7 @@ export function CommandPalette() {
             {/* List Body */}
             <div ref={listRef} className="flex-1 overflow-y-auto p-2 min-h-[300px]">
               {activeItems.length === 0 ? (
-                <div className="py-12 text-center text-gray-500">
+                <div className="py-12 text-center text-ash">
                   <p>No results found for "{query}"</p>
                 </div>
               ) : (
@@ -266,23 +266,23 @@ export function CommandPalette() {
                       data-active={idx === activeIndex}
                       onClick={() => executeCommand(cmd)}
                       onMouseEnter={() => setActiveIndex(idx)}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-colors ${
-                        idx === activeIndex ? 'bg-primary-50 border border-primary-100' : 'hover:bg-gray-50 border border-transparent'
+                      className={`flex items-center gap-3 px-3 py-3 rounded-inputs cursor-pointer transition-colors ${
+                        idx === activeIndex ? 'bg-sky-wash border border-slate-custom/10' : 'hover:bg-sky-wash border border-transparent'
                       }`}
                     >
-                      <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded bg-white shadow-sm border ${idx === activeIndex ? 'text-primary-600 border-primary-200' : 'text-gray-500 border-gray-200'}`}>
+                      <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-inputs bg-white shadow-product-card-sm border ${idx === activeIndex ? 'text-signal-blue border-signal-blue/20' : 'text-ash border-slate-custom/10'}`}>
                         {cmd.icon ? ICON_MAP[cmd.icon] || <Search size={16} /> : <Search size={16} />}
                       </div>
                       <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <span className={`text-sm font-medium truncate ${idx === activeIndex ? 'text-primary-900' : 'text-gray-900'}`}>
+                        <span className={`text-sm font-medium truncate ${idx === activeIndex ? 'text-signal-blue' : 'text-graphite'}`}>
                           {cmd.title}
                         </span>
                         {cmd.subtitle && (
-                          <span className="text-xs text-gray-500 truncate">{cmd.subtitle}</span>
+                          <span className="text-xs text-fog truncate">{cmd.subtitle}</span>
                         )}
                       </div>
                       <div className="flex-shrink-0 flex items-center">
-                        <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+                        <span className="text-xs text-fog uppercase tracking-wider font-semibold">
                           {cmd.type.replace('_', ' ')}
                         </span>
                       </div>
@@ -293,14 +293,14 @@ export function CommandPalette() {
             </div>
             
             {/* Footer */}
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-500 flex justify-between items-center">
+            <div className="px-4 py-3 bg-linen-canvas border-t border-slate-custom/10 text-xs text-ash flex justify-between items-center">
               <div className="flex gap-4">
-                <span className="flex items-center gap-1"><kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 font-mono shadow-sm">↑↓</kbd> to navigate</span>
-                <span className="flex items-center gap-1"><kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 font-mono shadow-sm">↵</kbd> to select</span>
-                <span className="flex items-center gap-1"><kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 font-mono shadow-sm">esc</kbd> to close</span>
+                <span className="flex items-center gap-1"><kbd className="bg-white border border-slate-custom/10 rounded px-1.5 py-0.5 font-mono shadow-product-card-sm">↑↓</kbd> to navigate</span>
+                <span className="flex items-center gap-1"><kbd className="bg-white border border-slate-custom/10 rounded px-1.5 py-0.5 font-mono shadow-product-card-sm">↵</kbd> to select</span>
+                <span className="flex items-center gap-1"><kbd className="bg-white border border-slate-custom/10 rounded px-1.5 py-0.5 font-mono shadow-product-card-sm">esc</kbd> to close</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-gray-400">Byparsathy Palette</span>
+                <span className="font-semibold text-ash">Byparsathy Palette</span>
               </div>
             </div>
           </div>

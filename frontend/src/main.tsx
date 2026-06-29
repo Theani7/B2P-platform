@@ -31,38 +31,37 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           <BrowserRouter>
             <UnsavedChangesProvider>
               <AppRoutes />
-              <Toaster 
-                position="bottom-right" 
+              <Toaster
+                position="bottom-right"
                 toastOptions={{
                   duration: 4000,
                   style: {
-                    boxShadow: 'none',
-                    border: '1px solid #E5E7EB', // gray-200
-                    borderRadius: '12px', // rounded-xl
+                    border: '1px solid #f0f4fe',
+                    borderRadius: '12px',
                     padding: '12px 16px',
                     fontSize: '14px',
                     fontWeight: '500',
-                    color: '#111827', // gray-900
-                    background: '#FFFFFF',
+                    color: '#14141e',
+                    background: '#ffffff',
                   },
                   success: {
                     iconTheme: {
-                      primary: '#1D9E75', // brand-teal
-                      secondary: '#FFFFFF',
+                      primary: '#16ca2e',
+                      secondary: '#ffffff',
                     },
                     style: {
-                      border: '1px solid #1D9E75',
-                      background: '#F0FDF4',
+                      border: '1px solid #16ca2e',
+                      background: '#fcfcfc',
                     }
                   },
                   error: {
                     iconTheme: {
-                      primary: '#D85A30', // brand-coral
-                      secondary: '#FFFFFF',
+                      primary: '#f26052',
+                      secondary: '#ffffff',
                     },
                     style: {
-                      border: '1px solid #D85A30',
-                      background: '#FEF2F2',
+                      border: '1px solid #f26052',
+                      background: '#fcfcfc',
                     }
                   }
                 }}
@@ -72,5 +71,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

@@ -5,9 +5,9 @@ interface ProgressBarProps {
 
 export function ProgressBar({ percentage, className = "" }: ProgressBarProps) {
   return (
-    <div className={`bg-gray-100 rounded-full h-1 ${className}`}>
+    <div className={`bg-sky-wash rounded-full h-1 ${className}`}>
       <div
-        className="bg-brand-teal rounded-full h-1 transition-all"
+        className="bg-emerald-status rounded-full h-1 transition-all"
         style={{ width: `${Math.min(100, Math.max(0, percentage))}%` }}
       />
     </div>

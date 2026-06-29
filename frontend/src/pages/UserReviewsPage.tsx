@@ -23,7 +23,7 @@ export default function UserReviewsPage() {
             <div className="text-center">
               <div className="text-4xl font-bold text-text">{ratingSummary.average_rating}</div>
               <RatingStars rating={ratingSummary.average_rating} size="sm" />
-              <p className="mt-1 text-sm text-gray-500">{ratingSummary.total_reviews} reviews</p>
+              <p className="mt-1 text-sm text-ash">{ratingSummary.total_reviews} reviews</p>
             </div>
             <div className="flex-1 space-y-1">
               {[5, 4, 3, 2, 1].map((star) => {
@@ -31,12 +31,12 @@ export default function UserReviewsPage() {
                 const pct = ratingSummary.total_reviews > 0 ? (count / ratingSummary.total_reviews) * 100 : 0;
                 return (
                   <div key={star} className="flex items-center gap-2 text-sm">
-                    <span className="w-8 text-right text-gray-600">{star}</span>
+                    <span className="w-8 text-right text-ash">{star}</span>
                     <RatingStars rating={star} size="sm" />
                     <div className="h-2 flex-1 rounded-full bg-gray-200">
                       <div className="h-2 rounded-full bg-yellow-400" style={{ width: `${pct}%` }} />
                     </div>
-                    <span className="w-8 text-right text-gray-500">{count}</span>
+                    <span className="w-8 text-right text-ash">{count}</span>
                   </div>
                 );
               })}
@@ -58,7 +58,7 @@ export default function UserReviewsPage() {
                   </div>
                   <div>
                     <p className="font-medium text-text">{review.reviewer.full_name}</p>
-                    <p className="text-xs text-gray-500">@{review.reviewer.username}</p>
+                    <p className="text-xs text-ash">@{review.reviewer.username}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -67,9 +67,9 @@ export default function UserReviewsPage() {
                 </div>
               </div>
               {review.comment && (
-                <p className="mt-3 text-sm text-gray-700">{review.comment}</p>
+                <p className="mt-3 text-sm text-graphite">{review.comment}</p>
               )}
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-fog">
                 {new Date(review.created_at).toLocaleDateString()}
               </p>
             </div>
@@ -86,7 +86,7 @@ export default function UserReviewsPage() {
           >
             Previous
           </button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-ash">
             Page {data.page} of {data.pages}
           </span>
           <button

@@ -112,26 +112,26 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-custom/10 bg-white">
         <div className="flex items-center gap-3">
           {onBack && (
-            <button onClick={onBack} className="md:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-50 transition-colors">
+            <button onClick={onBack} className="md:hidden p-2 -ml-2 text-ash hover:text-graphite rounded-full hover:bg-sky-wash transition-colors">
               <ChevronLeft size={20} />
             </button>
           )}
-          <img src={otherParticipant?.avatar || "/default-avatar.png"} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
+          <img src={otherParticipant?.avatar || "/default-avatar.png"} alt="" className="w-10 h-10 rounded-full object-cover bg-sky-wash" />
           <div>
-            <h2 className="text-sm font-bold text-gray-900">{otherParticipant?.name || "Unknown"}</h2>
+            <h2 className="text-sm font-bold text-graphite">{otherParticipant?.name || "Unknown"}</h2>
             {!isConnected && (
-              <div className="flex items-center gap-1 text-xs text-gray-400">
+              <div className="flex items-center gap-1 text-xs text-fog">
                 <WifiOff size={12} /> Reconnecting...
               </div>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3 text-gray-400">
-          <button className="p-2 hover:bg-gray-50 hover:text-gray-600 rounded-full transition-colors"><Search size={18} /></button>
-          <button className="p-2 hover:bg-gray-50 hover:text-gray-600 rounded-full transition-colors"><Info size={18} /></button>
+        <div className="flex items-center gap-3 text-ash">
+          <button className="p-2 hover:bg-sky-wash hover:text-graphite rounded-full transition-colors"><Search size={18} /></button>
+          <button className="p-2 hover:bg-sky-wash hover:text-graphite rounded-full transition-colors"><Info size={18} /></button>
         </div>
       </div>
 
@@ -142,19 +142,19 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
         ref={scrollRef}
       >
         {conversation.collaboration_status === 'COMPLETED' && (
-          <div className="bg-brand-purple-50 border border-purple-100 text-brand-purple-900 px-4 py-3 rounded-xl text-xs mb-6 text-center mx-auto max-w-lg">
+          <div className="bg-signal-blue/10 border border-signal-blue/20 text-signal-blue px-4 py-3 rounded-images text-xs mb-6 text-center mx-auto max-w-lg">
             <span className="font-semibold block mb-0.5">Collaboration Completed</span>
             This collaboration has been completed. You can continue chatting for follow-up discussions, but any new work should be started through a new campaign.
           </div>
         )}
         
         {wsError && (
-          <div className="bg-brand-amber-50 border border-amber-200 text-brand-amber-900 px-3 py-2 rounded-lg text-xs mb-4 flex items-center gap-2">
+          <div className="bg-amber-tag/10 border border-amber-tag/20 text-amber-tag px-3 py-2 rounded-inputs text-xs mb-4 flex items-center gap-2">
             <AlertTriangle size={14} />
             Connection issue: {wsError}
           </div>
         )}
-        {isFetchingNextPage && <div className="text-center text-xs text-gray-400 my-2">Loading older messages...</div>}
+        {isFetchingNextPage && <div className="text-center text-xs text-ash my-2">Loading older messages...</div>}
         
         {messages.map((msg) => (
           <MessageBubble 

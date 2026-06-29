@@ -24,13 +24,13 @@ export default function CampaignDetailsPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center p-8">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-purple border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-signal-blue border-t-transparent" />
       </div>
     );
   }
 
   if (!campaign) {
-    return <div className="text-center text-gray-500 py-8">Campaign not found</div>;
+    return <div className="text-center text-ash py-8">Campaign not found</div>;
   }
 
   const handleDelete = () => {
@@ -70,7 +70,7 @@ export default function CampaignDetailsPage() {
       <div>
         <Link
           to="/business/campaigns"
-          className="text-xs text-brand-purple hover:underline inline-flex items-center gap-1 font-medium mb-3"
+          className="text-xs text-signal-blue hover:underline inline-flex items-center gap-1 font-medium mb-3"
         >
           &larr; Back to Campaigns
         </Link>
@@ -82,14 +82,14 @@ export default function CampaignDetailsPage() {
               <StatusBadge status={campaign.status} />
               <Link
                 to={`/business/campaigns/${campaign.id}/edit`}
-                className="bg-white border border-gray-200 text-gray-700 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-gray-50 transition-colors"
+                className="bg-white border border-slate-custom/10 text-graphite rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-sky-wash transition-colors"
               >
                 Edit
               </Link>
               {campaign.status === "DRAFT" && (
                 <button
                   onClick={handlePublish}
-                  className="bg-primary-600 text-white border border-primary-600 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-primary-700 transition-colors flex items-center gap-1.5"
+                  className="bg-signal-blue text-white border border-signal-blue rounded-inputs px-3 py-1.5 text-xs font-medium hover:opacity-90 transition-colors flex items-center gap-1.5"
                 >
                   <Rocket size={14} /> Publish
                 </button>
@@ -97,21 +97,21 @@ export default function CampaignDetailsPage() {
               {campaign.status !== "ARCHIVED" ? (
                 <button
                   onClick={handleArchive}
-                  className="bg-brand-amber-50 text-brand-amber-900 border border-brand-amber/20 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-brand-amber-50/80 transition-colors"
+                  className="bg-amber-tag/10 text-amber-tag border border-amber-tag/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-amber-tag/20 transition-colors"
                 >
                   Archive
                 </button>
               ) : (
                 <button
                   onClick={handleReopen}
-                  className="bg-brand-teal-50 text-brand-teal-900 border border-brand-teal/20 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-brand-teal-50/80 transition-colors"
+                  className="bg-emerald-status/10 text-emerald-status border border-emerald-status/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-emerald-status/20 transition-colors"
                 >
                   Reopen
                 </button>
               )}
               <button
                 onClick={handleDelete}
-                className="bg-brand-coral-50 text-brand-coral-900 border border-brand-coral/20 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-brand-coral-50/80 transition-colors"
+                className="bg-coral-alert/10 text-coral-alert border border-coral-alert/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors"
               >
                 Delete
               </button>
@@ -122,77 +122,77 @@ export default function CampaignDetailsPage() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Details Card */}
-        <div className="bg-white border border-gray-100 rounded-xl p-5 space-y-4">
-          <h2 className="text-base font-medium text-gray-900 pb-2 border-b border-gray-100">Campaign Details</h2>
+        <div className="bg-white border border-slate-custom/10 rounded-cards p-5 space-y-4">
+          <h2 className="text-heading text-graphite pb-2 border-b border-slate-custom/10">Campaign Details</h2>
           <div>
-            <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Description</span>
-            <p className="mt-1 text-sm text-gray-700 leading-relaxed">{campaign.description}</p>
+            <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Description</span>
+            <p className="mt-1 text-sm text-graphite leading-relaxed">{campaign.description}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Category</span>
-              <p className="mt-0.5 text-sm font-medium text-gray-900">{campaign.category}</p>
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Category</span>
+              <p className="mt-0.5 text-sm font-medium text-graphite">{campaign.category}</p>
             </div>
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Budget</span>
-              <p className="mt-0.5 text-sm font-medium text-gray-900">
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Budget</span>
+              <p className="mt-0.5 text-sm font-medium text-graphite">
                 {formatNepaliCurrency(campaign.budget)}
               </p>
             </div>
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Location</span>
-              <p className="mt-0.5 text-sm font-medium text-gray-900">{campaign.location}</p>
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Location</span>
+              <p className="mt-0.5 text-sm font-medium text-graphite">{campaign.location}</p>
             </div>
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Visibility</span>
-              <p className="mt-0.5 text-sm font-medium text-gray-900">{campaign.visibility}</p>
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Visibility</span>
+              <p className="mt-0.5 text-sm font-medium text-graphite">{campaign.visibility}</p>
             </div>
           </div>
           {campaign.target_audience && (
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Target Audience</span>
-              <p className="mt-1 text-sm text-gray-700 leading-relaxed">{campaign.target_audience}</p>
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Target Audience</span>
+              <p className="mt-1 text-sm text-graphite leading-relaxed">{campaign.target_audience}</p>
             </div>
           )}
           {campaign.requirements && (
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Requirements</span>
-              <p className="mt-1 text-sm text-gray-700 leading-relaxed">{campaign.requirements}</p>
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Requirements</span>
+              <p className="mt-1 text-sm text-graphite leading-relaxed">{campaign.requirements}</p>
             </div>
           )}
         </div>
 
         {/* Timeline Card */}
-        <div className="bg-white border border-gray-100 rounded-xl p-5 space-y-4">
-          <h2 className="text-base font-medium text-gray-900 pb-2 border-b border-gray-100">Timeline</h2>
+        <div className="bg-white border border-slate-custom/10 rounded-cards p-5 space-y-4">
+          <h2 className="text-heading text-graphite pb-2 border-b border-slate-custom/10">Timeline</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Start Date</span>
-              <p className="mt-0.5 text-sm font-medium text-gray-900">
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Start Date</span>
+              <p className="mt-0.5 text-sm font-medium text-graphite">
                 {new Date(campaign.start_date).toLocaleDateString("en-US", {
                   month: "short", day: "numeric", year: "numeric"
                 })}
               </p>
             </div>
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">End Date</span>
-              <p className="mt-0.5 text-sm font-medium text-gray-900">
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">End Date</span>
+              <p className="mt-0.5 text-sm font-medium text-graphite">
                 {new Date(campaign.end_date).toLocaleDateString("en-US", {
                   month: "short", day: "numeric", year: "numeric"
                 })}
               </p>
             </div>
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Created</span>
-              <p className="mt-0.5 text-sm font-medium text-gray-900">
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Created</span>
+              <p className="mt-0.5 text-sm font-medium text-graphite">
                 {new Date(campaign.created_at).toLocaleDateString("en-US", {
                   month: "short", day: "numeric", year: "numeric"
                 })}
               </p>
             </div>
             <div>
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Last Updated</span>
-              <p className="mt-0.5 text-sm font-medium text-gray-900">
+              <span className="text-[11px] font-medium uppercase tracking-wide text-fog">Last Updated</span>
+              <p className="mt-0.5 text-sm font-medium text-graphite">
                 {new Date(campaign.updated_at).toLocaleDateString("en-US", {
                   month: "short", day: "numeric", year: "numeric"
                 })}
@@ -203,18 +203,18 @@ export default function CampaignDetailsPage() {
       </div>
 
       {/* Promoters Section */}
-      <div className="bg-white border border-gray-100 rounded-xl p-5 space-y-4">
-        <h2 className="text-base font-medium text-gray-900 pb-2 border-b border-gray-100">Promoter Matching</h2>
+      <div className="bg-white border border-slate-custom/10 rounded-cards p-5 space-y-4">
+        <h2 className="text-heading text-graphite pb-2 border-b border-slate-custom/10">Promoter Matching</h2>
         <div className="flex gap-3">
           <Link
             to={`/business/campaigns/${campaign.id}/matches`}
-            className="bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+            className="bg-signal-blue text-white rounded-button px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
           >
             Recommended Promoters
           </Link>
           <Link
             to={`/business/campaigns/${campaign.id}/applications`}
-            className="bg-white border border-gray-200 text-gray-700 rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="bg-white border border-slate-custom/10 text-graphite rounded-inputs px-4 py-2 text-sm font-medium hover:bg-sky-wash transition-colors"
           >
             View Applications
           </Link>

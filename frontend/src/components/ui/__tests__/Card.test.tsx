@@ -42,9 +42,9 @@ describe("Card", () => {
     render(<Card>Content</Card>);
     const card = screen.getByText("Content");
     expect(card.className).toContain("bg-white");
-    expect(card.className).toContain("rounded-xl");
+    expect(card.className).toContain("rounded-cards");
     expect(card.className).toContain("border");
-    expect(card.className).toContain("border-gray-100");
+    expect(card.className).toContain("border-slate-custom/10");
   });
 
   test("renders complex children", () => {

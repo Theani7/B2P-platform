@@ -65,7 +65,7 @@ describe("ConfirmDialog", () => {
       <ConfirmDialog isOpen={true} onClose={vi.fn()} onConfirm={vi.fn()} title="Confirm" message="Sure?" />,
     );
     const confirmBtn = screen.getByRole("button", { name: /confirm/i });
-    expect(confirmBtn.className).toContain("bg-brand-coral-50");
+    expect(confirmBtn.className).toContain("bg-coral-alert/10");
   });
 
   test("applies primary variant when specified", () => {
@@ -73,7 +73,7 @@ describe("ConfirmDialog", () => {
       <ConfirmDialog isOpen={true} onClose={vi.fn()} onConfirm={vi.fn()} title="Confirm" message="Sure?" variant="primary" />,
     );
     const confirmBtn = screen.getByRole("button", { name: /confirm/i });
-    expect(confirmBtn.className).toContain("bg-brand-purple");
+    expect(confirmBtn.className).toContain("hero-blue-fade");
   });
 
   test("applies secondary variant to cancel button", () => {
@@ -82,6 +82,6 @@ describe("ConfirmDialog", () => {
     );
     const cancelBtn = screen.getByRole("button", { name: /cancel/i });
     expect(cancelBtn.className).toContain("bg-white");
-    expect(cancelBtn.className).toContain("border-gray-200");
+    expect(cancelBtn.className).toContain("border-slate-custom/20");
   });
 });

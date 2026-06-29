@@ -44,6 +44,6 @@ describe("PageHeader", () => {
 
   test("renders description with gray text", () => {
     render(<PageHeader title="Title" description="Desc" />);
-    expect(screen.getByText("Desc").className).toContain("text-gray-500");
+    expect(screen.getByText("Desc").className).toContain("text-ash");
   });
 });

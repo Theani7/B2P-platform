@@ -5,7 +5,7 @@ export default function NotFoundPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-8 max-w-md w-full text-center flex flex-col items-center">
-        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
+        <div className="w-16 h-16 bg-coral-alert/10 text-coral-alert rounded-full flex items-center justify-center mb-6">
           <AlertCircle size={32} />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">404 - Page Not Found</h1>

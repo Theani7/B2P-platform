@@ -15,7 +15,7 @@ export function TopHeader() {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   return (
-    <header className="h-16 px-6 border-b border-stone-100 bg-white flex items-center justify-between sticky top-0 z-40">
+    <header className="h-16 px-6 border-b border-slate-custom/10 bg-white flex items-center justify-between sticky top-0 z-40">
       <div className="flex-1 max-w-lg flex items-center">
         <CommandPalette />
       </div>
@@ -30,10 +30,10 @@ export function TopHeader() {
               }
               setIsShareOpen(true);
             }}
-            className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
-              !user?.has_profile 
-                ? "text-stone-900 border-stone-100 bg-stone-50 cursor-not-allowed" 
-                : "text-stone-900 hover:bg-stone-50 border-stone-100"
+            className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-button text-sm font-medium transition-colors border ${
+              !user?.has_profile
+                ? "text-graphite border-slate-custom/10 bg-linen-canvas cursor-not-allowed"
+                : "text-graphite hover:bg-sky-wash border-slate-custom/10"
             }`}
           >
             Share Profile
@@ -49,11 +49,11 @@ export function TopHeader() {
               }
               window.location.href = "/business/campaigns/create";
             }}
-            className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              !user?.has_profile
-                ? "bg-stone-100 text-stone-900 cursor-not-allowed"
-                : "bg-brand-indigo text-white hover:opacity-90"
-            }`}
+className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-button text-sm font-medium transition-colors ${
+               !user?.has_profile
+                 ? "bg-slate-custom/10 text-steel cursor-not-allowed"
+                 : "hero-blue-fade text-white hover:opacity-90"
+             }`}
           >
             <Plus size={16} />
             Create Campaign
@@ -61,43 +61,43 @@ export function TopHeader() {
         )}
         <NotificationBell />
         <div className="relative">
-          <button 
+          <button
             onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
             onBlur={() => setTimeout(() => setIsProfileMenuOpen(false), 200)}
-            className="flex items-center gap-3 p-1 rounded-lg hover:bg-stone-50 transition-colors text-left"
+            className="flex items-center gap-3 p-1 rounded-button hover:bg-sky-wash transition-colors text-left"
           >
             <div className="hidden sm:flex flex-col items-end">
-              <span className="text-xs font-medium text-stone-900">{user?.full_name || "User"}</span>
+              <span className="text-xs font-medium text-graphite">{user?.full_name || "User"}</span>
               {user?.role && (
                 <Badge variant={user.role === Role.BUSINESS ? "business" : "promoter"} className="scale-[0.85] origin-right">
                   {user.role === Role.BUSINESS ? "Business" : "Promoter"}
                 </Badge>
               )}
             </div>
-            <div className="w-8 h-8 rounded-full bg-brand-purple-50 text-brand-purple-900 flex items-center justify-center text-xs font-medium border border-purple-200">
+            <div className="w-8 h-8 rounded-full bg-sky-wash text-signal-blue flex items-center justify-center text-xs font-medium border border-slate-custom/10">
               {user?.full_name?.charAt(0) || <User size={14} />}
             </div>
-            <ChevronDown size={14} className="text-stone-900" />
+            <ChevronDown size={14} className="text-graphite" />
           </button>
 
           {isProfileMenuOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-stone-100 py-1 z-50">
-              <div className="px-4 py-3 border-b border-stone-100 mb-1">
-                <p className="text-sm font-medium text-stone-900 truncate">{user?.full_name || "User"}</p>
-                <p className="text-xs text-stone-900 truncate">{user?.email}</p>
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-cards border border-slate-custom/10 py-1 z-50 shadow-product-card-product-card">
+              <div className="px-4 py-3 border-b border-slate-custom/10 mb-1">
+                <p className="text-sm font-medium text-graphite truncate">{user?.full_name || "User"}</p>
+                <p className="text-sm text-steel truncate">{user?.email}</p>
               </div>
               <Link
                 to={user?.role === Role.BUSINESS ? "/business/profile" : "/promoter/profile"}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-stone-900 hover:bg-stone-50 transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-sm text-graphite hover:bg-sky-wash transition-colors"
               >
-                <Settings size={16} className="text-stone-900" />
+                <Settings size={16} className="text-graphite" />
                 Settings
               </Link>
               <button
                 onClick={() => openLogoutDialog()}
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-brand-coral hover:bg-brand-coral-50 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-coral-alert hover:bg-coral-alert/10 transition-colors text-left"
               >
-                <LogOut size={16} className="text-brand-coral" />
+                <LogOut size={16} className="text-coral-alert" />
                 Sign out
               </button>
             </div>

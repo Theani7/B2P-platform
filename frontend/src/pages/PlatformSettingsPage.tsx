@@ -79,14 +79,14 @@ export default function PlatformSettingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-medium text-stone-900 font-stretch-condensed">Platform Settings</h1>
+          <h1 className="text-heading text-graphite">Platform Settings</h1>
           {data && data.items.length > 0 && (
-            <span className="text-sm text-stone-500">{data.items.length} variables configured</span>
+            <span className="text-sm text-ash">{data.items.length} variables configured</span>
           )}
         </div>
         <button
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 rounded-lg bg-brand-indigo px-4 py-2 text-sm font-medium text-white hover:bg-brand-indigo-900 transition-colors"
+          className="flex items-center gap-2 rounded-inputs bg-signal-blue px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors"
         >
           <Plus size={16} />
           Add Setting
@@ -94,58 +94,58 @@ export default function PlatformSettingsPage() {
       </div>
 
       {isAdding && (
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-5">
-          <h3 className="text-sm font-medium text-stone-900 mb-4">Add New Setting</h3>
+        <div className="rounded-cards border border-slate-custom/20 bg-linen-canvas p-5">
+          <h3 className="text-heading text-graphite mb-4">Add New Setting</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-4">
             <input
               type="text"
               placeholder="Key (e.g. max_file_size)"
               value={newKey}
               onChange={(e) => setNewKey(e.target.value.toLowerCase().replace(/\s+/g, '_'))}
-              className="rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-1 focus:ring-brand-purple"
+              className="rounded-inputs border border-slate-custom/10 px-3 py-2 text-sm text-graphite focus:outline-none focus:ring-signal-blue/10"
             />
             <input
               type="text"
               placeholder="Value"
               value={newValue}
               onChange={(e) => setNewValue(e.target.value)}
-              className="rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-1 focus:ring-brand-purple"
+              className="rounded-inputs border border-slate-custom/10 px-3 py-2 text-sm text-graphite focus:outline-none focus:ring-signal-blue/10"
             />
             <input
               type="text"
               placeholder="Description (Optional)"
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
-              className="rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-1 focus:ring-brand-purple"
+              className="rounded-inputs border border-slate-custom/10 px-3 py-2 text-sm text-graphite focus:outline-none focus:ring-signal-blue/10"
             />
           </div>
           <div className="flex gap-2 justify-end">
-            <button onClick={() => setIsAdding(false)} className="rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-900 hover:bg-stone-50 transition-colors">Cancel</button>
-            <button onClick={handleAddSave} className="rounded-lg bg-brand-indigo px-4 py-2 text-sm font-medium text-white hover:bg-brand-indigo-900 transition-colors">Create</button>
+            <button onClick={() => setIsAdding(false)} className="rounded-inputs border border-slate-custom/10 bg-white px-4 py-2 text-sm font-medium text-graphite hover:bg-sky-wash transition-colors">Cancel</button>
+            <button onClick={handleAddSave} className="rounded-inputs bg-signal-blue px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors">Create</button>
           </div>
         </div>
       )}
 
       <div className="space-y-4">
         {data?.items.map((setting) => (
-          <div key={setting.setting_key} className="rounded-xl border border-stone-100 bg-white p-5 border-t-[1px] border-t-brand-purple">
+          <div key={setting.setting_key} className="rounded-cards border border-slate-custom/10 bg-white p-5">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <label className="text-sm font-medium text-stone-900">{setting.setting_key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</label>
-                {setting.description && <p className="text-xs text-stone-400 mt-1">{setting.description}</p>}
+                <label className="text-sm font-medium text-graphite">{setting.setting_key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</label>
+                {setting.description && <p className="text-xs text-fog mt-1">{setting.description}</p>}
               </div>
             </div>
             {editingKey === setting.setting_key ? (
               <div className="mt-4 flex flex-col space-y-3">
                 {isListSetting(setting.setting_key) ? (
-                  <div className="rounded-lg border border-stone-200 p-2 flex flex-wrap gap-2 focus-within:border-brand-purple">
+                  <div className="rounded-inputs border border-slate-custom/10 p-2 flex flex-wrap gap-2 focus-within:border-signal-blue">
                     {editValue.split(',').map(t => t.trim()).filter(Boolean).map(tag => (
-                      <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-brand-purple/10 px-2.5 py-1 text-xs font-medium text-brand-purple">
+                      <span key={tag} className="inline-flex items-center gap-1 rounded-badges bg-signal-blue/10 px-1.5 py-0.5 text-xs font-medium text-signal-blue">
                         {tag}
                         <button type="button" onClick={() => {
                           const tags = editValue.split(',').map(t => t.trim()).filter(Boolean);
                           setEditValue(tags.filter(t => t !== tag).join(','));
-                        }} className="text-brand-purple hover:text-brand-purple-900 p-0.5 rounded-full hover:bg-brand-purple/20 transition-colors">
+                        }} className="text-signal-blue hover:text-signal-blue/80 p-0.5 rounded-badges hover:bg-signal-blue/20 transition-colors">
                           <X size={12} />
                         </button>
                       </span>
@@ -166,7 +166,7 @@ export default function PlatformSettingsPage() {
                           }
                         }
                       }}
-                      className="flex-1 bg-transparent text-sm text-stone-900 min-w-[150px] px-2 py-1 focus:outline-none"
+                      className="flex-1 bg-transparent text-sm text-graphite min-w-[150px] px-2 py-1 focus:outline-none"
                     />
                   </div>
                 ) : (
@@ -174,12 +174,12 @@ export default function PlatformSettingsPage() {
                     type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-1 focus:ring-brand-purple"
+                    className="w-full rounded-inputs border border-slate-custom/10 px-3 py-2 text-sm text-graphite focus:outline-none focus:ring-signal-blue/10"
                   />
                 )}
                 <div className="flex gap-3">
-                  <button onClick={() => handleSave(setting.setting_key)} className="rounded-lg bg-brand-indigo px-4 py-2 text-sm font-medium text-white hover:bg-brand-indigo-900 transition-colors">Save</button>
-                  <button onClick={handleCancel} className="rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-900 hover:bg-stone-50 transition-colors">Cancel</button>
+                  <button onClick={() => handleSave(setting.setting_key)} className="rounded-inputs bg-signal-blue px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors">Save</button>
+                  <button onClick={handleCancel} className="rounded-inputs border border-slate-custom/10 bg-white px-4 py-2 text-sm font-medium text-graphite hover:bg-sky-wash transition-colors">Cancel</button>
                 </div>
               </div>
             ) : (
@@ -187,19 +187,19 @@ export default function PlatformSettingsPage() {
                 {isListSetting(setting.setting_key) ? (
                   <div className="flex flex-wrap gap-2">
                     {setting.setting_value.split(',').map(t => t.trim()).filter(Boolean).map(tag => (
-                      <span key={tag} className="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-700">
+                      <span key={tag} className="inline-flex items-center rounded-badges bg-sky-wash px-1.5 py-0.5 text-xs font-medium text-graphite">
                         {tag}
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <span className="text-sm text-stone-900 truncate">{setting.setting_value}</span>
+                  <span className="text-sm text-graphite truncate">{setting.setting_value}</span>
                 )}
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button onClick={() => handleEdit(setting.setting_key, setting.setting_value)} className="p-1.5 text-stone-400 hover:text-brand-purple hover:bg-brand-purple/10 rounded-md transition-colors" title="Edit">
+                  <button onClick={() => handleEdit(setting.setting_key, setting.setting_value)} className="p-1.5 text-ash hover:text-signal-blue hover:bg-signal-blue/10 rounded-button transition-colors" title="Edit">
                     <Edit2 size={16} />
                   </button>
-                  <button onClick={() => handleDelete(setting.setting_key)} className="p-1.5 text-stone-400 hover:text-brand-coral hover:bg-brand-coral/10 rounded-md transition-colors" title="Delete">
+                  <button onClick={() => handleDelete(setting.setting_key)} className="p-1.5 text-ash hover:text-coral-alert hover:bg-coral-alert/10 rounded-button transition-colors" title="Delete">
                     <Trash2 size={16} />
                   </button>
                 </div>

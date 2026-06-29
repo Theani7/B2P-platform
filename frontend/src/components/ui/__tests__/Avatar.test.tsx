@@ -40,22 +40,22 @@ describe("Avatar", () => {
   test("applies default color (index 0)", () => {
     const { container } = render(<Avatar initials="AB" />);
     const el = container.firstChild as HTMLElement;
-    expect(el.className).toContain("bg-brand-purple-50");
-    expect(el.className).toContain("text-brand-purple-900");
+    expect(el.className).toContain("bg-periwinkle-glow/20");
+    expect(el.className).toContain("text-primary-action");
   });
 
   test("applies color by index", () => {
     const { container } = render(<Avatar initials="AB" colorIndex={1} />);
     const el = container.firstChild as HTMLElement;
-    expect(el.className).toContain("bg-brand-teal-50");
-    expect(el.className).toContain("text-brand-teal-900");
+    expect(el.className).toContain("bg-sky-wash");
+    expect(el.className).toContain("text-signal-blue");
   });
 
   test("wraps color index modulo 5", () => {
     const { container } = render(<Avatar initials="AB" colorIndex={7} />);
     const el = container.firstChild as HTMLElement;
-    // 7 % 5 = 2 → brand-amber
-    expect(el.className).toContain("bg-brand-amber-50");
+    // 7 % 5 = 2 → amber-tag
+    expect(el.className).toContain("bg-amber-tag/10");
   });
 
   test("merges custom className", () => {

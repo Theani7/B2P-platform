@@ -1,26 +1,28 @@
 import { motion } from "framer-motion";
-import { MessageSquare, BarChart2, FolderOpen, Bell } from "lucide-react";
 
-const screens = [
-  { name: "Business Dashboard", desc: "Overview of campaigns, applications, and top matches.", icon: BarChart2 },
-  { name: "Campaign Marketplace", desc: "Browse and apply to open campaigns from verified businesses.", icon: FolderOpen },
-  { name: "Real-time Chat", desc: "Collaboration threads keep every conversation in context.", icon: MessageSquare },
-  { name: "Notifications", desc: "Smart alerts for applications, requests, and review updates.", icon: Bell },
+const stats = [
+  { value: "500+", label: "Verified promoters" },
+  { value: "120+", label: "Businesses" },
+  { value: "900+", label: "Campaigns launched" },
+  { value: "4.8/5", label: "Average rating" },
 ];
 
 const container = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
 } as const;
 
 const item = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 12 },
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
 } as const;
 
 export default function LandingShowcase() {
   return (
-    <section className="py-20 lg:py-28 bg-white">
+    <section className="py-20 lg:py-28 bg-sky-wash/40">
       <div className="max-w-[1200px] mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -29,35 +31,27 @@ export default function LandingShowcase() {
           transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
-          <p className="text-[11px] font-medium uppercase tracking-widest text-brand-purple mb-3">
-            Platform
+          <p className="text-caption font-medium uppercase tracking-widest text-signal-blue mb-3">
+            Trusted by creators and brands
           </p>
-          <h2 className="text-2xl sm:text-3xl font-medium text-stone-900 font-stretch-condensed mb-4">
-            Built for the way you work
+          <h2 className="text-heading-lg text-midnight-ink max-w-2xl mx-auto">
+            Join a growing community of Nepal's best marketing partnerships
           </h2>
-          <p className="text-sm text-stone-900 leading-relaxed max-w-xl mx-auto">
-            Every screen is designed for clarity, speed, and zero friction.
-          </p>
         </motion.div>
 
         <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-40px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          viewport={{ once: true, margin: "-60px" }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12"
         >
-          {screens.map((screen) => (
-            <motion.div key={screen.name} variants={item} className="group relative bg-white border border-stone-100 rounded-xl p-6 hover:border-brand-purple transition-all duration-150">
-              <div className="flex items-start gap-4">
-                <span className="w-10 h-10 rounded-lg bg-stone-100 border border-stone-100 flex items-center justify-center flex-shrink-0 group-hover:border-brand-purple transition-colors">
-                  <screen.icon size={18} className="text-stone-900 group-hover:text-brand-purple transition-colors" />
-                </span>
-                <div>
-                  <p className="text-sm font-medium text-stone-900 mb-1">{screen.name}</p>
-                  <p className="text-sm text-stone-900 leading-relaxed">{screen.desc}</p>
-                </div>
-              </div>
+          {stats.map((stat) => (
+            <motion.div key={stat.label} variants={item} className="text-center">
+              <p className="text-heading-lg text-midnight-ink mb-2">
+                {stat.value}
+              </p>
+              <p className="text-body text-ash">{stat.label}</p>
             </motion.div>
           ))}
         </motion.div>

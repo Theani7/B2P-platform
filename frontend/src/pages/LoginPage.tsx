@@ -28,7 +28,6 @@ export default function LoginPage() {
 
   const loginMutation = useLogin();
 
-  // Redirect if already logged in or after login
   if (authLoading) return null;
   if (user) {
     if (user.role === "BUSINESS") return <Navigate to="/business/dashboard" replace />;
@@ -40,12 +39,7 @@ export default function LoginPage() {
     setServerError(null);
     loginMutation.mutate(data, {
       onError: (err: any) => {
-        let msg = err?.response?.data?.message || err?.response?.data?.detail || err?.message || "Login failed. Please check your credentials.";
-        if (Array.isArray(msg) && msg.length > 0 && msg[0].msg) {
-          msg = msg[0].msg;
-        } else if (typeof msg === 'object') {
-          msg = JSON.stringify(msg);
-        }
+        const msg = err?.response?.data?.message || err?.response?.data?.detail || err?.message || "Login failed. Please check your credentials.";
         setServerError(msg);
       },
     });
@@ -54,14 +48,14 @@ export default function LoginPage() {
   return (
     <AuthLayout>
       <div className="mb-8">
-        <h1 className="text-xl font-medium text-gray-900 text-center">Welcome back</h1>
-        <p className="text-sm text-gray-500 text-center mt-1">Continue managing your collaborations</p>
+        <h1 className="text-heading text-midnight-ink text-center">Welcome back</h1>
+        <p className="text-body text-steel text-center mt-2">Continue managing your collaborations</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         {serverError && (
-          <div className="bg-brand-coral-50 border border-brand-coral/20 text-brand-coral-900 px-3 py-2.5 rounded-lg text-sm flex items-start gap-2.5">
-            <AlertCircle size={16} className="mt-0.5 text-brand-coral flex-shrink-0" />
+          <div className="bg-coral-alert/10 border border-coral-alert/20 text-coral-alert px-3 py-2.5 rounded-inputs text-sm flex items-start gap-2.5">
+            <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
             <span className="flex-1">{serverError}</span>
           </div>
         )}
@@ -76,8 +70,8 @@ export default function LoginPage() {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label htmlFor="password" className="text-xs font-medium text-gray-700">Password</label>
-            <Link to="/forgot-password" className="text-xs text-brand-purple hover:underline">Forgot password?</Link>
+            <label htmlFor="password" className="text-xs font-medium text-graphite">Password</label>
+            <Link to="/forgot-password" className="text-xs text-signal-blue hover:underline">Forgot password?</Link>
           </div>
           <div className="relative">
             <input
@@ -85,34 +79,34 @@ export default function LoginPage() {
               type={showPassword ? "text" : "password"}
               id="password"
               placeholder="••••••••"
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo pr-10"
+              className="w-full px-3 py-2 text-sm border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 pr-10"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-fog hover:text-graphite transition-colors"
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          {errors.password && <p className="text-xs text-brand-coral mt-1">{errors.password.message}</p>}
+          {errors.password && <p className="text-xs text-coral-alert mt-1.5">{errors.password.message}</p>}
         </div>
 
         <button
           type="submit"
           disabled={loginMutation.isPending}
-          className="w-full mt-1 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:bg-brand-indigo-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+          className="w-full mt-1 hero-blue-fade text-white rounded-button py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-opacity"
         >
           {loginMutation.isPending && <Loader2 size={16} className="animate-spin" />}
           {loginMutation.isPending ? "Logging in..." : "Sign in"}
         </button>
       </form>
 
-      <p className="text-sm text-gray-500 text-center mt-6">
-        Don't have an account?{" "}
-        <Link to="/register" className="text-brand-purple hover:underline font-medium">Create account</Link>
+      <p className="text-sm text-graphite text-center mt-6">
+        Don&apos;t have an account?{" "}
+        <Link to="/register" className="text-signal-blue hover:underline font-medium">Create account</Link>
       </p>
     </AuthLayout>
   );

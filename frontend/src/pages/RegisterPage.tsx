@@ -72,7 +72,7 @@ export default function RegisterPage() {
     const { confirmPassword, ...payload } = data;
     registerMutation.mutate({ ...payload, role }, {
       onError: (err: any) => {
-        const msg = err?.response?.data?.message || err?.message || "Registration failed. Please try again.";
+        const msg = err?.response?.data?.message || err?.response?.data?.detail || err?.message || "Registration failed. Please try again.";
         setServerError(msg);
       },
     });
@@ -81,14 +81,14 @@ export default function RegisterPage() {
   return (
     <AuthLayout>
       <div className="mb-8">
-        <h1 className="text-xl font-medium text-gray-900 text-center">Create your account</h1>
-        <p className="text-sm text-gray-500 text-center mt-1">Join Nepal's promoter marketplace</p>
+        <h1 className="text-heading text-midnight-ink text-center">Create your account</h1>
+        <p className="text-body text-steel text-center mt-2">Join Nepal&apos;s promoter marketplace</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {serverError && (
-          <div className="bg-brand-coral-50 border border-brand-coral/20 text-brand-coral-900 px-3 py-2.5 rounded-lg text-sm flex items-start gap-2.5">
-            <AlertCircle size={16} className="mt-0.5 text-brand-coral flex-shrink-0" />
+          <div className="bg-coral-alert/10 border border-coral-alert/20 text-coral-alert px-3 py-2.5 rounded-inputs text-sm flex items-start gap-2.5">
+            <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
             <span className="flex-1">{serverError}</span>
           </div>
         )}
@@ -119,19 +119,19 @@ export default function RegisterPage() {
         />
 
         <div>
-          <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1.5">Password</label>
+          <label htmlFor="password" className="block text-xs font-medium text-graphite mb-1.5">Password</label>
           <div className="relative">
             <input
               {...register("password")}
               type={showPassword ? "text" : "password"}
               id="password"
               placeholder="••••••••"
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo pr-10"
+              className="w-full px-3 py-2 text-sm border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 pr-10"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-fog hover:text-graphite transition-colors"
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
@@ -141,19 +141,19 @@ export default function RegisterPage() {
           {password && (
             <div className="mt-2">
               <div className="flex items-center gap-2 mb-2">
-                <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                <div className="flex-1 h-1 bg-slate-custom/10 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${
-                      strength.level === "weak" ? "bg-brand-coral w-1/3" :
-                      strength.level === "medium" ? "bg-brand-amber w-2/3" :
-                      "bg-brand-teal w-full"
+                      strength.level === "weak" ? "bg-coral-alert w-1/3" :
+                      strength.level === "medium" ? "bg-amber-tag w-2/3" :
+                      "bg-emerald-status w-full"
                     }`}
                   />
                 </div>
-                <span className={`text-[10px] font-medium uppercase tracking-wide ${
-                  strength.level === "weak" ? "text-brand-coral" :
-                  strength.level === "medium" ? "text-brand-amber" :
-                  "text-brand-teal"
+                <span className={`text-[10px] font-medium uppercase tracking-wider ${
+                  strength.level === "weak" ? "text-coral-alert" :
+                  strength.level === "medium" ? "text-amber-tag" :
+                  "text-emerald-status"
                 }`}>
                   {strength.level}
                 </span>
@@ -162,8 +162,8 @@ export default function RegisterPage() {
                 {requirements.map((req) => {
                   const met = req.test(password);
                   return (
-                    <span key={req.label} className={`flex items-center gap-1.5 text-[11px] ${met ? "text-brand-teal" : "text-gray-400"}`}>
-                      {met ? <CheckCircle2 size={12} /> : <span className="w-3 h-3 rounded-full border border-gray-200" />}
+                    <span key={req.label} className={`flex items-center gap-1.5 text-[11px] ${met ? "text-emerald-status" : "text-fog"}`}>
+                      {met ? <CheckCircle2 size={12} /> : <span className="w-3 h-3 rounded-full border border-slate-custom/20" />}
                       {req.label}
                     </span>
                   );
@@ -171,45 +171,45 @@ export default function RegisterPage() {
               </div>
             </div>
           )}
-          {errors.password && <p className="text-xs text-brand-coral mt-1.5">{errors.password.message}</p>}
+          {errors.password && <p className="text-xs text-coral-alert mt-1.5">{errors.password.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-xs font-medium text-gray-700 mb-1.5">Confirm password</label>
+          <label htmlFor="confirmPassword" className="block text-xs font-medium text-graphite mb-1.5">Confirm password</label>
           <div className="relative">
             <input
               {...register("confirmPassword")}
               type={showConfirm ? "text" : "password"}
               id="confirmPassword"
               placeholder="••••••••"
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo pr-10"
+              className="w-full px-3 py-2 text-sm border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 pr-10"
             />
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-fog hover:text-graphite transition-colors"
               tabIndex={-1}
               aria-label={showConfirm ? "Hide password" : "Show password"}
             >
               {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-{errors.confirmPassword && <p className="text-xs text-brand-coral mt-1">{errors.confirmPassword.message}</p>}
-         </div>
+          {errors.confirmPassword && <p className="text-xs text-coral-alert mt-1">{errors.confirmPassword.message}</p>}
+        </div>
 
-         <button
+        <button
           type="submit"
           disabled={registerMutation.isPending || !role}
-          className="w-full mt-1 bg-brand-indigo text-white rounded-lg py-2.5 text-sm font-medium hover:bg-brand-indigo-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+          className="w-full mt-1 hero-blue-fade text-white rounded-button py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-opacity"
         >
           {registerMutation.isPending && <Loader2 size={16} className="animate-spin" />}
           {registerMutation.isPending ? "Creating account..." : "Create account"}
         </button>
       </form>
 
-      <p className="text-sm text-gray-500 text-center mt-6">
+      <p className="text-sm text-graphite text-center mt-6">
         Already have an account?{" "}
-        <Link to="/login" className="text-brand-purple hover:underline font-medium">Sign in</Link>
+        <Link to="/login" className="text-signal-blue hover:underline font-medium">Sign in</Link>
       </p>
     </AuthLayout>
   );

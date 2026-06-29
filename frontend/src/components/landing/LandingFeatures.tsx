@@ -1,33 +1,40 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { Button } from "../ui/Button";
+import { CheckCircle2 } from "lucide-react";
 
 const features = [
-  { title: "Campaign Marketplace", desc: "Create campaigns with structured briefs, budgets, and deliverables. Send invitations or let promoters apply." },
-  { title: "Smart Matching", desc: "Promoters scored by niche, audience size, location, and past performance. You always know why a match is recommended." },
-  { title: "Real-time Chat", desc: "Every collaboration has its own thread. Keep communication tied to the campaign, not scattered across inboxes." },
-  { title: "Portfolio Management", desc: "Promoters build rich portfolios with media and social proofs. Businesses review full work history." },
-  { title: "Reviews & Reputation", desc: "Dual review system builds trusted reputations on both sides. Make decisions backed by real feedback." },
-  { title: "Analytics Dashboard", desc: "Track campaign performance, acceptance rates, and ROI across all active and past campaigns." },
+  {
+    title: "Smart matching engine",
+    description:
+      "Promoters are scored by niche, audience, location, and track record. See exactly why each match fits your campaign.",
+    icon: CheckCircle2,
+  },
+  {
+    title: "Verified creators only",
+    description:
+      "Every promoter goes through identity and audience verification. Work with real creators, not bots.",
+    icon: CheckCircle2,
+  },
+  {
+    title: "Structured collaborations",
+    description:
+      "Briefs, deliverables, approvals, and payments in one workspace. No more WhatsApp chaos.",
+    icon: CheckCircle2,
+  },
 ];
 
 const container = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05, delayChildren: 0.1 },
-  },
+  show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
 } as const;
 
 const item = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
 } as const;
 
 export default function LandingFeatures() {
   return (
-    <section id="features" className="py-20 lg:py-28 bg-white">
+    <section id="features" className="py-20 lg:py-28 bg-linen-canvas">
       <div className="max-w-[1200px] mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -36,16 +43,12 @@ export default function LandingFeatures() {
           transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
-          <p className="text-[11px] font-medium uppercase tracking-widest text-brand-purple mb-3">
-            Platform features
+          <p className="text-caption font-medium uppercase tracking-widest text-signal-blue mb-3">
+            Features
           </p>
-          <h2 className="text-2xl sm:text-3xl font-medium text-stone-900 font-stretch-condensed mb-4">
-            Everything a campaign needs, in one place
+          <h2 className="text-heading-lg text-midnight-ink max-w-2xl mx-auto">
+            Everything you need to run successful creator campaigns
           </h2>
-          <p className="text-sm text-stone-900 leading-relaxed max-w-xl mx-auto">
-            From finding the right promoter to tracking deliverables and collecting reviews —
-            Byparsathy handles the full collaboration lifecycle.
-          </p>
         </motion.div>
 
         <motion.div
@@ -53,35 +56,21 @@ export default function LandingFeatures() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid md:grid-cols-3 gap-6"
         >
-          {features.map((f) => (
+          {features.map((feature) => (
             <motion.div
-              key={f.title}
+              key={feature.title}
               variants={item}
-              className="group bg-white border border-stone-100 rounded-xl p-5 hover:border-brand-purple transition-all duration-150"
+              className="bg-white border border-slate-custom/10 rounded-cards p-6 shadow-product-card"
             >
-              <h3 className="text-sm font-medium text-stone-900 mb-2">{f.title}</h3>
-              <p className="text-sm text-stone-900 leading-relaxed">{f.desc}</p>
+              <span className="w-8 h-8 rounded-button bg-sky-wash flex items-center justify-center flex-shrink-0 mb-4">
+                <feature.icon size={16} className="text-signal-blue" />
+              </span>
+              <h3 className="text-heading-sm text-graphite mb-2">{feature.title}</h3>
+              <p className="text-sm text-ash leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center mt-12"
-        >
-          <Link to="/register">
-            <Button variant="secondary" size="md" className="gap-1">
-              <span className="flex items-center">
-                <span>Explore the platform</span>
-                <ArrowRight size={14} className="ml-1" />
-              </span>
-            </Button>
-          </Link>
         </motion.div>
       </div>
     </section>

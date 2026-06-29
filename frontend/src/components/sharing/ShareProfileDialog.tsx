@@ -78,29 +78,29 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-stone-900/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-graphite/50 backdrop-blur-sm">
       <div
-        className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md overflow-hidden relative"
+        className="bg-white rounded-cards-lg w-full max-w-md overflow-hidden relative"
         role="dialog"
         aria-modal="true"
         aria-labelledby="share-profile-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-stone-100">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-custom/10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-brand-purple/10 flex items-center justify-center">
-              <QrCode size={18} className="text-brand-purple" />
+            <div className="w-9 h-9 rounded-button bg-signal-blue/10 flex items-center justify-center">
+              <QrCode size={18} className="text-signal-blue" />
             </div>
             <div>
-              <h2 id="share-profile-title" className="text-base font-medium text-stone-900">
+              <h2 id="share-profile-title" className="text-heading text-graphite">
                 Share {isPromoter ? 'Promoter' : 'Business'} Profile
               </h2>
-              <p className="text-xs text-stone-500">{shareInfo?.username}</p>
+              <p className="text-xs text-ash">{shareInfo?.username}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors"
+            className="p-1.5 text-ash hover:text-graphite hover:bg-sky-wash rounded-button transition-colors"
           >
             <X size={18} />
           </button>
@@ -108,17 +108,17 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
 
         {/* Body */}
         <div className="p-6">
-          <p className="text-sm text-stone-500 mb-6">{subtitle}</p>
+          <p className="text-sm text-ash mb-6">{subtitle}</p>
 
           {isLoading ? (
             <div className="h-52 flex items-center justify-center">
-              <div className="w-8 h-8 rounded-full border-2 border-brand-purple border-t-transparent animate-spin" />
+              <div className="w-8 h-8 rounded-full border-2 border-signal-blue border-t-transparent animate-spin" />
             </div>
           ) : shareInfo ? (
             <>
               {/* QR Code */}
               <div className="flex justify-center mb-6">
-                <div ref={qrRef} className="bg-stone-50 border border-stone-100 rounded-xl p-4">
+                <div ref={qrRef} className="bg-linen-canvas border border-slate-custom/10 rounded-images p-4">
                   <QRCodeSVG
                     value={shareInfo.public_url}
                     size={180}
@@ -132,19 +132,19 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
 
               {/* Link */}
               <div className="mb-5">
-                <label className="block text-xs font-medium text-stone-500 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-medium text-ash uppercase tracking-wider mb-2">
                   Public Link
                 </label>
-                <div className="flex items-center gap-2 p-2.5 bg-stone-50 border border-stone-100 rounded-lg">
-                  <span className="flex-1 text-sm text-stone-700 font-mono truncate">
+                <div className="flex items-center gap-2 p-2.5 bg-linen-canvas border border-slate-custom/10 rounded-inputs">
+                  <span className="flex-1 text-sm text-graphite font-mono truncate">
                     {shareInfo.public_url}
                   </span>
                   <button
                     onClick={handleCopy}
-                    className="p-1.5 rounded-md text-stone-500 hover:text-brand-purple hover:bg-brand-purple/10 transition-colors flex-shrink-0"
+                    className="p-1.5 rounded-md text-ash hover:text-signal-blue hover:bg-signal-blue/10 transition-colors flex-shrink-0"
                     title="Copy link"
                   >
-                    {copied ? <Check size={16} className="text-brand-teal" /> : <Copy size={16} />}
+                    {copied ? <Check size={16} className="text-emerald-status" /> : <Copy size={16} />}
                   </button>
                 </div>
               </div>
@@ -153,7 +153,7 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={handleDownloadQR}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-stone-200 bg-white text-sm font-medium text-stone-700 hover:bg-stone-50 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-inputs border border-slate-custom/10 bg-white text-sm font-medium text-graphite hover:bg-sky-wash transition-colors"
                 >
                   <Download size={15} />
                   Download QR
@@ -162,7 +162,7 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
                 {navigator.share ? (
                   <button
                     onClick={handleNativeShare}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-brand-purple text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-inputs bg-signal-blue text-white text-sm font-medium hover:opacity-90 transition-opacity"
                   >
                     <Share2 size={15} />
                     Share
@@ -172,7 +172,7 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
                     href={shareInfo.public_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-brand-purple text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-inputs bg-signal-blue text-white text-sm font-medium hover:opacity-90 transition-opacity"
                   >
                     <ExternalLink size={15} />
                     Open Profile
@@ -181,7 +181,7 @@ export const ShareProfileDialog: React.FC<{ isOpen: boolean; onClose: () => void
               </div>
             </>
           ) : (
-            <p className="text-sm text-brand-coral text-center py-8">Failed to load share information.</p>
+            <p className="text-sm text-coral-alert text-center py-8">Failed to load share information.</p>
           )}
         </div>
       </div>
