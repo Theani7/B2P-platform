@@ -125,7 +125,16 @@ export default function CampaignMatchesPage() {
       {!data || data.items.length === 0 ? (
         <EmptyState
           title="No matches yet"
-          description="Generate recommendations to see ranked promoter matches."
+          description="Generate recommendations to see ranked promoter matches based on audience fit."
+          action={
+            <button
+              onClick={handleGenerate}
+              disabled={generating}
+              className="bg-brand-indigo text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {generating ? "Generating..." : "Generate Recommendations"}
+            </button>
+          }
         />
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

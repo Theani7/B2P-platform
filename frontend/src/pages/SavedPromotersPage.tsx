@@ -161,15 +161,6 @@ export default function SavedPromotersPage() {
             <option value="followers">Most Followers</option>
             <option value="engagement">Highest Engagement</option>
           </select>
-          <div className="h-6 w-px bg-gray-200 mx-1 hidden lg:block" />
-          <div className="flex bg-gray-100 p-1 rounded-lg">
-            <button className="w-8 h-7 rounded bg-white shadow-sm flex items-center justify-center text-gray-900">
-              <LayoutGrid size={14} />
-            </button>
-            <button className="w-8 h-7 rounded flex items-center justify-center text-gray-500 hover:text-gray-900">
-              <List size={14} />
-            </button>
-          </div>
         </div>
       </div>
 

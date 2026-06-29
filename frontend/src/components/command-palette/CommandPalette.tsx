@@ -78,27 +78,37 @@ export function CommandPalette() {
     const cmds: Command[] = [];
     const prefix = user.role === 'BUSINESS' ? '/business' : user.role === 'PROMOTER' ? '/promoter' : '/admin';
     
-    // Navigation
-    cmds.push({ id: 'nav-dashboard', title: 'Dashboard', type: 'navigation', icon: 'dashboard', action: () => navigate(prefix) });
-    cmds.push({ id: 'nav-campaigns', title: 'Campaigns', type: 'navigation', icon: 'campaigns', action: () => navigate(`${prefix}/campaigns`) });
-    if (user.role === 'PROMOTER') {
-      cmds.push({ id: 'nav-applications', title: 'Applications', type: 'navigation', icon: 'applications', action: () => navigate(`${prefix}/applications`) });
+    // Dashboard
+    cmds.push({ id: 'nav-dashboard', title: 'Dashboard', type: 'navigation', icon: 'dashboard', action: () => navigate(`${prefix}/dashboard`) });
+
+    if (user.role === 'ADMIN') {
+      cmds.push({ id: 'nav-users', title: 'Users Management', type: 'navigation', icon: 'profile', action: () => navigate('/admin/users') });
+      cmds.push({ id: 'nav-verification', title: 'Verification Requests', type: 'navigation', icon: 'shield', action: () => navigate('/admin/verification') });
+      cmds.push({ id: 'nav-campaigns', title: 'Campaign Moderation', type: 'navigation', icon: 'campaigns', action: () => navigate('/admin/campaigns') });
+      cmds.push({ id: 'nav-reviews', title: 'Review Moderation', type: 'navigation', icon: 'reviews', action: () => navigate('/admin/reviews') });
+      cmds.push({ id: 'nav-analytics', title: 'Analytics', type: 'navigation', icon: 'dashboard', action: () => navigate('/admin/analytics') });
+      cmds.push({ id: 'nav-audit-logs', title: 'Audit Logs', type: 'navigation', icon: 'clock', action: () => navigate('/admin/audit-logs') });
+      cmds.push({ id: 'nav-settings', title: 'Platform Settings', type: 'navigation', icon: 'settings', action: () => navigate('/admin/settings') });
+    } else if (user.role === 'BUSINESS') {
+      cmds.push({ id: 'nav-campaigns', title: 'Campaigns', type: 'navigation', icon: 'campaigns', action: () => navigate('/business/campaigns') });
+      cmds.push({ id: 'action-create-campaign', title: 'Create Campaign', type: 'action', icon: 'plus', action: () => navigate('/business/campaigns/create') });
+      cmds.push({ id: 'action-marketplace', title: 'Find Promoters', type: 'navigation', icon: 'globe', action: () => navigate('/business/promoters') });
+      cmds.push({ id: 'nav-saved', title: 'Saved Promoters', type: 'navigation', icon: 'portfolio', action: () => navigate('/business/saved-promoters') });
+      cmds.push({ id: 'nav-collaborations', title: 'Collaborations', type: 'navigation', icon: 'collaborations', action: () => navigate('/business/collaborations') });
+      cmds.push({ id: 'nav-invitations', title: 'Invitations', type: 'navigation', icon: 'applications', action: () => navigate('/business/invitations') });
+      cmds.push({ id: 'nav-messages', title: 'Messages', type: 'navigation', icon: 'messages', action: () => navigate('/messages') });
+      cmds.push({ id: 'nav-notifications', title: 'Notifications', type: 'navigation', icon: 'notifications', action: () => navigate('/notifications') });
+    } else if (user.role === 'PROMOTER') {
+      cmds.push({ id: 'nav-marketplace', title: 'Marketplace', type: 'navigation', icon: 'globe', action: () => navigate('/promoter/marketplace') });
+      cmds.push({ id: 'nav-applications', title: 'Applications', type: 'navigation', icon: 'applications', action: () => navigate('/promoter/applications') });
+      cmds.push({ id: 'nav-invitations', title: 'Invitations', type: 'navigation', icon: 'applications', action: () => navigate('/promoter/invitations') });
+      cmds.push({ id: 'nav-collaborations', title: 'Collaborations', type: 'navigation', icon: 'collaborations', action: () => navigate('/promoter/collaborations') });
+      cmds.push({ id: 'nav-reviews', title: 'My Reviews', type: 'navigation', icon: 'reviews', action: () => navigate('/my/reviews') });
+      cmds.push({ id: 'nav-messages', title: 'Messages', type: 'navigation', icon: 'messages', action: () => navigate('/messages') });
+      cmds.push({ id: 'nav-notifications', title: 'Notifications', type: 'navigation', icon: 'notifications', action: () => navigate('/notifications') });
     }
-    cmds.push({ id: 'nav-collaborations', title: 'Collaborations', type: 'navigation', icon: 'collaborations', action: () => navigate(`${prefix}/collaborations`) });
-    cmds.push({ id: 'nav-messages', title: 'Messages', type: 'navigation', icon: 'messages', action: () => navigate(`${prefix}/chat`) });
-    cmds.push({ id: 'nav-notifications', title: 'Notifications', type: 'navigation', icon: 'notifications', action: () => navigate(`${prefix}/notifications`) });
-    cmds.push({ id: 'nav-reviews', title: 'Reviews', type: 'navigation', icon: 'reviews', action: () => navigate(`${prefix}/reviews`) });
-    if (user.role === 'PROMOTER') {
-      cmds.push({ id: 'nav-portfolio', title: 'Portfolio', type: 'navigation', icon: 'portfolio', action: () => navigate(`${prefix}/settings?tab=portfolio`) });
-    }
-    cmds.push({ id: 'nav-achievements', title: 'Achievements', type: 'navigation', icon: 'achievements', action: () => navigate(`${prefix}/settings?tab=achievements`) });
-    cmds.push({ id: 'nav-settings', title: 'Settings', type: 'navigation', icon: 'settings', action: () => navigate(`${prefix}/settings`) });
     
     // Quick Actions
-    if (user.role === 'BUSINESS') {
-      cmds.push({ id: 'action-create-campaign', title: 'Create Campaign', type: 'action', icon: 'plus', action: () => navigate('/business/campaigns/create') });
-      cmds.push({ id: 'action-marketplace', title: 'Open Marketplace', type: 'action', icon: 'globe', action: () => navigate('/business/promoters') });
-    }
     cmds.push({ id: 'action-logout', title: 'Logout', type: 'action', icon: 'logout', action: () => logout() });
     
     return cmds;
@@ -206,11 +216,11 @@ export function CommandPalette() {
   return (
     <>
       <div 
-        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg cursor-text hover:bg-gray-200 transition-colors w-full sm:w-64"
+        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg cursor-text hover:bg-gray-200 transition-colors w-full sm:w-96"
         onClick={() => setIsOpen(true)}
       >
-        <Search size={16} className="text-gray-500" />
-        <span className="text-sm text-gray-500 flex-1 text-left">Search or type a command...</span>
+        <Search size={16} className="text-gray-500 flex-shrink-0" />
+        <span className="text-sm text-gray-500 flex-1 text-left truncate">Search or type a command...</span>
         <div className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border bg-white shadow-sm text-xs text-gray-500 font-mono">
           <span className="text-[10px]">⌘</span>K
         </div>

@@ -25,7 +25,7 @@ export default function MessagesPage() {
 
   return (
     <div className="flex h-[calc(100vh-64px)] max-w-6xl mx-auto border-x border-gray-100 shadow-sm bg-white">
-      <div className="w-80 flex-shrink-0 border-r border-gray-100 hidden md:block">
+      <div className={`w-full md:w-80 flex-shrink-0 border-r border-gray-100 ${activeConversation ? 'hidden md:block' : 'block'}`}>
         <ChatSidebar 
           activeId={activeConversation?.id} 
           onSelect={setActiveConversation} 
@@ -33,9 +33,12 @@ export default function MessagesPage() {
         />
       </div>
       
-      <div className="flex-1 flex flex-col min-w-0 bg-gray-50/50">
+      <div className={`flex-1 flex-col min-w-0 bg-gray-50/50 ${activeConversation ? 'flex' : 'hidden md:flex'}`}>
         {activeConversation ? (
-          <ChatWindow conversation={activeConversation} />
+          <ChatWindow 
+            conversation={activeConversation} 
+            onBack={() => setActiveConversation(null)} 
+          />
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center p-8">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">

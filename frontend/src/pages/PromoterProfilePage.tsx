@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -65,6 +66,9 @@ export default function PromoterProfilePage() {
     },
   });
 
+  const methods = { register, handleSubmit, control, formState: { isDirty, isSubmitting, errors }, reset, getValues };
+  const { markClean } = useUnsavedChanges(methods as any);
+
   // Watch form fields for live preview
   const headline = useWatch({ control, name: "headline" });
   const niche = useWatch({ control, name: "niche" });
@@ -85,6 +89,7 @@ export default function PromoterProfilePage() {
   const onSubmit = (data: FormValues) => {
     updateProfile.mutate(data, {
       onSuccess: () => {
+        markClean();
         notifySuccess("Profile saved successfully");
         reset(data);
       },

@@ -33,14 +33,19 @@ export default function LoginPage() {
   if (user) {
     if (user.role === "BUSINESS") return <Navigate to="/business/dashboard" replace />;
     if (user.role === "PROMOTER") return <Navigate to="/promoter/dashboard" replace />;
-    if (user.role === "ADMIN") return <Navigate to="/admin" replace />;
+    if (user.role === "ADMIN") return <Navigate to="/admin/dashboard" replace />;
   }
 
   const onSubmit = (data: FormValues) => {
     setServerError(null);
     loginMutation.mutate(data, {
       onError: (err: any) => {
-        const msg = err?.response?.data?.message || err?.response?.data?.detail || err?.message || "Login failed. Please check your credentials.";
+        let msg = err?.response?.data?.message || err?.response?.data?.detail || err?.message || "Login failed. Please check your credentials.";
+        if (Array.isArray(msg) && msg.length > 0 && msg[0].msg) {
+          msg = msg[0].msg;
+        } else if (typeof msg === 'object') {
+          msg = JSON.stringify(msg);
+        }
         setServerError(msg);
       },
     });

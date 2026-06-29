@@ -21,6 +21,7 @@ export interface Conversation {
   unread_count: number;
   last_message?: Message;
   participants: { id: string; name: string; avatar: string; role: string }[];
+  collaboration_status?: string;
 }
 
 export interface WebSocketMessage {

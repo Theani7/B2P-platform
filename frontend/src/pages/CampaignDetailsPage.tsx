@@ -4,11 +4,13 @@ import {
   useDeleteCampaign,
   useArchiveCampaign,
   useReopenCampaign,
+  usePublishCampaign,
 } from "../features/campaigns/api";
 import StatusBadge from "../components/StatusBadge";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { PageHeader } from "../components/ui";
 import { formatNepaliCurrency } from "../utils/currency";
+import { Rocket } from "lucide-react";
 
 export default function CampaignDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +19,7 @@ export default function CampaignDetailsPage() {
   const deleteCampaign = useDeleteCampaign();
   const archiveCampaign = useArchiveCampaign();
   const reopenCampaign = useReopenCampaign();
+  const publishCampaign = usePublishCampaign();
 
   if (isLoading) {
     return (
@@ -55,6 +58,13 @@ export default function CampaignDetailsPage() {
     });
   };
 
+  const handlePublish = () => {
+    publishCampaign.mutate(campaign.id, {
+      onSuccess: () => notifySuccess("Campaign published! It's now visible in the marketplace."),
+      onError: (e) => notifyError(e.message || "Failed to publish campaign"),
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -76,6 +86,14 @@ export default function CampaignDetailsPage() {
               >
                 Edit
               </Link>
+              {campaign.status === "DRAFT" && (
+                <button
+                  onClick={handlePublish}
+                  className="bg-primary-600 text-white border border-primary-600 rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-primary-700 transition-colors flex items-center gap-1.5"
+                >
+                  <Rocket size={14} /> Publish
+                </button>
+              )}
               {campaign.status !== "ARCHIVED" ? (
                 <button
                   onClick={handleArchive}

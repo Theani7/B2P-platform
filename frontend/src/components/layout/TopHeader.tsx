@@ -21,22 +21,24 @@ export function TopHeader() {
       </div>
 
       <div className="flex items-center gap-4 pl-4 ml-auto">
-        <button
-          onClick={() => {
-            if (!user?.has_profile) {
-              notifyError("Please complete your profile to share it.");
-              return;
-            }
-            setIsShareOpen(true);
-          }}
-          className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
-            !user?.has_profile 
-              ? "text-stone-900 border-stone-100 bg-stone-50 cursor-not-allowed" 
-              : "text-stone-900 hover:bg-stone-50 border-stone-100"
-          }`}
-        >
-          Share Profile
-        </button>
+        {user?.role !== Role.ADMIN && (
+          <button
+            onClick={() => {
+              if (!user?.has_profile) {
+                notifyError("Please complete your profile to share it.");
+                return;
+              }
+              setIsShareOpen(true);
+            }}
+            className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
+              !user?.has_profile 
+                ? "text-stone-900 border-stone-100 bg-stone-50 cursor-not-allowed" 
+                : "text-stone-900 hover:bg-stone-50 border-stone-100"
+            }`}
+          >
+            Share Profile
+          </button>
+        )}
         {user?.role === Role.BUSINESS && (
           <button
             onClick={(e) => {

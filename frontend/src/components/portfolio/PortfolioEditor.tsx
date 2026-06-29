@@ -4,6 +4,7 @@ import { X, Upload, Plus, Trash2 } from "lucide-react";
 import type { PortfolioItem, PortfolioItemCreate } from "../../features/portfolio";
 import { useCreatePortfolioItem, useUpdatePortfolioItem, useUploadMedia } from "../../features/portfolio";
 import { notifySuccess, notifyError } from "../../hooks/useToast";
+import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 
 interface PortfolioEditorProps {
   item?: PortfolioItem | null;
@@ -19,7 +20,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, reset, watch, setValue } = useForm<PortfolioItemCreate>({
+  const methods = useForm<PortfolioItemCreate>({
     defaultValues: {
       title: "",
       client_name: "",
@@ -30,6 +31,9 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
       featured: false,
     },
   });
+
+  const { register, handleSubmit, reset, watch, setValue } = methods;
+  const { markClean } = useUnsavedChanges(methods as any);
 
   useEffect(() => {
     if (item) {
@@ -74,15 +78,20 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
   const onSubmit = async (data: PortfolioItemCreate) => {
     if (isEditing && item) {
       updateMutation.mutate({ id: item.id, data }, {
-        onSuccess: () => onClose()
+        onSuccess: () => {
+          markClean();
+          onClose();
+        }
       });
     } else {
       createMutation.mutate(data, {
         onSuccess: (newItem) => {
+          markClean();
           if (data.cover_image && data.cover_image.startsWith("blob:")) {
             setUploadingMedia(true);
             uploadMediaMutation.mutate({ id: newItem.id, file: fileInputRef.current?.files?.[0] as File });
           }
+          notifySuccess("Project added to portfolio");
           onClose();
         }
       });

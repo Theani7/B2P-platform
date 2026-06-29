@@ -176,6 +176,12 @@ class PlatformSettingRead(BaseModel):
         from_attributes = True
 
 
+class PlatformSettingCreate(BaseModel):
+    setting_key: str
+    setting_value: str
+    description: Optional[str] = None
+
+
 class PlatformSettingUpdate(BaseModel):
     setting_value: str
     description: Optional[str] = None

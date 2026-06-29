@@ -21,7 +21,6 @@ const STATUS_CONFIG: Record<string, { color: string; icon: any; label: string }>
 
 export default function PromoterInvitationsPage() {
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   
   const { data, isLoading, error } = usePromoterInvitations({ page, limit: 10, status: statusFilter !== "all" ? statusFilter.toUpperCase() : undefined });
@@ -132,31 +131,8 @@ export default function PromoterInvitationsPage() {
           {/* 3. STICKY FILTER TOOLBAR */}
           <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
             <div className="bg-white p-2 rounded-2xl shadow-sm ring-1 ring-gray-200 flex flex-col gap-3">
-              <div className="flex flex-col md:flex-row gap-2">
-                <div className="relative flex-1">
-                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search businesses or campaigns..."
-                    value={search}
-                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-gray-400 text-gray-900"
-                  />
-                </div>
-                <div className="hidden md:flex items-center gap-2 pr-2">
-                  <div className="h-8 w-px bg-gray-100 mx-2"></div>
-                  <button className="h-10 px-4 rounded-xl bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors flex items-center gap-2">
-                    <Filter size={16}/> Filter
-                  </button>
-                  <select className="h-10 pl-4 pr-10 text-sm font-medium text-gray-700 bg-gray-50 border-none rounded-xl focus:ring-0 cursor-pointer">
-                    <option>Newest Received</option>
-                    <option>Highest Budget</option>
-                    <option>Deadline Ending</option>
-                  </select>
-                </div>
-              </div>
               <div className="flex gap-2 overflow-x-auto no-scrollbar px-2 pb-1">
-                {["All", "Pending", "Accepted", "Declined", "High Budget"].map(status => (
+                {["All", "Pending", "Accepted", "Declined"].map(status => (
                   <button 
                     key={status}
                     onClick={() => setStatusFilter(status.toLowerCase())}

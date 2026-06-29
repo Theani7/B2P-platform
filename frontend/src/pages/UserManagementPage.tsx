@@ -16,7 +16,7 @@ export default function UserManagementPage() {
   const deleteUser = useAdminDeleteUser();
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  if (error) return <div className="text-center py-12"><p className="text-danger">Error loading data</p><p className="text-gray-500 text-sm">{(error as Error).message}</p></div>;
+  if (error) return <div className="text-center py-12"><p className="text-brand-coral">Error loading data</p><p className="text-stone-500 text-sm">{(error as Error).message}</p></div>;
   if (isLoading) return <LoadingSpinner />;
 
   const handleSuspend = (userId: string) => {
@@ -47,7 +47,7 @@ export default function UserManagementPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-text">User Management</h1>
+      <h1 className="text-xl font-medium text-stone-900 font-stretch-condensed">User Management</h1>
 
       <div className="flex flex-wrap gap-4">
         <input
@@ -55,12 +55,12 @@ export default function UserManagementPage() {
           placeholder="Search users..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="rounded border px-3 py-2 text-sm flex-1 min-w-[200px]"
+          className="rounded-lg border border-stone-100 px-3 py-2 text-sm flex-1 min-w-[200px] text-stone-900"
         />
         <select
           value={roleFilter}
           onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
-          className="rounded border px-3 py-2 text-sm"
+          className="rounded-lg border border-stone-100 px-3 py-2 text-sm text-stone-900"
         >
           <option value="">All Roles</option>
           <option value="BUSINESS">Business</option>
@@ -76,65 +76,67 @@ export default function UserManagementPage() {
         />
       ) : (
       <>
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left font-medium text-text">Username</th>
-              <th className="px-4 py-3 text-left font-medium text-text">Full Name</th>
-              <th className="px-4 py-3 text-left font-medium text-text">Email</th>
-              <th className="px-4 py-3 text-left font-medium text-text">Role</th>
-              <th className="px-4 py-3 text-left font-medium text-text">Status</th>
-              <th className="px-4 py-3 text-left font-medium text-text">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.items.map((user) => (
-              <tr key={user.id} className="border-t hover:bg-gray-50">
-                <td className="px-4 py-3">
-                  <Link to={`/admin/users/${user.id}`} className="text-primary hover:underline font-medium">
-                    {user.username}
-                  </Link>
-                </td>
-                <td className="px-4 py-3 text-text">{user.full_name}</td>
-                <td className="px-4 py-3 text-gray-600">{user.email}</td>
-                <td className="px-4 py-3">
-                  <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium">{user.role}</span>
-                </td>
-                <td className="px-4 py-3">
-                  {user.is_active ? (
-                    <span className="text-green-600 font-medium">Active</span>
-                  ) : (
-                    <span className="text-red-600 font-medium">Suspended</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex space-x-2">
-                    {user.is_active ? (
-                      <button onClick={() => handleSuspend(user.id)} className="text-xs text-yellow-600 hover:underline">
-                        Suspend
-                      </button>
-                    ) : (
-                      <button onClick={() => handleActivate(user.id)} className="text-xs text-green-600 hover:underline">
-                        Activate
-                      </button>
-                    )}
-                    {user.role !== "ADMIN" && (
-                      <button onClick={() => handleDelete(user.id)} className="text-xs text-danger hover:underline">
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </td>
+        <div className="rounded-xl border border-stone-100 bg-white border-t-[1px] border-t-brand-purple overflow-hidden overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-stone-50 border-b border-stone-100">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium text-stone-900">Username</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-900">Full Name</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-900">Email</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-900">Role</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-900">Status</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-900">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-stone-100">
+              {data?.items.map((user) => (
+                <tr key={user.id} className="hover:bg-stone-50 transition-colors">
+                  <td className="px-4 py-3">
+                    <Link to={`/admin/users/${user.id}`} className="text-brand-purple hover:underline font-medium">
+                      {user.username}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-stone-900">{user.full_name}</td>
+                  <td className="px-4 py-3 text-stone-500">{user.email}</td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-900">{user.role}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {user.is_active ? (
+                      <span className="inline-flex items-center rounded-full bg-brand-teal-50 px-2.5 py-0.5 text-xs font-medium text-brand-teal-900">Active</span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full bg-brand-coral-50 px-2.5 py-0.5 text-xs font-medium text-brand-coral-900">Suspended</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex space-x-3">
+                      {user.is_active ? (
+                        <button onClick={() => handleSuspend(user.id)} className="text-xs text-brand-amber-900 hover:underline">
+                          Suspend
+                        </button>
+                      ) : (
+                        <button onClick={() => handleActivate(user.id)} className="text-xs text-brand-teal-900 hover:underline">
+                          Activate
+                        </button>
+                      )}
+                      {user.role !== "ADMIN" && (
+                        <button onClick={() => handleDelete(user.id)} className="text-xs text-brand-coral hover:underline">
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {data && data.pages > 1 && (
-          <div className="flex items-center justify-center gap-2">
-            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Previous</button>
-            <span className="text-sm text-gray-600">Page {data.page} of {data.pages}</span>
-            <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Next</button>
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-lg border border-stone-100 bg-white px-3 py-1.5 text-sm text-stone-900 hover:bg-stone-50 disabled:opacity-50 transition-colors">Previous</button>
+            <span className="text-sm text-stone-500">Page {data.page} of {data.pages}</span>
+            <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded-lg border border-stone-100 bg-white px-3 py-1.5 text-sm text-stone-900 hover:bg-stone-50 disabled:opacity-50 transition-colors">Next</button>
           </div>
         )}
       </>)}

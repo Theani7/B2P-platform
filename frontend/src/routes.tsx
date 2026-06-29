@@ -32,6 +32,20 @@ const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 
+// Admin Pages
+const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
+const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
+const UserDetailsPage = lazy(() => import("./pages/UserDetailsPage"));
+const VerificationRequestsPage = lazy(() => import("./pages/VerificationRequestsPage"));
+const CampaignModerationPage = lazy(() => import("./pages/CampaignModerationPage"));
+const ReviewModerationPage = lazy(() => import("./pages/ReviewModerationPage"));
+const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
+const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage"));
+const PlatformSettingsPage = lazy(() => import("./pages/PlatformSettingsPage"));
+
+// Misc
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+
 function ProtectedRoute({ role, children }: { role?: Role; children: React.ReactNode }) {
   const { user, isLoading: authLoading } = useAuth();
   const location = useLocation();
@@ -102,7 +116,23 @@ export default function AppRoutes() {
        <Route path="/users/:userId/reviews" element={<ProtectedRoute><UserReviewsPage /></ProtectedRoute>} />
        <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
-      <Route path="*" element={<RoleRedirect />} />
+      
+      {/* Admin Routes */}
+      <Route path="/admin/dashboard" element={<ProtectedRoute role={Role.ADMIN}><AdminDashboardPage /></ProtectedRoute>} />
+      <Route path="/admin/users" element={<ProtectedRoute role={Role.ADMIN}><UserManagementPage /></ProtectedRoute>} />
+      <Route path="/admin/users/:userId" element={<ProtectedRoute role={Role.ADMIN}><UserDetailsPage /></ProtectedRoute>} />
+      <Route path="/admin/verification" element={<ProtectedRoute role={Role.ADMIN}><VerificationRequestsPage /></ProtectedRoute>} />
+      <Route path="/admin/campaigns" element={<ProtectedRoute role={Role.ADMIN}><CampaignModerationPage /></ProtectedRoute>} />
+      <Route path="/admin/reviews" element={<ProtectedRoute role={Role.ADMIN}><ReviewModerationPage /></ProtectedRoute>} />
+      <Route path="/admin/analytics" element={<ProtectedRoute role={Role.ADMIN}><AnalyticsPage /></ProtectedRoute>} />
+      <Route path="/admin/audit-logs" element={<ProtectedRoute role={Role.ADMIN}><AuditLogsPage /></ProtectedRoute>} />
+      <Route path="/admin/settings" element={<ProtectedRoute role={Role.ADMIN}><PlatformSettingsPage /></ProtectedRoute>} />
+
+      <Route path="*" element={
+        <Suspense fallback={<LoadingSpinner />}>
+          <NotFoundPage />
+        </Suspense>
+      } />
     </Routes>
   );
 }

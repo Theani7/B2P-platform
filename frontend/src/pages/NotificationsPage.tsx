@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNotifications, useMarkAllNotificationsRead } from "../features/notifications";
 import { NotificationCard } from "../components/notifications";
-import { Bell, Check } from "lucide-react";
+import { Bell, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function NotificationsPage() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotifications(1, 50, filter === "unread");
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useNotifications(page, 50, filter === "unread");
   const markAllRead = useMarkAllNotificationsRead();
 
   const notifications = data?.items || [];
@@ -23,13 +24,13 @@ export default function NotificationsPage() {
         <div className="flex items-center gap-4">
           <div className="bg-gray-100 p-1 rounded-lg inline-flex">
             <button 
-              onClick={() => setFilter("all")}
+              onClick={() => { setFilter("all"); setPage(1); }}
               className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-colors ${filter === "all" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-900"}`}
             >
               All
             </button>
             <button 
-              onClick={() => setFilter("unread")}
+              onClick={() => { setFilter("unread"); setPage(1); }}
               className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-colors ${filter === "unread" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-900"}`}
             >
               Unread
@@ -60,8 +61,29 @@ export default function NotificationsPage() {
             {notifications.map(notification => (
               <NotificationCard key={notification.id} notification={notification} />
             ))}
-            
-            {/* Pagination placeholder if needed, normally infinite query */}
+            {data && data.pages > 1 && (
+              <div className="p-4 flex items-center justify-between border-t border-gray-100 bg-gray-50/50">
+                <p className="text-sm text-gray-500">
+                  Page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{data.pages}</span>
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    onClick={() => setPage(p => Math.min(data.pages, p + 1))}
+                    disabled={page >= data.pages}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

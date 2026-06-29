@@ -39,6 +39,7 @@ from ....services.admin import (
     get_all_settings,
     update_setting,
     seed_default_settings,
+    delete_setting,
     log_action,
 )
 
@@ -229,6 +230,16 @@ def admin_update_setting(
 ):
     update_setting(db, setting_key, body.setting_value, body.description)
     return {"success": True, "message": "Setting updated"}
+
+
+@router.delete("/settings/{setting_key}")
+def admin_delete_setting(
+    setting_key: str,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    delete_setting(db, setting_key)
+    return {"success": True, "message": "Setting deleted"}
 
 
 @router.get("/analytics", response_model=AnalyticsData)

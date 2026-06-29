@@ -3,6 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CampaignStatus, CampaignVisibility } from "../features/campaigns/types";
 import { Input, Select, Textarea, Button } from "./ui";
+import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 
 const schema = z
   .object({
@@ -53,11 +54,7 @@ export default function CampaignForm({
 }: CampaignFormProps) {
   const today = new Date().toISOString().split("T")[0];
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CampaignFormValues>({
+  const methods = useForm<CampaignFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       visibility: CampaignVisibility.PUBLIC,
@@ -66,8 +63,21 @@ export default function CampaignForm({
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
+
+  const { markClean } = useUnsavedChanges(methods);
+
+  const handleFormSubmit = (data: CampaignFormValues) => {
+    markClean();
+    onSubmit(data);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="md:col-span-2">
           <Input

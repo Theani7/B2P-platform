@@ -4,13 +4,14 @@ import { MessageBubble } from "./MessageBubble";
 import { MessageComposer } from "./MessageComposer";
 import { TypingIndicator } from "./TypingIndicator";
 import { useChatWebSocket, useConversationHistory, useMarkConversationRead, useEditMessage, useDeleteMessage, Conversation, Message } from "../../features/chat";
-import { Phone, Video, Info, Search, WifiOff, AlertTriangle } from "lucide-react";
+import { Phone, Video, Info, Search, WifiOff, AlertTriangle, ChevronLeft } from "lucide-react";
 
 interface ChatWindowProps {
   conversation: Conversation;
+  onBack?: () => void;
 }
 
-export function ChatWindow({ conversation }: ChatWindowProps) {
+export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
   const { user, token } = useAuth();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversationHistory(conversation.collaboration_id);
   const markRead = useMarkConversationRead();
@@ -113,6 +114,11 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
         <div className="flex items-center gap-3">
+          {onBack && (
+            <button onClick={onBack} className="md:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-50 transition-colors">
+              <ChevronLeft size={20} />
+            </button>
+          )}
           <img src={otherParticipant?.avatar || "/default-avatar.png"} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
           <div>
             <h2 className="text-sm font-bold text-gray-900">{otherParticipant?.name || "Unknown"}</h2>
@@ -135,8 +141,15 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
         onScroll={handleScroll}
         ref={scrollRef}
       >
+        {conversation.collaboration_status === 'COMPLETED' && (
+          <div className="bg-brand-purple-50 border border-purple-100 text-brand-purple-900 px-4 py-3 rounded-xl text-xs mb-6 text-center mx-auto max-w-lg">
+            <span className="font-semibold block mb-0.5">Collaboration Completed</span>
+            This collaboration has been completed. You can continue chatting for follow-up discussions, but any new work should be started through a new campaign.
+          </div>
+        )}
+        
         {wsError && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-lg text-xs mb-4 flex items-center gap-2">
+          <div className="bg-brand-amber-50 border border-amber-200 text-brand-amber-900 px-3 py-2 rounded-lg text-xs mb-4 flex items-center gap-2">
             <AlertTriangle size={14} />
             Connection issue: {wsError}
           </div>

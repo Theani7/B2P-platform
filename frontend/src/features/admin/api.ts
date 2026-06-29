@@ -303,6 +303,18 @@ export function useAdminSeedSettings() {
   });
 }
 
+export function useAdminDeleteSetting() {
+  const qc = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: async (setting_key) => {
+      await api.delete(`/admin/settings/${setting_key}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-settings"] });
+    },
+  });
+}
+
 // --- Analytics ---
 export function useAdminAnalytics() {
   return useQuery<AnalyticsData>({

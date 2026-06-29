@@ -103,15 +103,12 @@ function ApplicationMenu({ app, onWithdraw, onViewBusiness }: any) {
 
 export default function MyApplicationsPage() {
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [sortOrder, setSortOrder] = useState("newest");
   const [withdrawConfirm, setWithdrawConfirm] = useState<string | null>(null);
   const [selectedBusiness, setSelectedBusiness] = useState<any | null>(null);
 
   const navigate = useNavigate();
 
-  const { data, isLoading, error } = usePromoterApplications({ page, limit: 100 });
+  const { data, isLoading, error } = usePromoterApplications({ page, limit: 10 });
   const withdrawMutation = useWithdrawApplication();
 
   if (error) return (
@@ -137,28 +134,7 @@ export default function MyApplicationsPage() {
   const acceptedCount = applications.filter((a:any) => a.status === 'ACCEPTED').length;
   const rejectedCount = applications.filter((a:any) => a.status === 'REJECTED').length;
 
-  let filteredApplications = [...applications];
-  
-  if (statusFilter !== "all") {
-    filteredApplications = filteredApplications.filter((a: any) => a.status?.toLowerCase() === statusFilter);
-  }
-  
-  if (search.trim()) {
-    const q = search.toLowerCase();
-    filteredApplications = filteredApplications.filter((a: any) => 
-      a.campaign_title?.toLowerCase().includes(q) || 
-      a.business_name?.toLowerCase().includes(q) ||
-      a.campaign_category?.toLowerCase().includes(q)
-    );
-  }
 
-  if (sortOrder === "newest") {
-    filteredApplications.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
-  } else if (sortOrder === "oldest") {
-    filteredApplications.sort((a: any, b: any) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
-  } else if (sortOrder === "highest_budget") {
-    filteredApplications.sort((a: any, b: any) => (b.campaign_budget || 0) - (a.campaign_budget || 0));
-  }
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
@@ -232,49 +208,6 @@ export default function MyApplicationsPage() {
         <div className="lg:col-span-12 space-y-6">
           
           {/* TOOLBAR */}
-          <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-            <div className="bg-white p-2 rounded-2xl shadow-sm ring-1 ring-gray-200 flex flex-col gap-3">
-              <div className="flex flex-col md:flex-row gap-2">
-                <div className="relative flex-1">
-                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search campaigns or businesses..."
-                    value={search}
-                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-gray-400 text-gray-900"
-                  />
-                </div>
-                <div className="hidden md:flex items-center gap-2 pr-2">
-                  <div className="h-8 w-px bg-gray-100 mx-2"></div>
-                  <select 
-                    value={sortOrder}
-                    onChange={(e) => setSortOrder(e.target.value)}
-                    className="h-10 pl-4 pr-10 text-sm font-medium text-gray-700 bg-gray-50 border-none rounded-xl focus:ring-0 cursor-pointer"
-                  >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="highest_budget">Highest Budget</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar px-2 pb-1">
-                {["All", "Pending", "Accepted", "Rejected", "Withdrawn"].map(status => (
-                  <button 
-                    key={status}
-                    onClick={() => setStatusFilter(status.toLowerCase())}
-                    className={`whitespace-nowrap px-4 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border ${
-                      statusFilter === status.toLowerCase() 
-                      ? 'bg-gray-900 text-white border-gray-900' 
-                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    {status}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
 
           {/* APPLICATION LIST */}
           {isLoading ? (
@@ -290,18 +223,9 @@ export default function MyApplicationsPage() {
                 Browse Marketplace
               </Link>
             </div>
-          ) : filteredApplications.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
-              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-4"><Filter size={32}/></div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">No results found</h2>
-              <p className="text-sm text-gray-500 max-w-sm mb-6">No applications match your current filters. Try adjusting your search or status filter.</p>
-              <button onClick={() => { setStatusFilter('all'); setSearch(''); }} className="h-11 px-6 flex items-center justify-center rounded-xl bg-gray-100 text-gray-700 text-sm font-bold hover:bg-gray-200 transition-colors shadow-sm">
-                Clear Filters
-              </button>
-            </div>
           ) : (
             <div className="space-y-4">
-              {filteredApplications.map((app: any, index: number) => {
+              {applications.map((app: any, index: number) => {
                 const conf = STATUS_CONFIG[app.status] || STATUS_CONFIG.PENDING;
                 const StatusIcon = conf.icon;
                 

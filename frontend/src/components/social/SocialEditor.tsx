@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { useCreateSocialLink, useUpdateSocialLink } from "../../features/social";
 import type { SocialLink, SocialLinkCreate } from "../../features/social";
+import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 
 interface SocialEditorProps {
   item?: SocialLink | null;
@@ -16,13 +17,16 @@ export function SocialEditor({ item, onClose }: SocialEditorProps) {
   const createMutation = useCreateSocialLink();
   const updateMutation = useUpdateSocialLink();
   
-  const { register, handleSubmit, reset } = useForm<SocialLinkCreate>({
+  const methods = useForm<SocialLinkCreate>({
     defaultValues: {
       platform: "Instagram",
       username: "",
       url: "",
     }
   });
+
+  const { register, handleSubmit, reset } = methods;
+  const { markClean } = useUnsavedChanges(methods as any);
 
   useEffect(() => {
     if (item) {
@@ -36,9 +40,9 @@ export function SocialEditor({ item, onClose }: SocialEditorProps) {
 
   const onSubmit = (data: SocialLinkCreate) => {
     if (isEditing && item) {
-      updateMutation.mutate({ id: item.id, data }, { onSuccess: () => onClose() });
+      updateMutation.mutate({ id: item.id, data }, { onSuccess: () => { markClean(); onClose(); } });
     } else {
-      createMutation.mutate(data, { onSuccess: () => onClose() });
+      createMutation.mutate(data, { onSuccess: () => { markClean(); onClose(); } });
     }
   };
 

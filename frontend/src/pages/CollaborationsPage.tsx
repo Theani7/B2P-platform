@@ -220,17 +220,6 @@ export default function CollaborationsPage() {
                     className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-gray-400 text-gray-900"
                   />
                 </div>
-                <div className="hidden md:flex items-center gap-2 pr-2">
-                  <div className="h-8 w-px bg-gray-100 mx-2"></div>
-                  <button className="h-10 px-4 rounded-xl bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors flex items-center gap-2">
-                    <Filter size={16}/> Filter
-                  </button>
-                  <select className="h-10 pl-4 pr-10 text-sm font-medium text-gray-700 bg-gray-50 border-none rounded-xl focus:ring-0 cursor-pointer">
-                    <option>Recently Updated</option>
-                    <option>Newest First</option>
-                    <option>Deadline</option>
-                  </select>
-                </div>
               </div>
               <div className="flex gap-2 overflow-x-auto no-scrollbar px-2 pb-1">
                 {["All", "Active", "Completed", "Cancelled"].map(status => (

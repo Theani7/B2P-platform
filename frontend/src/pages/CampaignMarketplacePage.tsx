@@ -460,9 +460,9 @@ export default function CampaignMarketplacePage() {
                   >
                     {c.has_applied ? 'Applied' : 'Apply Now'}
                   </button>
-                  <div className="flex-1 h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-center shadow-sm">
+                  <button type="button" className="flex-1 h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-center shadow-sm">
                     View Details
-                  </div>
+                  </button>
                 </div>
               </div>
             ))}

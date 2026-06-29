@@ -7,6 +7,7 @@ import { useBusinessProfile, useUpsertBusinessProfile, uploadLogo } from "../fea
 import { useBusinessProfileCompletion } from "../features/profile-completion";
 import { ProfileCompletionWidget } from "../components/ui";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
   Building2, Globe, MapPin, Briefcase, Image as ImageIcon,
@@ -27,7 +28,6 @@ type FormValues = z.infer<typeof schema>;
 
 const NAV_ITEMS = [
   { id: "general", label: "Company Information", icon: Building2 },
-  { id: "brand", label: "Brand & Logo", icon: ImageIcon },
   { id: "online", label: "Online Presence", icon: Globe },
   { id: "about", label: "Description", icon: Briefcase },
   { id: "notifications", label: "Notifications", icon: Bell },
@@ -67,7 +67,10 @@ export default function BusinessProfilePage() {
     }
   }, [profile, reset]);
 
-  const mutation = useUpsertBusinessProfile();
+  const upsertProfile = useUpsertBusinessProfile();
+
+  const methods = { register, handleSubmit, reset, getValues, formState: { errors, isDirty, isSubmitting } };
+  const { markClean } = useUnsavedChanges(methods as any);
 
   const handleLogoUpload = async (file: File) => {
     if (!file) return;
@@ -75,7 +78,7 @@ export default function BusinessProfilePage() {
     try {
       const url = await uploadLogo(file);
       const currentValues = getValues();
-      mutation.mutate(
+      upsertProfile.mutate(
         { ...currentValues, logo_url: url },
         {
           onSuccess: () => {
@@ -100,11 +103,12 @@ export default function BusinessProfilePage() {
   const { data: completionData, isLoading: completionLoading } = useBusinessProfileCompletion();
 
   const onSubmit = (data: FormValues) => {
-    mutation.mutate(data, {
+    upsertProfile.mutate(data, {
       onSuccess: () => {
-        notifySuccess("Profile updated successfully.");
+        markClean();
+        notifySuccess("Profile saved successfully.");
         qc.invalidateQueries({ queryKey: ["business-profile"] });
-        reset(data); // reset to new clean state
+        reset(data);
       },
       onError: () => notifyError("Failed to save profile."),
     });
@@ -177,9 +181,7 @@ export default function BusinessProfilePage() {
         </div>
 
         <div className="z-10 w-full md:w-auto">
-          <button className="w-full md:w-auto px-5 h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm">
-            View Public Profile
-          </button>
+          {/* View Public Profile button removed because there is no public business profile view yet */}
         </div>
       </div>
 
@@ -223,105 +225,127 @@ export default function BusinessProfilePage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             
             {/* Company Info Card */}
-            <div className={`bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden transition-opacity ${activeTab === 'general' ? 'opacity-100 block' : 'opacity-60 hidden lg:block'}`}>
-              <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                <h2 className="text-lg font-bold text-gray-900">Company Information</h2>
-                <p className="text-sm text-gray-500 mt-1">Basic details about your business.</p>
-              </div>
-              <div className="p-8 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-900">Company Name</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Building2 size={18} className="text-gray-400" />
-                      </div>
-                      <input
-                        {...register("company_name")}
-                        className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
-                        placeholder="Acme Inc."
-                      />
-                    </div>
-                    {errors.company_name && <p className="text-xs text-red-500">{errors.company_name.message}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-900">Industry</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Briefcase size={18} className="text-gray-400" />
-                      </div>
-                      <input
-                        {...register("industry")}
-                        className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
-                        placeholder="Technology, Fashion..."
-                      />
-                    </div>
-                    {errors.industry && <p className="text-xs text-red-500">{errors.industry.message}</p>}
-                  </div>
+            {activeTab === 'general' && (
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                  <h2 className="text-lg font-bold text-gray-900">Company Information</h2>
+                  <p className="text-sm text-gray-500 mt-1">Basic details about your business.</p>
                 </div>
+                <div className="p-8 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-900">Company Name</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                          <Building2 size={18} className="text-gray-400" />
+                        </div>
+                        <input
+                          {...register("company_name")}
+                          className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
+                          placeholder="Acme Inc."
+                        />
+                      </div>
+                      {errors.company_name && <p className="text-xs text-red-500">{errors.company_name.message}</p>}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-900">Industry</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                          <Briefcase size={18} className="text-gray-400" />
+                        </div>
+                        <input
+                          {...register("industry")}
+                          className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
+                          placeholder="Technology, Fashion..."
+                        />
+                      </div>
+                      {errors.industry && <p className="text-xs text-red-500">{errors.industry.message}</p>}
+                    </div>
+                  </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-900">Headquarters Location</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <MapPin size={18} className="text-gray-400" />
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-900">Headquarters Location</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <MapPin size={18} className="text-gray-400" />
+                      </div>
+                      <input
+                        {...register("location")}
+                        className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
+                        placeholder="San Francisco, CA"
+                      />
                     </div>
-                    <input
-                      {...register("location")}
-                      className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
-                      placeholder="San Francisco, CA"
-                    />
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Online Presence Card */}
-            <div className={`bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden transition-opacity ${activeTab === 'online' ? 'opacity-100 block' : 'opacity-60 hidden lg:block'}`}>
-              <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                <h2 className="text-lg font-bold text-gray-900">Online Presence</h2>
-                <p className="text-sm text-gray-500 mt-1">Links to your website and social profiles.</p>
-              </div>
-              <div className="p-8 space-y-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-900">Company Website</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Globe size={18} className="text-gray-400" />
+            {activeTab === 'online' && (
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                  <h2 className="text-lg font-bold text-gray-900">Online Presence</h2>
+                  <p className="text-sm text-gray-500 mt-1">Links to your website and social profiles.</p>
+                </div>
+                <div className="p-8 space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-900">Company Website</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <Globe size={18} className="text-gray-400" />
+                      </div>
+                      <input
+                        {...register("website")}
+                        type="url"
+                        className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
+                        placeholder="https://acme.com"
+                      />
                     </div>
-                    <input
-                      {...register("website")}
-                      type="url"
-                      className="w-full pl-11 pr-4 h-12 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none"
-                      placeholder="https://acme.com"
-                    />
+                    {errors.website && <p className="text-xs text-red-500">{errors.website.message}</p>}
                   </div>
-                  {errors.website && <p className="text-xs text-red-500">{errors.website.message}</p>}
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Description Card */}
-            <div className={`bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden transition-opacity ${activeTab === 'about' ? 'opacity-100 block' : 'opacity-60 hidden lg:block'}`}>
-              <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                <h2 className="text-lg font-bold text-gray-900">About Company</h2>
-                <p className="text-sm text-gray-500 mt-1">Tell promoters what your brand is all about.</p>
-              </div>
-              <div className="p-8 space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <label className="text-sm font-medium text-gray-900">Company Description</label>
+            {activeTab === 'about' && (
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                  <h2 className="text-lg font-bold text-gray-900">About Company</h2>
+                  <p className="text-sm text-gray-500 mt-1">Tell promoters what your brand is all about.</p>
+                </div>
+                <div className="p-8 space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <label className="text-sm font-medium text-gray-900">Company Description</label>
+                    </div>
+                    <textarea
+                      {...register("description")}
+                      rows={6}
+                      className="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none resize-none leading-relaxed"
+                      placeholder="Describe your company mission, values, and what kind of influencers you're looking to partner with. Markdown is supported."
+                    />
+                    <p className="text-xs text-gray-400 text-right">Make it compelling to attract better talent.</p>
                   </div>
-                  <textarea
-                    {...register("description")}
-                    rows={6}
-                    className="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow outline-none resize-none leading-relaxed"
-                    placeholder="Describe your company mission, values, and what kind of influencers you're looking to partner with. Markdown is supported."
-                  />
-                  <p className="text-xs text-gray-400 text-right">Make it compelling to attract better talent.</p>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Coming Soon Cards */}
+            {['notifications', 'security', 'billing', 'danger'].includes(activeTab) && (
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col items-center justify-center p-16 text-center">
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 mb-4 ring-1 ring-gray-100">
+                  {activeTab === 'notifications' && <Bell size={32} />}
+                  {activeTab === 'security' && <ShieldCheck size={32} />}
+                  {activeTab === 'billing' && <CreditCard size={32} />}
+                  {activeTab === 'danger' && <Trash2 size={32} />}
+                </div>
+                <h2 className="text-lg font-bold text-gray-900 mb-2 capitalize">{activeTab.replace('danger', 'Danger Zone')} settings</h2>
+                <p className="text-sm text-gray-500 max-w-sm">
+                  This feature is currently under development. We're working hard to bring it to you soon!
+                </p>
+              </div>
+            )}
 
           </form>
         </div>

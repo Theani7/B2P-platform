@@ -108,6 +108,7 @@ def get_conversations(
         conv_data["participants"] = participants
         conv_data["unread_count"] = unread_count
         conv_data["last_message"] = MessageRead.model_validate(last_msg).model_dump() if last_msg else None
+        conv_data["collaboration_status"] = conv.collaboration.status.value if conv.collaboration else "ACTIVE"
         
         result.append(conv_data)
         
@@ -289,10 +290,7 @@ async def websocket_endpoint(
             
             # Allow TEXT messages only if ACTIVE
             if event_type == "MESSAGE":
-                if collab.status != CollaborationStatus.ACTIVE:
-                    await websocket.send_json({"type": "ERROR", "payload": {"message": "Collaboration is completed, chat is read-only."}})
-                    continue
-                    
+                # Removed restriction blocking messages for completed collaborations
                 content = data.get("payload", {}).get("text", "")
                 msg_type_str = data.get("payload", {}).get("message_type", "TEXT")
                 if not content:

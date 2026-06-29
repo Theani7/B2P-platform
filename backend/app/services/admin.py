@@ -445,9 +445,6 @@ def seed_default_settings(db: Session) -> None:
         ("campaign_categories", "TECH,FASHION,FOOD,TRAVEL,FITNESS,LIFESTYLE,GAMING,BUSINESS,HEALTH,EDUCATION,ENTERTAINMENT,OTHER", "Available campaign categories"),
         ("industries", "TECH,FINANCE,HEALTH,RETAIL,FOOD,TRAVEL,EDUCATION,ENTERTAINMENT,REAL_ESTATE,FASHION,OTHER", "Available business industries"),
         ("promoter_niches", "LIFESTYLE,TECH,FASHION,FOOD,TRAVEL,FITNESS,GAMING,BUSINESS,OTHER", "Available promoter niches"),
-        ("max_portfolio_items", "20", "Maximum portfolio items per promoter"),
-        ("max_upload_size_mb", "10", "Maximum file upload size in MB"),
-        ("platform_name", "Byparsathy", "Platform display name"),
         ("support_email", "support@byparsathy.com", "Platform support email address"),
     ]
     for key, value, desc in defaults:
@@ -500,3 +497,9 @@ def get_analytics(db: Session) -> AnalyticsData:
         top_niches=top_niches,
         top_locations=top_locations,
     )
+
+def delete_setting(db: Session, setting_key: str) -> None:
+    setting = db.query(PlatformSetting).filter(PlatformSetting.setting_key == setting_key).first()
+    if setting:
+        db.delete(setting)
+        db.commit()

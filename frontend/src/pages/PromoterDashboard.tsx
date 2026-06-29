@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../providers/AuthProvider";
-import { usePromoterInvitations, usePromoterCollaborations } from "../features/collaboration/api";
+import { usePromoterInvitations, usePromoterCollaborations, useAcceptInvitation, useRejectInvitation } from "../features/collaboration/api";
 import { usePromoterAnalytics } from "../features/analytics/api";
 import { usePromoterProfile, useUploadAvatar, useUpsertPromoterProfile } from "../features/profile";
 
@@ -61,14 +61,30 @@ export default function PromoterDashboard() {
   };
 
   const onCameraClick = () => fileInputRef.current?.click();
+
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleAvatarUpload(file);
   };
 
+  const acceptMutation = useAcceptInvitation();
+  const rejectMutation = useRejectInvitation();
+  const [actionConfirm, setActionConfirm] = useState<{ id: string; action: "accept" | "reject" } | null>(null);
 
-
-  return (
+  const confirmAction = () => {
+    if (!actionConfirm) return;
+    if (actionConfirm.action === "accept") {
+      acceptMutation.mutate(actionConfirm.id, {
+        onSuccess: () => { setActionConfirm(null); },
+        onError: () => { setActionConfirm(null); },
+      });
+    } else {
+      rejectMutation.mutate(actionConfirm.id, {
+        onSuccess: () => { setActionConfirm(null); },
+        onError: () => { setActionConfirm(null); },
+      });
+    }
+  };  return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
       
       {/* 1. TOP HERO */}
@@ -231,8 +247,20 @@ export default function PromoterDashboard() {
                     <p className="text-sm font-bold text-gray-900 truncate">{inv.campaign_title}</p>
                     <p className="text-xs text-gray-500 mt-0.5 mb-3">{formatNepaliCurrency(inv.campaign_budget)}</p>
                     <div className="flex gap-2">
-                      <button className="flex-1 h-8 bg-primary-600 text-white rounded-lg text-xs font-semibold hover:bg-primary-700">Accept</button>
-                      <button className="flex-1 h-8 bg-gray-50 text-gray-700 rounded-lg text-xs font-semibold border border-gray-200 hover:bg-gray-100">Decline</button>
+                      <button 
+                        onClick={() => setActionConfirm({ id: inv.id, action: "accept" })}
+                        disabled={acceptMutation.isPending}
+                        className="flex-1 h-8 bg-primary-600 text-white rounded-lg text-xs font-semibold hover:bg-primary-700 disabled:opacity-50"
+                      >
+                        Accept
+                      </button>
+                      <button 
+                        onClick={() => setActionConfirm({ id: inv.id, action: "reject" })}
+                        disabled={rejectMutation.isPending}
+                        className="flex-1 h-8 bg-gray-50 text-gray-700 rounded-lg text-xs font-semibold border border-gray-200 hover:bg-gray-100 disabled:opacity-50"
+                      >
+                        Decline
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -255,14 +283,14 @@ export default function PromoterDashboard() {
                 <User size={18} className="mx-auto text-gray-600 mb-1.5"/>
                 <span className="text-xs font-medium text-gray-700">Edit Profile</span>
               </Link>
-              <button className="p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors text-center">
+              <Link to="/promoter/profile" className="p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors text-center">
                 <Briefcase size={18} className="mx-auto text-gray-600 mb-1.5"/>
                 <span className="text-xs font-medium text-gray-700">Portfolio</span>
-              </button>
-              <button className="p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors text-center">
+              </Link>
+              <Link to="/promoter/profile" className="p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors text-center">
                 <Star size={18} className="mx-auto text-gray-600 mb-1.5"/>
                 <span className="text-xs font-medium text-gray-700">Reviews</span>
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -270,6 +298,32 @@ export default function PromoterDashboard() {
 
         </div>
       </div>
+      
+      {/* Confirm Dialog for Quick Action Invitations */}
+      {actionConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full relative">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              {actionConfirm.action === 'accept' ? 'Accept Offer' : 'Decline Offer'}
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              {actionConfirm.action === 'accept' 
+                ? 'Are you sure you want to accept this invitation? This will instantly start a new collaboration project.' 
+                : 'Are you sure you want to decline? The business will be notified.'}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setActionConfirm(null)} className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+              <button 
+                onClick={confirmAction} 
+                disabled={acceptMutation.isPending || rejectMutation.isPending}
+                className={`px-4 py-2 text-sm font-semibold text-white rounded-lg ${actionConfirm.action === 'accept' ? 'bg-primary-600 hover:bg-primary-700' : 'bg-red-600 hover:bg-red-700'}`}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

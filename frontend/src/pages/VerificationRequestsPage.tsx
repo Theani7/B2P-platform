@@ -44,19 +44,19 @@ export default function VerificationRequestsPage() {
 
   const statusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      PENDING: "bg-yellow-100 text-yellow-800",
-      APPROVED: "bg-green-100 text-green-800",
-      REJECTED: "bg-red-100 text-red-800",
+      PENDING: "bg-brand-amber-50 text-brand-amber-900",
+      APPROVED: "bg-brand-teal-50 text-brand-teal-900",
+      REJECTED: "bg-brand-coral-50 text-brand-coral-900",
     };
-    return <span className={`rounded px-2 py-0.5 text-xs font-medium ${styles[status] || ""}`}>{status}</span>;
+    return <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status] || ""}`}>{status}</span>;
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-text">Verification Requests</h1>
+      <h1 className="text-xl font-medium text-stone-900 font-stretch-condensed">Verification Requests</h1>
 
       <div className="flex gap-4">
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="rounded border px-3 py-2 text-sm">
+        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="rounded-lg border border-stone-100 px-3 py-2 text-sm text-stone-900">
           <option value="">All</option>
           <option value="PENDING">Pending</option>
           <option value="APPROVED">Approved</option>
@@ -69,29 +69,29 @@ export default function VerificationRequestsPage() {
       ) : (
         <div className="space-y-4">
           {data.items.map((req) => (
-            <div key={req.id} className="rounded-lg border bg-white p-4">
+            <div key={req.id} className="rounded-xl border border-stone-100 bg-white p-5 border-t-[1px] border-t-brand-purple">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-semibold text-text">{req.promoter_username}</h3>
-                  {req.promoter_headline && <p className="text-sm text-gray-500">{req.promoter_headline}</p>}
-                  <p className="mt-1 text-xs text-gray-400">Submitted {new Date(req.submitted_at).toLocaleDateString()}</p>
+                  <h3 className="text-sm font-medium text-stone-900">{req.promoter_username}</h3>
+                  {req.promoter_headline && <p className="text-sm text-stone-500 mt-1">{req.promoter_headline}</p>}
+                  <p className="mt-2 text-xs text-stone-400">Submitted {new Date(req.submitted_at).toLocaleDateString()}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   {statusBadge(req.status)}
                 </div>
               </div>
               {req.status === "PENDING" && (
-                <div className="mt-3 flex space-x-3">
-                  <button onClick={() => handleApprove(req.id)} className="rounded bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700">
+                <div className="mt-4 flex space-x-3">
+                  <button onClick={() => handleApprove(req.id)} className="rounded-lg bg-brand-teal-50 border border-brand-teal text-brand-teal-900 px-3 py-1.5 text-xs font-medium hover:bg-brand-teal-100 transition-colors">
                     Approve
                   </button>
-                  <button onClick={() => handleReject(req.id)} className="rounded border border-red-300 px-3 py-1 text-xs font-medium text-danger hover:bg-red-50">
+                  <button onClick={() => handleReject(req.id)} className="rounded-lg bg-brand-coral-50 border border-brand-coral text-brand-coral-900 px-3 py-1.5 text-xs font-medium hover:bg-brand-coral-100 transition-colors">
                     Reject
                   </button>
                 </div>
               )}
               {req.admin_notes && (
-                <p className="mt-2 text-sm text-gray-600 italic">Note: {req.admin_notes}</p>
+                <p className="mt-3 text-sm text-stone-600 italic">Note: {req.admin_notes}</p>
               )}
             </div>
           ))}
@@ -99,10 +99,10 @@ export default function VerificationRequestsPage() {
       )}
 
       {data && data.pages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Previous</button>
-          <span className="text-sm text-gray-600">Page {data.page} of {data.pages}</span>
-          <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded border px-3 py-1.5 text-sm disabled:opacity-50">Next</button>
+        <div className="flex items-center justify-center gap-4 mt-6">
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-lg border border-stone-100 bg-white px-3 py-1.5 text-sm text-stone-900 hover:bg-stone-50 disabled:opacity-50 transition-colors">Previous</button>
+          <span className="text-sm text-stone-500">Page {data.page} of {data.pages}</span>
+          <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded-lg border border-stone-100 bg-white px-3 py-1.5 text-sm text-stone-900 hover:bg-stone-50 disabled:opacity-50 transition-colors">Next</button>
         </div>
       )}
 
@@ -120,17 +120,17 @@ export default function VerificationRequestsPage() {
         title="Reject Verification"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">Enter a reason for rejection (optional):</p>
+          <p className="text-sm text-stone-600">Enter a reason for rejection (optional):</p>
           <textarea
             value={rejectDialog?.notes ?? ""}
             onChange={(e) => setRejectDialog((prev) => prev ? { ...prev, notes: e.target.value } : null)}
-            className="w-full rounded border p-2 text-sm"
+            className="w-full rounded-lg border border-stone-100 p-3 text-sm text-stone-900 focus:outline-none focus:ring-1 focus:ring-brand-purple"
             rows={3}
             aria-label="Rejection notes"
           />
-          <div className="flex justify-end gap-2">
-            <button onClick={() => setRejectDialog(null)} className="rounded border px-3 py-1.5 text-sm">Cancel</button>
-            <button onClick={confirmReject} className="rounded bg-danger px-3 py-1.5 text-sm font-medium text-white">Reject</button>
+          <div className="flex justify-end gap-3 mt-4">
+            <button onClick={() => setRejectDialog(null)} className="rounded-lg border border-stone-100 bg-white px-4 py-2 text-sm font-medium text-stone-900 hover:bg-stone-50">Cancel</button>
+            <button onClick={confirmReject} className="rounded-lg bg-brand-coral-50 border border-brand-coral px-4 py-2 text-sm font-medium text-brand-coral-900 hover:bg-brand-coral-100">Reject</button>
           </div>
         </div>
       </Dialog>
