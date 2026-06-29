@@ -72,6 +72,14 @@ A full-stack SaaS platform connecting brands (businesses) with social media prom
 - PostgreSQL 16 (or Docker)
 - Docker & Docker Compose (optional)
 
+### Windows-Specific Prerequisites
+- **Git for Windows** — Includes Git Bash (recommended terminal)
+- **Python** — Download from python.org, check "Add Python to PATH" during install
+- **Node.js** — Download LTS from nodejs.org (includes npm)
+- **PostgreSQL** — Download from postgresql.org, or use Docker Desktop
+- **Docker Desktop for Windows** — Enable WSL 2 backend for best performance
+- **Terminal** — Use Git Bash, PowerShell 7+, or Windows Terminal (avoid legacy cmd.exe)
+
 ### 1. Clone the Repository
 
 ```bash
@@ -91,32 +99,127 @@ docker run -d --name byparsathy-db -e POSTGRES_DB=byparsathy_db \
   -p 5432:5432 postgres:16-alpine
 ```
 
+#### Windows PostgreSQL Options
+
+**Option A: PostgreSQL Installer (Recommended)**
+1. Download from https://www.postgresql.org/download/windows/
+2. Run installer, remember the superuser password
+3. Open **pgAdmin** or **psql** (added to PATH during install)
+4. Create database:
+   ```powershell
+   createdb -U postgres byparsathy_db
+   # Or via psql: psql -U postgres -c "CREATE DATABASE byparsathy_db;"
+   ```
+
+**Option B: Docker Desktop (if installed)**
+```powershell
+docker run -d --name byparsathy-db -e POSTGRES_DB=byparsathy_db `
+  -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres `
+  -p 5432:5432 postgres:16-alpine
+```
+
+**Option C: Scoop/Chocolatey**
+```powershell
+# Scoop
+scoop install postgresql
+# Then initialize and start service
+initdb -D ~\scoop\apps\postgresql\current\data
+pg_ctl -D ~\scoop\apps\postgresql\current\data -l logfile start
+createdb byparsathy_db
+
+# Chocolatey
+choco install postgresql
+# Follow installer prompts, then use pgAdmin or psql
+```
+
+**Windows Notes:**
+- If using local PostgreSQL, ensure `psql` is in PATH (typically `C:\Program Files\PostgreSQL\16\bin`)
+- Default superuser is `postgres` with password set during installation
+- Can also create database via pgAdmin 4 GUI: Right-click Databases → Create → Database
+
 ### 3. Backend Setup
 
 ```bash
+# Linux/macOS/Git Bash
 cd backend
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env         # Edit .env if needed
 alembic upgrade head
 uvicorn app.main:app --reload   # http://localhost:8000
 ```
 
+```powershell
+# Windows PowerShell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env    # Edit .env if needed
+alembic upgrade head
+uvicorn app.main:app --reload   # http://localhost:8000
+```
+
+```cmd
+:: Windows Command Prompt (cmd.exe)
+cd backend
+python -m venv .venv
+.\.venv\Scripts\activate.bat
+pip install -r requirements.txt
+copy .env.example .env         :: Edit .env if needed
+alembic upgrade head
+uvicorn app.main:app --reload   :: http://localhost:8000
+```
+
+**Windows Notes:**
+- If `Activate.ps1` fails, run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` in PowerShell
+- If `uvicorn` not found, ensure `.venv\Scripts` is in PATH or use `python -m uvicorn app.main:app --reload`
+- PostgreSQL connection string in `.env`: `DATABASE_URL=postgresql+psycopg2://postgres:your_password@localhost/byparsathy_db`
+
 ### 4. Frontend Setup
 
 ```bash
+# Linux/macOS/Git Bash
 cd frontend
 npm install
 cp .env.example .env         # VITE_API_URL defaults to /api/v1
 npm run dev                  # http://localhost:5173
 ```
 
+```powershell
+# Windows PowerShell
+cd frontend
+npm install
+Copy-Item .env.example .env   # VITE_API_URL defaults to /api/v1
+npm run dev                   # http://localhost:5173
+```
+
+```cmd
+:: Windows Command Prompt (cmd.exe)
+cd frontend
+npm install
+copy .env.example .env        :: VITE_API_URL defaults to /api/v1
+npm run dev                   :: http://localhost:5173
+```
+
+**Windows Notes:**
+- Ensure Node.js is in PATH (restart terminal after install)
+- If `npm` errors, try `npm cache clean --force` then reinstall
+- Vite dev server uses port 5173; if busy, it will auto-prompt for next port
+
 ### 5. Seed Data
 
 Populate the database with 10 businesses, 30 promoters, 100 campaigns, 300+ applications, invitations, collaborations, reviews, and match results:
 
 ```bash
+# Linux/macOS/Git Bash
+cd backend
+python -m app.seed_data
+```
+
+```powershell
+# Windows PowerShell
 cd backend
 python -m app.seed_data
 ```
@@ -132,10 +235,25 @@ Default password for all seeded accounts: `SeedPass123!`
 ### 6. Docker Deployment
 
 ```bash
+# Linux/macOS
 docker compose up -d
 # Backend: http://localhost:8000
 # Frontend: http://localhost:80
 ```
+
+```powershell
+# Windows PowerShell (Docker Desktop required)
+docker compose up -d
+# Backend: http://localhost:8000
+# Frontend: http://localhost:80
+```
+
+**Windows Docker Notes:**
+- Install **Docker Desktop** from https://www.docker.com/products/docker-desktop/
+- Enable **WSL 2** backend in Docker Desktop Settings → General
+- Allocate at least 4GB RAM in Settings → Resources → Advanced
+- If port 80 conflicts (IIS), stop IIS or change frontend port in `docker-compose.yml`
+- Use `docker compose logs -f` to view logs
 
 ---
 
@@ -437,6 +555,51 @@ Test coverage includes: authentication (register, login, refresh, token rotation
 ```bash
 cd frontend
 npm test                            # Vitest
+```
+
+---
+
+## Windows Troubleshooting
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| `python` not recognized | Reinstall Python with "Add to PATH" checked; restart terminal |
+| `psql` / `createdb` not found | Add PostgreSQL `bin` folder to PATH (e.g., `C:\Program Files\PostgreSQL\16\bin`) |
+| `npm` / `node` not recognized | Reinstall Node.js; restart terminal |
+| `uvicorn` not found after venv activate | Use `python -m uvicorn app.main:app --reload` |
+| PowerShell script execution blocked | Run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` |
+| Port 5432 already in use | Stop existing PostgreSQL service or change port in `.env` |
+| Port 80 in use (Docker) | Stop IIS (`iisreset /stop`) or change nginx port in `docker-compose.yml` |
+| Database connection refused | Ensure PostgreSQL service is running; check `DATABASE_URL` in `.env` |
+| `alembic upgrade head` fails | Delete `backend/alembic_version` table manually, then retry |
+| Frontend shows CORS errors | Check `ALLOWED_ORIGINS` in backend `.env` includes `http://localhost:5173` |
+| File watcher limits (WSL) | Increase inotify: `echo fs.inotify.max_user_watches=524288 \| sudo tee -a /etc/sysctl.conf \&\& sudo sysctl -p` |
+
+### Useful Windows Commands
+
+```powershell
+# Check if ports are in use
+netstat -ano | findstr :5432
+netstat -ano | findstr :8000
+netstat -ano | findstr :5173
+
+# Kill process on port
+taskkill /PID <PID> /F
+
+# View PostgreSQL service status
+Get-Service postgresql*
+
+# Restart PostgreSQL
+Restart-Service postgresql-x64-16
+
+# Clear npm cache
+npm cache clean --force
+
+# Reinstall frontend deps
+Remove-Item -Recurse -Force node_modules, package-lock.json
+npm install
 ```
 
 ---

