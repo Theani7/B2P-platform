@@ -10,7 +10,8 @@ export default function MessagesPage() {
   const { user } = useAuth();
   const location = useLocation();
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
-  const { data: conversations } = useConversations();
+  const { data } = useConversations();
+  const conversations = data?.items;
 
   useEffect(() => {
     const state = location.state as { collaborationId?: string } | null;

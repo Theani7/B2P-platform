@@ -20,7 +20,13 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  Legend
 } from "recharts";
 import { useBusinessAnalytics } from "../features/analytics";
 import { useBusinessActivity } from "../features/activity";
@@ -103,56 +109,150 @@ export default function BusinessDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Chart Section */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">Applications Trend</h2>
-              <p className="text-sm text-gray-500 mt-1">Number of promoter applications over the last 6 months</p>
+        {/* Left Column: Charts */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Main Trend Chart */}
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-base font-semibold text-gray-900">Platform Activity Trend</h2>
+                <p className="text-sm text-gray-500 mt-1">Applications and Collaborations over the last 6 months</p>
+              </div>
+            </div>
+            <div className="h-[300px] w-full">
+              {analytics?.charts?.monthly_applications?.length ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#7F77DD" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#7F77DD" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colorCollabs" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#1D9E75" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#1D9E75" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis 
+                      dataKey="month" 
+                      allowDuplicatedCategory={false}
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 12, fill: '#6B7280' }} 
+                      dy={10} 
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 12, fill: '#6B7280' }} 
+                    />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      itemStyle={{ color: '#111827', fontWeight: 500 }}
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    <Area 
+                      type="monotone" 
+                      data={analytics.charts.monthly_applications}
+                      dataKey="value" 
+                      name="Applications"
+                      stroke="#7F77DD" 
+                      strokeWidth={2}
+                      fillOpacity={1} 
+                      fill="url(#colorApps)" 
+                    />
+                    <Area 
+                      type="monotone" 
+                      data={analytics.charts.monthly_collaborations}
+                      dataKey="value" 
+                      name="Collaborations"
+                      stroke="#1D9E75" 
+                      strokeWidth={2}
+                      fillOpacity={1} 
+                      fill="url(#colorCollabs)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-gray-500 text-sm border-2 border-dashed border-gray-100 rounded-xl">
+                  {statsLoading ? <LoadingSpinner className="w-8 h-8" /> : "No analytics available yet."}
+                </div>
+              )}
             </div>
           </div>
-          <div className="h-[300px] w-full">
-            {analytics?.charts?.monthly_applications?.length ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={analytics.charts.monthly_applications} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis 
-                    dataKey="month" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fontSize: 12, fill: '#6B7280' }} 
-                    dy={10} 
-                  />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fontSize: 12, fill: '#6B7280' }} 
-                  />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <Tooltip 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    itemStyle={{ color: '#111827', fontWeight: 500 }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#6366F1" 
-                    strokeWidth={2}
-                    fillOpacity={1} 
-                    fill="url(#colorApps)" 
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500 text-sm border-2 border-dashed border-gray-100 rounded-xl">
-                {statsLoading ? <LoadingSpinner className="w-8 h-8" /> : "No analytics available yet."}
+
+          {/* Secondary Charts Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Pie Chart: Application Status */}
+            <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-6">
+              <h2 className="text-base font-semibold text-gray-900 mb-1">Application Status</h2>
+              <p className="text-sm text-gray-500 mb-6">Distribution of your campaign applications</p>
+              <div className="h-[220px] w-full">
+                {analytics?.charts?.application_status_distribution?.length ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={analytics.charts.application_status_distribution}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {analytics.charts.application_status_distribution.map((entry, index) => {
+                          const COLORS = ['#7F77DD', '#1D9E75', '#F59E0B', '#EF4444', '#6B7280'];
+                          return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />;
+                        })}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        itemStyle={{ color: '#111827', fontWeight: 500 }}
+                      />
+                      <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">No data</div>
+                )}
               </div>
-            )}
+            </div>
+
+            {/* Bar Chart: Top Campaigns */}
+            <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-6">
+              <h2 className="text-base font-semibold text-gray-900 mb-1">Top Campaigns</h2>
+              <p className="text-sm text-gray-500 mb-6">By number of applications received</p>
+              <div className="h-[220px] w-full">
+                {analytics?.charts?.top_campaigns_by_applications?.length ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={analytics.charts.top_campaigns_by_applications}
+                      layout="vertical"
+                      margin={{ top: 0, right: 10, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E5E7EB" />
+                      <XAxis type="number" hide />
+                      <YAxis 
+                        dataKey="name" 
+                        type="category" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        width={100}
+                        tick={{ fontSize: 11, fill: '#4B5563' }} 
+                      />
+                      <Tooltip 
+                        cursor={{ fill: '#F3F4F6' }}
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      />
+                      <Bar dataKey="value" name="Applications" fill="#5B4FCF" radius={[0, 4, 4, 0]} barSize={20} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">No data</div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

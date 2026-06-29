@@ -18,6 +18,37 @@ export enum CollaborationStatus {
   CANCELLED = "CANCELLED",
 }
 
+export enum DeliverableStatus {
+  DRAFT = "DRAFT",
+  IN_REVIEW = "IN_REVIEW",
+  APPROVED = "APPROVED",
+  REVISION_REQUESTED = "REVISION_REQUESTED",
+  PUBLISHED = "PUBLISHED",
+}
+
+export interface Deliverable {
+  id: string;
+  collaboration_id: string;
+  title: string;
+  description?: string;
+  content_url: string;
+  status: DeliverableStatus;
+  feedback?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DeliverableCreate {
+  title: string;
+  description?: string;
+  content_url: string;
+}
+
+export interface DeliverableReview {
+  status: DeliverableStatus;
+  feedback?: string;
+}
+
 export interface CampaignMarketplaceItem {
   id: string;
   business_profile_id: string;

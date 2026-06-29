@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Any, Dict, List
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from .models import NotificationType
 
 class NotificationPreferenceRead(BaseModel):
@@ -23,7 +23,7 @@ class NotificationBase(BaseModel):
     message: str
     entity_type: Optional[str] = None
     entity_id: Optional[UUID] = None
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: Optional[Dict[str, Any]] = Field(default=None, validation_alias="metadata_")
 
 class NotificationCreate(NotificationBase):
     recipient_id: UUID

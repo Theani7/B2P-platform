@@ -78,7 +78,7 @@ export const useCampaignApplications = (
     queryKey: ["campaign-applications", campaignId, params],
     queryFn: () =>
       api
-        .get(`/business/campaigns/${campaignId}/applications`, { params })
+        .get(`/campaigns/${campaignId}/applications`, { params })
         .then((r) => r.data),
     enabled: !!campaignId,
   });
@@ -98,7 +98,7 @@ export const useAcceptApplication = () => {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (applicationId) =>
-      api.post(`/business/applications/${applicationId}/accept`),
+      api.post(`/applications/${applicationId}/accept`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["campaign-applications"] });
       qc.invalidateQueries({ queryKey: ["business-collaborations"] });
@@ -110,7 +110,7 @@ export const useRejectApplication = () => {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (applicationId) =>
-      api.post(`/business/applications/${applicationId}/reject`),
+      api.post(`/applications/${applicationId}/reject`),
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ["campaign-applications"] }),
   });
@@ -205,3 +205,34 @@ export const usePromoterCollaborations = (
       api.get("/promoter/collaborations", { params }).then((r) => r.data),
     enabled: enabled ?? true,
   });
+
+export const useDeliverables = (role: 'business' | 'promoter', collaborationId: string) => {
+  return useQuery<import('./types').Deliverable[]>({
+    queryKey: ['deliverables', collaborationId],
+    queryFn: () => 
+      api.get(`/${role}/collaborations/${collaborationId}/deliverables`).then(r => r.data),
+    enabled: !!collaborationId,
+  });
+};
+
+export const useSubmitDeliverable = (collaborationId: string) => {
+  const qc = useQueryClient();
+  return useMutation<import('./types').Deliverable, Error, import('./types').DeliverableCreate>({
+    mutationFn: (data) =>
+      api.post(`/promoter/collaborations/${collaborationId}/deliverables`, data).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['deliverables', collaborationId] });
+    },
+  });
+};
+
+export const useReviewDeliverable = (collaborationId: string) => {
+  const qc = useQueryClient();
+  return useMutation<import('./types').Deliverable, Error, { deliverableId: string, data: import('./types').DeliverableReview }>({
+    mutationFn: ({ deliverableId, data }) =>
+      api.patch(`/business/collaborations/${collaborationId}/deliverables/${deliverableId}/review`, data).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['deliverables', collaborationId] });
+    },
+  });
+};

@@ -45,6 +45,11 @@ class NotificationService:
         }
         await manager.send_personal_message(payload, obj_in.recipient_id)
         
-        asyncio.create_task(send_daily_digest(self.repository.session, obj_in.recipient_id))
+        async def _trigger_digest(rec_id: UUID):
+            from app.db.session import SessionLocal
+            with SessionLocal() as bg_db:
+                await send_daily_digest(bg_db, rec_id)
+
+        asyncio.create_task(_trigger_digest(obj_in.recipient_id))
         
         return response_obj

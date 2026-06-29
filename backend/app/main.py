@@ -103,6 +103,8 @@ os.makedirs("uploads/avatars", exist_ok=True)
 app.mount("/avatars", StaticFiles(directory="uploads/avatars"), name="avatars")
 os.makedirs("uploads/exports", exist_ok=True)
 app.mount("/exports", StaticFiles(directory="uploads/exports"), name="exports")
+os.makedirs("uploads/chat", exist_ok=True)
+app.mount("/chat", StaticFiles(directory="uploads/chat"), name="chat")
 
 register_exception_handlers(app)
 

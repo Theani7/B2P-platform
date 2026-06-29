@@ -29,12 +29,12 @@ router = APIRouter()
 
 @router.get("/conversations")
 def get_conversations(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """Get all conversations for the current user's collaborations."""
-    # Find collaborations where user is either business or promoter
-    # We need to link through their profiles
     collaborations = []
     
     if hasattr(current_user, 'business_profile') and current_user.business_profile:
@@ -46,6 +46,9 @@ def get_conversations(
         collaborations.extend(collabs)
 
     collab_ids = [c.id for c in collaborations]
+    
+    # We should paginate here based on latest messages but for simplicity we paginate the collaborations
+    offset = (page - 1) * limit
     
     conversations = db.query(Conversation).filter(Conversation.collaboration_id.in_(collab_ids)).all()
     
@@ -62,10 +65,20 @@ def get_conversations(
         for new_conv in conversations:
             if new_conv.id is None:
                 db.refresh(new_conv)
+                
+    # Sort by latest message date
+    def get_latest_msg_date(conv):
+        latest_msg = db.query(Message).filter(Message.conversation_id == conv.id).order_by(desc(Message.created_at)).first()
+        if latest_msg:
+            return latest_msg.created_at
+        return conv.created_at
+
+    conversations.sort(key=get_latest_msg_date, reverse=True)
+    
+    paginated_conversations = conversations[offset:offset+limit]
     
     result = []
-    for conv in conversations:
-        # Build participant info
+    for conv in paginated_conversations:
         participants = []
         if conv.collaboration.business_profile and conv.collaboration.business_profile.user:
             bu = conv.collaboration.business_profile.user
@@ -98,7 +111,13 @@ def get_conversations(
         
         result.append(conv_data)
         
-    return result
+    return {
+        "items": result,
+        "total": len(conversations),
+        "page": page,
+        "limit": limit,
+        "pages": max(1, (len(conversations) + limit - 1) // limit)
+    }
 
 @router.get("/collaborations/{collaboration_id}/history")
 def get_conversation_history(
@@ -172,6 +191,45 @@ def mark_read(
     db.commit()
     return {"message": "Conversation marked as read"}
 
+@router.patch("/messages/{message_id}")
+def edit_message(
+    message_id: UUID,
+    content: str = Query(..., min_length=1),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from datetime import datetime, timezone
+    msg = db.query(Message).filter(Message.id == message_id, Message.sender_id == current_user.id).first()
+    if not msg:
+        raise HTTPException(status_code=404, detail="Message not found or not authorized")
+    if msg.is_deleted:
+        raise HTTPException(status_code=400, detail="Cannot edit a deleted message")
+        
+    msg.message = content
+    msg.edited_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(msg)
+    
+    # Broadcast edit using manager if needed, but for now just return it
+    return MessageRead.model_validate(msg)
+
+@router.delete("/messages/{message_id}")
+def delete_message(
+    message_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    msg = db.query(Message).filter(Message.id == message_id, Message.sender_id == current_user.id).first()
+    if not msg:
+        raise HTTPException(status_code=404, detail="Message not found or not authorized")
+        
+    msg.is_deleted = True
+    msg.message = "This message was deleted."
+    db.commit()
+    db.refresh(msg)
+    
+    return MessageRead.model_validate(msg)
+
 
 # --- WEBSOCKET ENDPOINT ---
 
@@ -236,14 +294,20 @@ async def websocket_endpoint(
                     continue
                     
                 content = data.get("payload", {}).get("text", "")
+                msg_type_str = data.get("payload", {}).get("message_type", "TEXT")
                 if not content:
                     continue
+                    
+                from app.models.chat import MessageType
+                msg_type = MessageType.TEXT
+                if msg_type_str == "IMAGE":
+                    msg_type = MessageType.IMAGE
                     
                 msg = Message(
                     conversation_id=conversation_id,
                     sender_id=user.id,
                     message=content,
-                    message_type=MessageType.TEXT
+                    message_type=msg_type
                 )
                 db.add(msg)
                 db.commit()
@@ -284,19 +348,26 @@ async def websocket_endpoint(
                     # A robust way is to just generate a notification if we are not tracking user identities in chat_manager.
                     pass 
                 
-                # We'll just create the notification and let the WS broadcast push it. 
-                # If they are reading chat, it will be fetched as read.
-                notification_service = NotificationService(db)
-                notification_in = NotificationCreate(
-                    recipient_id=other_user_id,
-                    actor_id=user.id,
-                    type=NotificationType.NEW_MESSAGE,
-                    title="New Message",
-                    message=f"You received a new message from {user.username}",
-                    entity_type="chat_message",
-                    entity_id=msg.id
-                )
-                asyncio.create_task(notification_service.create_notification(notification_in))
+                async def _send_notification_bg(rec_id: UUID, act_id: UUID, actor_name: str, msg_id: UUID):
+                    from app.db.session import SessionLocal
+                    with SessionLocal() as bg_db:
+                        notification_service = NotificationService(bg_db)
+                        notification_in = NotificationCreate(
+                            recipient_id=rec_id,
+                            actor_id=act_id,
+                            type=NotificationType.NEW_MESSAGE,
+                            title="New Message",
+                            message=f"You received a new message from {actor_name}",
+                            entity_type="chat_message",
+                            entity_id=msg_id
+                        )
+                        # the service itself uses asyncio.create_task for digest which is fine if it creates its own session 
+                        # or we can await it here.
+                        # Wait, send_daily_digest inside create_notification expects a session.
+                        # We must await the create_notification so bg_db is alive during it.
+                        await notification_service.create_notification(notification_in)
+
+                asyncio.create_task(_send_notification_bg(other_user_id, user.id, user.username, msg.id))
                 
             elif event_type == "TYPING_START":
                 await chat_manager.broadcast({

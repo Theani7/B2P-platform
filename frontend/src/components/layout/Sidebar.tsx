@@ -62,10 +62,10 @@ function getLinks(role: string) {
 
 export function Sidebar({ role }: SidebarProps) {
   const { user } = useAuth();
-  const { data: conversations } = useConversations();
+  const { data: conversationsData } = useConversations();
   const links = getLinks(role);
 
-  const unreadMessagesCount = conversations?.reduce((acc, conv) => acc + conv.unread_count, 0) || 0;
+  const unreadMessagesCount = conversationsData?.items?.reduce((acc, conv) => acc + conv.unread_count, 0) || 0;
 
   return (
     <aside className="hidden md:flex w-56 flex-shrink-0 bg-white border-r border-stone-100 flex-col h-screen fixed left-0 top-0 z-40">

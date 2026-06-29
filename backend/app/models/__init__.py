@@ -22,6 +22,7 @@ from .chat import Conversation, Message, MessageType
 from app.notifications.models import Notification, NotificationType
 from app.achievements.models import Achievement, UserAchievement
 from .search_history import SearchHistory
+from .deliverable import Deliverable, DeliverableStatus
 
 __all__ = [
     "User",
@@ -48,4 +49,6 @@ __all__ = [
     "AuditLog",
     "PlatformSetting",
     "VerificationRequest",
+    "Deliverable",
+    "DeliverableStatus",
 ]

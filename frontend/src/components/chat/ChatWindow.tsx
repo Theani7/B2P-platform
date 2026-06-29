@@ -3,7 +3,7 @@ import { useAuth } from "../../providers/AuthProvider";
 import { MessageBubble } from "./MessageBubble";
 import { MessageComposer } from "./MessageComposer";
 import { TypingIndicator } from "./TypingIndicator";
-import { useChatWebSocket, useConversationHistory, useMarkConversationRead, Conversation, Message } from "../../features/chat";
+import { useChatWebSocket, useConversationHistory, useMarkConversationRead, useEditMessage, useDeleteMessage, Conversation, Message } from "../../features/chat";
 import { Phone, Video, Info, Search, WifiOff, AlertTriangle } from "lucide-react";
 
 interface ChatWindowProps {
@@ -14,6 +14,8 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
   const { user, token } = useAuth();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversationHistory(conversation.collaboration_id);
   const markRead = useMarkConversationRead();
+  const editMsg = useEditMessage(conversation.id);
+  const deleteMsg = useDeleteMessage(conversation.id);
   const scrollRef = useRef<HTMLDivElement>(null);
   
   const { isConnected, lastMessage, sendMessage, error: wsError } = useChatWebSocket(conversation.id, token || undefined);
@@ -78,10 +80,10 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
   }, [messages, isOtherTyping]);
 
   // Send message
-  const handleSend = (text: string) => {
+  const handleSend = (text: string, msgType: "TEXT" | "IMAGE" = "TEXT") => {
     sendMessage({
       type: "MESSAGE",
-      payload: { text }
+      payload: { text, message_type: msgType }
     });
   };
 
@@ -142,7 +144,14 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
         {isFetchingNextPage && <div className="text-center text-xs text-gray-400 my-2">Loading older messages...</div>}
         
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} isOwn={msg.sender_id === user?.id} senderAvatar={senderAvatars[msg.sender_id] || (msg as any).sender_avatar} />
+          <MessageBubble 
+            key={msg.id} 
+            message={msg} 
+            isOwn={msg.sender_id === user?.id} 
+            senderAvatar={senderAvatars[msg.sender_id] || (msg as any).sender_avatar} 
+            onEdit={(id, content) => editMsg.mutate({ messageId: id, content })}
+            onDelete={(id) => deleteMsg.mutate(id)}
+          />
         ))}
         
         {isOtherTyping && <TypingIndicator />}

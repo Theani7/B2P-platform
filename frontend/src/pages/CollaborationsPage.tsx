@@ -8,6 +8,7 @@ import ReviewFormDialog from "../components/reviews/ReviewFormDialog";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { formatNepaliCurrency } from "../utils/currency";
+import DeliverablesSection from "../features/collaboration/components/DeliverablesSection";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2, XCircle, Clock, Star, TrendingUp,
@@ -358,6 +359,16 @@ export default function CollaborationsPage() {
                           <span className={isCompleted ? "text-emerald-600" : ""}>Review</span>
                         </div>
                       </div>
+
+                      {/* Deliverables Section */}
+                      {isActive && (
+                        <div className="mt-4 border-t border-gray-100 pt-2">
+                          <DeliverablesSection 
+                            collaborationId={c.id} 
+                            role={isBusiness ? "business" : "promoter"} 
+                          />
+                        </div>
+                      )}
 
                     </div>
 

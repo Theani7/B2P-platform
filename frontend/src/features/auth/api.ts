@@ -36,11 +36,11 @@ export const useLogin = () => {
   });
 };
 
-export const useCurrentUser = () =>
+export const useCurrentUser = (token?: string | null) =>
   useQuery<User, Error>({
     queryKey: ["me"],
     queryFn: () => api.get("/auth/me").then((r) => r.data),
-    enabled: !!localStorage.getItem("access_token"),
+    enabled: token !== undefined ? !!token : !!localStorage.getItem("access_token"),
   });
 
 export const useLogout = () => {

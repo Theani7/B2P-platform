@@ -53,6 +53,7 @@ export default function PromoterProfilePage() {
     control,
     formState: { isDirty, isSubmitting, errors },
     reset,
+    getValues,
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -96,7 +97,9 @@ export default function PromoterProfilePage() {
     setAvatarUploading(true);
     try {
       const url = await uploadAvatarMutation.mutateAsync(file);
-      await updateProfile.mutateAsync({ avatar_url: url });
+      // Merge with current form values in case profile doesn't exist yet
+      const currentValues = getValues();
+      await updateProfile.mutateAsync({ ...currentValues, avatar_url: url });
     } catch {
       // error handled by mutation
     } finally {

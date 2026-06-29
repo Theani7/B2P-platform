@@ -125,6 +125,39 @@ def update_campaign(db: Session, user: User, campaign_id, payload: CampaignUpdat
 def delete_campaign(db: Session, user: User, campaign_id) -> None:
     profile = _get_business_profile(db, user)
     campaign = _get_campaign(db, campaign_id, profile.id)
+    
+    # Import models here to avoid circular imports
+    from ..models.campaign_application import CampaignApplication
+    from ..models.campaign_invitation import CampaignInvitation
+    from ..models.match_result import MatchResult
+    from ..models.saved_campaign import SavedCampaign
+    from ..models.collaboration import Collaboration
+    from ..models.chat import Conversation, Message
+    from ..models.review import Review
+
+    # Find all collaborations for this campaign
+    collaborations = db.query(Collaboration).filter(Collaboration.campaign_id == campaign_id).all()
+    collab_ids = [c.id for c in collaborations]
+
+    if collab_ids:
+        # Delete reviews and conversations linked to collaborations
+        db.query(Review).filter(Review.collaboration_id.in_(collab_ids)).delete(synchronize_session=False)
+        
+        conversations = db.query(Conversation).filter(Conversation.collaboration_id.in_(collab_ids)).all()
+        conv_ids = [c.id for c in conversations]
+        if conv_ids:
+            db.query(Message).filter(Message.conversation_id.in_(conv_ids)).delete(synchronize_session=False)
+            db.query(Conversation).filter(Conversation.id.in_(conv_ids)).delete(synchronize_session=False)
+            
+        # Delete the collaborations themselves
+        db.query(Collaboration).filter(Collaboration.campaign_id == campaign_id).delete(synchronize_session=False)
+
+    # Delete other dependencies
+    db.query(CampaignApplication).filter(CampaignApplication.campaign_id == campaign_id).delete(synchronize_session=False)
+    db.query(CampaignInvitation).filter(CampaignInvitation.campaign_id == campaign_id).delete(synchronize_session=False)
+    db.query(MatchResult).filter(MatchResult.campaign_id == campaign_id).delete(synchronize_session=False)
+    db.query(SavedCampaign).filter(SavedCampaign.campaign_id == campaign_id).delete(synchronize_session=False)
+
     db.delete(campaign)
     db.commit()
 

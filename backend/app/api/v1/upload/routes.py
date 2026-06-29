@@ -28,3 +28,8 @@ async def upload_logo(file: UploadFile = File(...), db: Session = Depends(get_db
 async def upload_portfolio_image(file: UploadFile = File(...), db: Session = Depends(get_db), user=Depends(get_current_user)):
     url = save_upload(file, "portfolio")
     return {"success": True, "data": {"url": url}}
+
+@router.post("/chat-attachment")
+async def upload_chat_attachment(file: UploadFile = File(...), db: Session = Depends(get_db), user=Depends(get_current_user)):
+    url = save_upload(file, "chat")
+    return {"success": True, "data": {"url": url}}

@@ -44,7 +44,7 @@ export default function BusinessProfilePage() {
   const [logoUploading, setLogoUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, reset, formState: { errors, isDirty, isSubmitting } } = useForm<FormValues>({
+  const { register, handleSubmit, reset, getValues, formState: { errors, isDirty, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       company_name: "",
@@ -74,8 +74,9 @@ export default function BusinessProfilePage() {
     setLogoUploading(true);
     try {
       const url = await uploadLogo(file);
+      const currentValues = getValues();
       mutation.mutate(
-        { ...profile, logo_url: url } as any,
+        { ...currentValues, logo_url: url },
         {
           onSuccess: () => {
             notifySuccess("Logo uploaded successfully.");

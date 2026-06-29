@@ -9,7 +9,8 @@ interface ChatSidebarProps {
 }
 
 export function ChatSidebar({ activeId, onSelect, currentUserId }: ChatSidebarProps) {
-  const { data: conversations, isLoading } = useConversations();
+  const { data, isLoading } = useConversations();
+  const conversations = data?.items;
 
   if (isLoading) {
     return <div className="p-4 text-center text-gray-500 text-sm">Loading conversations...</div>;
