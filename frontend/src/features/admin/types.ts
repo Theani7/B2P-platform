@@ -35,9 +35,12 @@ export type AdminUserListResponse = {
 
 export type VerificationRequestRead = {
   id: string;
-  promoter_profile_id: string;
-  promoter_username: string;
-  promoter_headline: string | null;
+  promoter_profile_id: string | null;
+  business_profile_id: string | null;
+  requester_name: string;
+  requester_headline: string | null;
+  requester_type: string;
+  profile_data: Record<string, any> | null;
   status: string;
   submitted_at: string;
   reviewed_at: string | null;

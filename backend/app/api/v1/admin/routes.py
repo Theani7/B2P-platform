@@ -131,7 +131,18 @@ def admin_revoke_verification(
     db: Session = Depends(get_db),
     admin_user=Depends(get_current_user),
 ):
-    revoke_verification(db, promoter_profile_id, admin_user, request)
+    revoke_verification(db, promoter_profile_id, admin_user, request, is_business=False)
+    return {"success": True, "message": "Verification revoked"}
+
+
+@router.post("/businesses/{business_profile_id}/revoke-verification")
+def admin_revoke_business_verification(
+    business_profile_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    admin_user=Depends(get_current_user),
+):
+    revoke_verification(db, business_profile_id, admin_user, request, is_business=True)
     return {"success": True, "message": "Verification revoked"}
 
 

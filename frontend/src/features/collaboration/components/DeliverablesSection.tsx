@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useDeliverables, useSubmitDeliverable, useReviewDeliverable } from "../api";
 import { DeliverableStatus } from "../types";
-import { Upload, CheckCircle, XCircle, FileText, Loader2, Send } from "lucide-react";
+import { Upload, CheckCircle2, XCircle, FileVideo, Loader2, Send, ExternalLink, Clock, MessageSquare, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface DeliverablesSectionProps {
   collaborationId: string;
@@ -47,113 +48,215 @@ export default function DeliverablesSection({ collaborationId, role }: Deliverab
     );
   };
 
-  const getStatusBadge = (status: DeliverableStatus) => {
+  const getStatusConfig = (status: DeliverableStatus) => {
     switch(status) {
-      case DeliverableStatus.APPROVED: return <span className="inline-flex items-center px-1.5 py-0.5 rounded-badges text-xs font-medium bg-emerald-status/10 text-emerald-status">Approved</span>;
-      case DeliverableStatus.REVISION_REQUESTED: return <span className="inline-flex items-center px-1.5 py-0.5 rounded-badges text-xs font-medium bg-amber-tag/10 text-amber-tag">Revision Requested</span>;
-      case DeliverableStatus.IN_REVIEW: return <span className="inline-flex items-center px-1.5 py-0.5 rounded-badges text-xs font-medium bg-signal-blue/10 text-signal-blue">In Review</span>;
-      default: return <span className="inline-flex items-center px-1.5 py-0.5 rounded-badges text-xs font-medium bg-slate-custom/10 text-slate-custom">{status}</span>;
+      case DeliverableStatus.APPROVED: 
+        return { color: "bg-emerald-50 text-emerald-700 ring-emerald-600/20", icon: CheckCircle2, label: "Approved" };
+      case DeliverableStatus.REVISION_REQUESTED: 
+        return { color: "bg-amber-50 text-amber-700 ring-amber-600/20", icon: AlertCircle, label: "Revision Requested" };
+      case DeliverableStatus.IN_REVIEW: 
+        return { color: "bg-sky-50 text-signal-blue ring-signal-blue/20", icon: Clock, label: "In Review" };
+      default: 
+        return { color: "bg-gray-50 text-gray-700 ring-gray-600/20", icon: FileVideo, label: status };
     }
   };
 
-  if (isLoading) return <div className="p-4 flex justify-center"><Loader2 className="w-5 h-5 animate-spin text-signal-blue" /></div>;
+  if (isLoading) return (
+    <div className="p-8 flex justify-center items-center h-48 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100">
+      <Loader2 className="w-8 h-8 animate-spin text-signal-blue opacity-50" />
+    </div>
+  );
 
   return (
-    <div className="bg-linen-canvas rounded-cards p-4 mt-4 border border-slate-custom/10">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-graphite flex items-center gap-2">
-          <FileText className="w-4 h-4" /> Content Deliverables
-        </h3>
-        {role === "promoter" && !showForm && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-1 text-xs font-medium hero-blue-fade text-white px-3 py-1.5 rounded-button hover:opacity-90 transition-opacity"
-          >
-            <Upload className="w-3 h-3" /> Upload Draft
-          </button>
-        )}
+    <div className="space-y-4 mt-6">
+      {/* HEADER */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+            <FileVideo className="w-4 h-4 text-signal-blue" /> 
+            Content Deliverables
+          </h3>
+          
+          {role === "promoter" && !showForm && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-1.5 bg-gray-900 text-white px-3 h-8 rounded-lg text-xs font-semibold hover:bg-signal-blue transition-colors shadow-sm shrink-0"
+            >
+              <Upload className="w-3.5 h-3.5" /> 
+              Upload Draft
+            </button>
+          )}
+        </div>
+        <p className="text-xs text-gray-500">
+          {role === "promoter" 
+            ? "Submit your content drafts for brand approval." 
+            : "Review and provide feedback on content drafts."}
+        </p>
       </div>
 
-      {showForm && role === "promoter" && (
-        <form onSubmit={handleSubmit} className="bg-white p-4 rounded-cards shadow-product-card mb-4 border border-slate-custom/10 space-y-3">
-          <h4 className="text-sm font-medium text-graphite">Submit New Draft</h4>
-          <div>
-            <label className="text-xs font-medium text-graphite block mb-1">Title</label>
-            <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="w-full text-sm border border-slate-custom/20 rounded-inputs shadow-sm focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 py-1.5" placeholder="e.g. Instagram Reel Draft 1" />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-graphite block mb-1">Link to Content (Google Drive, Frame.io, etc.)</label>
-            <input type="url" required value={contentUrl} onChange={e => setContentUrl(e.target.value)} className="w-full text-sm border border-slate-custom/20 rounded-inputs shadow-sm focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 py-1.5" placeholder="https://..." />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-graphite block mb-1">Notes (Optional)</label>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full text-sm border border-slate-custom/20 rounded-inputs shadow-sm focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 py-1.5 h-16" placeholder="Any context for the business..." />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={() => setShowForm(false)} className="text-xs font-medium text-ash hover:text-graphite px-3 py-1.5 transition-colors">Cancel</button>
-            <button type="submit" disabled={submitDeliverable.isPending} className="flex items-center gap-1 text-xs font-medium hero-blue-fade text-white px-3 py-1.5 rounded-button hover:opacity-90 transition-opacity disabled:opacity-50">
-              {submitDeliverable.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />} Submit
-            </button>
-          </div>
-        </form>
-      )}
-
-      {(!deliverables || deliverables.length === 0) ? (
-        <div className="text-center py-6 text-sm text-ash bg-white rounded-cards border border-dashed border-slate-custom/10">
-          No deliverables submitted yet.
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {deliverables.map((d) => (
-            <div key={d.id} className="bg-white p-4 rounded-cards border border-slate-custom/10 shadow-product-card">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-sm font-semibold text-graphite">{d.title}</h4>
-                    {getStatusBadge(d.status)}
-                  </div>
-                  <a href={d.content_url} target="_blank" rel="noopener noreferrer" className="text-xs text-signal-blue hover:underline mb-2 inline-block">
-                    View Content Draft &rarr;
-                  </a>
-                  {d.description && <p className="text-xs text-ash bg-linen-canvas p-2 rounded-cards mb-2">{d.description}</p>}
-                  {d.feedback && (
-                    <div className="mt-2 p-2 bg-amber-tag/10 border border-amber-tag/20 rounded-cards">
-                      <span className="text-[10px] font-bold text-amber-tag uppercase tracking-wider mb-1 block">Business Feedback</span>
-                      <p className="text-xs text-amber-tag">{d.feedback}</p>
-                    </div>
-                  )}
+      {/* UPLOAD FORM (PROMOTER ONLY) */}
+      <AnimatePresence>
+        {showForm && role === "promoter" && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0, y: -10 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, overflow: "hidden" }}
+            className="overflow-hidden"
+          >
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-5">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-base font-bold text-gray-900">Submit New Draft</h4>
+                <button type="button" onClick={() => setShowForm(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                  <XCircle size={18} />
+                </button>
+              </div>
+              
+              <div className="flex flex-col gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Title</label>
+                  <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="w-full h-10 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-signal-blue focus:ring-2 focus:ring-signal-blue/20 outline-none transition-all" placeholder="e.g. Instagram Reel Draft 1" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Content Link (Drive, Frame.io)</label>
+                  <input type="url" required value={contentUrl} onChange={e => setContentUrl(e.target.value)} className="w-full h-10 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-signal-blue focus:ring-2 focus:ring-signal-blue/20 outline-none transition-all" placeholder="https://..." />
                 </div>
               </div>
+              
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Notes (Optional)</label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full p-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-signal-blue focus:ring-2 focus:ring-signal-blue/20 outline-none transition-all resize-none min-h-[80px]" placeholder="Add any context or questions..." />
+              </div>
+              
+              <div className="flex justify-end pt-2">
+                <button type="submit" disabled={submitDeliverable.isPending} className="flex items-center gap-2 bg-signal-blue text-white px-8 h-11 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 shadow-sm">
+                  {submitDeliverable.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} 
+                  Submit Deliverable
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-              {role === "business" && d.status === DeliverableStatus.IN_REVIEW && (
-                <div className="mt-4 pt-3 border-t border-slate-custom/10">
-                  {reviewingId === d.id ? (
-                    <div className="space-y-2">
-                      <textarea
-                        value={feedback}
-                        onChange={e => setFeedback(e.target.value)}
-                        placeholder="Add feedback for revisions..."
-                        className="w-full text-sm border border-slate-custom/20 rounded-inputs focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 py-1.5 h-16"
-                      />
-                      <div className="flex gap-2">
-                        <button onClick={() => handleReview(d.id, DeliverableStatus.APPROVED)} className="flex-1 flex items-center justify-center gap-1 bg-emerald-status hover:bg-emerald-status/90 text-white text-xs font-medium py-1.5 rounded-button transition-colors">
-                          <CheckCircle className="w-3 h-3" /> Approve
-                        </button>
-                        <button onClick={() => handleReview(d.id, DeliverableStatus.REVISION_REQUESTED)} className="flex-1 flex items-center justify-center gap-1 bg-amber-tag hover:bg-amber-tag/90 text-white text-xs font-medium py-1.5 rounded-button transition-colors">
-                          <XCircle className="w-3 h-3" /> Request Revision
-                        </button>
-                        <button onClick={() => setReviewingId(null)} className="text-xs text-ash hover:text-graphite px-2 transition-colors">Cancel</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <button onClick={() => setReviewingId(d.id)} className="text-xs font-medium text-signal-blue hover:underline w-full text-center bg-signal-blue/10 hover:bg-signal-blue/20 py-1.5 rounded-button transition-colors">
-                      Review this Draft
-                    </button>
-                  )}
+      {/* DELIVERABLES LIST */}
+      {(!deliverables || deliverables.length === 0) ? (
+        <div className="flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm text-gray-300">
+            <FileVideo size={28} />
+          </div>
+          <h4 className="text-base font-bold text-gray-900 mb-1">No drafts submitted</h4>
+          <p className="text-sm text-gray-500 max-w-sm text-center">
+            {role === "promoter" 
+              ? "You haven't submitted any content deliverables yet. Click 'Upload Draft' to get started." 
+              : "The promoter hasn't submitted any content for review yet."}
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {deliverables.map((d) => {
+            const conf = getStatusConfig(d.status);
+            const StatusIcon = conf.icon;
+            
+            return (
+              <motion.div 
+                key={d.id} 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group flex flex-col"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="min-w-0">
+                    <h4 className="text-base font-bold text-gray-900 truncate pr-4">{d.title}</h4>
+                    <span className="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                      Submitted on {new Date(d.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset whitespace-nowrap shrink-0 ${conf.color}`}>
+                    <StatusIcon size={14} /> {conf.label}
+                  </span>
                 </div>
-              )}
-            </div>
-          ))}
+                
+                {/* Content Link */}
+                <a 
+                  href={d.content_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100 text-sm font-medium text-gray-700 hover:bg-sky-50 hover:border-signal-blue/30 hover:text-signal-blue transition-colors mb-4"
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    <ExternalLink size={16} className="shrink-0" />
+                    <span className="truncate">{d.content_url}</span>
+                  </span>
+                  <span className="text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">Open</span>
+                </a>
+
+                {/* Description */}
+                {d.description && (
+                  <div className="mb-4">
+                    <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Promoter Notes</h5>
+                    <p className="text-sm text-gray-700 leading-relaxed bg-white border border-gray-100 p-3 rounded-xl">
+                      {d.description}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Feedback block */}
+                {d.feedback && (
+                  <div className="mt-auto p-4 bg-amber-50 rounded-xl border border-amber-100">
+                    <div className="flex items-center gap-2 mb-2 text-amber-800">
+                      <MessageSquare size={16} />
+                      <span className="text-xs font-bold uppercase tracking-wider">Business Feedback</span>
+                    </div>
+                    <p className="text-sm text-amber-900 leading-relaxed italic">{d.feedback}</p>
+                  </div>
+                )}
+
+                {/* Review Actions (Business Only) */}
+                {role === "business" && d.status === DeliverableStatus.IN_REVIEW && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <AnimatePresence mode="wait">
+                      {reviewingId === d.id ? (
+                        <motion.div 
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-3"
+                        >
+                          <textarea
+                            value={feedback}
+                            onChange={e => setFeedback(e.target.value)}
+                            placeholder="Add your feedback or required changes here..."
+                            className="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:border-signal-blue focus:ring-4 focus:ring-signal-blue/10 outline-none transition-all resize-none min-h-[100px]"
+                          />
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <button onClick={() => handleReview(d.id, DeliverableStatus.APPROVED)} disabled={reviewDeliverable.isPending} className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white h-10 font-bold text-sm rounded-xl transition-colors shadow-sm disabled:opacity-50">
+                              <CheckCircle2 size={16} /> Approve
+                            </button>
+                            <button onClick={() => handleReview(d.id, DeliverableStatus.REVISION_REQUESTED)} disabled={reviewDeliverable.isPending || !feedback.trim()} className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white h-10 font-bold text-sm rounded-xl transition-colors shadow-sm disabled:opacity-50">
+                              <AlertCircle size={16} /> Request Changes
+                            </button>
+                            <button onClick={() => setReviewingId(null)} className="w-full flex items-center justify-center h-10 text-sm font-semibold text-gray-500 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">
+                              Cancel
+                            </button>
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.button 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          onClick={() => setReviewingId(d.id)} 
+                          className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-signal-blue/10 text-signal-blue text-sm font-bold hover:bg-signal-blue hover:text-white transition-colors"
+                        >
+                          <CheckCircle2 size={16} /> Evaluate Draft
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>

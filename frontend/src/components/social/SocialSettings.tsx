@@ -6,7 +6,15 @@ import { SocialEditor } from "./SocialEditor";
 import type { SocialLink } from "../../features/social";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 
-export function SocialSettings() {
+interface SocialSettingsProps {
+  title?: string;
+  description?: string;
+}
+
+export function SocialSettings({ 
+  title = "Social Accounts", 
+  description = "Connect your social media accounts to showcase your audience to brands." 
+}: SocialSettingsProps) {
   const { data: items, isLoading } = useMySocialLinks();
   const deleteMutation = useDeleteSocialLink();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -34,8 +42,8 @@ export function SocialSettings() {
     <div className="bg-white rounded-cards shadow-product-card-product-card p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-heading text-graphite mb-2">Social Accounts</h3>
-          <p className="text-sm text-fog">Connect your social media accounts to showcase your audience to brands.</p>
+          <h3 className="text-heading text-graphite mb-2">{title}</h3>
+          <p className="text-sm text-fog">{description}</p>
         </div>
         <button 
           onClick={() => {

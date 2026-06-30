@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from ..schemas.promoter_profile import PromoterProfileCreate, PromoterProfileUpdate
 from ..models.promoter_profile import PromoterProfile
+from ..models.verification_request import VerificationRequest, VerificationStatus
 from ..models.user import User, RoleEnum
 
 
@@ -27,6 +28,10 @@ def create_or_update(db: Session, user: User, payload: PromoterProfileCreate):
         db.add(profile)
     db.commit()
     db.refresh(profile)
+    profile.has_pending_verification = db.query(VerificationRequest).filter(
+        VerificationRequest.promoter_profile_id == profile.id,
+        VerificationRequest.status == VerificationStatus.PENDING
+    ).first() is not None
     return profile
 
 
@@ -35,6 +40,10 @@ def get_my_profile(db: Session, user: User):
     profile = db.query(PromoterProfile).filter(PromoterProfile.user_id == user.id).first()
     if not profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+    profile.has_pending_verification = db.query(VerificationRequest).filter(
+        VerificationRequest.promoter_profile_id == profile.id,
+        VerificationRequest.status == VerificationStatus.PENDING
+    ).first() is not None
     return profile
 
 

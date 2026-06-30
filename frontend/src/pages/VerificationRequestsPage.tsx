@@ -80,10 +80,13 @@ export default function VerificationRequestsPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-cards bg-sky-wash flex items-center justify-center text-signal-blue font-bold">
-                      {req.promoter_username.substring(0, 2).toUpperCase()}
+                      {req.requester_name.substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className="text-body font-bold text-graphite">{req.promoter_username}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-body font-bold text-graphite">{req.requester_name}</h3>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-sm bg-slate-custom/10 text-ash uppercase tracking-widest">{req.requester_type}</span>
+                      </div>
                       <p className="text-caption text-ash flex items-center gap-1 mt-0.5">
                         <Calendar size={12} />
                         {new Date(req.submitted_at).toLocaleDateString()}
@@ -101,11 +104,63 @@ export default function VerificationRequestsPage() {
                     <FileText size={14} className="text-ash" />
                     Applicant Details
                   </div>
-                  {req.promoter_headline ? (
-                    <p className="text-body text-ash">{req.promoter_headline}</p>
+                  {req.requester_headline ? (
+                    <p className="text-body text-ash">{req.requester_headline}</p>
                   ) : (
                     <p className="text-body text-fog italic">No headline provided.</p>
                   )}
+                  
+                  {req.profile_data && (
+                    <div className="mt-3 space-y-2">
+                      {req.requester_type === "PROMOTER" && (
+                        <>
+                          {req.profile_data.niche && (
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-ash">Niche</span>
+                              <span className="font-medium text-graphite">{req.profile_data.niche}</span>
+                            </div>
+                          )}
+                          {req.profile_data.followers_count !== undefined && (
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-ash">Followers</span>
+                              <span className="font-medium text-graphite">{req.profile_data.followers_count}</span>
+                            </div>
+                          )}
+                          {req.profile_data.engagement_rate !== undefined && (
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-ash">Engagement</span>
+                              <span className="font-medium text-graphite">{req.profile_data.engagement_rate}%</span>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      
+                      {req.requester_type === "BUSINESS" && (
+                        <>
+                          {req.profile_data.website && (
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-ash">Website</span>
+                              <span className="font-medium text-signal-blue truncate max-w-[120px]">{req.profile_data.website}</span>
+                            </div>
+                          )}
+                          {req.profile_data.company_size && (
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-ash">Company Size</span>
+                              <span className="font-medium text-graphite">{req.profile_data.company_size} employees</span>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      
+                      {req.profile_data.location && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-ash">Location</span>
+                          <span className="font-medium text-graphite">{req.profile_data.location}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {req.admin_notes && (
                     <div className="mt-3 pt-3 border-t border-slate-custom/10">
                       <p className="text-caption font-medium text-graphite uppercase tracking-wide mb-1">Admin Notes</p>

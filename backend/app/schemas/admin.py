@@ -48,9 +48,12 @@ class AdminUserListResponse(BaseModel):
 # --- Verification ---
 class VerificationRequestRead(BaseModel):
     id: uuid.UUID
-    promoter_profile_id: uuid.UUID
-    promoter_username: str = ""
-    promoter_headline: Optional[str] = None
+    promoter_profile_id: Optional[uuid.UUID] = None
+    business_profile_id: Optional[uuid.UUID] = None
+    requester_name: str = ""
+    requester_headline: Optional[str] = None
+    requester_type: str = "PROMOTER"
+    profile_data: Optional[Dict[str, Any]] = None
     status: str
     submitted_at: datetime
     reviewed_at: Optional[datetime] = None

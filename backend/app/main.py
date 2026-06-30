@@ -34,6 +34,7 @@ from .api.v1.matching.routes import router as matching_router
 from .api.v1.reviews.routes import router as review_router
 from .api.v1.admin.routes import router as admin_router
 from .api.v1.promoter_verification.routes import router as promoter_verification_router
+from .api.v1.business_verification.routes import router as business_verification_router
 from .api.v1.activity.routes import router as activity_router
 from .api.v1.profile_completion.routes import router as profile_completion_router
 from .social.routes import router as social_router
@@ -134,6 +135,8 @@ os.makedirs("uploads/portfolio", exist_ok=True)
 app.mount("/portfolio/media", StaticFiles(directory="uploads/portfolio"), name="portfolio_media")
 os.makedirs("uploads/avatars", exist_ok=True)
 app.mount("/avatars", StaticFiles(directory="uploads/avatars"), name="avatars")
+os.makedirs("uploads/logos", exist_ok=True)
+app.mount("/logos", StaticFiles(directory="uploads/logos"), name="logos")
 os.makedirs("uploads/exports", exist_ok=True)
 app.mount("/exports", StaticFiles(directory="uploads/exports"), name="exports")
 os.makedirs("uploads/chat", exist_ok=True)
@@ -160,6 +163,7 @@ app.include_router(matching_router, prefix=settings.API_V1_STR)
 app.include_router(review_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(promoter_verification_router, prefix=settings.API_V1_STR)
+app.include_router(business_verification_router, prefix=settings.API_V1_STR)
 app.include_router(activity_router, prefix=f"{settings.API_V1_STR}/activity", tags=["activity"])
 app.include_router(profile_completion_router, prefix=f"{settings.API_V1_STR}/profile-completion", tags=["profile-completion"])
 app.include_router(social_router, prefix=settings.API_V1_STR, tags=["social-links"])

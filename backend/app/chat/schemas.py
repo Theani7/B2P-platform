@@ -31,5 +31,8 @@ class ConversationRead(BaseModel):
     unread_count: int = 0
     last_message: Optional[MessageRead] = None
     participants: List[dict] = []
+    collaboration_status: Optional[str] = None
+    campaign_title: Optional[str] = None
+    campaign_budget: Optional[float] = None
     class Config:
         from_attributes = True

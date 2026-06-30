@@ -33,6 +33,8 @@ class BusinessProfileUpdate(BaseModel):
 class BusinessProfileRead(BusinessProfileBase):
     id: uuid.UUID
     user_id: uuid.UUID
+    verified: bool = False
+    has_pending_verification: bool = False
     created_at: datetime
     updated_at: datetime
 

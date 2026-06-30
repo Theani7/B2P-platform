@@ -67,7 +67,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ module, className = 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
-    doc.text("B2P Platform", 14, 20);
+    doc.text("Byparsathy", 14, 20);
     
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");

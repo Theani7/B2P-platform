@@ -33,7 +33,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-6 py-24 relative">
           <div className="text-center mb-12">
             <h1 className="text-display text-midnight-ink mb-4">
-              Build with <span className="text-signal-blue">B2P</span>
+              Build with <span className="text-signal-blue">Byparsathy</span>
             </h1>
             <p className="text-body text-ash max-w-2xl mx-auto">
               A full-stack Brand-to-Promoter collaboration platform. FastAPI backend, React frontend, PostgreSQL database.

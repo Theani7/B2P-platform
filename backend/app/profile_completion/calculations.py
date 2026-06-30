@@ -3,15 +3,13 @@ from app.models.campaign import CampaignStatus
 
 def calculate_business_completion(user: User):
     weights = {
-        "company_name": 10,
-        "logo": 10,
-        "industry": 10,
-        "description": 15,
-        "website": 10,
+        "company_name": 15,
+        "logo": 15,
+        "industry": 15,
+        "description": 20,
+        "website": 15,
         "location": 10,
-        "contact": 10,
-        "published_campaign": 15,
-        "verification": 5,
+        "contact": 5,
         "social_links": 5
     }
     
@@ -26,8 +24,6 @@ def calculate_business_completion(user: User):
         "website": "Add Company Website",
         "location": "Add Headquarters Location",
         "contact": "Add Contact Information",
-        "published_campaign": "Publish a Campaign",
-        "verification": "Verify your Business",
         "social_links": "Add Social Links"
     }
 
@@ -63,13 +59,6 @@ def calculate_business_completion(user: User):
     
     if user.email or user.full_name: completed.append("contact")
     else: missing.append("contact")
-    
-    has_published_campaign = any(c.status in [CampaignStatus.OPEN, CampaignStatus.ACTIVE, CampaignStatus.COMPLETED] for c in getattr(bp, 'campaigns', []))
-    if has_published_campaign: completed.append("published_campaign")
-    else: missing.append("published_campaign")
-    
-    if user.is_verified: completed.append("verification")
-    else: missing.append("verification")
     
     if hasattr(user, 'social_links') and user.social_links:
         completed.append("social_links")

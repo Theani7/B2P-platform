@@ -84,3 +84,16 @@ export const usePublicPromoterProfile = (username: string) =>
 // Directory
 export const usePromoterDirectory = () =>
   useQuery<{ items: PromoterProfileRead[] }>({ queryKey: ["promoter-directory"], queryFn: () => api.get("/promoters").then(r => r.data) });
+
+// Verification Requests
+export const useRequestPromoterVerification = () => {
+  return useMutation({
+    mutationFn: () => api.post("/promoter/verification-request").then((r) => r.data),
+  });
+};
+
+export const useRequestBusinessVerification = () => {
+  return useMutation({
+    mutationFn: () => api.post("/business/verification-request").then((r) => r.data),
+  });
+};

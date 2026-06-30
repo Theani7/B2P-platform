@@ -181,7 +181,10 @@ def get_verification_requests(
     limit: int = 20,
     status_filter: Optional[str] = None,
 ) -> Tuple[List[VerificationRequestRead], int]:
-    query = db.query(VerificationRequest).options(joinedload(VerificationRequest.promoter_profile))
+    query = db.query(VerificationRequest).options(
+        joinedload(VerificationRequest.promoter_profile),
+        joinedload(VerificationRequest.business_profile)
+    )
     if status_filter:
         query = query.filter(VerificationRequest.status == status_filter)
     total = query.count()
@@ -189,12 +192,45 @@ def get_verification_requests(
 
     items = []
     for r in reqs:
-        profile = r.promoter_profile
+        p_profile = r.promoter_profile
+        b_profile = r.business_profile
+        
+        req_name = ""
+        req_headline = None
+        req_type = "PROMOTER"
+        profile_data = {}
+        
+        if p_profile:
+            req_name = p_profile.username
+            req_headline = p_profile.headline
+            req_type = "PROMOTER"
+            profile_data = {
+                "bio": p_profile.bio,
+                "niche": p_profile.niche,
+                "location": p_profile.location,
+                "followers_count": p_profile.followers_count,
+                "engagement_rate": p_profile.engagement_rate,
+                "years_experience": p_profile.years_experience
+            }
+        elif b_profile:
+            req_name = b_profile.company_name
+            req_headline = b_profile.industry
+            req_type = "BUSINESS"
+            profile_data = {
+                "description": b_profile.description,
+                "location": b_profile.location,
+                "website": b_profile.website,
+                "company_size": b_profile.company_size
+            }
+            
         items.append(VerificationRequestRead(
             id=r.id,
             promoter_profile_id=r.promoter_profile_id,
-            promoter_username=profile.username if profile else "",
-            promoter_headline=profile.headline if profile else None,
+            business_profile_id=r.business_profile_id,
+            requester_name=req_name,
+            requester_headline=req_headline,
+            requester_type=req_type,
+            profile_data=profile_data,
             status=r.status.value if hasattr(r.status, "value") else str(r.status),
             submitted_at=r.submitted_at,
             reviewed_at=r.reviewed_at,
@@ -216,9 +252,14 @@ def approve_verification(db: Session, request_id: str, admin_user: User, admin_n
     vr.reviewed_by = admin_user.id
     vr.admin_notes = admin_notes
 
-    profile = db.query(PromoterProfile).filter(PromoterProfile.id == vr.promoter_profile_id).first()
-    if profile:
-        profile.verified = True
+    if vr.promoter_profile_id:
+        profile = db.query(PromoterProfile).filter(PromoterProfile.id == vr.promoter_profile_id).first()
+        if profile:
+            profile.verified = True
+    elif vr.business_profile_id:
+        profile = db.query(BusinessProfile).filter(BusinessProfile.id == vr.business_profile_id).first()
+        if profile:
+            profile.verified = True
 
     db.commit()
     log_action(db, admin_user.id, "VERIFICATION_APPROVED", "verification_request", request_id, req)
@@ -242,29 +283,57 @@ def reject_verification(db: Session, request_id: str, admin_user: User, admin_no
     return vr
 
 
-def revoke_verification(db: Session, promoter_profile_id: str, admin_user: User, req: Request) -> None:
-    profile = db.query(PromoterProfile).filter(PromoterProfile.id == promoter_profile_id).first()
-    if not profile:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promoter not found")
-    profile.verified = False
-    db.commit()
-    log_action(db, admin_user.id, "VERIFICATION_REVOKED", "promoter", promoter_profile_id, req)
+def revoke_verification(db: Session, target_profile_id: str, admin_user: User, req: Request, is_business: bool = False) -> None:
+    if is_business:
+        profile = db.query(BusinessProfile).filter(BusinessProfile.id == target_profile_id).first()
+        if not profile:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Business not found")
+        profile.verified = False
+        db.commit()
+        log_action(db, admin_user.id, "VERIFICATION_REVOKED", "business", target_profile_id, req)
+    else:
+        profile = db.query(PromoterProfile).filter(PromoterProfile.id == target_profile_id).first()
+        if not profile:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promoter not found")
+        profile.verified = False
+        db.commit()
+        log_action(db, admin_user.id, "VERIFICATION_REVOKED", "promoter", target_profile_id, req)
 
 
 def submit_verification_request(db: Session, user: User) -> VerificationRequest:
-    if not user.promoter_profile:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No promoter profile found")
-    if user.promoter_profile.verified:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Already verified")
+    if user.role == RoleEnum.PROMOTER:
+        if not user.promoter_profile:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No promoter profile found")
+        if user.promoter_profile.verified:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Already verified")
 
-    existing = db.query(VerificationRequest).filter(
-        VerificationRequest.promoter_profile_id == user.promoter_profile.id,
-        VerificationRequest.status == VerificationStatus.PENDING,
-    ).first()
-    if existing:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Pending request already exists")
+        existing = db.query(VerificationRequest).filter(
+            VerificationRequest.promoter_profile_id == user.promoter_profile.id,
+            VerificationRequest.status == VerificationStatus.PENDING,
+        ).first()
+        if existing:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Pending request already exists")
 
-    vr = VerificationRequest(promoter_profile_id=user.promoter_profile.id)
+        vr = VerificationRequest(promoter_profile_id=user.promoter_profile.id)
+        
+    elif user.role == RoleEnum.BUSINESS:
+        if not user.business_profile:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No business profile found")
+        if user.business_profile.verified:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Already verified")
+
+        existing = db.query(VerificationRequest).filter(
+            VerificationRequest.business_profile_id == user.business_profile.id,
+            VerificationRequest.status == VerificationStatus.PENDING,
+        ).first()
+        if existing:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Pending request already exists")
+
+        vr = VerificationRequest(business_profile_id=user.business_profile.id)
+        
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only promoters and businesses can verify")
+
     db.add(vr)
     db.commit()
     db.refresh(vr)

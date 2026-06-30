@@ -24,7 +24,7 @@ export default function MessagesPage() {
   if (!user) return null;
 
   return (
-    <div className="flex h-[calc(100vh-64px)] max-w-6xl mx-auto border-x border-slate-custom/10 shadow-product-card-sm bg-white">
+    <div className="flex h-[calc(100vh-64px-48px)] max-w-6xl mx-auto border-x border-slate-custom/10 shadow-product-card-sm bg-white rounded-2xl overflow-hidden ring-1 ring-gray-200">
       <div className={`w-full md:w-80 flex-shrink-0 border-r border-slate-custom/10 ${activeConversation ? 'hidden md:block' : 'block'}`}>
         <ChatSidebar 
           activeId={activeConversation?.id} 

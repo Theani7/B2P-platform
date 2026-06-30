@@ -28,6 +28,12 @@ def save_upload(file: UploadFile, subfolder: str) -> str:
     path.write_bytes(content)
     if subfolder == "avatars":
         return f"/avatars/{filename}"
+    elif subfolder == "logos":
+        return f"/logos/{filename}"
+    elif subfolder == "portfolio":
+        return f"/portfolio/media/{filename}"
+    elif subfolder == "chat":
+        return f"/chat/{filename}"
     return f"/uploads/{subfolder}/{filename}"
 
 

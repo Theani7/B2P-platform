@@ -1,7 +1,7 @@
 """Business profile model."""
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -20,7 +20,9 @@ class BusinessProfile(Base):
     website = Column(String(255), nullable=True)
     logo_url = Column(String(500), nullable=True)
     company_size = Column(String(50), nullable=True)
+    verified = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     user = relationship("User", back_populates="business_profile")
+    verification_requests = relationship("VerificationRequest", back_populates="business_profile")

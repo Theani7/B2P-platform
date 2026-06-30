@@ -3,7 +3,7 @@ import React from "react";
 interface AvatarProps {
   initials: string;
   src?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   colorIndex?: number;
   className?: string;
 }
@@ -20,6 +20,7 @@ const sizeClasses = {
   sm: "w-7 h-7 text-[10px]",
   md: "w-9 h-9 text-xs",
   lg: "w-16 h-16 text-xl",
+  xl: "w-full h-full text-3xl",
 };
 
 export function Avatar({ initials, src, size = "md", colorIndex = 0, className = "" }: AvatarProps) {
@@ -28,7 +29,7 @@ export function Avatar({ initials, src, size = "md", colorIndex = 0, className =
       <img
         src={src}
         alt={initials}
-        className={`rounded-images object-cover ${sizeClasses[size]} ${className}`}
+        className={`rounded-full object-cover ${sizeClasses[size]} ${className}`}
       />
     );
   }

@@ -3,16 +3,19 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { useBusinessProfile, useUpsertBusinessProfile, uploadLogo } from "../features/profile";
+import { useBusinessProfile, useUpsertBusinessProfile, uploadLogo, useRequestBusinessVerification } from "../features/profile";
 import { useBusinessProfileCompletion } from "../features/profile-completion";
 import { ProfileCompletionWidget, Avatar } from "../components/ui";
+import { SocialSettings } from "../components/social/SocialSettings";
+import { VerificationModal } from "../components/profile/VerificationModal";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { useCurrentUser } from "../features/auth/api";
 import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import { usePlatformSettings } from "../features/settings/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
   Building2, Globe, MapPin, Briefcase,
-  Upload, Save, AlertTriangle, RefreshCw, BadgeCheck
+  Upload, Save, AlertTriangle, RefreshCw, BadgeCheck, Clock, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -28,8 +31,11 @@ type FormValues = z.infer<typeof schema>;
 
 export default function BusinessProfilePage() {
   const qc = useQueryClient();
+  const { data: user } = useCurrentUser();
   const { data: profile, isLoading: profileLoading } = useBusinessProfile();
+  const requestVerification = useRequestBusinessVerification();
   const [logoUploading, setLogoUploading] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: completionData, isLoading: completionLoading } = useBusinessProfileCompletion();
@@ -44,6 +50,7 @@ export default function BusinessProfilePage() {
     register,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -58,10 +65,10 @@ export default function BusinessProfilePage() {
 
   // Keep form in sync when profile loads
   useEffect(() => {
-    if (profile) {
+    if (profile && !isDirty) {
       reset(profile);
     }
-  }, [profile, reset]);
+  }, [profile, reset, isDirty]);
 
   useUnsavedChanges(isDirty);
 
@@ -97,7 +104,9 @@ export default function BusinessProfilePage() {
 
     try {
       setLogoUploading(true);
-      await uploadLogo(file);
+      const url = await uploadLogo(file);
+      const currentValues = getValues();
+      await upsertProfile.mutateAsync({ ...currentValues, logo_url: url });
       await qc.invalidateQueries({ queryKey: ["business-profile"] });
       await qc.invalidateQueries({ queryKey: ["business-profile-completion"] });
       notifySuccess("Logo updated successfully");
@@ -109,6 +118,19 @@ export default function BusinessProfilePage() {
         fileInputRef.current.value = "";
       }
     }
+  };
+
+  const isComplete = completionData?.percentage === 100;
+
+  const handleRequestVerification = () => {
+    requestVerification.mutate(undefined, {
+      onSuccess: () => {
+        notifySuccess("Verification request submitted!");
+        setShowVerificationModal(false);
+        qc.invalidateQueries({ queryKey: ["business-profile"] });
+      },
+      onError: (err: any) => notifyError(err?.response?.data?.detail || "Failed to submit request"),
+    });
   };
 
   if (profileLoading) {
@@ -130,6 +152,18 @@ export default function BusinessProfilePage() {
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-button text-signal-blue font-semibold text-sm">
             <span>{completionData?.percentage || 0}% Complete</span>
           </div>
+          {profile?.has_pending_verification ? (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-amber-50 text-amber-600 border border-amber-200 text-sm font-medium">
+              <Clock size={16} /> Verification Pending
+            </div>
+          ) : isComplete && !profile?.verified && (
+            <button
+              onClick={() => setShowVerificationModal(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-button bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
+            >
+              <BadgeCheck size={16} /> Request Verification
+            </button>
+          )}
           <button
             onClick={handleSubmit(onSubmit)}
             disabled={!isDirty || isSubmitting}
@@ -146,43 +180,43 @@ export default function BusinessProfilePage() {
       </div>
 
       <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card flex flex-col relative overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
+        <div className="h-32 sm:h-40 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
           <div className="absolute inset-0 bg-black/5 mix-blend-overlay"></div>
-        </div>
-        <div className="px-8 pb-6 pt-0 flex flex-col sm:flex-row items-center sm:items-end gap-6 relative z-10 -mt-12">
-          <div className="relative">
-            {logoUploading ? (
-              <div className="w-24 h-24 rounded-full bg-sky-wash border-4 border-white flex items-center justify-center shadow-product-card">
-                <div className="w-6 h-6 border-2 border-signal-blue border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <div className="w-24 h-24 rounded-full border-4 border-white bg-white shadow-product-card flex items-center justify-center overflow-hidden">
-                <Avatar initials={profile?.company_name?.[0] || 'C'} src={profile?.logo_url} size="lg" colorIndex={0} />
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={onCameraClick}
-              className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-slate-custom/10 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-product-card-sm"
-            >
-              <Upload size={14} />
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
-          </div>
-          <div className="flex-1 text-center sm:text-left pt-2 sm:pt-0 pb-2">
-            <div className="flex items-center justify-center sm:justify-start gap-2">
-              <h2 className="text-heading-lg text-graphite">{profile?.company_name || "Your Company"}</h2>
-              <div className="w-5 h-5 rounded-full bg-emerald-status flex items-center justify-center shadow-product-card-sm" title="Verified Business">
-                <BadgeCheck size={12} className="text-white" />
-              </div>
+          {profile?.verified && (
+            <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-button flex items-center gap-1.5 text-xs font-semibold text-white shadow-product-card-sm">
+              <BadgeCheck size={16} /> Verified Business
             </div>
-            <p className="text-sm font-medium text-ash mt-1">{profile?.industry || "Industry not set"}</p>
+          )}
+        </div>
+        
+        <div className="px-6 sm:px-8 pb-6 sm:pb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 sm:gap-6">
+            {/* Avatar container with negative margin */}
+            <div className="relative shrink-0 -mt-12 sm:-mt-16 z-10">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-white shadow-sm flex items-center justify-center">
+                {logoUploading ? (
+                  <div className="w-6 h-6 border-2 border-signal-blue border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Avatar initials={profile?.company_name?.[0] || 'C'} src={profile?.logo_url} size="xl" colorIndex={0} />
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={onCameraClick}
+                className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-8 h-8 bg-white border border-slate-custom/10 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-product-card-sm"
+              >
+                <Upload size={14} />
+              </button>
+              <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+            </div>
+
+            {/* Text details */}
+            <div className="flex-1 text-center sm:text-left sm:pb-2">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <h2 className="text-2xl sm:text-3xl font-bold text-graphite tracking-tight">{profile?.company_name || "Your Company"}</h2>
+              </div>
+              <p className="text-sm sm:text-base font-medium text-ash mt-1">{profile?.industry || "Industry not set"}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -291,6 +325,15 @@ export default function BusinessProfilePage() {
               </div>
             </div>
           </form>
+
+          {user?.has_profile && (
+            <div className="space-y-8 mt-8">
+              <SocialSettings 
+                title="Company Socials" 
+                description="Connect your brand's social media accounts for promoters to check out."
+              />
+            </div>
+          )}
         </div>
         
         <div className="lg:w-80 flex-shrink-0 space-y-6">
@@ -337,6 +380,41 @@ export default function BusinessProfilePage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <VerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+        onSubmit={handleRequestVerification}
+        isPending={requestVerification.isPending}
+        title="Review Business Verification"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Company Name</span>
+              <span className="text-sm font-bold text-midnight-ink">{profile?.company_name}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Industry</span>
+              <span className="text-sm font-medium text-graphite">{profile?.industry}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Location</span>
+              <span className="text-sm font-medium text-graphite">{profile?.location || "Not provided"}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Website</span>
+              <span className="text-sm font-medium text-signal-blue">{profile?.website || "Not provided"}</span>
+            </div>
+          </div>
+          {profile?.description && (
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Description</span>
+              <p className="text-sm text-graphite line-clamp-3">{profile.description}</p>
+            </div>
+          )}
+        </div>
+      </VerificationModal>
     </div>
   );
 }

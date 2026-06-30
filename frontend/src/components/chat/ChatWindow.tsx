@@ -4,7 +4,8 @@ import { MessageBubble } from "./MessageBubble";
 import { MessageComposer } from "./MessageComposer";
 import { TypingIndicator } from "./TypingIndicator";
 import { useChatWebSocket, useConversationHistory, useMarkConversationRead, useEditMessage, useDeleteMessage, Conversation, Message } from "../../features/chat";
-import { Phone, Video, Info, Search, WifiOff, AlertTriangle, ChevronLeft } from "lucide-react";
+import { Phone, Video, Info, Search, WifiOff, AlertTriangle, ChevronLeft, Target, Wallet } from "lucide-react";
+import { formatNepaliCurrency } from "../../utils/currency";
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -141,10 +142,24 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
         onScroll={handleScroll}
         ref={scrollRef}
       >
-        {conversation.collaboration_status === 'COMPLETED' && (
-          <div className="bg-signal-blue/10 border border-signal-blue/20 text-signal-blue px-4 py-3 rounded-images text-xs mb-6 text-center mx-auto max-w-lg">
-            <span className="font-semibold block mb-0.5">Collaboration Completed</span>
-            This collaboration has been completed. You can continue chatting for follow-up discussions, but any new work should be started through a new campaign.
+        {conversation.collaboration_status && conversation.collaboration_status !== 'ACTIVE' && (
+          <div className="bg-amber-tag/10 border border-amber-tag/20 text-amber-tag px-4 py-3 rounded-xl text-sm mb-6 text-center mx-auto max-w-lg shadow-sm">
+            <span className="font-bold flex items-center justify-center gap-2 mb-1">
+              <AlertTriangle size={16} /> Chat Disabled
+            </span>
+            This collaboration is no longer active. You cannot send new messages. Start a new collaboration to chat again.
+          </div>
+        )}
+        
+        {conversation.campaign_title && (
+          <div className="bg-linen-canvas border border-slate-custom/10 px-4 py-3 rounded-xl text-sm mb-6 mx-auto max-w-lg shadow-sm flex flex-col items-center">
+            <span className="text-[10px] font-bold text-fog uppercase tracking-widest mb-2">Collaboration Details</span>
+            <h4 className="font-bold text-graphite flex items-center gap-2 mb-1">
+              <Target size={14} className="text-signal-blue" /> {conversation.campaign_title}
+            </h4>
+            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-status">
+              <Wallet size={12} /> {formatNepaliCurrency(conversation.campaign_budget || 0)} Budget
+            </div>
           </div>
         )}
         
@@ -171,7 +186,13 @@ export function ChatWindow({ conversation, onBack }: ChatWindowProps) {
       </div>
 
       {/* Input */}
-      <MessageComposer onSend={handleSend} onTyping={handleTyping} onTypingStop={handleTypingStop} disabled={!isConnected} />
+      {conversation.collaboration_status === 'ACTIVE' ? (
+        <MessageComposer onSend={handleSend} onTyping={handleTyping} onTypingStop={handleTypingStop} disabled={!isConnected} />
+      ) : (
+        <div className="p-4 bg-linen-canvas border-t border-slate-custom/10 text-center text-sm text-ash font-medium">
+          Messaging is disabled for inactive collaborations.
+        </div>
+      )}
     </div>
   );
 }

@@ -49,8 +49,8 @@ def create_social_link(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    if current_user.role != RoleEnum.PROMOTER:
-        raise HTTPException(status_code=403, detail="Only PROMOTER users can create social links")
+    if current_user.role not in [RoleEnum.PROMOTER, RoleEnum.BUSINESS]:
+        raise HTTPException(status_code=403, detail="Only PROMOTER or BUSINESS users can create social links")
     service = SocialLinkService(db)
     link = service.create_link(current_user.id, schema)
     return link

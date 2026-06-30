@@ -43,6 +43,7 @@ class PromoterProfileUpdate(BaseModel):
 class PromoterProfileRead(PromoterProfileBase):
     id: uuid.UUID
     user_id: uuid.UUID
+    has_pending_verification: bool = False
     created_at: datetime
     updated_at: datetime
 

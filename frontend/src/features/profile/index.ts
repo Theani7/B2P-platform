@@ -4,6 +4,8 @@ export {
   usePromoterProfile, 
   useUpsertPromoterProfile, 
   uploadAvatar, 
-  uploadLogo 
+  uploadLogo,
+  useRequestPromoterVerification,
+  useRequestBusinessVerification
 } from "./api";
 export { useUploadAvatar, useUploadLogo } from "./hooks";

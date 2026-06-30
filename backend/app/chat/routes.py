@@ -109,6 +109,9 @@ def get_conversations(
         conv_data["unread_count"] = unread_count
         conv_data["last_message"] = MessageRead.model_validate(last_msg).model_dump() if last_msg else None
         conv_data["collaboration_status"] = conv.collaboration.status.value if conv.collaboration else "ACTIVE"
+        if conv.collaboration and conv.collaboration.campaign:
+            conv_data["campaign_title"] = conv.collaboration.campaign.title
+            conv_data["campaign_budget"] = float(conv.collaboration.campaign.budget)
         
         result.append(conv_data)
         
@@ -290,7 +293,13 @@ async def websocket_endpoint(
             
             # Allow TEXT messages only if ACTIVE
             if event_type == "MESSAGE":
-                # Removed restriction blocking messages for completed collaborations
+                if collab.status.value != "ACTIVE":
+                    await websocket.send_json({
+                        "type": "ERROR",
+                        "payload": {"message": "You can only send messages for active collaborations."}
+                    })
+                    continue
+                    
                 content = data.get("payload", {}).get("text", "")
                 msg_type_str = data.get("payload", {}).get("message_type", "TEXT")
                 if not content:

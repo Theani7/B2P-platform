@@ -22,6 +22,8 @@ export interface Conversation {
   last_message?: Message;
   participants: { id: string; name: string; avatar: string; role: string }[];
   collaboration_status?: string;
+  campaign_title?: string;
+  campaign_budget?: number;
 }
 
 export interface WebSocketMessage {

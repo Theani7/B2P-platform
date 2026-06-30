@@ -7,7 +7,8 @@ import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
-import { usePromoterProfile, useUpsertPromoterProfile, useUploadAvatar } from "../features/profile";
+import { usePromoterProfile, useUpsertPromoterProfile, useUploadAvatar, useRequestPromoterVerification } from "../features/profile";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePromoterProfileCompletion } from "../features/profile-completion";
 import { ProfileCompletionWidget } from "../components/ui";
 import { PortfolioSettings } from "../components/portfolio/PortfolioSettings";
@@ -16,8 +17,9 @@ import { Avatar } from "../components/ui";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { formatCompactNumber } from "../utils/number";
 import {
-  BadgeCheck, Save, Eye, Trophy, AlertTriangle, MapPin, Briefcase, Camera, Upload, RefreshCw
+  BadgeCheck, Save, Eye, Trophy, AlertTriangle, MapPin, Briefcase, Camera, Upload, RefreshCw, Clock, X
 } from "lucide-react";
+import { VerificationModal } from "../components/profile/VerificationModal";
 import { usePlatformSettings } from "../features/settings/api";
 
 
@@ -40,9 +42,13 @@ export default function PromoterProfilePage() {
   const { data: profile, isLoading } = usePromoterProfile();
   const updateProfile = useUpsertPromoterProfile();
   const uploadAvatarMutation = useUploadAvatar();
+  const requestVerification = useRequestPromoterVerification();
+  
   const { data: completionData, isLoading: completionLoading } = usePromoterProfileCompletion();
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const qc = useQueryClient();
 
   const { data: settingsData } = usePlatformSettings();
   const nicheSetting = settingsData?.items.find((s) => s.setting_key === "promoter_niches");
@@ -132,6 +138,17 @@ export default function PromoterProfilePage() {
 
   const isComplete = completionData?.percentage === 100;
 
+  const handleRequestVerification = () => {
+    requestVerification.mutate(undefined, {
+      onSuccess: () => {
+        notifySuccess("Verification request submitted!");
+        setShowVerificationModal(false);
+        qc.invalidateQueries({ queryKey: ["promoter-profile"] });
+      },
+      onError: (err: any) => notifyError(err?.response?.data?.detail || "Failed to submit request"),
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -152,6 +169,18 @@ export default function PromoterProfilePage() {
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-button text-signal-blue font-semibold text-sm">
             <span>{completionData?.percentage || 0}% Complete</span>
           </div>
+          {profile?.has_pending_verification ? (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-amber-50 text-amber-600 border border-amber-200 text-sm font-medium">
+              <Clock size={16} /> Verification Pending
+            </div>
+          ) : isComplete && !profile?.verified && (
+            <button
+              onClick={() => setShowVerificationModal(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-button bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
+            >
+              <BadgeCheck size={16} /> Request Verification
+            </button>
+          )}
           <button
             onClick={handleSubmit(onSubmit)}
             disabled={!isDirty || isSubmitting}
@@ -183,7 +212,7 @@ export default function PromoterProfilePage() {
 
       {/* Hero Profile Banner */}
       <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card flex flex-col relative overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
+        <div className="h-32 sm:h-40 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
           <div className="absolute inset-0 bg-black/5 mix-blend-overlay"></div>
           {profile?.verified && (
             <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-button flex items-center gap-1.5 text-xs font-semibold text-white shadow-product-card-sm">
@@ -191,54 +220,50 @@ export default function PromoterProfilePage() {
             </div>
           )}
         </div>
-        <div className="px-8 pb-6 pt-0 flex flex-col sm:flex-row items-center sm:items-end gap-6 relative z-10 -mt-12">
-          <div className="relative">
-            {avatarUploading ? (
-              <div className="w-24 h-24 rounded-full bg-sky-wash border-4 border-white flex items-center justify-center shadow-product-card">
-                <div className="w-6 h-6 border-2 border-signal-blue border-t-transparent rounded-full animate-spin"></div>
+        
+        <div className="px-6 sm:px-8 pb-6 sm:pb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 sm:gap-6">
+            <div className="relative shrink-0 -mt-12 sm:-mt-16 z-10">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-white shadow-sm flex items-center justify-center">
+                {avatarUploading ? (
+                  <div className="w-6 h-6 border-2 border-signal-blue border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Avatar initials={user?.full_name?.[0] || 'U'} src={profile?.avatar_url} size="xl" colorIndex={1} />
+                )}
               </div>
-            ) : (
-              <div className="w-24 h-24 rounded-full border-4 border-white bg-white shadow-product-card flex items-center justify-center overflow-hidden">
-                <Avatar initials={user?.full_name?.[0] || 'U'} src={profile?.avatar_url} size="lg" colorIndex={1} />
+              <button
+                type="button"
+                onClick={onCameraClick}
+                disabled={avatarUploading}
+                className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-8 h-8 bg-white border border-slate-custom/10 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-product-card-sm disabled:opacity-50"
+              >
+                <Upload size={14} />
+              </button>
+              <input type="file" ref={fileInputRef} onChange={onFileChange} accept="image/*" className="hidden" />
+            </div>
+            
+            <div className="flex-1 text-center sm:text-left sm:pb-2">
+              <h2 className="text-2xl sm:text-3xl font-bold text-graphite tracking-tight">{user?.full_name || 'Creator Name'}</h2>
+              <p className="text-sm sm:text-base font-medium text-signal-blue mt-1">{headline || 'Your awesome headline'}</p>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3 text-xs sm:text-sm font-medium text-ash">
+                {niche && (
+                  <span className="inline-flex items-center gap-1.5 bg-sky-wash text-signal-blue px-2.5 py-1 rounded-button">
+                    <Briefcase size={14} /> {NICHE_OPTIONS.find(o => o.value === niche)?.label || niche}
+                  </span>
+                )}
+                {location && (
+                  <span className="flex items-center gap-1.5 bg-slate-custom/5 text-graphite px-2.5 py-1 rounded-button border border-slate-custom/10">
+                    <MapPin size={14} /> {location}
+                  </span>
+                )}
+                <span className="flex items-center gap-1.5 ml-2">
+                  <strong className="text-graphite">{formatCompactNumber(followersCount)}</strong> Followers
+                </span>
+                <span className="text-slate-custom/30 hidden sm:inline">•</span>
+                <span className="flex items-center gap-1.5">
+                  <strong className="text-graphite">{engagementRate ? engagementRate + '%' : '0%'}</strong> Engagement
+                </span>
               </div>
-            )}
-            <button
-              type="button"
-              onClick={onCameraClick}
-              disabled={avatarUploading}
-              className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-slate-custom/10 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-product-card-sm disabled:opacity-50"
-            >
-              <Upload size={14} />
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={onFileChange}
-              accept="image/*"
-              className="hidden"
-            />
-          </div>
-          <div className="flex-1 text-center sm:text-left pt-2 sm:pt-0 pb-2">
-            <h2 className="text-heading-lg text-graphite">{user?.full_name || 'Creator Name'}</h2>
-            <p className="text-sm font-medium text-signal-blue mt-1">{headline || 'Your awesome headline'}</p>
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3 text-xs font-medium text-ash">
-              {niche && (
-                <span className="inline-flex items-center gap-1.5 bg-sky-wash text-signal-blue px-2.5 py-1 rounded-button">
-                  <Briefcase size={12} /> {NICHE_OPTIONS.find(o => o.value === niche)?.label || niche}
-                </span>
-              )}
-              {location && (
-                <span className="flex items-center gap-1.5 bg-slate-custom/5 text-graphite px-2.5 py-1 rounded-button border border-slate-custom/10">
-                  <MapPin size={12} /> {location}
-                </span>
-              )}
-              <span className="flex items-center gap-1.5 ml-2">
-                <strong className="text-graphite">{formatCompactNumber(followersCount)}</strong> Followers
-              </span>
-              <span className="text-slate-custom/30">•</span>
-              <span className="flex items-center gap-1.5">
-                <strong className="text-graphite">{engagementRate ? engagementRate + '%' : '0%'}</strong> Engagement
-              </span>
             </div>
           </div>
         </div>
@@ -390,6 +415,57 @@ export default function PromoterProfilePage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <VerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+        onSubmit={handleRequestVerification}
+        isPending={requestVerification.isPending}
+        title="Review Promoter Verification"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Creator Name</span>
+              <span className="text-sm font-bold text-midnight-ink">{user?.full_name}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Primary Niche</span>
+              <span className="text-sm font-medium text-signal-blue">
+                {NICHE_OPTIONS.find(o => o.value === profile?.niche)?.label || profile?.niche}
+              </span>
+            </div>
+            <div className="col-span-2">
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Headline</span>
+              <span className="text-sm font-medium text-graphite">{profile?.headline || "Not provided"}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Location</span>
+              <span className="text-sm font-medium text-graphite">{profile?.location || "Not provided"}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Experience</span>
+              <span className="text-sm font-medium text-graphite">
+                {profile?.years_experience ? `${profile.years_experience} years` : "Not provided"}
+              </span>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Followers</span>
+              <span className="text-sm font-medium text-graphite">{formatCompactNumber(profile?.followers_count || 0)}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Engagement</span>
+              <span className="text-sm font-medium text-graphite">{profile?.engagement_rate || 0}%</span>
+            </div>
+          </div>
+          {profile?.bio && (
+            <div>
+              <span className="text-xs font-bold text-ash uppercase tracking-wider block mb-1">Bio</span>
+              <p className="text-sm text-graphite line-clamp-3">{profile.bio}</p>
+            </div>
+          )}
+        </div>
+      </VerificationModal>
     </div>
   );
 }
