@@ -15,11 +15,13 @@ export default function CampaignPreviewModal({ campaign, onClose, onApply }: Cam
 
   useEffect(() => {
     setMounted(true);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
+    if (campaign) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [campaign]);
 
   if (!campaign || !mounted) return null;
 

@@ -4,12 +4,14 @@ import { useMySocialLinks, useDeleteSocialLink } from "../../features/social";
 import { SocialIcon } from "./SocialIcon";
 import { SocialEditor } from "./SocialEditor";
 import type { SocialLink } from "../../features/social";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 export function SocialSettings() {
   const { data: items, isLoading } = useMySocialLinks();
   const deleteMutation = useDeleteSocialLink();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<SocialLink | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleEdit = (item: SocialLink) => {
     setEditingItem(item);
@@ -17,8 +19,14 @@ export function SocialSettings() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to remove this social link?")) {
-      deleteMutation.mutate(id);
+    setDeleteId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteId) {
+      deleteMutation.mutate(deleteId, {
+        onSettled: () => setDeleteId(null),
+      });
     }
   };
 
@@ -112,6 +120,16 @@ export function SocialSettings() {
           }} 
         />
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Social Link"
+        message="Are you sure you want to remove this social link? This action cannot be undone."
+        confirmText="Remove"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

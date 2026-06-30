@@ -10,6 +10,7 @@ export interface PromoterDirectoryItem {
   engagement_rate: number;
   years_experience?: number | null;
   verified: boolean;
+  average_rating?: number;
   created_at: string;
 }
 
@@ -52,6 +53,7 @@ export interface PromoterPublicProfile {
   engagement_rate: number;
   years_experience?: number | null;
   verified: boolean;
+  average_rating?: number;
   portfolio_items: PortfolioItemRead[];
   social_links: SocialLinkRead[];
   created_at: string;

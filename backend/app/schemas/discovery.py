@@ -5,8 +5,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from .portfolio_item import PortfolioItemRead
 from .social_link import SocialLinkRead
+from app.portfolio.schemas import PortfolioItemResponse
 
 
 class PromoterDirectoryItem(BaseModel):
@@ -21,6 +21,7 @@ class PromoterDirectoryItem(BaseModel):
     engagement_rate: float
     years_experience: Optional[int] = None
     verified: bool
+    average_rating: float = 0.0
     created_at: datetime
 
     class Config:
@@ -48,7 +49,8 @@ class PromoterPublicProfileRead(BaseModel):
     engagement_rate: float
     years_experience: Optional[int] = None
     verified: bool
-    portfolio_items: List[PortfolioItemRead] = []
+    average_rating: float = 0.0
+    portfolio_items: List[PortfolioItemResponse] = []
     social_links: List[SocialLinkRead] = []
     created_at: datetime
     updated_at: datetime

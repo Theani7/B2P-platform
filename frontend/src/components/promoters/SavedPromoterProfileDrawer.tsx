@@ -81,7 +81,7 @@ export function ProfileDrawer({ isOpen, onClose, promoter, onRemove }: any) {
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
                 <Star size={16} className="text-amber-400 mb-1" />
-                <span className="text-lg font-bold text-gray-900">4.9</span>
+                <span className="text-lg font-bold text-gray-900">{promoter.average_rating ? promoter.average_rating.toFixed(1) : "0.0"}</span>
                 <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Rating</span>
               </div>
             </div>

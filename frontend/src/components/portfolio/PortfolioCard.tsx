@@ -1,6 +1,7 @@
 import React from "react";
 import { Star, Image as ImageIcon, Video, Eye, Heart, Pencil, Trash2 } from "lucide-react";
 import type { PortfolioItem } from "../../features/portfolio";
+import { getMediaUrl } from "../../utils/media";
 
 interface PortfolioCardProps {
   item: PortfolioItem;
@@ -12,6 +13,7 @@ interface PortfolioCardProps {
 
 export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: PortfolioCardProps) {
   const hasVideo = item.media?.some(m => m.media_type === "video");
+  const coverImageUrl = item.cover_image || item.media?.[0]?.file_path;
 
   return (
     <div className="group bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -20,9 +22,9 @@ export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: Port
         className="relative aspect-video bg-gray-100 cursor-pointer overflow-hidden"
         onClick={() => onClick?.(item)}
       >
-        {item.cover_image ? (
+        {coverImageUrl ? (
           <img 
-            src={`http://localhost:8000/static/${item.cover_image}`} 
+            src={getMediaUrl(coverImageUrl)}
             alt={item.title} 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />

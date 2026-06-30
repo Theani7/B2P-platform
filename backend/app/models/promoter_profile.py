@@ -46,3 +46,14 @@ class PromoterProfile(Base):
     @property
     def social_links(self):
         return self.user.social_links if self.user else []
+
+    @property
+    def average_rating(self) -> float:
+        from sqlalchemy.orm import object_session
+        from .review import Review
+        from sqlalchemy import func
+        session = object_session(self)
+        if session is None:
+            return 0.0
+        avg = session.query(func.avg(Review.rating)).filter(Review.reviewee_id == self.user_id).scalar()
+        return round(float(avg), 1) if avg else 0.0

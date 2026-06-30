@@ -78,7 +78,7 @@ export default function PromoterInvitationsPage() {
 
           <Link
             to="/promoter/marketplace"
-            className="inline-flex items-center gap-2 bg-primary-600 text-white h-11 px-5 rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors shadow-product-card-sm"
+            className="inline-flex items-center gap-2 bg-signal-blue text-white h-11 px-5 rounded-xl text-sm font-semibold hover:opacity-90 transition-colors shadow-product-card-sm"
           >
             <Search size={16} /> Marketplace
           </Link>
@@ -159,7 +159,7 @@ export default function PromoterInvitationsPage() {
               <div className="w-20 h-20 bg-linen-canvas rounded-full flex items-center justify-center text-gray-300 mb-4"><Inbox size={32}/></div>
               <h2 className="text-xl font-bold text-graphite mb-2">Inbox is empty</h2>
               <p className="text-sm text-ash max-w-sm mb-6">You don't have any pending invitations right now. Complete your profile to attract more brands.</p>
-              <Link to="/promoter/profile" className="h-11 px-6 flex items-center justify-center rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-product-card-sm">
+              <Link to="/promoter/profile" className="h-11 px-6 flex items-center justify-center rounded-xl bg-signal-blue text-white text-sm font-bold hover:opacity-90 transition-colors shadow-product-card-sm">
                 Complete Profile
               </Link>
             </div>
@@ -176,7 +176,7 @@ export default function PromoterInvitationsPage() {
                     key={inv.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-2xl p-6 shadow-product-card-sm ring-1 ring-gray-200 hover:shadow-product-card-product-card hover:ring-primary-200 transition-all flex flex-col"
+                    className="bg-white rounded-2xl p-6 shadow-product-card-sm ring-1 ring-gray-200 hover:shadow-product-card-product-card hover:ring-signal-blue/30 transition-all flex flex-col"
                   >
                     
                     {/* Header */}
@@ -231,7 +231,7 @@ export default function PromoterInvitationsPage() {
                           <button 
                             onClick={(e) => handleAction(inv.id, 'accept', e)} 
                             disabled={acceptMutation.isPending}
-                            className="flex-1 h-10 rounded-xl bg-gray-900 text-white text-sm font-bold hover:bg-primary-600 transition-colors shadow-product-card-sm"
+                            className="flex-1 h-10 rounded-xl bg-signal-blue text-white text-sm font-bold hover:opacity-90 transition-colors shadow-product-card-sm"
                           >
                             Accept Offer
                           </button>
@@ -244,7 +244,7 @@ export default function PromoterInvitationsPage() {
                           </button>
                         </div>
                       ) : isAccepted ? (
-                        <button onClick={() => navigate('/promoter/collaborations')} className="w-full h-10 rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors shadow-product-card-sm">
+                        <button onClick={() => navigate('/promoter/collaborations')} className="w-full h-10 rounded-xl bg-signal-blue text-white text-sm font-bold hover:opacity-90 transition-colors shadow-product-card-sm">
                           Open Collaboration
                         </button>
                       ) : (

@@ -30,6 +30,7 @@ const schema = z.object({
   location: z.string().optional(),
   followers_count: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").optional(),
   engagement_rate: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").max(100, "Cannot exceed 100").optional(),
+  years_experience: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -66,6 +67,7 @@ export default function PromoterProfilePage() {
       location: profile?.location || "",
       followers_count: profile?.followers_count || 0,
       engagement_rate: profile?.engagement_rate || 0,
+      years_experience: profile?.years_experience || 0,
     },
   });
 
@@ -77,6 +79,7 @@ export default function PromoterProfilePage() {
   const location = useWatch({ control, name: "location" });
   const followersCount = useWatch({ control, name: "followers_count" });
   const engagementRate = useWatch({ control, name: "engagement_rate" });
+  const yearsExperience = useWatch({ control, name: "years_experience" });
 
   useEffect(() => {
     if (profile) {
@@ -88,6 +91,7 @@ export default function PromoterProfilePage() {
         location: profile.location || "",
         followers_count: profile.followers_count || 0,
         engagement_rate: profile.engagement_rate || 0,
+        years_experience: profile.years_experience || 0,
       });
     }
   }, [profile, reset, user]);
@@ -306,6 +310,11 @@ export default function PromoterProfilePage() {
                     <label className="text-sm font-medium text-graphite">Avg. Engagement Rate (%)</label>
                     <input type="number" step="0.1" {...register("engagement_rate", { valueAsNumber: true })} min="0" max="100" placeholder="e.g. 4.5" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
                     {errors.engagement_rate && <p className="text-xs text-coral-alert">{errors.engagement_rate.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-graphite">Years of Experience</label>
+                    <input type="number" {...register("years_experience", { valueAsNumber: true })} min="0" placeholder="e.g. 3" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
+                    {errors.years_experience && <p className="text-xs text-coral-alert">{errors.years_experience.message}</p>}
                   </div>
                 </div>
               </div>

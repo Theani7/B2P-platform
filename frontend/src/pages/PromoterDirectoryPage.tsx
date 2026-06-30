@@ -264,7 +264,7 @@ onError: (err: any) => {
                       <span className="text-[10px] text-ash font-medium mt-0.5">Engagement</span>
                     </div>
                     <div className="flex flex-col items-center p-2 rounded-inputs bg-linen-canvas/80 border border-slate-custom/10 group-hover:border-signal-blue/20 transition-colors">
-                      <span className="text-sm font-bold text-graphite flex items-center gap-0.5">4.9 <Star size={10} className="text-amber-400 fill-amber-400" /></span>
+                      <span className="text-sm font-bold text-graphite flex items-center gap-0.5">{p.average_rating ? p.average_rating.toFixed(1) : "0.0"} <Star size={10} className="text-amber-400 fill-amber-400" /></span>
                       <span className="text-[10px] text-ash font-medium mt-0.5">Rating</span>
                     </div>
                   </div>

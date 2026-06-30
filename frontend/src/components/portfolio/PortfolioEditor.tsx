@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { X, Upload, Plus, Trash2 } from "lucide-react";
 import type { PortfolioItem, PortfolioItemCreate } from "../../features/portfolio";
-import { useCreatePortfolioItem, useUpdatePortfolioItem, useUploadMedia } from "../../features/portfolio";
+import { useCreatePortfolioItem, useUpdatePortfolioItem, useUploadMedia, useDeleteMedia } from "../../features/portfolio";
 import { notifySuccess, notifyError } from "../../hooks/useToast";
+import { getMediaUrl } from "../../utils/media";
 import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 
 interface PortfolioEditorProps {
@@ -16,7 +17,9 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
   const createMutation = useCreatePortfolioItem();
   const updateMutation = useUpdatePortfolioItem();
   const uploadMediaMutation = useUploadMedia();
-  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const deleteMediaMutation = useDeleteMedia();
+  
+  const [mediaPreviews, setMediaPreviews] = useState<{url: string, file?: File, id?: string, type: string}[]>([]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,53 +49,82 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
         tags: item.tags || [],
         featured: item.featured,
       });
-      if (item.cover_image) {
-        setMediaPreview(item.cover_image);
-      }
+      const existingMedia = item.media?.map(m => ({
+        id: m.id,
+        url: getMediaUrl(m.file_path),
+        type: m.media_type
+      })) || [];
+      setMediaPreviews(existingMedia);
     }
   }, [item, reset]);
 
-  const handleMediaUpload = async (file: File) => {
-    if (!file) return;
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const newPreviews = files.map(file => ({
+      url: URL.createObjectURL(file),
+      file,
+      type: file.type.startsWith('video/') ? 'video' : 'image'
+    }));
+
+    setMediaPreviews(prev => [...prev, ...newPreviews]);
 
     if (isEditing && item) {
-      setUploadingMedia(true);
-      try {
-        await uploadMediaMutation.mutateAsync({ id: item.id, file });
-        notifySuccess("Media uploaded successfully");
-      } finally {
-        setUploadingMedia(false);
-      }
-    } else {
-      const url = URL.createObjectURL(file);
-      setMediaPreview(url);
-      setValue("cover_image", url);
+      files.forEach(async (file) => {
+        setUploadingMedia(true);
+        try {
+          await uploadMediaMutation.mutateAsync({ id: item.id, file });
+        } finally {
+          setUploadingMedia(false);
+        }
+      });
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleMediaUpload(file);
+  const handleRemoveMedia = (index: number) => {
+    const target = mediaPreviews[index];
+    if (target.id) {
+       deleteMediaMutation.mutate(target.id);
+    }
+    setMediaPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit = async (data: PortfolioItemCreate) => {
+    const payload = { ...data };
+    delete payload.cover_image;
+
     if (isEditing && item) {
-      updateMutation.mutate({ id: item.id, data }, {
+      updateMutation.mutate({ id: item.id, data: payload }, {
         onSuccess: () => {
           markClean();
           onClose();
         }
       });
     } else {
-      createMutation.mutate(data, {
+      createMutation.mutate(payload, {
         onSuccess: (newItem) => {
           markClean();
-          if (data.cover_image && data.cover_image.startsWith("blob:")) {
+          const pendingFiles = mediaPreviews.filter(m => m.file).map(m => m.file as File);
+          if (pendingFiles.length > 0) {
             setUploadingMedia(true);
-            uploadMediaMutation.mutate({ id: newItem.id, file: fileInputRef.current?.files?.[0] as File });
+            Promise.all(pendingFiles.map(file => 
+              uploadMediaMutation.mutateAsync({ id: newItem.id, file })
+            )).then(() => {
+              notifySuccess("Project added to portfolio");
+              onClose();
+            }).catch(() => {
+              notifyError("Project created but some media failed to upload");
+              onClose();
+            });
+          } else {
+            notifySuccess("Project added to portfolio");
+            onClose();
           }
-          notifySuccess("Project added to portfolio");
-          onClose();
         }
       });
     }
@@ -159,37 +191,43 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1">Cover Image</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1">Media Gallery</label>
               <div className="border border-gray-200 rounded-xl p-4">
-                {mediaPreview ? (
-                  <div className="relative">
-                    <img src={mediaPreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploadingMedia}
-                      className="absolute top-2 right-2 px-2 py-1 bg-white rounded text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      Change
-                    </button>
-                  </div>
-                ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                  {mediaPreviews.map((media, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group">
+                      {media.type === 'video' ? (
+                        <video src={media.url} className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={media.url} alt={`Media ${idx}`} className="w-full h-full object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMedia(idx)}
+                        className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingMedia}
-                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:border-signal-blue hover:text-signal-blue transition-colors"
+                    className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:border-signal-blue hover:text-signal-blue transition-colors"
                   >
                     <Upload size={24} className="mb-2" />
-                    <span className="text-sm font-medium">Click to upload cover image</span>
+                    <span className="text-xs font-medium text-center px-2">Add Photo/Video</span>
                   </button>
-                )}
-                {uploadingMedia && <p className="text-xs text-gray-500 mt-2">Uploading...</p>}
+                </div>
+                {uploadingMedia && <p className="text-xs text-gray-500 text-center">Uploading...</p>}
               </div>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                multiple
+                accept="image/*,video/*"
                 onChange={onFileChange}
                 className="hidden"
               />

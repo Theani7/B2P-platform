@@ -9,6 +9,8 @@ import { Avatar } from "../ui";
 import { formatCompactNumber } from "../../utils/number";
 import InvitePromoterModal from "./InvitePromoterModal";
 import { notifySuccess } from "../../hooks/useToast";
+import { usePublicPromoterProfile } from "../../features/discovery/api";
+import { PortfolioGrid } from "../portfolio";
 
 interface ProfilePreviewModalProps {
   isOpen: boolean;
@@ -26,6 +28,8 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
     else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
+
+  const { data: fullProfile, isLoading } = usePublicPromoterProfile(isOpen && promoter ? promoter.username : "");
 
   if (!isOpen || !promoter) return null;
 
@@ -72,7 +76,7 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                     <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{promoter.username}</h2>
                     <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-tag/10 text-amber-tag text-xs font-bold tracking-wide">
                       <Star size={12} className="fill-amber-400 text-amber-400" />
-                      4.9
+                      {promoter.average_rating ? promoter.average_rating.toFixed(1) : "0.0"}
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 mt-1.5">{promoter.headline || "No headline provided"}</p>
@@ -138,15 +142,17 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">About Creator</h3>
                     <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
-                      {promoter.bio || "This promoter hasn't added a bio yet. They mainly focus on creating high-quality content for their audience."}
+                      {fullProfile?.bio || promoter.bio || "This promoter hasn't added a bio yet. They mainly focus on creating high-quality content for their audience."}
                     </p>
                   </div>
 
                   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Social Channels</h3>
                     <div className="space-y-3">
-                      {promoter.social_links?.length > 0 ? (
-                        promoter.social_links.map((link: any, idx: number) => (
+                      {isLoading ? (
+                        <div className="animate-pulse h-12 bg-gray-100 rounded-xl"></div>
+                      ) : fullProfile?.social_links?.length ? (
+                        fullProfile.social_links.map((link: any, idx: number) => (
                           <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-signal-blue/20 hover:bg-sky-wash transition-colors group">
                             <div className="flex items-center gap-3">
                               <ExternalLink size={18} className="text-gray-400 group-hover:text-signal-blue" />
@@ -170,18 +176,20 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                     <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Recent Portfolio Work</h3>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="aspect-[4/5] rounded-xl bg-gray-50 flex flex-col items-center justify-center border border-gray-100 overflow-hidden relative group cursor-pointer">
-                        <ImageIcon size={28} className="text-gray-300" />
-                        <div className="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-200">
-                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center border border-white/30 transform scale-75 group-hover:scale-100 transition-transform duration-200">
-                            <Play size={20} className="text-white ml-1" fill="currentColor" />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  {isLoading ? (
+                    <div className="grid grid-cols-2 gap-4 animate-pulse">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="aspect-[4/5] rounded-xl bg-gray-100"></div>
+                      ))}
+                    </div>
+                  ) : fullProfile?.portfolio_items?.length ? (
+                    <PortfolioGrid items={fullProfile.portfolio_items} isOwner={false} />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-gray-100 rounded-xl">
+                      <ImageIcon size={32} className="text-gray-300 mb-3" />
+                      <p className="text-sm text-gray-500 font-medium">No portfolio items added yet.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -4,12 +4,14 @@ import { useMyPortfolio, useDeletePortfolioItem } from "../../features/portfolio
 import { PortfolioGrid } from "./PortfolioGrid";
 import { PortfolioEditor } from "./PortfolioEditor";
 import type { PortfolioItem } from "../../features/portfolio";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 export function PortfolioSettings() {
   const { data: items, isLoading } = useMyPortfolio();
   const deleteMutation = useDeletePortfolioItem();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleEdit = (item: PortfolioItem) => {
     setEditingItem(item);
@@ -17,8 +19,14 @@ export function PortfolioSettings() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this project?")) {
-      deleteMutation.mutate(id);
+    setDeleteId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteId) {
+      deleteMutation.mutate(deleteId, {
+        onSettled: () => setDeleteId(null),
+      });
     }
   };
 
@@ -66,6 +74,16 @@ export function PortfolioSettings() {
           }} 
         />
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Project"
+        message="Are you sure you want to delete this project? This action cannot be undone."
+        confirmText="Delete"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

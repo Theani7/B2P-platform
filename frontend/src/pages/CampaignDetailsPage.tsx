@@ -11,6 +11,8 @@ import { notifySuccess, notifyError } from "../hooks/useToast";
 import { PageHeader } from "../components/ui";
 import { formatNepaliCurrency } from "../utils/currency";
 import { Rocket } from "lucide-react";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
+import { useState } from "react";
 
 export default function CampaignDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +22,7 @@ export default function CampaignDetailsPage() {
   const archiveCampaign = useArchiveCampaign();
   const reopenCampaign = useReopenCampaign();
   const publishCampaign = usePublishCampaign();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (isLoading) {
     return (
@@ -34,13 +37,13 @@ export default function CampaignDetailsPage() {
   }
 
   const handleDelete = () => {
-    if (!confirm(`Delete "${campaign.title}"? This cannot be undone.`)) return;
     deleteCampaign.mutate(campaign.id, {
       onSuccess: () => {
         notifySuccess("Campaign deleted");
         navigate("/business/campaigns");
       },
       onError: () => notifyError("Failed to delete campaign"),
+      onSettled: () => setShowDeleteConfirm(false),
     });
   };
 
@@ -110,7 +113,7 @@ export default function CampaignDetailsPage() {
                 </button>
               )}
               <button
-                onClick={handleDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 className="bg-coral-alert/10 text-coral-alert border border-coral-alert/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors"
               >
                 Delete
@@ -220,6 +223,16 @@ export default function CampaignDetailsPage() {
           </Link>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Campaign"
+        message={`Are you sure you want to delete "${campaign.title}"? This cannot be undone.`}
+        confirmText="Delete"
+        loading={deleteCampaign.isPending}
+      />
     </div>
   );
 }

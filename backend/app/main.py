@@ -70,6 +70,38 @@ def _log_startup():
     except Exception:
         logger.info("DB URL: %s", db_url)
 
+    # Seed hardcoded admin user
+    try:
+        from .db.session import SessionLocal
+        from .models.user import User
+        from .core.role import RoleEnum
+        from .core.security import get_password_hash
+        import uuid
+
+        db = SessionLocal()
+        admin_email = "admin@gmail.com"
+        admin_username = "admin"
+        
+        # Check if admin already exists
+        existing_admin = db.query(User).filter(User.email == admin_email).first()
+        if not existing_admin:
+            logger.info("Creating default hardcoded admin user (admin@gmail.com)")
+            admin_user = User(
+                id=uuid.uuid4(),
+                email=admin_email,
+                username=admin_username,
+                hashed_password=get_password_hash("admin123"),
+                full_name="Platform Admin",
+                role=RoleEnum.ADMIN,
+                is_active=True,
+                is_verified=True,
+            )
+            db.add(admin_user)
+            db.commit()
+        db.close()
+    except Exception as e:
+        logger.error(f"Failed to seed admin user: {e}")
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):

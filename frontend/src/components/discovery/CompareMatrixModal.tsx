@@ -46,7 +46,7 @@ export default function CompareMatrixModal({ isOpen, onClose, promoters }: Compa
       id: "rating",
       label: "Client Rating",
       icon: Star,
-      getValue: (p: any) => 4.9, // Hardcoded for now based on current UI
+      getValue: (p: any) => p.average_rating || 0,
       format: (val: number) => val.toFixed(1),
       isBetter: (a: number, b: number) => a > b,
       insight: "Indicates reliability and quality of work.",

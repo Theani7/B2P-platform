@@ -22,19 +22,11 @@ export const getPublicPortfolio = async (promoterId: string) => {
 };
 
 export const createPortfolioItem = async (item: PortfolioItemCreate) => {
-  const { data } = await apiClient.post<PortfolioItem>("/portfolio", item);
+  const { data } = await apiClient.post<PortfolioItem>("/portfolio/", item);
   return data;
 };
 
-export function useUpdatePortfolioItem() {
-  const qc = useQueryClient();
-  return useMutation<PortfolioItem, Error, { id: string; data: Partial<PortfolioItem> }>({
-    mutationFn: async ({ id, data }) => {
-      const res = await apiClient.patch(`/portfolio/${id}`, data);
-      return res.data;
-    },
-  });
-}
+
 
 export const updatePortfolioItem = async ({ id, data }: { id: string; data: PortfolioItemUpdate }) => {
   const response = await apiClient.patch<PortfolioItem>(`/portfolio/${id}`, data);
@@ -48,6 +40,7 @@ export const deletePortfolioItem = async (id: string) => {
 export const uploadMedia = async ({ id, file }: { id: string; file: File }) => {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("is_video", file.type.startsWith('video/') ? "true" : "false");
   const { data } = await apiClient.post<PortfolioMedia>(`/portfolio/${id}/media`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",

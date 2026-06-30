@@ -68,19 +68,71 @@ def list_saved_promoters(
     )
 
 
+from datetime import datetime, timezone
+from sqlalchemy import func
+from ....models.campaign import Campaign, CampaignStatus
+from ....models.campaign_application import CampaignApplication
+from ....models.collaboration import Collaboration, CollaborationStatus
+
 @router.get("/analytics")
 def business_analytics(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    profile = user.business_profile
+    if not profile:
+        return {
+            "summary": {
+                "active_campaigns": 0,
+                "total_campaigns": 0,
+                "total_spent": 0,
+                "applications_received": 0,
+                "total_applications": 0,
+                "active_collaborations": 0,
+                "collaborations_completed": 0,
+                "average_roi": 0,
+                "profile_views": 0,
+                "average_rating": 0,
+            },
+            "charts": {},
+            "growth": {},
+            "metadata": {"period": "30d"}
+        }
+
+    total_campaigns = db.query(Campaign).filter(Campaign.business_profile_id == profile.id).count()
+    active_campaigns = db.query(Campaign).filter(Campaign.business_profile_id == profile.id, Campaign.status == CampaignStatus.OPEN).count()
+    
+    total_applications = db.query(CampaignApplication).join(Campaign).filter(Campaign.business_profile_id == profile.id).count()
+    
+    active_collabs = db.query(Collaboration).filter(Collaboration.business_profile_id == profile.id, Collaboration.status == CollaborationStatus.ACTIVE).count()
+    completed_collabs = db.query(Collaboration).filter(Collaboration.business_profile_id == profile.id, Collaboration.status == CollaborationStatus.COMPLETED).count()
+
+    # Simple chart data
+    status_dist = db.query(
+        CampaignApplication.status, func.count(CampaignApplication.id)
+    ).join(Campaign).filter(Campaign.business_profile_id == profile.id).group_by(CampaignApplication.status).all()
+
+    dist_data = [{"name": s.value if hasattr(s, 'value') else str(s), "value": count} for s, count in status_dist] if status_dist else []
+    if not dist_data:
+        dist_data = [{"name": "PENDING", "value": 0}, {"name": "ACCEPTED", "value": 0}, {"name": "REJECTED", "value": 0}]
+
     return {
         "summary": {
-            "active_campaigns": 0,
+            "active_campaigns": active_campaigns,
+            "total_campaigns": total_campaigns,
             "total_spent": 0,
-            "applications_received": 0,
-            "collaborations_completed": 0,
+            "applications_received": total_applications,
+            "total_applications": total_applications,
+            "active_collaborations": active_collabs,
+            "collaborations_completed": completed_collabs,
             "average_roi": 0,
             "profile_views": 0,
             "average_rating": 0,
         },
-        "charts": {},
-        "growth": {},
+        "charts": {
+            "application_status_distribution": dist_data,
+        },
+        "growth": {
+            "campaign_growth": 0,
+            "application_growth": 0,
+            "collaboration_growth": 0
+        },
         "metadata": {"period": "30d"}
     }

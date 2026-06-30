@@ -35,6 +35,12 @@ export function SocialEditor({ item, onClose }: SocialEditorProps) {
         username: item.username,
         url: item.url,
       });
+    } else {
+      reset({
+        platform: "INSTAGRAM",
+        username: "",
+        url: "",
+      });
     }
   }, [item, reset]);
 

@@ -123,7 +123,7 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
                   value={selectedCampaignId}
                   onChange={(e) => setSelectedCampaignId(e.target.value)}
                   disabled={campaignsLoading || campaigns.length === 0}
-                  className="w-full h-11 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all disabled:bg-gray-50 disabled:text-gray-500"
+                  className="w-full h-11 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:ring-2 focus:ring-signal-blue focus:border-signal-blue outline-none transition-all disabled:bg-gray-50 disabled:text-gray-500"
                 >
                   <option value="">{campaignsLoading ? "Loading campaigns..." : eligibleCampaigns.length === 0 ? "No campaigns available" : "Choose a campaign"}</option>
                   {eligibleCampaigns.map((c: any) => (
@@ -145,7 +145,7 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Hi, I'd love to collaborate with you on this campaign..."
                   rows={4}
-                  className="w-full p-3 rounded-lg border border-gray-200 bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none"
+                  className="w-full p-3 rounded-lg border border-gray-200 bg-white text-sm focus:ring-2 focus:ring-signal-blue focus:border-signal-blue outline-none transition-all resize-none"
                 />
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
               <button
                 onClick={handleSend}
                 disabled={invitePromoter.isPending || !selectedCampaignId || eligibleCampaigns.length === 0}
-                className="px-5 h-10 rounded-xl bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 h-10 rounded-xl bg-signal-blue text-white font-medium text-sm hover:opacity-90 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {invitePromoter.isPending ? "Sending..." : (
                   <>
