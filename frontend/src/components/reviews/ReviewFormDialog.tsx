@@ -67,7 +67,7 @@ export default function ReviewFormDialog({
             <button
               type="submit"
               disabled={rating < 1}
-              className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
+              className="rounded-buttons bg-signal-blue px-4 py-2 text-sm font-medium text-white hover:bg-signal-blue/90 disabled:opacity-50 transition-colors"
             >
               Submit Review
             </button>
