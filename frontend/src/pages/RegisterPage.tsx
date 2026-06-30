@@ -74,10 +74,16 @@ export default function RegisterPage() {
       onError: (err: any) => {
         let msg = "Registration failed. Please try again.";
         if (err?.response?.data?.message) {
-          msg = err.response.data.message;
+          msg = typeof err.response.data.message === "string" ? err.response.data.message : JSON.stringify(err.response.data.message);
         } else if (err?.response?.data?.detail) {
           const detail = err.response.data.detail;
-          msg = Array.isArray(detail) && detail.length > 0 ? detail[0].msg : detail;
+          if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
+            msg = detail[0].msg;
+          } else if (typeof detail === "string") {
+            msg = detail;
+          } else {
+            msg = JSON.stringify(detail);
+          }
         } else if (err?.message) {
           msg = err.message;
         }
