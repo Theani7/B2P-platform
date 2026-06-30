@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 import { ActionMenu } from "../components/promoters/SavedPromoterActionMenu";
+import { formatCompactNumber } from "../utils/number";
 import ProfilePreviewModal from "../components/discovery/ProfilePreviewModal";
 import CompareMatrixModal from "../components/discovery/CompareMatrixModal";
 
@@ -281,7 +282,7 @@ export default function SavedPromotersPage() {
 
                     <div className="grid grid-cols-3 gap-2 mt-auto pt-6 z-10">
                       <div className="flex flex-col items-center p-2 rounded-inputs bg-linen-canvas/80 border border-slate-custom/10 group-hover:border-signal-blue/20 transition-colors">
-                        <span className="text-sm font-bold text-graphite">{(p.followers_count || 0).toLocaleString()}</span>
+                        <span className="text-sm font-bold text-graphite">{formatCompactNumber(p.followers_count)}</span>
                         <span className="text-[10px] text-ash font-medium mt-0.5">Followers</span>
                       </div>
                       <div className="flex flex-col items-center p-2 rounded-inputs bg-linen-canvas/80 border border-slate-custom/10 group-hover:border-signal-blue/20 transition-colors">

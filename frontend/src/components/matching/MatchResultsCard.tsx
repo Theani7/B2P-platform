@@ -1,4 +1,6 @@
 import type { MatchResultRead } from "../../features/matching/types";
+import { Star } from "lucide-react";
+import { formatCompactNumber } from "../../utils/number";
 
 const CLASSIFICATION_STYLES: Record<string, string> = {
   EXCELLENT_MATCH: "bg-emerald-status/10 text-emerald-status",
@@ -50,7 +52,7 @@ export default function MatchResultsCard({ match, onInvite }: MatchResultsCardPr
       </div>
 
       <div className="flex flex-wrap gap-4 text-xs text-ash">
-        <span>{match.promoter.followers_count.toLocaleString()} followers</span>
+        <span>{formatCompactNumber(match.promoter.followers_count)} followers</span>
         <span>{match.promoter.engagement_rate}% engagement</span>
         {match.promoter.years_experience != null && <span>{match.promoter.years_experience} yrs exp</span>}
         {match.promoter.location && <span>{match.promoter.location}</span>}

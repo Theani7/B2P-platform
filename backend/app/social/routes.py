@@ -89,14 +89,3 @@ def reorder_social_links(
     service = SocialLinkService(db)
     result = service.reorder_links(current_user.id, schema.link_ids)
     return result
-
-@router.put("/reorder")
-def reorder_social_links(
-    schema: SocialLinkReorder,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    # This route has to be before /{link_id} if it were generic, but reorder is a specific path
-    service = SocialLinkService(db)
-    result = service.reorder_links(current_user.id, schema.link_ids)
-    return result

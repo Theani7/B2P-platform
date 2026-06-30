@@ -180,7 +180,7 @@ export default function BusinessProfilePage() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row items-start gap-8">
         <div className="flex-1 min-w-0 space-y-8">
           <form id="profile-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">

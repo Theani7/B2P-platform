@@ -51,7 +51,7 @@ export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: Port
       <div className="p-5">
         <div className="flex items-start justify-between gap-4 mb-2">
           <div>
-            <h3 className="text-base font-bold text-gray-900 cursor-pointer hover:text-primary-600 transition-colors" onClick={() => onClick?.(item)}>
+            <h3 className="text-base font-bold text-gray-900 cursor-pointer hover:text-signal-blue transition-colors" onClick={() => onClick?.(item)}>
               {item.title}
             </h3>
             {item.client_name && (
@@ -98,7 +98,7 @@ export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: Port
             <div className="flex items-center gap-2">
               <button 
                 onClick={(e) => { e.stopPropagation(); onEdit?.(item); }}
-                className="w-8 h-8 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-sky-wash hover:text-signal-blue transition-colors"
               >
                 <Pencil size={14} />
               </button>

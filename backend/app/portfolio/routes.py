@@ -39,6 +39,16 @@ def get_portfolio_items(
     service = PortfolioService(db)
     return service.get_promoter_items(promoter_id, skip, limit)
 
+@router.get("/promoter/{promoter_id}", response_model=List[PortfolioItemResponse])
+def get_public_portfolio_items(
+    promoter_id: UUID,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    service = PortfolioService(db)
+    return service.get_promoter_items(promoter_id, skip, limit)
+
 @router.get("/{item_id}", response_model=PortfolioItemResponse)
 def get_portfolio_item(
     item_id: UUID,

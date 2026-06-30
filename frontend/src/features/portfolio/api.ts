@@ -27,7 +27,7 @@ export const createPortfolioItem = async (item: PortfolioItemCreate) => {
 };
 
 export const updatePortfolioItem = async ({ id, data }: { id: string; data: PortfolioItemUpdate }) => {
-  const response = await apiClient.put<PortfolioItem>(`/portfolio/${id}`, data);
+  const response = await apiClient.patch<PortfolioItem>(`/portfolio/${id}`, data);
   return response.data;
 };
 

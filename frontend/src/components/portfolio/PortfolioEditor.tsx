@@ -114,7 +114,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
               <label className="block text-sm font-semibold text-gray-900 mb-1">Project Title</label>
               <input 
                 {...register("title", { required: true })}
-                className="w-full h-11 px-4 rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 text-sm shadow-sm"
+                className="w-full h-11 px-4 rounded-xl border-gray-200 focus:border-signal-blue focus:ring-signal-blue text-sm shadow-sm"
                 placeholder="e.g., Summer Fashion Campaign"
               />
             </div>
@@ -124,7 +124,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
                 <label className="block text-sm font-semibold text-gray-900 mb-1">Client / Brand</label>
                 <input 
                   {...register("client_name")}
-                  className="w-full h-11 px-4 rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 text-sm shadow-sm"
+                  className="w-full h-11 px-4 rounded-xl border-gray-200 focus:border-signal-blue focus:ring-signal-blue text-sm shadow-sm"
                   placeholder="Brand Name"
                 />
               </div>
@@ -132,7 +132,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
                 <label className="block text-sm font-semibold text-gray-900 mb-1">Campaign Type</label>
                 <input 
                   {...register("campaign_type")}
-                  className="w-full h-11 px-4 rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 text-sm shadow-sm"
+                  className="w-full h-11 px-4 rounded-xl border-gray-200 focus:border-signal-blue focus:ring-signal-blue text-sm shadow-sm"
                   placeholder="e.g., Product Launch, Review"
                 />
               </div>
@@ -143,7 +143,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
               <textarea 
                 {...register("description")}
                 rows={4}
-                className="w-full p-4 rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 text-sm shadow-sm resize-none"
+                className="w-full p-4 rounded-xl border-gray-200 focus:border-signal-blue focus:ring-signal-blue text-sm shadow-sm resize-none"
                 placeholder="Describe your role and the impact of the campaign..."
               />
             </div>
@@ -153,7 +153,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
                 type="checkbox" 
                 id="featured" 
                 {...register("featured")}
-                className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                className="w-5 h-5 rounded border-gray-300 text-signal-blue focus:ring-signal-blue"
               />
               <label htmlFor="featured" className="text-sm font-medium text-gray-900">Feature this project on my profile (Max 3)</label>
             </div>
@@ -178,7 +178,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingMedia}
-                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:border-primary-500 hover:text-primary-500 transition-colors"
+                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:border-signal-blue hover:text-signal-blue transition-colors"
                   >
                     <Upload size={24} className="mb-2" />
                     <span className="text-sm font-medium">Click to upload cover image</span>
@@ -209,7 +209,7 @@ export function PortfolioEditor({ item, onClose }: PortfolioEditorProps) {
             type="submit" 
             form="portfolio-form"
             disabled={createMutation.isPending || updateMutation.isPending}
-            className="px-6 h-11 rounded-xl text-sm font-bold bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-sm disabled:opacity-50"
+            className="px-6 h-11 rounded-xl text-sm font-bold bg-signal-blue text-white hover:bg-signal-blue/90 transition-colors shadow-sm disabled:opacity-50"
           >
             {createMutation.isPending || updateMutation.isPending ? "Saving..." : "Save Project"}
           </button>

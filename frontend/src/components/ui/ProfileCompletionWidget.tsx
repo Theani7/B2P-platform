@@ -29,7 +29,7 @@ export function ProfileCompletionWidget({ data, isLoading }: ProfileCompletionWi
 
   if (percentage === 100) {
     return (
-      <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl shadow-sm ring-1 ring-emerald-100 p-6 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
+      <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl shadow-sm ring-1 ring-emerald-100 p-6 flex flex-col items-center justify-center text-center min-h-[250px]">
         <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
           <Sparkles className="text-emerald-500 w-8 h-8" />
         </div>
@@ -42,7 +42,7 @@ export function ProfileCompletionWidget({ data, isLoading }: ProfileCompletionWi
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-6 flex flex-col h-full">
+    <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 p-6 flex flex-col">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-sm font-bold text-gray-900">Profile Completion</h2>
         <span className={`text-sm font-bold ${textColor}`}>{percentage}%</span>
@@ -79,8 +79,8 @@ export function ProfileCompletionWidget({ data, isLoading }: ProfileCompletionWi
         {missing_items.map((item) => (
           item.route ? (
             <Link key={item.key} to={item.route} className="flex items-center gap-2 group hover:bg-gray-50 p-1 -ml-1 rounded transition-colors">
-              <Circle className="w-4 h-4 text-gray-300 group-hover:text-primary-500" />
-              <span className="text-sm font-medium text-gray-700 group-hover:text-primary-700">{item.label}</span>
+              <Circle className="w-4 h-4 text-gray-300 group-hover:text-signal-blue" />
+              <span className="text-sm font-medium text-gray-700 group-hover:text-signal-blue">{item.label}</span>
             </Link>
           ) : (
             <div key={item.key} className="flex items-center gap-2 p-1 -ml-1">

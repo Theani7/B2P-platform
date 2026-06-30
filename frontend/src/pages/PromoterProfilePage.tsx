@@ -14,6 +14,7 @@ import { PortfolioSettings } from "../components/portfolio/PortfolioSettings";
 import { SocialSettings } from "../components/social/SocialSettings";
 import { Avatar } from "../components/ui";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { formatCompactNumber } from "../utils/number";
 import {
   BadgeCheck, Save, Eye, Trophy, AlertTriangle, MapPin, Briefcase, Camera, Upload, RefreshCw
 } from "lucide-react";
@@ -231,7 +232,7 @@ export default function PromoterProfilePage() {
                 </span>
               )}
               <span className="flex items-center gap-1.5 ml-2">
-                <strong className="text-graphite">{followersCount ? (followersCount / 1000).toFixed(1) + 'k' : '0'}</strong> Followers
+                <strong className="text-graphite">{formatCompactNumber(followersCount)}</strong> Followers
               </span>
               <span className="text-slate-custom/30">•</span>
               <span className="flex items-center gap-1.5">
@@ -243,7 +244,7 @@ export default function PromoterProfilePage() {
       </div>
 
       {/* Main Layout */}
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row items-start gap-8">
         <div className="flex-1 min-w-0 space-y-8">
           <form id="profile-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* General Info */}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { formatCompactNumber } from "../utils/number";
 import { usePromoterDirectory, useSavePromoter, useRemoveSavedPromoter, useSavedPromoters } from "../features/discovery/api";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { getErrorMessage } from "../utils/error";
@@ -248,7 +249,7 @@ onError: (err: any) => {
 
                   <div className="grid grid-cols-3 gap-2 mt-auto pt-6 z-10">
                     <div className="flex flex-col items-center p-2 rounded-inputs bg-linen-canvas/80 border border-slate-custom/10 group-hover:border-signal-blue/20 transition-colors">
-                      <span className="text-sm font-bold text-graphite">{(p.followers_count || 0).toLocaleString()}</span>
+                      <span className="text-sm font-bold text-graphite">{formatCompactNumber(p.followers_count)}</span>
                       <span className="text-[10px] text-ash font-medium mt-0.5">Followers</span>
                     </div>
                     <div className="flex flex-col items-center p-2 rounded-inputs bg-linen-canvas/80 border border-slate-custom/10 group-hover:border-signal-blue/20 transition-colors">

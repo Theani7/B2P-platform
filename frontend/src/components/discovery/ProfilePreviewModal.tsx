@@ -6,6 +6,7 @@ import {
   Bookmark, Share2, Play, Image as ImageIcon, ExternalLink, Mail, Send
 } from "lucide-react";
 import { Avatar } from "../ui";
+import { formatCompactNumber } from "../../utils/number";
 import InvitePromoterModal from "./InvitePromoterModal";
 import { notifySuccess } from "../../hooks/useToast";
 
@@ -123,7 +124,7 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                         <div className="p-2 bg-gray-50 rounded-lg"><Users size={16} className="text-gray-500" /></div>
                         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Followers</span>
                       </div>
-                      <span className="text-2xl font-bold text-gray-900">{(promoter.followers_count || 0).toLocaleString()}</span>
+                      <span className="text-2xl font-bold text-gray-900">{formatCompactNumber(promoter.followers_count)}</span>
                     </div>
                     <div className="p-4 rounded-2xl bg-white border border-gray-100 shadow-sm flex flex-col">
                       <div className="flex items-center gap-2 mb-2">

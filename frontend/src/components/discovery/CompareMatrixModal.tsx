@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { formatCompactNumber } from "../../utils/number";
 import { 
   X, CheckCircle2, TrendingUp, Users, Star, MapPin, Briefcase, Award, Zap, ShieldCheck 
 } from "lucide-react";
@@ -28,7 +29,7 @@ export default function CompareMatrixModal({ isOpen, onClose, promoters }: Compa
       label: "Audience Size",
       icon: Users,
       getValue: (p: any) => p.followers_count || 0,
-      format: (val: number) => val.toLocaleString(),
+      format: (val: number) => formatCompactNumber(val),
       isBetter: (a: number, b: number) => a > b,
       insight: "Higher reach for brand awareness.",
     },

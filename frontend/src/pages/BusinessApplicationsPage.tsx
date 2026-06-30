@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCampaignApplications, useAcceptApplication, useRejectApplication } from "../features/collaboration/api";
+import { formatCompactNumber } from "../utils/number";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
@@ -125,7 +126,7 @@ export default function BusinessApplicationsPage() {
           </span>
           <span className="inline-flex items-center gap-1 text-xs text-ash">
             <Users size={10} className="text-fog" />
-            {app.promoter_followers_count?.toLocaleString()} followers
+            {formatCompactNumber(app.promoter_followers_count)} followers
           </span>
           <span className="inline-flex items-center gap-1 text-xs text-emerald-status font-medium">
             <TrendingUp size={10} />

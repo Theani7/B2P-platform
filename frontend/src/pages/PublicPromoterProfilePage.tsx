@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
+import { formatCompactNumber } from "../utils/number";
 import { usePublicPromoterProfile, useSavePromoter } from "../features/discovery/api";
 import { useUserRating } from "../features/reviews/api";
 import RatingStars from "../components/reviews/RatingStars";
@@ -108,7 +109,7 @@ export default function PublicPromoterProfilePage() {
                 <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium">{profile.niche}</span>
               )}
               {profile.location && <span className="flex items-center gap-1.5"><MapPin size={14} className="text-gray-400" /> {profile.location}</span>}
-              <span className="flex items-center gap-1.5"><Users size={14} className="text-gray-400" /> {profile.followers_count.toLocaleString()} followers</span>
+              <span className="flex items-center gap-1.5"><Users size={14} className="text-gray-400" /> {formatCompactNumber(profile.followers_count)} followers</span>
               <span className="flex items-center gap-1.5"><TrendingUp size={14} className="text-gray-400" /> {profile.engagement_rate.toFixed(1)}% engagement rate</span>
               {profile.years_experience != null && (
                 <span className="flex items-center gap-1.5"><Briefcase size={14} className="text-gray-400" /> {profile.years_experience} year{profile.years_experience !== 1 ? "s" : ""} experience</span>

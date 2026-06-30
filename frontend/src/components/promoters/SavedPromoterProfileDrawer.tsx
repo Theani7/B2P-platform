@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { X, BadgeCheck, MapPin, Briefcase, Users, TrendingUp, Star, Image as ImageIcon, Play, UserPlus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar } from "../ui";
+import { formatCompactNumber } from "../../utils/number";
 import InvitePromoterModal from "../discovery/InvitePromoterModal";
 
 export function ProfileDrawer({ isOpen, onClose, promoter, onRemove }: any) {
@@ -70,7 +71,7 @@ export function ProfileDrawer({ isOpen, onClose, promoter, onRemove }: any) {
             <div className="grid grid-cols-3 gap-3">
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
                 <Users size={16} className="text-gray-400 mb-1" />
-                <span className="text-lg font-bold text-gray-900">{(promoter.followers_count || 0).toLocaleString()}</span>
+                <span className="text-lg font-bold text-gray-900">{formatCompactNumber(promoter.followers_count)}</span>
                 <span className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Followers</span>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center text-center">
