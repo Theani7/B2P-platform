@@ -19,6 +19,7 @@ export interface TokenResponse {
 
 export interface User {
   id: string;
+  username: string;
   full_name: string;
   email: string;
   role: "BUSINESS" | "PROMOTER" | "ADMIN";

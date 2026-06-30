@@ -62,7 +62,7 @@ export default function PublicPromoterProfilePage() {
 
       <div className="rounded-lg border bg-white p-6">
         <div className="flex items-start gap-6">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary">
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-signal-blue/10 text-3xl font-bold text-signal-blue">
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
             ) : (
@@ -95,7 +95,7 @@ export default function PublicPromoterProfilePage() {
                 </button>
                 <button
                   onClick={() => setIsInviteModalOpen(true)}
-                  className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 flex items-center gap-2"
+                  className="rounded bg-signal-blue px-4 py-2 text-sm font-medium text-white hover:bg-signal-blue/90 flex items-center gap-2"
                 >
                   <Send size={16} />
                   Invite to Campaign

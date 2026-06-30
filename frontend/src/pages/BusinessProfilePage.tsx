@@ -5,14 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBusinessProfile, useUpsertBusinessProfile, uploadLogo } from "../features/profile";
 import { useBusinessProfileCompletion } from "../features/profile-completion";
-import { ProfileCompletionWidget } from "../components/ui";
+import { ProfileCompletionWidget, Avatar } from "../components/ui";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
-  Building2, Globe, MapPin, Briefcase, Image as ImageIcon,
-  Upload, ShieldCheck, Bell, CreditCard, Trash2, Save,
-  CheckCircle2, AlertTriangle, RefreshCw, BadgeCheck
+  Building2, Globe, MapPin, Briefcase,
+  Upload, Save, AlertTriangle, RefreshCw, BadgeCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -26,26 +25,22 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const NAV_ITEMS = [
-  { id: "general", label: "Company Information", icon: Building2 },
-  { id: "online", label: "Online Presence", icon: Globe },
-  { id: "about", label: "Description", icon: Briefcase },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "security", label: "Security", icon: ShieldCheck },
-  { id: "billing", label: "Billing", icon: CreditCard },
-  { id: "danger", label: "Danger Zone", icon: Trash2 },
-];
-
 export default function BusinessProfilePage() {
   const qc = useQueryClient();
   const { data: profile, isLoading: profileLoading } = useBusinessProfile();
-  const [activeTab, setActiveTab] = useState("general");
   const [logoUploading, setLogoUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, reset, getValues, formState: { errors, isDirty, isSubmitting } } = useForm<FormValues>({
+  const { data: completionData, isLoading: completionLoading } = useBusinessProfileCompletion();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: {
+    defaultValues: profile || {
       company_name: "",
       industry: "",
       description: "",
@@ -54,69 +49,68 @@ export default function BusinessProfilePage() {
     },
   });
 
+  // Keep form in sync when profile loads
   useEffect(() => {
     if (profile) {
-      reset({
-        company_name: profile.company_name || "",
-        industry: profile.industry || "",
-        description: profile.description || "",
-        location: profile.location || "",
-        website: profile.website || "",
-      });
+      reset(profile);
     }
   }, [profile, reset]);
 
-  const upsertProfile = useUpsertBusinessProfile();
-  const methods = { register, handleSubmit, reset, getValues, formState: { errors, isDirty, isSubmitting } };
-  const { markClean } = useUnsavedChanges(methods as any);
+  useUnsavedChanges(isDirty);
 
-  const handleLogoUpload = async (file: File) => {
-    if (!file) return;
-    setLogoUploading(true);
+  const upsertProfile = useUpsertBusinessProfile();
+
+  const onSubmit = async (data: FormValues) => {
     try {
-      const url = await uploadLogo(file);
-      const currentValues = getValues();
-      upsertProfile.mutate(
-        { ...currentValues, logo_url: url },
-        {
-          onSuccess: () => {
-            notifySuccess("Logo uploaded successfully.");
-            qc.invalidateQueries({ queryKey: ["business-profile"] });
-          },
-          onError: () => notifyError("Failed to update logo."),
-        }
-      );
-    } catch {
-      notifyError("Failed to upload logo.");
-    } finally {
-      setLogoUploading(false);
+      await upsertProfile.mutateAsync(data);
+      notifySuccess("Profile updated successfully");
+      reset(data);
+      qc.invalidateQueries({ queryKey: ["business-profile-completion"] });
+    } catch (err: any) {
+      notifyError(err.message || "Failed to update profile");
     }
   };
 
-  const onLogoClick = () => fileInputRef.current?.click();
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onCameraClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) handleLogoUpload(file);
-  };
-  const { data: completionData, isLoading: completionLoading } = useBusinessProfileCompletion();
+    if (!file) return;
 
-  const onSubmit = (data: FormValues) => {
-    upsertProfile.mutate(data, {
-      onSuccess: () => {
-        markClean();
-        notifySuccess("Profile saved successfully.");
-        qc.invalidateQueries({ queryKey: ["business-profile"] });
-        reset(data);
-      },
-      onError: () => notifyError("Failed to save profile."),
-    });
+    if (!file.type.startsWith("image/")) {
+      notifyError("Please select an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      notifyError("Image size should be less than 5MB");
+      return;
+    }
+
+    try {
+      setLogoUploading(true);
+      await uploadLogo(file);
+      await qc.invalidateQueries({ queryKey: ["business-profile"] });
+      await qc.invalidateQueries({ queryKey: ["business-profile-completion"] });
+      notifySuccess("Logo updated successfully");
+    } catch (err: any) {
+      notifyError(err.message || "Failed to upload logo");
+    } finally {
+      setLogoUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   };
 
-  if (profileLoading) return (
-    <div className="flex h-[60vh] items-center justify-center">
-      <LoadingSpinner />
-    </div>
-  );
+  if (profileLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-32">
@@ -125,173 +119,171 @@ export default function BusinessProfilePage() {
           <h1 className="text-heading-lg text-midnight-ink">Business Profile</h1>
           <p className="text-body text-steel mt-2">Manage your company information and public presence.</p>
         </div>
-        <div className="flex flex-col items-end gap-2 w-full md:w-72">
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-button text-signal-blue font-semibold text-sm">
+            <span>{completionData?.percentage || 0}% Complete</span>
+          </div>
+          <button
+            onClick={handleSubmit(onSubmit)}
+            disabled={!isDirty || isSubmitting}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-button text-sm font-medium transition-all shadow-feature-section ${
+              isDirty && !isSubmitting
+                ? "hero-blue-fade text-white hover:opacity-90 hover:scale-[1.02]"
+                : "bg-slate-custom/5 text-steel cursor-not-allowed"
+            }`}
+          >
+            {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
+            {isSubmitting ? "Saving..." : "Save Changes"}
+          </button>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-        <div className="flex-1 text-center md:text-left z-10">
-          <div className="flex items-center justify-center md:justify-start gap-2">
-            <h2 className="text-heading text-graphite">{profile?.company_name || "Your Company"}</h2>
-            <div className="w-5 h-5 rounded-full bg-emerald-status flex items-center justify-center" title="Verified Business">
-              <BadgeCheck size={12} className="text-white" />
-            </div>
+      <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card flex flex-col relative overflow-hidden">
+        <div className="h-32 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
+          <div className="absolute inset-0 bg-black/5 mix-blend-overlay"></div>
+        </div>
+        <div className="px-8 pb-6 pt-0 flex flex-col sm:flex-row items-center sm:items-end gap-6 relative z-10 -mt-12">
+          <div className="relative">
+            {logoUploading ? (
+              <div className="w-24 h-24 rounded-full bg-sky-wash border-4 border-white flex items-center justify-center shadow-product-card">
+                <div className="w-6 h-6 border-2 border-signal-blue border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <div className="w-24 h-24 rounded-full border-4 border-white bg-white shadow-product-card flex items-center justify-center overflow-hidden">
+                <Avatar initials={profile?.company_name?.[0] || 'C'} src={profile?.logo_url} size="lg" colorIndex={0} />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={onCameraClick}
+              className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-slate-custom/10 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-product-card-sm"
+            >
+              <Upload size={14} />
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
           </div>
-          <p className="text-sm font-medium text-signal-blue mt-1">{profile?.industry || "Industry not set"}</p>
+          <div className="flex-1 text-center sm:text-left pt-2 sm:pt-0 pb-2">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
+              <h2 className="text-heading-lg text-graphite">{profile?.company_name || "Your Company"}</h2>
+              <div className="w-5 h-5 rounded-full bg-emerald-status flex items-center justify-center shadow-product-card-sm" title="Verified Business">
+                <BadgeCheck size={12} className="text-white" />
+              </div>
+            </div>
+            <p className="text-sm font-medium text-ash mt-1">{profile?.industry || "Industry not set"}</p>
+          </div>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="lg:w-72 flex-shrink-0">
-          <div className="sticky top-8 bg-white border border-slate-custom/10 rounded-cards shadow-product-card p-3">
-            <nav className="space-y-1">
-              {NAV_ITEMS.map((item) => {
-                const isActive = activeTab === item.id;
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-button text-sm font-medium transition-all ${
-                      isActive
-                        ? item.id === 'danger' ? "bg-coral-alert/10 text-coral-alert" : "bg-sky-wash text-signal-blue"
-                        : "text-graphite hover:bg-sky-wash hover:text-signal-blue"
-                    }`}
-                  >
-                    <Icon size={18} className={isActive ? (item.id === 'danger' ? "text-coral-alert" : "text-signal-blue") : "text-ash"} />
-                    {item.label}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-
-          <div className="mt-6">
-            <ProfileCompletionWidget data={completionData} isLoading={completionLoading} />
-          </div>
-        </div>
-
-        <div className="flex-1">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {activeTab === 'general' && (
-              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
-                  <h2 className="text-heading text-graphite">Company Information</h2>
-                  <p className="text-sm text-ash mt-1">Basic details about your business.</p>
-                </div>
-                <div className="p-6 space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-graphite">Company Name</label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                          <Building2 size={18} className="text-ash" />
-                        </div>
-                        <input
-                          {...register("company_name")}
-                          className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
-                          placeholder="Acme Inc."
-                        />
-                      </div>
-                      {errors.company_name && <p className="text-xs text-coral-alert">{errors.company_name.message}</p>}
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-graphite">Industry</label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                          <Briefcase size={18} className="text-ash" />
-                        </div>
-                        <input
-                          {...register("industry")}
-                          className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
-                          placeholder="Technology, Fashion..."
-                        />
-                      </div>
-                      {errors.industry && <p className="text-xs text-coral-alert">{errors.industry.message}</p>}
-                    </div>
-                  </div>
-
+        <div className="flex-1 min-w-0 space-y-8">
+          <form id="profile-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+                <h2 className="text-heading text-graphite">Company Information</h2>
+                <p className="text-sm text-ash mt-1">Basic details about your business.</p>
+              </div>
+              <div className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-graphite">Headquarters Location</label>
+                    <label className="text-sm font-medium text-graphite">Company Name</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <MapPin size={18} className="text-ash" />
+                        <Building2 size={18} className="text-ash" />
                       </div>
                       <input
-                        {...register("location")}
+                        {...register("company_name")}
                         className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
-                        placeholder="San Francisco, CA"
+                        placeholder="Acme Inc."
                       />
                     </div>
+                    {errors.company_name && <p className="text-xs text-coral-alert">{errors.company_name.message}</p>}
                   </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'online' && (
-              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
-                  <h2 className="text-heading text-graphite">Online Presence</h2>
-                  <p className="text-sm text-ash mt-1">Links to your website and social profiles.</p>
-                </div>
-                <div className="p-6 space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-graphite">Company Website</label>
+                    <label className="text-sm font-medium text-graphite">Industry</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Globe size={18} className="text-ash" />
+                        <Briefcase size={18} className="text-ash" />
                       </div>
                       <input
-                        {...register("website")}
-                        type="url"
+                        {...register("industry")}
                         className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
-                        placeholder="https://acme.com"
+                        placeholder="Technology, Fashion..."
                       />
                     </div>
-                    {errors.website && <p className="text-xs text-coral-alert">{errors.website.message}</p>}
+                    {errors.industry && <p className="text-xs text-coral-alert">{errors.industry.message}</p>}
                   </div>
                 </div>
-              </div>
-            )}
 
-            {activeTab === 'about' && (
-              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
-                  <h2 className="text-heading text-graphite">About Company</h2>
-                  <p className="text-sm text-ash mt-1">Tell promoters what your brand is all about.</p>
-                </div>
-                <div className="p-6 space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <label className="text-sm font-medium text-graphite">Company Description</label>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-graphite">Headquarters Location</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                      <MapPin size={18} className="text-ash" />
                     </div>
-                    <textarea
-                      {...register("description")}
-                      rows={6}
-                      className="w-full p-4 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm leading-relaxed resize-none"
-                      placeholder="Describe your company mission, values, and what kind of influencers you're looking to partner with."
+                    <input
+                      {...register("location")}
+                      className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
+                      placeholder="San Francisco, CA"
                     />
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
-            {['notifications', 'security', 'billing', 'danger'].includes(activeTab) && (
-              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden flex flex-col items-center justify-center p-16 text-center">
-                <div className="w-16 h-16 bg-sky-wash rounded-full flex items-center justify-center text-signal-blue mb-4 border border-slate-custom/10">
-                  {activeTab === 'notifications' && <Bell size={32} />}
-                  {activeTab === 'security' && <ShieldCheck size={32} />}
-                  {activeTab === 'billing' && <CreditCard size={32} />}
-                  {activeTab === 'danger' && <Trash2 size={32} />}
-                </div>
-                <h2 className="text-heading text-graphite mb-2 capitalize">{activeTab === 'danger' ? 'Danger Zone' : activeTab} settings</h2>
-                <p className="text-sm text-ash max-w-sm">
-                  This feature is currently under development. We're working hard to bring it to you soon!
-                </p>
+            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+                <h2 className="text-heading text-graphite">Online Presence</h2>
+                <p className="text-sm text-ash mt-1">Links to your website and social profiles.</p>
               </div>
-            )}
+              <div className="p-6 space-y-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-graphite">Company Website</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                      <Globe size={18} className="text-ash" />
+                    </div>
+                    <input
+                      {...register("website")}
+                      type="url"
+                      className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
+                      placeholder="https://acme.com"
+                    />
+                  </div>
+                  {errors.website && <p className="text-xs text-coral-alert">{errors.website.message}</p>}
+                </div>
+              </div>
+            </div>
 
+            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+                <h2 className="text-heading text-graphite">About Company</h2>
+                <p className="text-sm text-ash mt-1">Tell promoters what your brand is all about.</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <label className="text-sm font-medium text-graphite">Company Description</label>
+                  </div>
+                  <textarea
+                    {...register("description")}
+                    rows={6}
+                    className="w-full p-4 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm leading-relaxed resize-none"
+                    placeholder="Describe your company mission, values, and what kind of influencers you're looking to partner with."
+                  />
+                </div>
+              </div>
+            </div>
           </form>
+        </div>
+        
+        <div className="lg:w-80 flex-shrink-0 space-y-6">
+          <ProfileCompletionWidget data={completionData} isLoading={completionLoading} />
         </div>
       </div>
 

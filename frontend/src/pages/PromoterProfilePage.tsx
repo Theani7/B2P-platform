@@ -13,8 +13,9 @@ import { ProfileCompletionWidget } from "../components/ui";
 import { PortfolioSettings } from "../components/portfolio/PortfolioSettings";
 import { SocialSettings } from "../components/social/SocialSettings";
 import { Avatar } from "../components/ui";
+import LoadingSpinner from "../components/LoadingSpinner";
 import {
-  BadgeCheck, Save, Eye, Trophy, AlertTriangle, MapPin, Briefcase, Camera
+  BadgeCheck, Save, Eye, Trophy, AlertTriangle, MapPin, Briefcase, Camera, Upload, RefreshCw
 } from "lucide-react";
 
 const NICHE_OPTIONS = [
@@ -35,6 +36,8 @@ const schema = z.object({
   bio: z.string().optional(),
   niche: z.enum(["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS", "OTHER"]),
   location: z.string().optional(),
+  followers_count: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").optional(),
+  engagement_rate: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").max(100, "Cannot exceed 100").optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -58,37 +61,42 @@ export default function PromoterProfilePage() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      username: profile?.username || "",
+      username: profile?.username || user?.username || "",
       headline: profile?.headline || "",
       bio: profile?.bio || "",
       niche: (profile?.niche as FormValues["niche"]) || "OTHER",
       location: profile?.location || "",
+      followers_count: profile?.followers_count || 0,
+      engagement_rate: profile?.engagement_rate || 0,
     },
   });
 
   const methods = { register, handleSubmit, control, formState: { isDirty, isSubmitting, errors }, reset, getValues };
-  const { markClean } = useUnsavedChanges(methods as any);
+  useUnsavedChanges(isDirty);
 
   const headline = useWatch({ control, name: "headline" });
   const niche = useWatch({ control, name: "niche" });
   const location = useWatch({ control, name: "location" });
+  const followersCount = useWatch({ control, name: "followers_count" });
+  const engagementRate = useWatch({ control, name: "engagement_rate" });
 
   useEffect(() => {
     if (profile) {
       reset({
-        username: profile.username || "",
+        username: profile.username || user?.username || "",
         headline: profile.headline || "",
         bio: profile.bio || "",
         niche: (profile.niche as FormValues["niche"]) || "OTHER",
         location: profile.location || "",
+        followers_count: profile.followers_count || 0,
+        engagement_rate: profile.engagement_rate || 0,
       });
     }
-  }, [profile, reset]);
+  }, [profile, reset, user]);
 
   const onSubmit = (data: FormValues) => {
     updateProfile.mutate(data, {
       onSuccess: () => {
-        markClean();
         notifySuccess("Profile saved successfully");
         reset(data);
       },
@@ -103,10 +111,14 @@ export default function PromoterProfilePage() {
       const url = await uploadAvatarMutation.mutateAsync(file);
       const currentValues = getValues();
       await updateProfile.mutateAsync({ ...currentValues, avatar_url: url });
+      notifySuccess("Avatar updated successfully");
     } catch {
-      // error handled by mutation
+      notifyError("Failed to upload avatar");
     } finally {
       setAvatarUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -118,9 +130,18 @@ export default function PromoterProfilePage() {
 
   const isComplete = completionData?.percentage === 100;
 
+  if (isLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-32">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-custom/10">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-heading-lg text-midnight-ink">Promoter Profile</h1>
           <p className="text-body text-steel mt-2">Manage your public profile and improve your discoverability.</p>
@@ -132,11 +153,14 @@ export default function PromoterProfilePage() {
           <button
             onClick={handleSubmit(onSubmit)}
             disabled={!isDirty || isSubmitting}
-className={`inline-flex items-center gap-2 h-10 px-5 rounded-button text-sm font-medium transition-colors ${
-               isDirty && !isSubmitting ? "hero-blue-fade text-white hover:opacity-90" : "bg-slate-custom/10 text-steel cursor-not-allowed"
-             }`}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-button text-sm font-medium transition-all shadow-feature-section ${
+              isDirty && !isSubmitting
+                ? "hero-blue-fade text-white hover:opacity-90 hover:scale-[1.02]"
+                : "bg-slate-custom/5 text-steel cursor-not-allowed"
+            }`}
           >
-            <Save size={16} /> {isSubmitting ? "Saving..." : "Save Changes"}
+            {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>
@@ -155,149 +179,172 @@ className={`inline-flex items-center gap-2 h-10 px-5 rounded-button text-sm font
         </div>
       )}
 
+      {/* Hero Profile Banner */}
+      <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card flex flex-col relative overflow-hidden">
+        <div className="h-32 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
+          <div className="absolute inset-0 bg-black/5 mix-blend-overlay"></div>
+          {profile?.verified && (
+            <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-button flex items-center gap-1.5 text-xs font-semibold text-white shadow-product-card-sm">
+              <BadgeCheck size={16} /> Verified Creator
+            </div>
+          )}
+        </div>
+        <div className="px-8 pb-6 pt-0 flex flex-col sm:flex-row items-center sm:items-end gap-6 relative z-10 -mt-12">
+          <div className="relative">
+            {avatarUploading ? (
+              <div className="w-24 h-24 rounded-full bg-sky-wash border-4 border-white flex items-center justify-center shadow-product-card">
+                <div className="w-6 h-6 border-2 border-signal-blue border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <div className="w-24 h-24 rounded-full border-4 border-white bg-white shadow-product-card flex items-center justify-center overflow-hidden">
+                <Avatar initials={user?.full_name?.[0] || 'U'} src={profile?.avatar_url} size="lg" colorIndex={1} />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={onCameraClick}
+              disabled={avatarUploading}
+              className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-slate-custom/10 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-product-card-sm disabled:opacity-50"
+            >
+              <Upload size={14} />
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={onFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+          </div>
+          <div className="flex-1 text-center sm:text-left pt-2 sm:pt-0 pb-2">
+            <h2 className="text-heading-lg text-graphite">{user?.full_name || 'Creator Name'}</h2>
+            <p className="text-sm font-medium text-signal-blue mt-1">{headline || 'Your awesome headline'}</p>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3 text-xs font-medium text-ash">
+              {niche && (
+                <span className="inline-flex items-center gap-1.5 bg-sky-wash text-signal-blue px-2.5 py-1 rounded-button">
+                  <Briefcase size={12} /> {NICHE_OPTIONS.find(o => o.value === niche)?.label || niche}
+                </span>
+              )}
+              {location && (
+                <span className="flex items-center gap-1.5 bg-slate-custom/5 text-graphite px-2.5 py-1 rounded-button border border-slate-custom/10">
+                  <MapPin size={12} /> {location}
+                </span>
+              )}
+              <span className="flex items-center gap-1.5 ml-2">
+                <strong className="text-graphite">{followersCount ? (followersCount / 1000).toFixed(1) + 'k' : '0'}</strong> Followers
+              </span>
+              <span className="text-slate-custom/30">•</span>
+              <span className="flex items-center gap-1.5">
+                <strong className="text-graphite">{engagementRate ? engagementRate + '%' : '0%'}</strong> Engagement
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Layout */}
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1 min-w-0 space-y-8">
           <form id="profile-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card p-6">
-              <h3 className="text-heading text-graphite mb-6">General Information</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-graphite">First Name</label>
-                  <input type="text" disabled className="w-full h-11 px-4 rounded-inputs border border-slate-custom/10 bg-linen-canvas text-steel text-sm" value={user?.full_name?.split(' ')[0] || ""} />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-graphite">Last Name</label>
-                  <input type="text" disabled className="w-full h-11 px-4 rounded-inputs border border-slate-custom/10 bg-linen-canvas text-steel text-sm" value={user?.full_name?.split(' ')[1] || ""} />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-graphite">Username <span className="text-coral-alert">*</span></label>
-                  <input type="text" {...register("username")} className={`w-full h-11 px-4 rounded-inputs border ${errors.username ? 'border-coral-alert' : 'border-slate-custom/20'} focus:ring-[3px] focus:ring-signal-blue/10 text-sm`} />
-                  {errors.username && <p className="text-xs text-coral-alert">{errors.username.message}</p>}
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <label className="text-sm font-medium text-graphite">Creator Headline</label>
-                  <input type="text" {...register("headline")} placeholder="e.g. Food & Travel Creator" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <label className="text-sm font-medium text-graphite">Bio</label>
-                  <textarea {...register("bio")} rows={4} placeholder="Tell brands about yourself..." className="w-full p-4 rounded-inputs border border-slate-custom/20 focus:ring-[3px] focus:ring-signal-blue/10 text-sm resize-none"></textarea>
+            {/* General Info */}
+            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+                <h3 className="text-heading text-graphite">General Information</h3>
+                <p className="text-sm text-ash mt-1">Basic details about you and your brand.</p>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-graphite">First Name</label>
+                    <input type="text" disabled className="w-full h-11 px-4 rounded-inputs border border-slate-custom/10 bg-slate-custom/5 text-steel text-sm cursor-not-allowed" value={user?.full_name?.split(' ')[0] || ""} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-graphite">Last Name</label>
+                    <input type="text" disabled className="w-full h-11 px-4 rounded-inputs border border-slate-custom/10 bg-slate-custom/5 text-steel text-sm cursor-not-allowed" value={user?.full_name?.split(' ')[1] || ""} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-graphite">Username <span className="text-coral-alert">*</span></label>
+                    <input type="text" {...register("username")} className={`w-full h-11 px-4 rounded-inputs border ${errors.username ? 'border-coral-alert focus:ring-coral-alert/10' : 'border-slate-custom/20 focus:border-signal-blue focus:ring-signal-blue/10'} focus:outline-none focus:ring-[3px] text-sm`} />
+                    {errors.username && <p className="text-xs text-coral-alert">{errors.username.message}</p>}
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <label className="text-sm font-medium text-graphite">Creator Headline</label>
+                    <input type="text" {...register("headline")} placeholder="e.g. Food & Travel Creator" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <label className="text-sm font-medium text-graphite">Bio</label>
+                    <textarea {...register("bio")} rows={4} placeholder="Tell brands about yourself..." className="w-full p-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm resize-none"></textarea>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card p-6">
-              <h3 className="text-heading text-graphite mb-6">Creator Details</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-graphite">Primary Niche <span className="text-coral-alert">*</span></label>
-                  <select {...register("niche")} className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:ring-[3px] focus:ring-signal-blue/10 text-sm bg-white">
-                    {NICHE_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-graphite">Location</label>
-                  <input type="text" {...register("location")} placeholder="e.g. Kathmandu" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
+            {/* Creator Details */}
+            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+                <h3 className="text-heading text-graphite">Creator Details</h3>
+                <p className="text-sm text-ash mt-1">Provide metrics and data for potential brand partners.</p>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-graphite">Primary Niche <span className="text-coral-alert">*</span></label>
+                    <select {...register("niche")} className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm bg-white">
+                      {NICHE_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-graphite">Location</label>
+                    <input type="text" {...register("location")} placeholder="e.g. Kathmandu" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-graphite">Total Followers</label>
+                    <input type="number" {...register("followers_count", { valueAsNumber: true })} min="0" placeholder="e.g. 15000" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
+                    {errors.followers_count && <p className="text-xs text-coral-alert">{errors.followers_count.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-graphite">Avg. Engagement Rate (%)</label>
+                    <input type="number" step="0.1" {...register("engagement_rate", { valueAsNumber: true })} min="0" max="100" placeholder="e.g. 4.5" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
+                    {errors.engagement_rate && <p className="text-xs text-coral-alert">{errors.engagement_rate.message}</p>}
+                  </div>
                 </div>
               </div>
             </div>
           </form>
 
           {user?.has_profile && (
-            <>
+            <div className="space-y-8">
               <PortfolioSettings />
               <SocialSettings />
-            </>
+            </div>
           )}
         </div>
 
-        <div className="w-full lg:w-96 flex-shrink-0">
-          <div className="sticky top-24 space-y-6">
-            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
-              <div className="h-24 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
-                {profile?.verified && (
-                  <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-button flex items-center gap-1 text-xs font-medium text-white">
-                    <BadgeCheck size={14} /> Verified
-                  </div>
-                )}
-              </div>
-              <div className="p-6 pt-0 flex flex-col items-center text-center -mt-12 relative z-10">
-                <div className="relative mb-3">
-                  {avatarUploading ? (
-                    <div className="w-20 h-20 rounded-full bg-sky-wash border-2 border-dashed border-slate-custom/20 flex items-center justify-center">
-                      <div className="w-6 h-6 border-2 border-signal-blue border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  ) : (
-                    <div className="w-20 h-20 rounded-full border-4 border-white bg-white shadow-product-card flex items-center justify-center overflow-hidden">
-                      <Avatar initials={user?.full_name?.[0] || 'U'} src={profile?.avatar_url} size="lg" colorIndex={1} />
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={onCameraClick}
-                    disabled={avatarUploading}
-                    className="absolute bottom-0 right-0 w-7 h-7 bg-white rounded-full flex items-center justify-center border border-slate-custom/20 hover:bg-sky-wash transition-colors text-steel disabled:opacity-50"
-                  >
-                    <Camera size={14} />
-                  </button>
-                  <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
-                </div>
-                <h3 className="text-heading text-graphite">
-                  {user?.full_name || 'Creator Name'}
-                </h3>
-                <p className="text-sm font-medium text-signal-blue mt-1">
-                  {headline || 'Your awesome headline'}
-                </p>
-                <div className="flex items-center justify-center gap-3 mt-3 text-xs text-steel">
-                  {niche && (
-                    <span className="inline-flex items-center gap-1 bg-sky-wash px-2 py-1 rounded-button font-medium text-graphite">
-                      <Briefcase size={12} /> {NICHE_OPTIONS.find(o => o.value === niche)?.label || niche}
-                    </span>
-                  )}
-                  {location && (
-                    <span className="flex items-center gap-1">
-                      <MapPin size={12} /> {location}
-                    </span>
-                  )}
-                </div>
+        {/* Right Sidebar */}
+        <div className="w-full lg:w-80 flex-shrink-0 space-y-6">
+          <ProfileCompletionWidget data={completionData} isLoading={completionLoading} />
 
-                <div className="w-full grid grid-cols-2 gap-2 mt-6 pt-6 border-t border-slate-custom/10">
-                  <div className="text-center">
-                    <div className="text-heading text-graphite">{profile?.followers_count ? (profile.followers_count / 1000).toFixed(1) + 'k' : '---'}</div>
-                    <div className="text-caption text-ash font-medium uppercase tracking-wider">Followers</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-heading text-graphite">{profile?.engagement_rate ? profile.engagement_rate + '%' : '---'}</div>
-                    <div className="text-caption text-ash font-medium uppercase tracking-wider">Engagement</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
-              <ProfileCompletionWidget data={completionData} isLoading={completionLoading} />
-            </div>
-
-            <div className="bg-sky-wash/50 border border-slate-custom/10 rounded-cards p-5">
-              <h4 className="text-sm font-medium text-graphite flex items-center gap-2 mb-3">
-                <Trophy size={16} className="text-amber-tag" /> Tips for Discovery
-              </h4>
-              <ul className="space-y-2 text-sm text-ash">
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-signal-blue mt-2 shrink-0" />
-                  Add at least 3 portfolio items to increase your chances of being hired.
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-signal-blue mt-2 shrink-0" />
-                  Link your primary social accounts so brands can verify your audience.
-                </li>
-              </ul>
-            </div>
+          <div className="bg-sky-wash/50 border border-slate-custom/10 rounded-cards p-6">
+            <h4 className="text-sm font-semibold text-signal-blue flex items-center gap-2 mb-4">
+              <Trophy size={16} className="text-amber-tag" /> Tips for Discovery
+            </h4>
+            <ul className="space-y-3 text-sm text-ash font-medium">
+              <li className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-signal-blue mt-1.5 shrink-0" />
+                <span>Add at least <strong>3 portfolio items</strong> to increase your chances of being hired.</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-signal-blue mt-1.5 shrink-0" />
+                <span>Link your <strong>primary social accounts</strong> so brands can verify your audience.</span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
 
+      {/* Floating Save Bar */}
       <AnimatePresence>
         {isDirty && (
           <motion.div
@@ -308,19 +355,27 @@ className={`inline-flex items-center gap-2 h-10 px-5 rounded-button text-sm font
           >
             <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-4 shadow-feature-section flex items-center justify-between ring-1 ring-slate-custom/5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-signal-blue/10 flex items-center justify-center text-signal-blue">
-                  <Save size={20} />
+                <div className="w-10 h-10 rounded-full bg-amber-tag/10 flex items-center justify-center text-amber-tag">
+                  <AlertTriangle size={18} />
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-graphite">Unsaved changes</h4>
-                  <p className="text-xs text-ash">Please save your profile changes.</p>
+                  <p className="text-xs text-ash mt-0.5">Please save your profile changes.</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => profile && reset(profile)} className="h-10 px-4 rounded-button text-sm font-medium text-ash hover:text-graphite hover:bg-sky-wash transition-colors">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => profile && reset(profile as any)}
+                  className="h-10 px-4 rounded-button text-sm font-medium text-ash hover:text-graphite hover:bg-sky-wash transition-colors"
+                >
                   Discard
                 </button>
-                <button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} className="h-10 px-6 rounded-button hero-blue-fade text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+                <button
+                  onClick={handleSubmit(onSubmit)}
+                  disabled={isSubmitting}
+                  className="h-10 px-6 rounded-button hero-blue-fade text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>

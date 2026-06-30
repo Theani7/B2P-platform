@@ -158,7 +158,7 @@ export default function CampaignMarketplacePage() {
       setBookmarkedCampaigns(prev => {
         const backendSet = new Set<string>();
         data.items.forEach(c => {
-          if (c.is_bookmarked) backendSet.add(c.id);
+          if ((c as any).is_bookmarked) backendSet.add(c.id);
         });
         return backendSet;
       });

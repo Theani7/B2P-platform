@@ -161,7 +161,7 @@ onError: (err: any) => {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-cards-lg p-6 shadow-product-card-product-card animate-pulse flex flex-col">
+              <div key={i} className="bg-white rounded-cards-lg p-6 shadow-product-card animate-pulse flex flex-col">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-16 h-16 bg-sky-wash rounded-full" />
                   <div className="flex-1 space-y-2 mt-2">
@@ -206,7 +206,7 @@ onError: (err: any) => {
                   whileHover={{ y: -4, scale: 1.01 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   onClick={() => setDrawerPromoter(p)}
-                  className="bg-white rounded-cards-lg shadow-product-card-product-card border border-slate-custom/10 hover:shadow-product-card-product-card transition-all cursor-pointer flex flex-col group relative overflow-hidden"
+                  className="bg-white rounded-cards-lg p-6 shadow-product-card border border-slate-custom/10 hover:shadow-product-card-hover transition-all cursor-pointer flex flex-col group relative overflow-hidden"
                 >
                   <div className="flex items-start gap-4 relative z-10">
                     <div className="relative">

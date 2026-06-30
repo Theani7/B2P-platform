@@ -170,7 +170,7 @@ export default function SavedPromotersPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-cards-lg p-6 shadow-product-card-product-card animate-pulse flex flex-col">
+              <div key={i} className="bg-white rounded-cards-lg p-6 shadow-product-card animate-pulse flex flex-col">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-16 h-16 bg-sky-wash rounded-full" />
                   <div className="flex-1 space-y-2 mt-2">
@@ -188,7 +188,7 @@ export default function SavedPromotersPage() {
             ))}
           </div>
         ) : !data || data.items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-cards-lg shadow-product-card-product-card border border-slate-custom/10">
+          <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-cards-lg shadow-product-card border border-slate-custom/10">
             <div className="w-20 h-20 rounded-full bg-linen-canvas flex items-center justify-center mb-5 shadow-product-card-sm border border-slate-custom/10">
               <BookmarkX size={32} className="text-ash" />
             </div>
@@ -204,7 +204,7 @@ export default function SavedPromotersPage() {
             </Link>
           </div>
         ) : filteredPromoters.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-cards-lg shadow-product-card-product-card border border-slate-custom/10">
+          <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-cards-lg shadow-product-card border border-slate-custom/10">
             <div className="w-20 h-20 rounded-full bg-linen-canvas flex items-center justify-center mb-5 shadow-product-card-sm border border-slate-custom/10">
               <Filter size={32} className="text-ash" />
             </div>
@@ -230,7 +230,7 @@ export default function SavedPromotersPage() {
                     whileHover={{ y: -4, scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     onClick={() => setDrawerPromoter(p)}
-                    className={`bg-white rounded-cards-lg shadow-product-card-product-card border transition-all cursor-pointer flex flex-col group relative hover:z-50 ${
+                    className={`bg-white rounded-cards-lg p-6 shadow-product-card border transition-all cursor-pointer flex flex-col group relative hover:z-50 overflow-hidden ${
                       isSelected ? "border-signal-blue shadow-product-card-md bg-signal-blue/5" : "border-slate-custom/10 hover:border-signal-blue/20 shadow-product-card-sm"
                     }`}
                   >
@@ -309,7 +309,7 @@ export default function SavedPromotersPage() {
             </div>
 
             {data.pages > 0 && (
-              <div className="mt-8 flex items-center justify-between bg-white px-6 py-4 rounded-cards shadow-product-card-product-card border border-slate-custom/10">
+              <div className="mt-8 flex items-center justify-between bg-white px-6 py-4 rounded-cards shadow-product-card border border-slate-custom/10">
                 <p className="text-sm text-ash">
                   Showing <span className="font-semibold text-graphite">{(page - 1) * 12 + 1}</span> to <span className="font-semibold text-graphite">{Math.min(page * 12, data.total || page * 12)}</span> of <span className="font-semibold text-graphite">{data.total || "?"}</span> profiles
                 </p>

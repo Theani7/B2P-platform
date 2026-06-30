@@ -61,7 +61,7 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                     <Avatar initials={promoter.username?.[0]?.toUpperCase() ?? "?"} size="lg" colorIndex={promoter.id?.charCodeAt(0) || 0} />
                   )}
                   {promoter.verified && (
-                    <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center ring-4 ring-white shadow-sm">
+                    <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-signal-blue flex items-center justify-center ring-4 ring-white shadow-sm">
                       <BadgeCheck size={16} className="text-white" />
                     </div>
                   )}
@@ -79,8 +79,8 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                       <MapPin size={12} className="text-gray-500" /> {promoter.location || "Remote"}
                     </span>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
-                      <Briefcase size={12} className="text-primary-500" /> {promoter.niche || "General"}
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-wash text-signal-blue">
+                      <Briefcase size={12} className="text-signal-blue" /> {promoter.niche || "General"}
                     </span>
                   </div>
                 </div>
@@ -96,14 +96,14 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                 </button>
                 <button
                   onClick={() => onSave(promoter.id)}
-                  className={`h-10 px-4 rounded-xl border font-medium text-sm transition-colors shadow-sm ${isSaved ? 'bg-primary-50 border-primary-200 text-primary-700 hover:bg-primary-100 hover:text-primary-800' : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
+                  className={`h-10 px-4 rounded-xl border font-medium text-sm transition-colors shadow-sm ${isSaved ? 'bg-sky-wash border-signal-blue text-signal-blue hover:bg-sky-wash/80 hover:text-signal-blue' : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
                 >
                   <Bookmark size={16} className={`inline mr-2 ${isSaved ? 'fill-current' : ''}`} />
                   {isSaved ? "Saved" : "Save"}
                 </button>
                 <button
                   onClick={() => setIsInviteModalOpen(true)}
-                  className="h-10 px-5 rounded-xl bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 transition-colors shadow-sm flex items-center gap-2"
+                  className="h-10 px-5 rounded-xl bg-signal-blue text-white font-medium text-sm hover:opacity-90 transition-colors shadow-sm flex items-center gap-2"
                 >
                   <Send size={16} />
                   Invite to Campaign
@@ -146,10 +146,10 @@ export default function ProfilePreviewModal({ isOpen, onClose, promoter, onSave,
                     <div className="space-y-3">
                       {promoter.social_links?.length > 0 ? (
                         promoter.social_links.map((link: any, idx: number) => (
-                          <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors group">
+                          <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-signal-blue/20 hover:bg-sky-wash transition-colors group">
                             <div className="flex items-center gap-3">
-                              <ExternalLink size={18} className="text-gray-400 group-hover:text-primary-500" />
-                              <span className="text-sm font-medium text-gray-700 group-hover:text-primary-700 capitalize">{link.platform}</span>
+                              <ExternalLink size={18} className="text-gray-400 group-hover:text-signal-blue" />
+                              <span className="text-sm font-medium text-gray-700 group-hover:text-signal-blue capitalize">{link.platform}</span>
                             </div>
                             <span className="text-xs text-gray-500 font-medium">View Profile</span>
                           </a>
