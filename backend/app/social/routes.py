@@ -56,6 +56,16 @@ def create_social_link(
     return link
 
 
+@router.put("/reorder")
+def reorder_social_links(
+    schema: SocialLinkReorder,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    service = SocialLinkService(db)
+    result = service.reorder_links(current_user.id, schema.link_ids)
+    return result
+
 @router.put("/{link_id}", response_model=SocialLinkResponse)
 def update_social_link(
     link_id: UUID,
@@ -67,7 +77,6 @@ def update_social_link(
     link = service.update_link(current_user.id, link_id, schema)
     return link
 
-
 @router.delete("/{link_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_social_link(
     link_id: UUID,
@@ -78,14 +87,3 @@ def delete_social_link(
     service.delete_link(current_user.id, link_id)
     return None
 
-
-@router.put("/reorder")
-def reorder_social_links(
-    schema: SocialLinkReorder,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    # This route has to be before /{link_id} if it were generic, but reorder is a specific path
-    service = SocialLinkService(db)
-    result = service.reorder_links(current_user.id, schema.link_ids)
-    return result

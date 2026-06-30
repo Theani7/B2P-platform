@@ -26,6 +26,16 @@ export const createPortfolioItem = async (item: PortfolioItemCreate) => {
   return data;
 };
 
+export function useUpdatePortfolioItem() {
+  const qc = useQueryClient();
+  return useMutation<PortfolioItem, Error, { id: string; data: Partial<PortfolioItem> }>({
+    mutationFn: async ({ id, data }) => {
+      const res = await apiClient.patch(`/portfolio/${id}`, data);
+      return res.data;
+    },
+  });
+}
+
 export const updatePortfolioItem = async ({ id, data }: { id: string; data: PortfolioItemUpdate }) => {
   const response = await apiClient.patch<PortfolioItem>(`/portfolio/${id}`, data);
   return response.data;

@@ -215,7 +215,7 @@ def admin_settings(db: Session = Depends(get_db), user=Depends(get_current_user)
     return PlatformSettingListResponse(items=items)
 
 
-@router.get("/settings/seed")
+@router.post("/settings/seed")
 def admin_seed_settings(db: Session = Depends(get_db), user=Depends(get_current_user)):
     seed_default_settings(db)
     return {"success": True, "message": "Default settings seeded"}

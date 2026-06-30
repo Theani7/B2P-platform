@@ -11,6 +11,8 @@ const BusinessDashboard = lazy(() => import("./pages/BusinessDashboard"));
 const PromoterDashboard = lazy(() => import("./pages/PromoterDashboard"));
 const Login = lazy(() => import("./pages/LoginPage"));
 const Register = lazy(() => import("./pages/RegisterPage"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPassword = lazy(() => import("./pages/ResetPasswordPage"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 const PromoterProfilePage = lazy(() => import("./pages/PromoterProfilePage"));
 const PublicPromoterProfilePage = lazy(() => import("./pages/PublicPromoterProfilePage"));
@@ -116,8 +118,24 @@ export default function AppRoutes() {
        <Route path="/users/:userId/reviews" element={<ProtectedRoute><UserReviewsPage /></ProtectedRoute>} />
        <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+      <Route
+        path="/forgot-password"
+        element={
+          <GuestRoute>
+            <ForgotPassword />
+          </GuestRoute>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <GuestRoute>
+            <ResetPassword />
+          </GuestRoute>
+        }
+      />
       
-      {/* Admin Routes */}
+      {/* Protected Layout */}
       <Route path="/admin/dashboard" element={<ProtectedRoute role={Role.ADMIN}><AdminDashboardPage /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute role={Role.ADMIN}><UserManagementPage /></ProtectedRoute>} />
       <Route path="/admin/users/:userId" element={<ProtectedRoute role={Role.ADMIN}><UserDetailsPage /></ProtectedRoute>} />

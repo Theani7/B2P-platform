@@ -5,6 +5,7 @@ import EmptyState from "../components/EmptyState";
 import { Dialog } from "../components/ui/Dialog";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
+import { Filter, CheckCircle, XCircle, FileText, Calendar, ShieldAlert } from "lucide-react";
 
 export default function VerificationRequestsPage() {
   const [page, setPage] = useState(1);
@@ -16,22 +17,12 @@ export default function VerificationRequestsPage() {
   const [approveConfirm, setApproveConfirm] = useState<string | null>(null);
   const [rejectDialog, setRejectDialog] = useState<{ requestId: string; notes: string } | null>(null);
 
-  if (isLoading) return <LoadingSpinner />;
-
-  const handleApprove = (requestId: string) => {
-    setApproveConfirm(requestId);
-  };
-
   const confirmApprove = () => {
     if (!approveConfirm) return;
     approve.mutate({ requestId: approveConfirm }, {
       onSuccess: () => { notifySuccess("Verification approved"); setApproveConfirm(null); },
       onError: () => { notifyError("Failed to approve"); setApproveConfirm(null); },
     });
-  };
-
-  const handleReject = (requestId: string) => {
-    setRejectDialog({ requestId, notes: "" });
   };
 
   const confirmReject = () => {
@@ -42,67 +33,114 @@ export default function VerificationRequestsPage() {
     });
   };
 
-  const statusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      PENDING: "bg-amber-tag/10 text-amber-tag",
-      APPROVED: "bg-emerald-status/10 text-emerald-status",
-      REJECTED: "bg-coral-alert/10 text-coral-alert",
-    };
-    return <span className={`rounded-badges px-1.5 py-0.5 text-xs font-medium ${styles[status] || ""}`}>{status}</span>;
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case "PENDING": return { bg: "bg-amber-tag/10", text: "text-amber-tag", dot: "bg-amber-tag" };
+      case "APPROVED": return { bg: "bg-emerald-status/10", text: "text-emerald-status", dot: "bg-emerald-status" };
+      case "REJECTED": return { bg: "bg-coral-alert/10", text: "text-coral-alert", dot: "bg-coral-alert" };
+      default: return { bg: "bg-slate-custom/10", text: "text-graphite", dot: "bg-graphite" };
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-heading text-graphite">Verification Requests</h1>
-
-      <div className="flex gap-4">
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="rounded-inputs border border-slate-custom/10 px-3 py-2 text-sm text-graphite">
-          <option value="">All</option>
-          <option value="PENDING">Pending</option>
-          <option value="APPROVED">Approved</option>
-          <option value="REJECTED">Rejected</option>
-        </select>
+    <div className="max-w-[1200px] mx-auto space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-heading text-midnight-ink">Verification Requests</h1>
+          <p className="text-body text-ash mt-1">Review and process promoter KYC and identity verifications.</p>
+        </div>
       </div>
 
-      {!data || data.items.length === 0 ? (
-        <EmptyState title="No requests" description="No verification requests found." />
+      <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card p-4 flex flex-col md:flex-row gap-4">
+        <div className="relative w-full md:w-64">
+          <Filter size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-fog" />
+          <select
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+            className="w-full rounded-inputs border border-slate-custom/10 pl-10 pr-8 py-2.5 text-body text-graphite appearance-none focus:outline-none focus:border-signal-blue/50 focus:ring-1 focus:ring-signal-blue/50 bg-white"
+          >
+            <option value="">All Statuses</option>
+            <option value="PENDING">Pending Review</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : !data || data.items.length === 0 ? (
+        <EmptyState title="No verification requests" description="There are currently no requests matching your criteria." />
       ) : (
-        <div className="space-y-4">
-          {data.items.map((req) => (
-            <div key={req.id} className="rounded-cards border border-slate-custom/10 bg-white p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-graphite">{req.promoter_username}</h3>
-                  {req.promoter_headline && <p className="text-sm text-ash mt-1">{req.promoter_headline}</p>}
-                  <p className="mt-2 text-xs text-fog">Submitted {new Date(req.submitted_at).toLocaleDateString()}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {data.items.map((req) => {
+            const statusStyle = getStatusStyle(req.status);
+            return (
+              <div key={req.id} className="bg-white border border-slate-custom/10 border-t border-t-signal-blue rounded-cards shadow-product-card p-5 flex flex-col h-full hover:border-signal-blue/30 transition-all">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-cards bg-sky-wash flex items-center justify-center text-signal-blue font-bold">
+                      {req.promoter_username.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="text-body font-bold text-graphite">{req.promoter_username}</h3>
+                      <p className="text-caption text-ash flex items-center gap-1 mt-0.5">
+                        <Calendar size={12} />
+                        {new Date(req.submitted_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center gap-1.5 rounded-badges ${statusStyle.bg} px-2 py-1 text-caption font-medium ${statusStyle.text} uppercase tracking-wide`}>
+                    <span className={`w-1.5 h-1.5 rounded-pill ${statusStyle.dot}`}></span>
+                    {req.status}
+                  </span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  {statusBadge(req.status)}
+                
+                <div className="flex-1 bg-linen-canvas rounded-cards p-3 border border-slate-custom/10 mb-5">
+                  <div className="flex items-center gap-2 mb-1.5 text-caption font-medium text-graphite uppercase tracking-wide">
+                    <FileText size={14} className="text-ash" />
+                    Applicant Details
+                  </div>
+                  {req.promoter_headline ? (
+                    <p className="text-body text-ash">{req.promoter_headline}</p>
+                  ) : (
+                    <p className="text-body text-fog italic">No headline provided.</p>
+                  )}
+                  {req.admin_notes && (
+                    <div className="mt-3 pt-3 border-t border-slate-custom/10">
+                      <p className="text-caption font-medium text-graphite uppercase tracking-wide mb-1">Admin Notes</p>
+                      <p className="text-body text-coral-alert">{req.admin_notes}</p>
+                    </div>
+                  )}
                 </div>
+
+                {req.status === "PENDING" && (
+                  <div className="flex items-center gap-3 mt-auto pt-4 border-t border-slate-custom/10">
+                    <button 
+                      onClick={() => setApproveConfirm(req.id)} 
+                      className="flex-1 flex items-center justify-center gap-2 rounded-buttons bg-emerald-status/10 border border-emerald-status/20 text-emerald-status px-3 py-2 text-body font-medium hover:bg-emerald-status/20 transition-colors"
+                    >
+                      <CheckCircle size={16} /> Approve
+                    </button>
+                    <button 
+                      onClick={() => setRejectDialog({ requestId: req.id, notes: "" })} 
+                      className="flex-1 flex items-center justify-center gap-2 rounded-buttons bg-coral-alert/10 border border-coral-alert/20 text-coral-alert px-3 py-2 text-body font-medium hover:bg-coral-alert/20 transition-colors"
+                    >
+                      <XCircle size={16} /> Reject
+                    </button>
+                  </div>
+                )}
               </div>
-              {req.status === "PENDING" && (
-                <div className="mt-4 flex space-x-3">
-                  <button onClick={() => handleApprove(req.id)} className="rounded-inputs bg-emerald-status/10 border border-emerald-status text-emerald-status px-3 py-1.5 text-xs font-medium hover:bg-emerald-status/20 transition-colors">
-                    Approve
-                  </button>
-                  <button onClick={() => handleReject(req.id)} className="rounded-inputs bg-coral-alert/10 border border-coral-alert text-coral-alert px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors">
-                    Reject
-                  </button>
-                </div>
-              )}
-              {req.admin_notes && (
-                <p className="mt-3 text-sm text-graphite italic">Note: {req.admin_notes}</p>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {data && data.pages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-6">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-inputs border border-slate-custom/10 bg-white px-3 py-1.5 text-sm text-graphite hover:bg-sky-wash disabled:opacity-50 transition-colors">Previous</button>
-          <span className="text-sm text-ash">Page {data.page} of {data.pages}</span>
-          <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded-inputs border border-slate-custom/10 bg-white px-3 py-1.5 text-sm text-graphite hover:bg-sky-wash disabled:opacity-50 transition-colors">Next</button>
+        <div className="p-4 bg-white border border-slate-custom/10 rounded-cards flex items-center justify-between shadow-product-card">
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-buttons border border-slate-custom/10 bg-white px-4 py-2 text-body font-medium text-graphite hover:bg-sky-wash disabled:opacity-50 transition-colors">Previous</button>
+          <span className="text-caption text-ash uppercase tracking-wide">Page {data.page} of {data.pages}</span>
+          <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="rounded-buttons border border-slate-custom/10 bg-white px-4 py-2 text-body font-medium text-graphite hover:bg-sky-wash disabled:opacity-50 transition-colors">Next</button>
         </div>
       )}
 
@@ -111,7 +149,7 @@ export default function VerificationRequestsPage() {
         onClose={() => setApproveConfirm(null)}
         onConfirm={confirmApprove}
         title="Approve Verification"
-        message="Approve this verification request?"
+        message="Are you sure you want to approve this verification request? This will mark the promoter as verified across the platform."
       />
 
       <Dialog
@@ -120,17 +158,31 @@ export default function VerificationRequestsPage() {
         title="Reject Verification"
       >
         <div className="space-y-4">
-          <p className="text-sm text-ash">Enter a reason for rejection (optional):</p>
-          <textarea
-            value={rejectDialog?.notes ?? ""}
-            onChange={(e) => setRejectDialog((prev) => prev ? { ...prev, notes: e.target.value } : null)}
-            className="w-full rounded-inputs border border-slate-custom/10 p-3 text-sm text-graphite focus:outline-none focus:ring-signal-blue/10"
-            rows={3}
-            aria-label="Rejection notes"
-          />
-          <div className="flex justify-end gap-3 mt-4">
-            <button onClick={() => setRejectDialog(null)} className="rounded-inputs border border-slate-custom/10 bg-white px-4 py-2 text-sm font-medium text-graphite hover:bg-sky-wash">Cancel</button>
-            <button onClick={confirmReject} className="rounded-inputs bg-coral-alert/10 border border-coral-alert px-4 py-2 text-sm font-medium text-coral-alert hover:bg-coral-alert/20">Reject</button>
+          <div className="bg-coral-alert/10 border border-coral-alert/20 rounded-cards p-3">
+            <p className="text-body text-coral-alert flex items-start gap-2">
+              <ShieldAlert size={18} className="mt-0.5 shrink-0" />
+              You are about to reject this verification request. Please provide a reason to help the promoter understand what they need to fix.
+            </p>
+          </div>
+          <div>
+            <label className="block text-caption font-medium uppercase tracking-wide text-graphite mb-2">Rejection Reason (Required)</label>
+            <textarea
+              value={rejectDialog?.notes ?? ""}
+              onChange={(e) => setRejectDialog((prev) => prev ? { ...prev, notes: e.target.value } : null)}
+              className="w-full rounded-inputs border border-slate-custom/10 p-3 text-body text-graphite focus:outline-none focus:border-coral-alert/50 focus:ring-1 focus:ring-coral-alert/50"
+              rows={3}
+              placeholder="e.g., Identity document is blurry..."
+            />
+          </div>
+          <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-slate-custom/10">
+            <button onClick={() => setRejectDialog(null)} className="rounded-buttons border border-slate-custom/10 bg-white px-5 py-2.5 text-body font-medium text-graphite hover:bg-sky-wash transition-colors">Cancel</button>
+            <button 
+              onClick={confirmReject} 
+              disabled={!rejectDialog?.notes?.trim()}
+              className="rounded-buttons bg-coral-alert border border-coral-alert px-5 py-2.5 text-body font-medium text-white hover:bg-coral-alert/90 disabled:opacity-50 transition-colors"
+            >
+              Confirm Rejection
+            </button>
           </div>
         </div>
       </Dialog>

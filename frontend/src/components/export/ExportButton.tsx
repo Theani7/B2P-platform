@@ -1,63 +1,167 @@
 import React, { useState } from 'react';
-import { Download, Loader2, FileSpreadsheet, FileText } from 'lucide-react';
-import { useExport } from '../../features/export';
+import { Download, FileSpreadsheet, FileText, FileDown, CheckCircle2 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface ExportButtonProps {
   module: string;
   className?: string;
   availableColumns?: string[];
+  data?: any[];
 }
 
-export const ExportButton: React.FC<ExportButtonProps> = ({ module, className = '', availableColumns = [] }) => {
+export const ExportButton: React.FC<ExportButtonProps> = ({ module, className = '', availableColumns = [], data = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [format, setFormat] = useState<'csv' | 'xlsx'>('csv');
+  const [format, setFormat] = useState<'csv' | 'pdf'>('pdf');
   const [columns, setColumns] = useState<string[]>(availableColumns);
-  const exportMutation = useExport();
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = () => {
-    exportMutation.mutate(
-      { module, format, columns: columns.length > 0 ? columns : undefined },
-      { onSuccess: () => setIsOpen(false) }
-    );
+    if (!data || data.length === 0) {
+      alert("No data available to export.");
+      return;
+    }
+
+    setIsExporting(true);
+    
+    setTimeout(() => {
+      if (format === 'csv') {
+        exportCSV();
+      } else {
+        exportPDF();
+      }
+      setIsExporting(false);
+      setIsOpen(false);
+    }, 500);
+  };
+
+  const exportCSV = () => {
+    const headers = columns.join(',');
+    const rows = data.map(item => {
+      return columns.map(col => {
+        let val = item[col];
+        if (val === null || val === undefined) return '';
+        if (typeof val === 'string') return `"${val.replace(/"/g, '""')}"`;
+        return val;
+      }).join(',');
+    });
+    
+    const csvContent = [headers, ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${module}_export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add beautiful header
+    doc.setFillColor(29, 158, 117); // Brand Teal
+    doc.rect(0, 0, 220, 30, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text("B2P Platform", 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${module.toUpperCase()} EXPORT`, 150, 20);
+
+    // Subtitle
+    doc.setTextColor(50, 50, 50);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(`My ${module.charAt(0).toUpperCase() + module.slice(1)} Report`, 14, 45);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 52);
+    doc.text(`Total Records: ${data.length}`, 14, 57);
+
+    // Prepare Table Data
+    const tableHeaders = columns.map(c => c.charAt(0).toUpperCase() + c.slice(1));
+    const tableRows = data.map(item => columns.map(col => item[col] || '-'));
+
+    // AutoTable
+    autoTable(doc, {
+      startY: 65,
+      head: [tableHeaders],
+      body: tableRows,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [127, 119, 221], // Brand Purple
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+      styles: {
+        font: 'helvetica',
+        fontSize: 9,
+        cellPadding: 4,
+        lineColor: [230, 230, 230],
+        lineWidth: 0.1,
+      },
+      alternateRowStyles: {
+        fillColor: [249, 250, 251] // slate-50
+      }
+    });
+
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for(let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 25, doc.internal.pageSize.getHeight() - 10);
+    }
+
+    doc.save(`${module}_report.pdf`);
   };
 
   if (!isOpen) {
     return (
       <button 
         onClick={() => setIsOpen(true)}
-        className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-sm ${className}`}
+        className={`flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-slate-custom/10 rounded-inputs hover:bg-sky-wash hover:text-signal-blue focus:outline-none transition-colors shadow-sm ${className}`}
       >
         <Download size={16} />
-        Export
+        Export Data
       </button>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h3 className="text-lg font-semibold text-gray-900">Export Data: {module.charAt(0).toUpperCase() + module.slice(1)}</h3>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+          <h3 className="text-lg font-bold text-graphite">Export {module.charAt(0).toUpperCase() + module.slice(1)}</h3>
         </div>
         
-        <div className="p-6 space-y-5">
+        <div className="p-6 space-y-6">
           {/* Format Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Format</label>
+            <label className="block text-xs font-bold text-fog uppercase tracking-wider mb-3">Format</label>
             <div className="grid grid-cols-2 gap-3">
               <div 
-                className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-colors ${format === 'csv' ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-200 hover:border-gray-300 text-gray-600'}`}
-                onClick={() => setFormat('csv')}
+                className={`relative flex flex-col items-center justify-center p-5 rounded-xl border-2 cursor-pointer transition-all ${format === 'pdf' ? 'border-signal-blue bg-signal-blue/5 text-signal-blue shadow-sm' : 'border-gray-100 hover:border-gray-200 text-ash hover:text-graphite'}`}
+                onClick={() => setFormat('pdf')}
               >
-                <FileText size={24} className="mb-2" />
-                <span className="font-semibold text-sm">CSV</span>
+                {format === 'pdf' && <CheckCircle2 size={16} className="absolute top-3 right-3 text-signal-blue" />}
+                <FileDown size={28} className="mb-2" />
+                <span className="font-bold text-sm">PDF Report</span>
               </div>
               <div 
-                className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-colors opacity-50 ${format === 'xlsx' ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-400'}`}
-                title="Excel export coming soon"
+                className={`relative flex flex-col items-center justify-center p-5 rounded-xl border-2 cursor-pointer transition-all ${format === 'csv' ? 'border-signal-blue bg-signal-blue/5 text-signal-blue shadow-sm' : 'border-gray-100 hover:border-gray-200 text-ash hover:text-graphite'}`}
+                onClick={() => setFormat('csv')}
               >
-                <FileSpreadsheet size={24} className="mb-2" />
-                <span className="font-semibold text-sm">Excel (XLSX)</span>
+                {format === 'csv' && <CheckCircle2 size={16} className="absolute top-3 right-3 text-signal-blue" />}
+                <FileText size={28} className="mb-2" />
+                <span className="font-bold text-sm">CSV Data</span>
               </div>
             </div>
           </div>
@@ -65,13 +169,13 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ module, className = 
           {/* Columns Selection */}
           {availableColumns.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
-                <span>Columns</span>
-                <button onClick={() => setColumns(availableColumns)} className="text-xs text-primary-600 hover:text-primary-700">Select All</button>
-              </label>
-              <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-md p-3 space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center mb-3">
+                <label className="block text-xs font-bold text-fog uppercase tracking-wider">Include Columns</label>
+                <button onClick={() => setColumns(availableColumns)} className="text-xs font-bold text-signal-blue hover:underline">Select All</button>
+              </div>
+              <div className="max-h-48 overflow-y-auto border border-gray-100 rounded-xl p-4 space-y-3 bg-slate-50/50">
                 {availableColumns.map(col => (
-                  <label key={col} className="flex items-center gap-2 cursor-pointer">
+                  <label key={col} className="flex items-center gap-3 cursor-pointer group">
                     <input 
                       type="checkbox" 
                       checked={columns.includes(col)}
@@ -79,9 +183,11 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ module, className = 
                         if (e.target.checked) setColumns([...columns, col]);
                         else setColumns(columns.filter(c => c !== col));
                       }}
-                      className="rounded text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 rounded text-signal-blue focus:ring-signal-blue border-gray-300 transition-colors"
                     />
-                    <span className="text-sm text-gray-700">{col}</span>
+                    <span className="text-sm font-medium text-graphite group-hover:text-signal-blue transition-colors">
+                      {col.charAt(0).toUpperCase() + col.slice(1)}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -89,20 +195,20 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ module, className = 
           )}
         </div>
         
-        <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+        <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
           <button 
             onClick={() => setIsOpen(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            className="px-5 py-2.5 text-sm font-bold text-ash bg-white border border-gray-200 rounded-inputs hover:text-graphite transition-colors"
           >
             Cancel
           </button>
           <button 
             onClick={handleExport}
-            disabled={exportMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+            disabled={isExporting}
+            className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-signal-blue rounded-inputs hover:bg-signal-blue/90 disabled:opacity-50 transition-colors shadow-sm"
           >
-            {exportMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-            Generate Export
+            {isExporting ? <span className="animate-pulse">Exporting...</span> : <Download size={16} />}
+            {isExporting ? 'Generating' : 'Generate'}
           </button>
         </div>
       </div>

@@ -7,24 +7,11 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, validator
 
-
-class NicheEnum(str, Enum):
-    LIFESTYLE = "LIFESTYLE"
-    TECH = "TECH"
-    FASHION = "FASHION"
-    FOOD = "FOOD"
-    TRAVEL = "TRAVEL"
-    FITNESS = "FITNESS"
-    GAMING = "GAMING"
-    BUSINESS = "BUSINESS"
-    OTHER = "OTHER"
-
-
 class PromoterProfileBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=150)
     headline: Optional[str] = Field(None, max_length=255)
     bio: Optional[str] = None
-    niche: NicheEnum
+    niche: str
     location: Optional[str] = Field(None, max_length=255)
     avatar_url: Optional[str] = Field(None, max_length=500)
     followers_count: int = Field(0, ge=0)
@@ -45,7 +32,7 @@ class PromoterProfileUpdate(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=150)
     headline: Optional[str] = Field(None, max_length=255)
     bio: Optional[str] = None
-    niche: Optional[NicheEnum] = None
+    niche: Optional[str] = None
     location: Optional[str] = Field(None, max_length=255)
     avatar_url: Optional[str] = Field(None, max_length=500)
     followers_count: Optional[int] = Field(None, ge=0)

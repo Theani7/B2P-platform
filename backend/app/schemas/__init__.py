@@ -18,7 +18,6 @@ from .business_profile import (
     BusinessProfileRead,
 )
 from .promoter_profile import (
-    NicheEnum,
     PromoterProfileBase,
     PromoterProfileCreate,
     PromoterProfileUpdate,

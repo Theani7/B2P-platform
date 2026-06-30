@@ -34,17 +34,19 @@ export default function CreateCampaignPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader
-        title="Create Campaign"
-        description="Fill out the details below to launch a new promoter campaign"
-      />
-      <div className="bg-white border border-gray-100 rounded-xl p-5">
-        <CampaignForm
-          onSubmit={onSubmit}
-          isSubmitting={createCampaign.isPending}
-          submitLabel="Create Campaign"
+    <div className="mx-auto max-w-4xl space-y-6 pb-20">
+      <div className="bg-white border border-slate-custom/10 rounded-xl p-8 shadow-sm">
+        <PageHeader
+          title="Create Campaign"
+          description="Fill out the details below to launch a new promoter campaign"
         />
+        <div className="mt-8">
+          <CampaignForm
+            onSubmit={onSubmit}
+            isSubmitting={createCampaign.isPending}
+            submitLabel="Create Campaign"
+          />
+        </div>
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ export function useBusinessAnalytics() {
   return useQuery({
     queryKey: analyticsKeys.business(),
     queryFn: async () => {
-      const { data } = await apiClient.get<BusinessAnalyticsResponse>("/analytics/business");
+      const { data } = await apiClient.get<BusinessAnalyticsResponse>("/business/analytics");
       return data;
     },
     staleTime: 5 * 60 * 1000,

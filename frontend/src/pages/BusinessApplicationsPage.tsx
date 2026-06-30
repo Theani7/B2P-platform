@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCampaignApplications, useAcceptApplication, useRejectApplication } from "../features/collaboration/api";
+import { useCampaignMatches } from "../features/matching/api";
+import { useCampaign } from "../features/campaigns/api";
 import { formatCompactNumber } from "../utils/number";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { notifySuccess, notifyError } from "../hooks/useToast";
-import { PageHeader, Avatar, Badge } from "../components/ui";
+import { PageHeader, Avatar, Badge, Dialog } from "../components/ui";
 import { Table, TableColumn } from "../components/ui/Table";
+import MatchBreakdownCard from "../components/matching/MatchBreakdownCard";
 import {
   ArrowLeft,
   Users,
@@ -17,12 +20,18 @@ import {
   BadgeCheck,
   CheckCircle2,
   XCircle,
+  Star
 } from "lucide-react";
 
 export default function BusinessApplicationsPage() {
   const { campaignId } = useParams<{ campaignId: string }>();
   const [page, setPage] = useState(1);
+  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+
+  const { data: campaign } = useCampaign(campaignId ?? "");
   const { data, isLoading, error } = useCampaignApplications(campaignId ?? "", { page, limit: 20 });
+  const { data: matchesData } = useCampaignMatches(campaignId ?? "", { limit: 100 });
+  
   const acceptMutation = useAcceptApplication();
   const rejectMutation = useRejectApplication();
   const [rejectConfirm, setRejectConfirm] = useState<string | null>(null);
@@ -39,7 +48,10 @@ export default function BusinessApplicationsPage() {
 
   const handleAccept = (id: string) => {
     acceptMutation.mutate(id, {
-      onSuccess: () => notifySuccess("Application accepted — collaboration created!"),
+      onSuccess: () => {
+        notifySuccess("Application accepted — collaboration created!");
+        setSelectedAppId(null);
+      },
       onError: (e) => notifyError(e.message),
     });
   };
@@ -51,7 +63,11 @@ export default function BusinessApplicationsPage() {
   const confirmReject = () => {
     if (!rejectConfirm) return;
     rejectMutation.mutate(rejectConfirm, {
-      onSuccess: () => { notifySuccess("Application rejected"); setRejectConfirm(null); },
+      onSuccess: () => { 
+        notifySuccess("Application rejected"); 
+        setRejectConfirm(null); 
+        setSelectedAppId(null);
+      },
       onError: (e) => { notifyError(e.message); setRejectConfirm(null); },
     });
   };
@@ -79,6 +95,8 @@ export default function BusinessApplicationsPage() {
   }
 
   const items = data.items as any[];
+  const selectedApp = items.find(app => app.id === selectedAppId);
+  const promoterMatch = selectedApp ? matchesData?.items?.find(m => m.promoter.id === selectedApp.promoter_profile_id) : null;
 
   const columns: TableColumn<any>[] = [
     {
@@ -150,56 +168,18 @@ export default function BusinessApplicationsPage() {
         return <Badge variant={badgeVariant}>{app.status}</Badge>;
       }
     },
-    ...(items.some((app: any) => app.message)
-      ? [
-          {
-            key: "message",
-            header: "Message",
-            render: (app: any) =>
-              app.message ? (
-                <div className="max-w-[200px]">
-                  <p className="text-xs text-graphite truncate" title={app.message}>
-                    {app.message}
-                  </p>
-                </div>
-              ) : (
-                <span className="text-xs text-fog">-</span>
-              ),
-          },
-        ]
-      : []),
     {
       key: "actions",
       header: "Actions",
       render: (app) => (
         <div className="flex items-center gap-3">
-          {app.status === "PENDING" && (
-            <>
-              <button
-                onClick={() => handleAccept(app.id)}
-                disabled={acceptMutation.isPending}
-                className="bg-emerald-status/10 text-emerald-status border border-emerald-status/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-emerald-status/20 transition-colors inline-flex items-center gap-1.5"
-              >
-                <CheckCircle2 size={12} />
-                {acceptMutation.isPending ? "Accepting..." : "Accept"}
-              </button>
-              <button
-                onClick={() => handleReject(app.id)}
-                disabled={rejectMutation.isPending}
-                className="bg-coral-alert/10 text-coral-alert border border-coral-alert/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors inline-flex items-center gap-1.5"
-              >
-                <XCircle size={12} />
-                {rejectMutation.isPending ? "Rejecting..." : "Reject"}
-              </button>
-            </>
-          )}
-          <Link
-            to={`/promoters/${app.promoter_username}`}
+          <button
+            onClick={() => setSelectedAppId(app.id)}
             className="text-xs text-signal-blue hover:underline flex items-center gap-1 font-medium ml-auto"
           >
-            <Eye size={12} />
-            View Profile
-          </Link>
+            <Eye size={14} />
+            View Application & Match
+          </button>
         </div>
       )
     }
@@ -257,6 +237,162 @@ export default function BusinessApplicationsPage() {
           </button>
         </div>
       )}
+
+      {/* Application Review Dialog */}
+      <Dialog
+        isOpen={!!selectedAppId}
+        onClose={() => setSelectedAppId(null)}
+        title="Application Review"
+        size="lg"
+        footer={
+          selectedApp?.status === "PENDING" && (
+            <div className="flex items-center justify-end gap-3 w-full">
+              <button
+                onClick={() => handleReject(selectedApp.id)}
+                disabled={rejectMutation.isPending}
+                className="bg-white border border-coral-alert/20 text-coral-alert rounded-inputs px-6 py-2.5 text-sm font-bold hover:bg-coral-alert/10 disabled:opacity-50 shadow-sm"
+              >
+                {rejectMutation.isPending ? "Rejecting..." : "Reject"}
+              </button>
+              <button
+                onClick={() => handleAccept(selectedApp.id)}
+                disabled={acceptMutation.isPending}
+                className="bg-signal-blue text-white rounded-inputs px-6 py-2.5 text-sm font-bold hover:bg-signal-blue/90 disabled:opacity-50 shadow-sm"
+              >
+                {acceptMutation.isPending ? "Accepting..." : "Accept Application"}
+              </button>
+            </div>
+          )
+        }
+      >
+        {selectedApp && (
+          <div className="space-y-8 pb-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+            {/* Promoter Info */}
+            <div className="flex items-center gap-4">
+              {selectedApp.promoter_avatar_url ? (
+                <img src={selectedApp.promoter_avatar_url} alt="" className="w-16 h-16 rounded-full object-cover shadow-sm ring-2 ring-slate-custom/5" />
+              ) : (
+                <Avatar initials={selectedApp.promoter_username?.[0]?.toUpperCase() ?? "?"} size="lg" className="w-16 h-16" />
+              )}
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-graphite">{selectedApp.promoter_username}</h3>
+                  {selectedApp.promoter_verified && (
+                    <BadgeCheck size={16} className="text-emerald-status" />
+                  )}
+                </div>
+                <p className="text-sm text-ash">{selectedApp.promoter_headline}</p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="text-xs font-bold text-fog uppercase tracking-wide">{selectedApp.promoter_niche}</span>
+                  <span className="text-xs text-ash">•</span>
+                  <span className="text-xs text-graphite font-medium">{formatCompactNumber(selectedApp.promoter_followers_count)} Followers</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Application Message */}
+            <div className="bg-linen-canvas/50 border border-slate-custom/10 rounded-xl p-5">
+              <h4 className="text-xs font-bold text-ash uppercase tracking-wider mb-2">Message to Business</h4>
+              {selectedApp.message ? (
+                <p className="text-sm text-graphite leading-relaxed whitespace-pre-wrap italic">"{selectedApp.message}"</p>
+              ) : (
+                <p className="text-sm text-ash italic">No message provided.</p>
+              )}
+            </div>
+
+            {/* Match Score */}
+            <div>
+              <h4 className="text-sm font-bold text-graphite mb-3 flex items-center gap-2">
+                <Star size={16} className="text-signal-blue" />
+                Promoter Fit Analysis
+              </h4>
+              {(() => {
+                // If we have backend match, use it. Otherwise, compute instantly on frontend.
+                let matchData = promoterMatch;
+                
+                if (!matchData && campaign) {
+                  let score = 0;
+                  const breakdown: any = { niche: 0, location: 0, followers: 0, experience: 0, engagement: 0 };
+                  
+                  // Niche
+                  const cCat = (campaign.category || "").toUpperCase();
+                  const pCat = (selectedApp.promoter_niche || "").toUpperCase();
+                  if (cCat === pCat) { score += 40; breakdown.niche = 40; }
+                  else {
+                    const related: Record<string, string[]> = {
+                      "LIFESTYLE": ["FASHION", "TRAVEL", "FOOD", "FITNESS"],
+                      "TECH": ["GAMING", "BUSINESS"],
+                      "FASHION": ["LIFESTYLE"],
+                      "FOOD": ["LIFESTYLE", "TRAVEL"],
+                      "TRAVEL": ["LIFESTYLE", "FOOD"],
+                      "FITNESS": ["LIFESTYLE"],
+                      "GAMING": ["TECH"],
+                      "BUSINESS": ["TECH"],
+                    };
+                    if (related[cCat]?.includes(pCat)) { score += 20; breakdown.niche = 20; }
+                  }
+                  
+                  // Location
+                  const cLoc = (campaign.location || "").toLowerCase();
+                  const pLoc = (selectedApp.promoter_location || "").toLowerCase();
+                  if (pLoc && cLoc === pLoc) { score += 20; breakdown.location = 20; }
+                  
+                  // Followers
+                  const fols = selectedApp.promoter_followers_count || 0;
+                  if (fols >= 100000) { score += 15; breakdown.followers = 15; }
+                  else if (fols >= 50000) { score += 10; breakdown.followers = 10; }
+                  else if (fols >= 10000) { score += 5; breakdown.followers = 5; }
+                  
+                  // Experience
+                  const exp = selectedApp.promoter_years_experience || 0;
+                  if (exp >= 5) { score += 10; breakdown.experience = 10; }
+                  else if (exp >= 3) { score += 7; breakdown.experience = 7; }
+                  else if (exp >= 1) { score += 5; breakdown.experience = 5; }
+                  
+                  // Engagement
+                  const eng = selectedApp.promoter_engagement_rate || 0;
+                  if (eng >= 10.0) { score += 15; breakdown.engagement = 15; }
+                  else if (eng >= 5.0) { score += 10; breakdown.engagement = 10; }
+                  else if (eng >= 2.0) { score += 5; breakdown.engagement = 5; }
+                  
+                  let classification = "LOW_MATCH";
+                  if (score >= 90) classification = "EXCELLENT_MATCH";
+                  else if (score >= 70) classification = "GOOD_MATCH";
+                  else if (score >= 50) classification = "AVERAGE_MATCH";
+                  
+                  matchData = {
+                    score,
+                    classification,
+                    score_breakdown: breakdown,
+                    explanation: ""
+                  };
+                }
+
+                if (!matchData) return null;
+
+                return (
+                  <div className="space-y-4">
+                    <div className="bg-white border border-slate-custom/10 rounded-xl p-5 shadow-sm flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-bold text-fog uppercase tracking-wider">Match Score</p>
+                        <p className="text-xs text-ash mt-1">{matchData.classification.replace(/_/g, " ")}</p>
+                      </div>
+                      <div className="text-3xl font-bold text-signal-blue">
+                        {Math.round(matchData.score)}<span className="text-lg text-ash">/100</span>
+                      </div>
+                    </div>
+                    <MatchBreakdownCard breakdown={matchData.score_breakdown} />
+                    {matchData.explanation && (
+                      <p className="text-sm text-graphite leading-relaxed">{matchData.explanation}</p>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+
+          </div>
+        )}
+      </Dialog>
 
       <ConfirmDialog
         isOpen={!!rejectConfirm}

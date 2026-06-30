@@ -66,3 +66,21 @@ def list_saved_promoters(
         limit=limit,
         pages=max(1, (total + limit - 1) // limit),
     )
+
+
+@router.get("/analytics")
+def business_analytics(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return {
+        "summary": {
+            "active_campaigns": 0,
+            "total_spent": 0,
+            "applications_received": 0,
+            "collaborations_completed": 0,
+            "average_roi": 0,
+            "profile_views": 0,
+            "average_rating": 0,
+        },
+        "charts": {},
+        "growth": {},
+        "metadata": {"period": "30d"}
+    }

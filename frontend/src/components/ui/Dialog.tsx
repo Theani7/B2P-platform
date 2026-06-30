@@ -22,7 +22,7 @@ export function Dialog({ isOpen, onClose, title, description, children, footer, 
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/20 p-4" role="dialog" aria-modal="true" aria-labelledby={description ? undefined : title}>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/20 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-labelledby={description ? undefined : title}>
       <div
         className={`w-full ${sizeClasses[size]} bg-white rounded-2xl`}
         onClick={(e) => e.stopPropagation()}

@@ -13,7 +13,7 @@ export const getMyAchievements = async () => {
 };
 
 export const getUserAchievements = async (userId: string) => {
-  const { data } = await apiClient.get<AchievementResponse>(`/users/${userId}/achievements`);
+  const { data } = await apiClient.get<AchievementResponse>(`/achievements/users/${userId}/achievements`);
   return data;
 };
 

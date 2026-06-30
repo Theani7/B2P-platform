@@ -18,24 +18,15 @@ import { formatCompactNumber } from "../utils/number";
 import {
   BadgeCheck, Save, Eye, Trophy, AlertTriangle, MapPin, Briefcase, Camera, Upload, RefreshCw
 } from "lucide-react";
+import { usePlatformSettings } from "../features/settings/api";
 
-const NICHE_OPTIONS = [
-  { value: "LIFESTYLE", label: "Lifestyle" },
-  { value: "TECH", label: "Tech" },
-  { value: "FASHION", label: "Fashion" },
-  { value: "FOOD", label: "Food" },
-  { value: "TRAVEL", label: "Travel" },
-  { value: "FITNESS", label: "Fitness" },
-  { value: "GAMING", label: "Gaming" },
-  { value: "BUSINESS", label: "Business" },
-  { value: "OTHER", label: "Other" },
-];
+
 
 const schema = z.object({
   username: z.string().min(3, "Username too short"),
   headline: z.string().optional(),
   bio: z.string().optional(),
-  niche: z.enum(["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS", "OTHER"]),
+  niche: z.string().min(1, "Niche required"),
   location: z.string().optional(),
   followers_count: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").optional(),
   engagement_rate: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").max(100, "Cannot exceed 100").optional(),
@@ -52,6 +43,12 @@ export default function PromoterProfilePage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { data: settingsData } = usePlatformSettings();
+  const nicheSetting = settingsData?.items.find((s) => s.setting_key === "promoter_niches");
+  const NICHE_OPTIONS = nicheSetting 
+    ? nicheSetting.setting_value.split(",").map(n => ({ value: n.trim(), label: n.trim().replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) }))
+    : [{ value: "OTHER", label: "Other" }];
+
   const {
     register,
     handleSubmit,
@@ -65,7 +62,7 @@ export default function PromoterProfilePage() {
       username: profile?.username || user?.username || "",
       headline: profile?.headline || "",
       bio: profile?.bio || "",
-      niche: (profile?.niche as FormValues["niche"]) || "OTHER",
+      niche: profile?.niche || "OTHER",
       location: profile?.location || "",
       followers_count: profile?.followers_count || 0,
       engagement_rate: profile?.engagement_rate || 0,
@@ -87,7 +84,7 @@ export default function PromoterProfilePage() {
         username: profile.username || user?.username || "",
         headline: profile.headline || "",
         bio: profile.bio || "",
-        niche: (profile.niche as FormValues["niche"]) || "OTHER",
+        niche: profile.niche || "OTHER",
         location: profile.location || "",
         followers_count: profile.followers_count || 0,
         engagement_rate: profile.engagement_rate || 0,

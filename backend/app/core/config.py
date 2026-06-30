@@ -5,16 +5,16 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Byparsathy"
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = "CHANGE_ME_IN_PROD"
+    SECRET_KEY: str = "INSECURE-CHANGE-ME-IN-PRODUCTION-V1"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost/byparsathy_db"
+    DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost/b2p_db"
     DATABASE_TEST_URL: str = "postgresql+psycopg2://postgres:postgres@localhost/b2p_test_db"
 
     # JWT claims
-    JWT_AUDIENCE: str = "api.byparsathy.com"
-    JWT_ISSUER: str = "auth.byparsathy.com"
+    JWT_AUDIENCE: str = "api.b2p.com"
+    JWT_ISSUER: str = "auth.b2p.com"
 
     # Rate limiting
     RATE_LIMIT_AUTH: int = 30

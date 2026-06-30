@@ -6,13 +6,13 @@ export const preferencesKeys = {
 };
 
 export async function getNotificationPreferences() {
-  const { data } = await apiClient.get("/api/v1/notifications/preferences");
+  const { data } = await apiClient.get("/notifications/preferences");
   return data.data.preferences;
 }
 
 export async function updateNotificationPreferences(
   preferences: Array<{ type: string; enabled: boolean }>
 ) {
-  const { data } = await apiClient.put("/api/v1/notifications/preferences", { preferences });
+  const { data } = await apiClient.put("/notifications/preferences", { preferences });
   return data.data.preferences;
 }

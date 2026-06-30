@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfilePreviewModal from "../components/discovery/ProfilePreviewModal";
-const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS"];
+import { usePlatformSettings } from "../features/settings/api";
+
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest Profiles" },
   { value: "followers_count", label: "Most Followers" },
@@ -28,6 +29,12 @@ export default function PromoterDirectoryPage() {
   const [sortBy, setSortBy] = useState("followers_count");
   const [page, setPage] = useState(1);
   const [drawerPromoter, setDrawerPromoter] = useState<any>(null);
+
+  const { data: settingsData } = usePlatformSettings();
+  const nicheSetting = settingsData?.items.find((s) => s.setting_key === "promoter_niches");
+  const NICHE_OPTIONS = nicheSetting 
+    ? nicheSetting.setting_value.split(",").map(n => n.trim().toUpperCase())
+    : ["LIFESTYLE", "TECH", "FASHION", "FOOD"];
 
   const { data, isLoading } = usePromoterDirectory({
     search: search || undefined,

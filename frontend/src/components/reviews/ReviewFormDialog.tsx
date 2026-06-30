@@ -40,7 +40,7 @@ export default function ReviewFormDialog({
               <RatingStars rating={rating} interactive size="lg" onChange={setRating} />
               <span className="ml-2 text-sm text-gray-500">{rating > 0 ? `${rating}/5` : "Select"}</span>
             </div>
-            {rating < 1 && <p className="mt-1 text-xs text-danger">Please select a rating</p>}
+            {rating < 1 && <p className="mt-1 text-xs text-coral-alert">Please select a rating</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">

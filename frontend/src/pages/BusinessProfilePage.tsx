@@ -8,6 +8,7 @@ import { useBusinessProfileCompletion } from "../features/profile-completion";
 import { ProfileCompletionWidget, Avatar } from "../components/ui";
 import { notifySuccess, notifyError } from "../hooks/useToast";
 import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
+import { usePlatformSettings } from "../features/settings/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
   Building2, Globe, MapPin, Briefcase,
@@ -32,6 +33,12 @@ export default function BusinessProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: completionData, isLoading: completionLoading } = useBusinessProfileCompletion();
+
+  const { data: settingsData } = usePlatformSettings();
+  const industrySetting = settingsData?.items.find((s) => s.setting_key === "industries");
+  const industryOptions = industrySetting 
+    ? industrySetting.setting_value.split(",").map(i => i.trim())
+    : ["Technology", "Fashion", "Food", "Other"];
 
   const {
     register,
@@ -210,11 +217,15 @@ export default function BusinessProfilePage() {
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                         <Briefcase size={18} className="text-ash" />
                       </div>
-                      <input
+                      <select
                         {...register("industry")}
-                        className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink placeholder-fog focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
-                        placeholder="Technology, Fashion..."
-                      />
+                        className="w-full pl-11 pr-4 h-12 px-3 py-2 border border-slate-custom/20 rounded-inputs bg-white text-midnight-ink appearance-none focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm"
+                      >
+                        <option value="">Select an industry</option>
+                        {industryOptions.map(ind => (
+                          <option key={ind} value={ind}>{ind.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</option>
+                        ))}
+                      </select>
                     </div>
                     {errors.industry && <p className="text-xs text-coral-alert">{errors.industry.message}</p>}
                   </div>
