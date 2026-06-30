@@ -91,7 +91,7 @@ def _log_startup():
                 id=uuid.uuid4(),
                 email=admin_email,
                 username=admin_username,
-                hashed_password=get_password_hash("admin123"),
+                password_hash=get_password_hash("admin123"),
                 full_name="Platform Admin",
                 role=RoleEnum.ADMIN,
                 is_active=True,
