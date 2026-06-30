@@ -39,7 +39,15 @@ export default function LoginPage() {
     setServerError(null);
     loginMutation.mutate(data, {
       onError: (err: any) => {
-        const msg = err?.response?.data?.message || err?.response?.data?.detail || err?.message || "Login failed. Please check your credentials.";
+        let msg = "Login failed. Please check your credentials.";
+        if (err?.response?.data?.message) {
+          msg = err.response.data.message;
+        } else if (err?.response?.data?.detail) {
+          const detail = err.response.data.detail;
+          msg = Array.isArray(detail) && detail.length > 0 ? detail[0].msg : detail;
+        } else if (err?.message) {
+          msg = err.message;
+        }
         setServerError(msg);
       },
     });
