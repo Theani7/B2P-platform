@@ -295,7 +295,7 @@ export function useAdminSeedSettings() {
   const qc = useQueryClient();
   return useMutation<void, Error, void>({
     mutationFn: async () => {
-      await api.get("/admin/settings/seed");
+      await api.post("/admin/settings/seed");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-settings"] });
