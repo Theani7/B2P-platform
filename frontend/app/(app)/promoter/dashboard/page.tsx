@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { useAuth } from "@/providers/AuthProvider";
@@ -13,11 +14,11 @@ import { usePromoterCollaborations } from "@/features/collaborations/api";
 import { usePromoterInvitations, useAcceptInvitation, useRejectInvitation } from "@/features/invitations/api";
 import { Spinner } from "@/components/ui/Spinner";
 import { useMyActivities } from "@/features/activity/api";
-import { useProfileCompletion } from "@/features/profile-completion/api";
 import { usePromoterProfile, useUpdatePromoterProfile } from "@/features/profile/api";
 import { useUserRating } from "@/features/reviews/api";
 import { useUpload } from "@/features/upload/api";
 import { notifySuccess, notifyError } from "@/lib/notify";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Handshake,
   Star,
@@ -28,9 +29,6 @@ import {
   ChevronRight,
   ArrowRight,
 } from "lucide-react";
-
-const fmtNpr = (n?: number | null) =>
-  new Intl.NumberFormat("en-NP", { style: "currency", currency: "NPR", maximumFractionDigits: 0 }).format(n ?? 0);
 
 function relativeTime(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -45,20 +43,22 @@ function relativeTime(iso: string) {
 
 function DashboardInner() {
   const { user } = useAuth();
+  const qc = useQueryClient();
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadAvatar = useUpload("avatar");
   const updateProfile = useUpdatePromoterProfile();
 
-  const { data: invitations, isLoading: invsLoading } = usePromoterInvitations({ limit: 5 });
-  const { data: collabs, isLoading: collabsLoading } = usePromoterCollaborations({ limit: 5 });
+  // Fetch PENDING invitations with a larger page size so the count is accurate
+  const { data: invitations, isLoading: invsLoading } = usePromoterInvitations({ status: "PENDING", limit: 20 });
+  // Fetch only ACTIVE collaborations from the server for accurate stats + preview
+  const { data: collabs, isLoading: collabsLoading } = usePromoterCollaborations({ status: "ACTIVE", limit: 5 });
   const { data: activityData, isLoading: activityLoading } = useMyActivities({ size: 5 });
-  const { data: completionData, isLoading: completionLoading } = useProfileCompletion();
   const { data: profile } = usePromoterProfile();
   const { data: rating } = useUserRating(user?.id ?? "");
 
-  const pendingInvites = invitations?.items.filter((i) => i.status === "PENDING").length ?? 0;
-  const activeCollabs = collabs?.items.filter((c) => c.status === "ACTIVE").length ?? 0;
+  const pendingInvites = invitations?.total ?? 0;
+  const activeCollabs = collabs?.total ?? 0;
   const avgRating = rating?.averageRating ?? 0;
   const reviewsReceived = rating?.totalReviews ?? 0;
 
@@ -68,8 +68,9 @@ function DashboardInner() {
     try {
       const res = await uploadAvatar.mutateAsync(file);
       await updateProfile.mutateAsync({ avatarUrl: res.url } as any);
+      notifySuccess("Avatar updated!");
     } catch {
-      /* handled by mutation */
+      notifyError("Failed to upload avatar.");
     } finally {
       setAvatarUploading(false);
     }
@@ -88,18 +89,20 @@ function DashboardInner() {
   const confirmAction = () => {
     if (!actionConfirm) return;
     if (actionConfirm.action === "accept") {
-      acceptMutation.mutate(actionConfirm.id, { 
+      acceptMutation.mutate(actionConfirm.id, {
         onSuccess: () => {
           notifySuccess("Invitation accepted! A new collaboration project has been created.");
+          // Invalidate collaborations so the active count updates immediately
+          qc.invalidateQueries({ queryKey: ["promoter-collaborations"] });
           setActionConfirm(null);
         },
         onError: (e: any) => {
           notifyError(e?.response?.data?.message ?? "Failed to accept invitation");
           setActionConfirm(null);
-        }
+        },
       });
     } else {
-      rejectMutation.mutate(actionConfirm.id, { 
+      rejectMutation.mutate(actionConfirm.id, {
         onSuccess: () => {
           notifySuccess("Invitation declined.");
           setActionConfirm(null);
@@ -107,7 +110,7 @@ function DashboardInner() {
         onError: (e: any) => {
           notifyError(e?.response?.data?.message ?? "Failed to decline invitation");
           setActionConfirm(null);
-        }
+        },
       });
     }
   };
@@ -115,9 +118,9 @@ function DashboardInner() {
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       {/* Hero Header */}
-      <div className="bg-white border border-slate-custom/10 rounded-xl shadow-sm overflow-hidden border-t-[#7F77DD]">
+      <div className="bg-white border border-slate-custom/10 rounded-xl shadow-sm overflow-hidden border-t-4 border-t-signal-blue">
         <div className="h-24 bg-gradient-to-r from-sky-wash via-periwinkle-glow/30 to-sky-wash relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay" />
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay" />
         </div>
         <div className="px-8 pb-8 relative">
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 -mt-10">
@@ -130,7 +133,7 @@ function DashboardInner() {
                 ) : (
                   <Avatar
                     src={profile?.avatarUrl}
-                    initials={user?.fullName?.[0]?.toUpperCase() ?? "P"}
+                    initials={(user?.fullName?.[0] ?? "P").toUpperCase()}
                     size="lg"
                     className="w-24 h-24 text-2xl ring-4 ring-white shadow-sm"
                     colorIndex={2}
@@ -153,27 +156,53 @@ function DashboardInner() {
                 </div>
                 <p className="text-sm font-medium text-ash mt-0.5 flex items-center gap-1.5">
                   <Star size={14} className="fill-amber-tag text-amber-tag" />
-                  <span className="text-graphite font-bold">{avgRating.toFixed(1)}</span> ({reviewsReceived} reviews)
+                  <span className="text-graphite font-bold">{avgRating.toFixed(1)}</span>
+                  <span>({reviewsReceived} {reviewsReceived === 1 ? "review" : "reviews"})</span>
                 </p>
+                {profile?.niche && (
+                  <p className="text-xs text-ash mt-0.5 uppercase tracking-wider font-medium">{profile.niche}</p>
+                )}
               </div>
             </div>
 
             <div className="flex items-center gap-3 w-full md:w-auto">
-              <a href="/promoter/profile" className="flex-1 md:flex-none flex justify-center items-center h-11 px-6 rounded-inputs bg-white border border-slate-custom/10 text-sm font-bold text-graphite hover:bg-sky-wash transition-colors shadow-sm">
+              <Link
+                href="/promoter/profile"
+                className="flex-1 md:flex-none flex justify-center items-center h-11 px-6 rounded-inputs bg-white border border-slate-custom/10 text-sm font-bold text-graphite hover:bg-sky-wash transition-colors shadow-sm"
+              >
                 Edit Profile
-              </a>
-              <a href="/promoter/marketplace" className="flex-1 md:flex-none flex justify-center items-center h-11 px-6 rounded-inputs bg-signal-blue text-white text-sm font-bold hover:bg-signal-blue/90 transition-colors shadow-sm">
+              </Link>
+              <Link
+                href="/promoter/marketplace"
+                className="flex-1 md:flex-none flex justify-center items-center h-11 px-6 rounded-inputs bg-signal-blue text-white text-sm font-bold hover:bg-signal-blue/90 transition-colors shadow-sm"
+              >
                 Browse Campaigns
-              </a>
+              </Link>
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-        <StatCard label="Pending Invites" value={pendingInvites} icon={Mail} />
-        <StatCard label="Active Collabs" value={activeCollabs} icon={Handshake} />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <StatCard
+          label="Pending Invites"
+          value={invsLoading ? "—" : pendingInvites}
+          icon={Mail}
+          hint={pendingInvites > 0 ? "Action required" : "All caught up"}
+        />
+        <StatCard
+          label="Active Collabs"
+          value={collabsLoading ? "—" : activeCollabs}
+          icon={Handshake}
+          hint="In progress"
+        />
+        <StatCard
+          label="Avg. Rating"
+          value={reviewsReceived === 0 ? "—" : avgRating.toFixed(1)}
+          icon={Star}
+          hint={reviewsReceived > 0 ? `${reviewsReceived} ${reviewsReceived === 1 ? "review" : "reviews"}` : "No reviews yet"}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -188,14 +217,18 @@ function DashboardInner() {
                 </div>
                 <h2 className="text-base font-bold text-graphite">Active Collaborations</h2>
               </div>
-              <a href="/promoter/collaborations" className="text-xs font-bold text-signal-blue hover:underline flex items-center gap-1">
+              <Link href="/promoter/collaborations" className="text-xs font-bold text-signal-blue hover:underline flex items-center gap-1">
                 View All <ArrowRight size={14} />
-              </a>
+              </Link>
             </div>
 
             <div className="p-6">
               {collabsLoading ? (
-                <div className="h-32 bg-sky-wash/50 rounded-lg animate-pulse" />
+                <div className="space-y-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="h-16 bg-sky-wash/50 rounded-xl animate-pulse" />
+                  ))}
+                </div>
               ) : !collabs || collabs.items.length === 0 ? (
                 <div className="bg-sky-wash/30 border border-slate-custom/10 border-dashed rounded-xl p-8 text-center flex flex-col items-center justify-center">
                   <div className="w-12 h-12 bg-white shadow-sm rounded-full flex items-center justify-center text-signal-blue mb-3">
@@ -203,26 +236,39 @@ function DashboardInner() {
                   </div>
                   <p className="text-sm font-bold text-graphite mb-1">No active collaborations</p>
                   <p className="text-xs text-ash max-w-xs mx-auto">Apply to campaigns to start working with brands and earning.</p>
-                  <a href="/promoter/marketplace" className="mt-4 px-4 h-9 flex items-center justify-center rounded-inputs bg-white border border-slate-custom/10 text-xs font-bold text-graphite shadow-sm hover:bg-sky-wash transition-colors">
+                  <Link
+                    href="/promoter/marketplace"
+                    className="mt-4 px-4 h-9 flex items-center justify-center rounded-inputs bg-white border border-slate-custom/10 text-xs font-bold text-graphite shadow-sm hover:bg-sky-wash transition-colors"
+                  >
                     Find Campaigns
-                  </a>
+                  </Link>
                 </div>
               ) : (
                 <div className="grid gap-3">
                   {collabs.items.slice(0, 3).map((c) => (
-                    <a key={c.id} href="/promoter/collaborations" className="bg-white border border-slate-custom/10 rounded-xl p-4 shadow-sm flex items-center justify-between group hover:border-signal-blue/30 transition-all cursor-pointer">
+                    <Link key={c.id} href="/promoter/collaborations" className="bg-white border border-slate-custom/10 rounded-xl p-4 shadow-sm flex items-center justify-between group hover:border-signal-blue/30 transition-all cursor-pointer">
                       <div className="flex items-center gap-4 min-w-0">
                         <div className="w-12 h-12 bg-periwinkle-glow/30 text-signal-blue rounded-lg flex flex-shrink-0 items-center justify-center text-lg font-bold">
-                          {c.campaignTitle?.[0] || "C"}
+                          {c.campaignTitle?.[0]?.toUpperCase() || "C"}
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-bold text-graphite truncate">{c.campaignTitle}</p>
-                          <p className="text-[11px] font-medium text-ash uppercase tracking-wider mt-1">{c.partnerName} • In Progress</p>
+                          <p className="text-[11px] font-medium text-ash uppercase tracking-wider mt-1">
+                            {c.partnerName} • <span className="text-emerald-status">Active</span>
+                          </p>
                         </div>
                       </div>
-                      <ChevronRight size={16} className="text-slate-custom/20 group-hover:text-signal-blue transition-colors" />
-                    </a>
+                      <ChevronRight size={16} className="text-slate-custom/20 group-hover:text-signal-blue transition-colors flex-shrink-0" />
+                    </Link>
                   ))}
+                  {collabs.total > 3 && (
+                    <Link
+                      href="/promoter/collaborations"
+                      className="block w-full text-center text-xs font-bold text-signal-blue hover:underline pt-1"
+                    >
+                      +{collabs.total - 3} more collaborations
+                    </Link>
+                  )}
                 </div>
               )}
             </div>
@@ -241,7 +287,11 @@ function DashboardInner() {
                 </div>
               </div>
               {activityLoading ? (
-                <div className="p-8 flex justify-center"><Spinner /></div>
+                <div className="p-6 space-y-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="h-12 bg-sky-wash/50 rounded-lg animate-pulse" />
+                  ))}
+                </div>
               ) : !activityData?.items?.length ? (
                 <div className="p-12 text-center border-t border-slate-custom/5 flex flex-col items-center justify-center">
                   <div className="w-16 h-16 rounded-full bg-sky-wash flex items-center justify-center mx-auto mb-4">
@@ -259,7 +309,9 @@ function DashboardInner() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-graphite">{activity.title}</p>
-                        {activity.description && <p className="text-xs text-ash mt-0.5">{activity.description}</p>}
+                        {activity.description && (
+                          <p className="text-xs text-ash mt-0.5">{activity.description}</p>
+                        )}
                         <p className="text-[10px] text-fog uppercase tracking-wider mt-1">{relativeTime(activity.createdAt)}</p>
                       </div>
                     </div>
@@ -277,25 +329,32 @@ function DashboardInner() {
                   </div>
                   <h2 className="text-base font-bold text-graphite">Pending Invites</h2>
                   {pendingInvites > 0 && (
-                    <span className="bg-amber-tag text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm ml-1">{pendingInvites}</span>
+                    <span className="bg-amber-tag text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                      {pendingInvites}
+                    </span>
                   )}
                 </div>
               </div>
 
               <div className="p-6 flex flex-col">
                 {invsLoading ? (
-                  <div className="space-y-3"><div className="h-16 bg-sky-wash/50 rounded-lg animate-pulse" /></div>
-                ) : !invitations || invitations.items.filter((i) => i.status === "PENDING").length === 0 ? (
+                  <div className="space-y-3">
+                    <div className="h-16 bg-sky-wash/50 rounded-lg animate-pulse" />
+                    <div className="h-16 bg-sky-wash/50 rounded-lg animate-pulse" />
+                  </div>
+                ) : !invitations || invitations.items.length === 0 ? (
                   <div className="text-center py-8 bg-sky-wash/30 rounded-xl border border-dashed border-slate-custom/10 flex flex-col items-center justify-center">
                     <p className="text-sm font-bold text-graphite">You're all caught up!</p>
                     <p className="text-xs text-ash mt-1">No pending invitations.</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {invitations.items.filter((i) => i.status === "PENDING").slice(0, 3).map((inv) => (
+                    {invitations.items.slice(0, 3).map((inv) => (
                       <div key={inv.id} className="border border-slate-custom/10 rounded-xl p-4 hover:border-signal-blue/30 transition-colors shadow-sm">
-                        <p className="text-sm font-bold text-graphite truncate">{inv.campaign?.title}</p>
-                        <p className="text-[11px] font-bold text-ash uppercase tracking-wider mt-1 mb-4">{fmtNpr(inv.campaign?.budget)}</p>
+                        <p className="text-sm font-bold text-graphite truncate">{inv.campaign?.title ?? "Untitled Campaign"}</p>
+                        <p className="text-[11px] font-medium text-ash uppercase tracking-wider mt-0.5 mb-4">
+                          {inv.campaign?.businessProfile?.companyName ?? "Unknown Brand"}
+                        </p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => setActionConfirm({ id: inv.id, action: "accept" })}
@@ -314,9 +373,16 @@ function DashboardInner() {
                         </div>
                       </div>
                     ))}
-                    <a href="/promoter/invitations" className="block w-full text-center text-xs font-bold text-signal-blue hover:underline pt-3">
-                      View all invitations
-                    </a>
+                    {invitations.total > 3 && (
+                      <Link href="/promoter/invitations" className="block w-full text-center text-xs font-bold text-signal-blue hover:underline pt-1">
+                        +{invitations.total - 3} more invitations
+                      </Link>
+                    )}
+                    {invitations.total <= 3 && (
+                      <Link href="/promoter/invitations" className="block w-full text-center text-xs font-bold text-signal-blue hover:underline pt-3">
+                        View all invitations
+                      </Link>
+                    )}
                   </div>
                 )}
               </div>
@@ -343,15 +409,28 @@ function DashboardInner() {
                 : "Are you sure you want to decline? The business will be notified."}
             </p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setActionConfirm(null)} className="px-5 py-2.5 text-sm font-bold text-graphite bg-white border border-slate-custom/10 rounded-inputs hover:bg-sky-wash transition-colors shadow-sm">
+              <button
+                onClick={() => setActionConfirm(null)}
+                className="px-5 py-2.5 text-sm font-bold text-graphite bg-white border border-slate-custom/10 rounded-inputs hover:bg-sky-wash transition-colors shadow-sm"
+              >
                 Cancel
               </button>
               <button
                 onClick={confirmAction}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
-                className={`px-6 py-2.5 text-sm font-bold text-white rounded-inputs transition-colors disabled:opacity-50 shadow-sm ${actionConfirm.action === "accept" ? "bg-signal-blue hover:bg-signal-blue/90" : "bg-coral-alert hover:bg-coral-alert/90"}`}
+                className={`px-6 py-2.5 text-sm font-bold text-white rounded-inputs transition-colors disabled:opacity-50 shadow-sm ${
+                  actionConfirm.action === "accept"
+                    ? "bg-signal-blue hover:bg-signal-blue/90"
+                    : "bg-coral-alert hover:bg-coral-alert/90"
+                }`}
               >
-                Confirm
+                {acceptMutation.isPending || rejectMutation.isPending ? (
+                  <span className="flex items-center gap-2">
+                    <Spinner /> Confirming…
+                  </span>
+                ) : (
+                  "Confirm"
+                )}
               </button>
             </div>
           </div>
