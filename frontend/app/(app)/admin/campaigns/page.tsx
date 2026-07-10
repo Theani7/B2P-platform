@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
@@ -39,7 +40,7 @@ function CampaignsInner() {
     fn.mutate(id, { onSuccess: () => notifySuccess(ok), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") });
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       <PageHeader title="Campaigns" subtitle="Moderate campaigns across the platform." />
       <Card className="mb-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -51,14 +52,14 @@ function CampaignsInner() {
         </div>
       </Card>
 
-      {isFetching && !data ? <Spinner /> : null}
+      {isFetching && !data ? <Spinner full /> : null}
 
       <div className="space-y-2">
         {(data?.items ?? []).map((c) => (
           <Card key={c.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
             <div>
               <div className="flex items-center gap-2">
-                <a href={`/business/campaigns/${c.id}`} className="text-body font-medium text-midnight-ink hover:underline">{c.title}</a>
+                <Link href={`/business/campaigns/${c.id}`} className="text-body font-medium text-midnight-ink hover:underline">{c.title}</Link>
                 <Badge tone={STATUS_TONE[c.status] ?? "slate"}>{c.status}</Badge>
               </div>
               <p className="text-caption text-slate-custom">{c.businessCompanyName} · {c.category} · {c.location} · Rs. {new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(Number(c.budget) || 0)}</p>
@@ -96,7 +97,7 @@ function CampaignsInner() {
           setActionCampaign(null);
         }}
       />
-    </>
+    </div>
   );
 }
 

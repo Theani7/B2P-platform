@@ -20,13 +20,13 @@ function ReviewsInner() {
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       <PageHeader title="Reviews" subtitle="Moderate user reviews." />
       <Card className="mb-5">
         <Input placeholder="Search comment" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
       </Card>
 
-      {isFetching && !data ? <Spinner /> : null}
+      {isFetching && !data ? <Spinner full /> : null}
 
       <div className="space-y-2">
         {(data?.items ?? []).map((r) => (
@@ -71,7 +71,7 @@ function ReviewsInner() {
           setReviewToDelete(null);
         }}
       />
-    </>
+    </div>
   );
 }
 
