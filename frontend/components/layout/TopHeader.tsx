@@ -9,9 +9,12 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Role } from "@/lib/roles";
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { notifyError } from "@/lib/notify";
 
 export function TopHeader() {
+  const router = useRouter();
   const { user, openLogoutDialog, hasProfile } = useAuth();
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -55,7 +58,7 @@ export function TopHeader() {
                 notifyError("Please complete your profile to create a campaign.");
                 return;
               }
-              window.location.href = "/business/campaigns/create";
+              router.push("/business/campaigns/create");
             }}
             className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-button text-sm font-medium transition-colors ${
               !hasProfile
@@ -94,13 +97,13 @@ export function TopHeader() {
                 <p className="text-sm font-medium text-graphite truncate">{user?.fullName || "User"}</p>
                 <p className="text-sm text-steel truncate">{user?.email}</p>
               </div>
-              <a
+              <Link
                 href={user?.role === Role.BUSINESS ? "/business/profile" : "/promoter/profile"}
                 className="flex items-center gap-3 px-4 py-2 text-sm text-graphite hover:bg-sky-wash transition-colors"
               >
                 <Settings size={16} className="text-graphite" />
                 Settings
-              </a>
+              </Link>
               <button
                 onClick={() => openLogoutDialog()}
                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-coral-alert hover:bg-coral-alert/10 transition-colors text-left"
