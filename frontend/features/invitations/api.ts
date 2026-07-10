@@ -12,6 +12,7 @@ export interface CampaignInvitation {
     id: string;
     title: string;
     budget: number;
+    category?: string | null;
     location: string;
     status: string;
     businessProfile?: { companyName?: string };

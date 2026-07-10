@@ -1,7 +1,5 @@
 "use client";
 
-"use use client";
-
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
@@ -61,9 +59,33 @@ function DeliverablesPanel({ collaborationId }: { collaborationId: string }) {
               {d.description && <p className="mt-1 text-body text-slate-custom">{d.description}</p>}
               {d.feedback && <p className="mt-1 text-caption text-steel">Feedback: {d.feedback}</p>}
               <div className="mt-2 flex flex-wrap gap-2">
-                <Button onClick={() => act(d.id, "APPROVED")}>Approve</Button>
-                <Button variant="danger" onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}>Request revision</Button>
-                <Button variant="subtle" onClick={() => act(d.id, "PUBLISHED")}>Mark published</Button>
+                {/* PUBLISHED: no actions */}
+                {/* APPROVED: only Mark published */}
+                {d.status === "APPROVED" && (
+                  <Button variant="subtle" onClick={() => act(d.id, "PUBLISHED")}>Mark published</Button>
+                )}
+                {/* IN_REVIEW: Approve + Request revision */}
+                {d.status === "IN_REVIEW" && (
+                  <>
+                    <Button onClick={() => act(d.id, "APPROVED")}>Approve</Button>
+                    <Button variant="danger" onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}>Request revision</Button>
+                  </>
+                )}
+                {/* DRAFT: Approve + Request revision */}
+                {d.status === "DRAFT" && (
+                  <>
+                    <Button onClick={() => act(d.id, "APPROVED")}>Approve</Button>
+                    <Button variant="danger" onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}>Request revision</Button>
+                  </>
+                )}
+                {/* REVISION_REQUESTED: Approve + Mark published + Request revision again */}
+                {d.status === "REVISION_REQUESTED" && (
+                  <>
+                    <Button onClick={() => act(d.id, "APPROVED")}>Approve</Button>
+                    <Button variant="subtle" onClick={() => act(d.id, "PUBLISHED")}>Mark published</Button>
+                    <Button variant="danger" onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}>Request revision</Button>
+                  </>
+                )}
               </div>
             </li>
           ))}
@@ -181,9 +203,21 @@ function CollaborationsPageInner() {
   const router = useRouter();
   const [status, setStatus] = useState<string>("");
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
   const { data, isLoading, isError } = useBusinessCollaborations({ status: (status || undefined) as any, page, limit: 20 });
 
   const collabs = data?.items || [];
+
+  const filtered = search.trim()
+    ? collabs.filter((c) => {
+        const q = search.toLowerCase();
+        return (
+          c.campaignTitle?.toLowerCase().includes(q) ||
+          c.partnerName?.toLowerCase().includes(q)
+        );
+      })
+    : collabs;
+
   const activeCount = collabs.filter((c) => c.status === "ACTIVE").length;
   const completedCount = collabs.filter((c) => c.status === "COMPLETED").length;
   const pendingReviewCount = collabs.filter((c) => c.status === "COMPLETED" && !c.hasReview).length;
@@ -248,6 +282,8 @@ function CollaborationsPageInner() {
               <SearchIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-fog" />
               <input
                 type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search projects by name or partner..."
                 className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-gray-400 text-graphite"
               />
@@ -273,7 +309,7 @@ function CollaborationsPageInner() {
         </div>
       ) : isError ? (
         <p className="text-body text-coral-alert">Could not load collaborations.</p>
-      ) : collabs.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-product-card-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
           <div className="w-20 h-20 bg-linen-canvas rounded-full flex items-center justify-center text-gray-300 mb-4"><Briefcase size={32} /></div>
           <h2 className="text-xl font-bold text-graphite mb-2">No active projects</h2>
@@ -284,7 +320,7 @@ function CollaborationsPageInner() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {collabs.map((c) => <CollabCard key={c.id} collab={c} />)}
+          {filtered.map((c) => <CollabCard key={c.id} collab={c} />)}
         </div>
       )}
 

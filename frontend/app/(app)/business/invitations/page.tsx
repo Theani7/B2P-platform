@@ -1,8 +1,6 @@
 "use client";
 
-"use use client";
-
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { notifySuccess, notifyError } from "@/lib/notify";
@@ -24,6 +22,7 @@ function StatusBadge({ status }: { status: string }) {
     ACCEPTED: { color: "text-emerald-status bg-emerald-status/10 ring-emerald-status/20", icon: CheckCircle2, label: "Accepted" },
     PENDING: { color: "text-amber-700 bg-amber-50 ring-amber-600/20", icon: Clock, label: "Pending" },
     REJECTED: { color: "text-coral-alert bg-coral-alert/10 ring-red-600/20", icon: XCircle, label: "Declined" },
+    CANCELLED: { color: "text-graphite bg-linen-canvas ring-gray-600/20", icon: XCircle, label: "Cancelled" },
     EXPIRED: { color: "text-graphite bg-linen-canvas ring-gray-600/20", icon: Send, label: "Expired" },
   };
   const c = config[status] || { color: "text-graphite bg-linen-canvas ring-gray-600/20", icon: Send, label: status };
@@ -35,15 +34,43 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// Map UI filter value → backend status value
+const STATUS_MAP: Record<string, string> = {
+  all: "",
+  pending: "PENDING",
+  accepted: "ACCEPTED",
+  declined: "REJECTED",
+  cancelled: "CANCELLED",
+  expired: "EXPIRED",
+};
+
 function InvitationsPageInner() {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const { data, isLoading, error } = useBusinessInvitations({ page, limit: 10, status: statusFilter !== "all" ? statusFilter.toUpperCase() : undefined });
+  const backendStatus = STATUS_MAP[statusFilter] || undefined;
+
+  const { data, isLoading, error } = useBusinessInvitations({
+    page,
+    limit: 10,
+    status: backendStatus || undefined,
+  });
   const cancelMutation = useCancelInvitation();
   const [cancelConfirm, setCancelConfirm] = useState<string | null>(null);
+
+  // Client-side search filter on loaded results
+  const filteredItems = useMemo(() => {
+    const items = data?.items ?? [];
+    if (!search.trim()) return items;
+    const q = search.trim().toLowerCase();
+    return items.filter(
+      (inv: any) =>
+        inv.campaign?.title?.toLowerCase().includes(q) ||
+        inv.promoterProfile?.username?.toLowerCase().includes(q)
+    );
+  }, [data?.items, search]);
 
   if (error) return (
     <div className="flex flex-col items-center justify-center py-16">
@@ -64,6 +91,13 @@ function InvitationsPageInner() {
   };
 
   const formatBudget = (n?: number) => (typeof n === "number" ? `$${n.toLocaleString()}` : "—");
+
+  const allItems = data?.items ?? [];
+  const pendingCount = allItems.filter((i: any) => i.status === "PENDING").length;
+  const acceptedCount = allItems.filter((i: any) => i.status === "ACCEPTED").length;
+  const responseRate = allItems.length
+    ? Math.round((allItems.filter((i: any) => i.status !== "PENDING").length / allItems.length) * 100)
+    : 0;
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-32">
@@ -90,18 +124,19 @@ function InvitationsPageInner() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Invitations Sent" value={data?.total ?? 0} />
-        <StatCard label="Pending Responses" value={data?.items?.filter((i: any) => i.status === "PENDING").length || 0} />
-        <StatCard label="Accepted Invitations" value={data?.items?.filter((i: any) => i.status === "ACCEPTED").length || 0} />
-        <StatCard label="Response Rate" value={`${data?.items?.length ? Math.round((data.items.filter((i: any) => i.status !== "PENDING").length / data.items.length) * 100) : 0}%`} />
+        <StatCard label="Pending Responses" value={pendingCount} />
+        <StatCard label="Accepted Invitations" value={acceptedCount} />
+        <StatCard label="Response Rate" value={`${responseRate}%`} />
       </div>
 
+      {/* Search & Filters */}
       <div className="bg-white rounded-xl shadow-product-card-sm ring-1 ring-gray-200 p-2 flex flex-col gap-3">
         <div className="flex flex-col lg:flex-row gap-3">
           <div className="relative flex-1 min-w-[300px]">
             <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fog" />
             <input
               type="text"
-              placeholder="Search invitations by campaign or promoter..."
+              placeholder="Search by campaign or promoter…"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full pl-10 pr-4 h-10 bg-linen-canvas border border-slate-custom/10 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-signal-blue text-sm text-graphite placeholder-gray-400 transition-all"
@@ -109,15 +144,16 @@ function InvitationsPageInner() {
           </div>
         </div>
         <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-          {["All", "Pending", "Accepted", "Declined", "Expired"].map((status) => {
-            const isActive = statusFilter === status.toLowerCase();
+          {["All", "Pending", "Accepted", "Declined", "Cancelled", "Expired"].map((label) => {
+            const key = label.toLowerCase();
+            const isActive = statusFilter === key;
             return (
               <button
-                key={status}
-                onClick={() => { setStatusFilter(status.toLowerCase()); setPage(1); }}
+                key={label}
+                onClick={() => { setStatusFilter(key); setPage(1); }}
                 className={`whitespace-nowrap px-4 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border flex-shrink-0 ${isActive ? "bg-sky-wash border-signal-blue text-signal-blue" : "bg-white border-slate-custom/10 text-ash hover:bg-linen-canvas"}`}
               >
-                {status}
+                {label}
               </button>
             );
           })}
@@ -138,19 +174,27 @@ function InvitationsPageInner() {
               </div>
             ))}
           </div>
-        ) : !data || data.items.length === 0 ? (
+        ) : filteredItems.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center py-20 text-center bg-white rounded-xl shadow-product-card-sm ring-1 ring-gray-200">
             <div className="w-20 h-20 rounded-full bg-linen-canvas flex items-center justify-center mb-5 ring-1 ring-gray-900/5">
               <Send size={32} className="text-gray-300 ml-1" />
             </div>
-            <h3 className="text-lg font-semibold text-graphite">No invitations sent yet</h3>
-            <p className="text-sm text-ash mt-2 max-w-md">Start inviting promoters from the directory to collaborate on your active marketing campaigns.</p>
-            <button
-              onClick={() => router.push("/business/promoters")}
-              className="mt-6 inline-flex items-center gap-2 bg-signal-blue text-white rounded-lg h-10 px-6 text-sm font-medium hover:opacity-90 transition-colors shadow-product-card-sm"
-            >
-              <Users size={16} /> Browse Promoters
-            </button>
+            <h3 className="text-lg font-semibold text-graphite">
+              {search || statusFilter !== "all" ? "No invitations match your filters" : "No invitations sent yet"}
+            </h3>
+            <p className="text-sm text-ash mt-2 max-w-md">
+              {search || statusFilter !== "all"
+                ? "Try clearing the search or changing the status filter."
+                : "Start inviting promoters from the directory to collaborate on your active marketing campaigns."}
+            </p>
+            {!search && statusFilter === "all" && (
+              <button
+                onClick={() => router.push("/business/promoters")}
+                className="mt-6 inline-flex items-center gap-2 bg-signal-blue text-white rounded-lg h-10 px-6 text-sm font-medium hover:opacity-90 transition-colors shadow-product-card-sm"
+              >
+                <Users size={16} /> Browse Promoters
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
@@ -164,7 +208,7 @@ function InvitationsPageInner() {
                   <div className="text-right">Actions</div>
                 </div>
 
-                {data.items.map((inv: any, index: number) => (
+                {filteredItems.map((inv: any, index: number) => (
                   <div
                     key={inv.id}
                     style={{ zIndex: 100 - index, position: "relative" }}
@@ -177,7 +221,9 @@ function InvitationsPageInner() {
                       <div className="min-w-0 flex flex-col justify-center">
                         <p className="text-[20px] leading-tight font-bold text-graphite truncate">{inv.campaign?.title}</p>
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          <span className="text-[10px] font-bold text-ash bg-sky-wash px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap">{inv.campaign?.category}</span>
+                          {inv.campaign?.category && (
+                            <span className="text-[10px] font-bold text-ash bg-sky-wash px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap">{inv.campaign.category}</span>
+                          )}
                           <span className="text-sm font-medium text-ash whitespace-nowrap">{formatBudget(inv.campaign?.budget)}</span>
                         </div>
                       </div>
@@ -241,8 +287,9 @@ function InvitationsPageInner() {
                       <button
                         onClick={() => inv.promoterProfile?.username && router.push(`/promoters/${inv.promoterProfile.username}`)}
                         className="w-10 h-10 rounded-lg border border-slate-custom/10 text-ash hover:bg-linen-canvas hover:text-graphite transition-colors bg-white shadow-product-card-sm flex items-center justify-center"
+                        title="View promoter profile"
                       >
-                        <MoreHorizontal size={18} />
+                        <Eye size={18} />
                       </button>
                     </div>
                   </div>
@@ -250,16 +297,17 @@ function InvitationsPageInner() {
               </div>
             </div>
 
-            {data.pages > 0 && (
+            {(data?.pages ?? 0) > 1 && (
               <div className="bg-white px-6 py-4 rounded-xl shadow-product-card-sm ring-1 ring-gray-200 flex items-center justify-between mt-6">
                 <p className="text-sm text-ash">
-                  Showing <span className="font-semibold text-graphite">{(page - 1) * 10 + 1}</span> to <span className="font-semibold text-graphite">{Math.min(page * 10, data.total || page * 10)}</span> of <span className="font-semibold text-graphite">{data.total || "?"}</span> invitations
+                  Page <span className="font-semibold text-graphite">{page}</span> of <span className="font-semibold text-graphite">{data?.pages}</span>
+                  {" "}· <span className="font-semibold text-graphite">{data?.total ?? 0}</span> total invitations
                 </p>
                 <div className="flex items-center gap-2">
                   <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="p-2 rounded-lg border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
                     <ChevronLeft size={16} />
                   </button>
-                  <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="p-2 rounded-lg border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
+                  <button onClick={() => setPage((p) => Math.min(data?.pages ?? 1, p + 1))} disabled={page >= (data?.pages ?? 1)} className="p-2 rounded-lg border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
                     <ChevronRight size={16} />
                   </button>
                 </div>
@@ -275,8 +323,10 @@ function InvitationsPageInner() {
             <h3 className="text-heading font-bold text-graphite">Cancel Invitation</h3>
             <p className="text-sm text-ash mt-2">Are you sure you want to cancel this invitation? The promoter will be notified that the offer was withdrawn.</p>
             <div className="mt-6 flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setCancelConfirm(null)}>Cancel</Button>
-              <Button variant="danger" onClick={confirmCancel}>Confirm</Button>
+              <Button variant="ghost" onClick={() => setCancelConfirm(null)}>Keep it</Button>
+              <Button variant="danger" onClick={confirmCancel} disabled={cancelMutation.isPending}>
+                {cancelMutation.isPending ? "Cancelling…" : "Yes, Cancel"}
+              </Button>
             </div>
           </div>
         </div>
