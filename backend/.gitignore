@@ -1,0 +1,8 @@
+# Node backend (Express + Prisma)
+node_modules/
+npm-debug.log*
+.env
+uploads/
+
+# Prisma
+prisma/migrations/dev.db*

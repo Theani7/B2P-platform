@@ -67,3 +67,12 @@ frontend/playwright-report/
 *.sln
 # Uploads
 uploads/
+
+# Next.js
+.next/
+frontend/.next/
+
+# Node
+backend/node_modules/
+frontend/node_modules/
+

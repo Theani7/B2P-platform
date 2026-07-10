@@ -1,0 +1,92 @@
+"use client";
+
+import { RequireAuth } from "@/components/common/RequireAuth";
+import { Role } from "@/lib/roles";
+import { Card, PageHeader, Badge } from "@/components/ui/Card";
+import { StatCard } from "@/components/ui/Stats";
+import { Spinner } from "@/components/ui/Spinner";
+import { useAdminAnalytics } from "@/features/admin/api";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+
+
+function AnalyticsInner() {
+  const { data, isLoading } = useAdminAnalytics();
+  if (isLoading) return <Spinner />;
+  if (!data) return <Card><p className="text-body text-slate-custom">No analytics available.</p></Card>;
+
+  const nicheData = Object.entries(data.topNiches).map(([k, v]) => ({ name: k, value: v as number }));
+  const locData = Object.entries(data.topLocations).map(([k, v]) => ({ name: k, value: v as number }));
+
+  return (
+    <>
+      <PageHeader title="Analytics" subtitle="Platform-wide metrics and trends." />
+
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <StatCard label="Users" value={data.totalUsers} />
+        <StatCard label="Businesses" value={data.totalBusinesses} />
+        <StatCard label="Promoters" value={data.totalPromoters} />
+        <StatCard label="Verified promoters" value={data.verifiedPromoters} />
+        <StatCard label="Campaigns" value={data.totalCampaigns} />
+        <StatCard label="Applications" value={data.totalApplications} />
+        <StatCard label="Collaborations" value={data.totalCollaborations} />
+        <StatCard label="Reviews" value={data.totalReviews} />
+        <StatCard label="Avg rating" value={data.averageRating} />
+        <StatCard label="Acceptance rate" value={`${data.acceptanceRate}%`} hint="of collaborations" />
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <Card className="h-[400px] flex flex-col">
+          <h2 className="mb-6 text-heading-sm font-semibold text-midnight-ink">Top niches</h2>
+          <div className="flex-1 min-h-0">
+            {nicheData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={nicheData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 12, fill: "#8f9fb3" }} axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{ fill: "#f0f2f5" }} contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }} />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                    {nicheData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill="#145aff" />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-caption text-slate-custom">No data.</p>
+            )}
+          </div>
+        </Card>
+
+        <Card className="h-[400px] flex flex-col">
+          <h2 className="mb-6 text-heading-sm font-semibold text-midnight-ink">Top locations</h2>
+          <div className="flex-1 min-h-0">
+            {locData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={locData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 12, fill: "#8f9fb3" }} axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{ fill: "#f0f2f5" }} contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }} />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                    {locData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill="#145aff" />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-caption text-slate-custom">No data.</p>
+            )}
+          </div>
+        </Card>
+      </div>
+    </>
+  );
+}
+
+export default function AdminAnalyticsPage() {
+  return (
+    <RequireAuth role={Role.ADMIN}>
+      <AnalyticsInner />
+    </RequireAuth>
+  );
+}
