@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { useAuth } from "@/providers/AuthProvider";
 import { Spinner } from "@/components/ui/Spinner";
@@ -470,9 +471,20 @@ function ChatPanel({
 
 function MessagesInner() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const collabIdParam = searchParams.get("collaborationId");
+  
   const { data: conversations, isLoading } = useConversations();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+
+  // Automatically select the conversation if accessed via query param
+  useEffect(() => {
+    if (collabIdParam && conversations && !activeId) {
+      const match = conversations.find((c) => c.collaborationId === collabIdParam);
+      if (match) setActiveId(match.id);
+    }
+  }, [collabIdParam, conversations, activeId]);
 
   const active = conversations?.find((c) => c.id === activeId) ?? null;
 
@@ -518,7 +530,13 @@ function MessagesInner() {
 export default function MessagesPage() {
   return (
     <RequireAuth>
-      <MessagesInner />
+      <Suspense fallback={
+        <div className="flex h-[calc(100vh-64px-48px)] items-center justify-center">
+          <Spinner />
+        </div>
+      }>
+        <MessagesInner />
+      </Suspense>
     </RequireAuth>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { notifySuccess, notifyError } from "@/lib/notify";
@@ -282,12 +283,12 @@ function PromoterCollaborationsInner() {
           <p className="text-sm text-ash mt-2 max-w-xl">Manage your active and completed brand partnerships.</p>
         </div>
         <div className="flex items-center gap-3">
-          <a
+          <Link
             href="/promoter/marketplace"
             className="inline-flex items-center gap-2 bg-signal-blue text-white h-11 px-5 rounded-inputs text-sm font-semibold hover:opacity-90 transition-colors shadow-product-card-sm"
           >
             <SearchIcon size={16} /> Browse Campaigns
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -355,12 +356,12 @@ function PromoterCollaborationsInner() {
               </div>
               <h2 className="text-xl font-bold text-graphite mb-2">No active projects</h2>
               <p className="text-sm text-ash max-w-sm mb-6">You don&apos;t have any collaborations right now. Start by finding new partners.</p>
-              <a
+              <Link
                 href="/promoter/marketplace"
                 className="h-11 px-6 flex items-center justify-center rounded-inputs bg-signal-blue text-white text-sm font-bold hover:opacity-90 transition-colors shadow-product-card-sm"
               >
                 Explore Marketplace
-              </a>
+              </Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
