@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
@@ -27,11 +27,14 @@ export function RegisterForm() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { role: Role.BUSINESS },
   });
+
+  const selectedRole = useWatch({ control, name: "role" });
 
   const onSubmit = handleSubmit(async (values) => {
     try {
@@ -63,24 +66,41 @@ export function RegisterForm() {
         </label>
         <div className="grid grid-cols-2 gap-3">
           <label className={`relative flex cursor-pointer rounded-inputs border p-4 focus:outline-none transition-all ${
-            // Since we don't have access to watch("role") here without adding useWatch, we'll just style the select better, or use generic hover states
-            'border-slate-custom/20 hover:border-signal-blue hover:bg-sky-wash/50 bg-white'
+            selectedRole === Role.BUSINESS
+              ? 'border-signal-blue bg-sky-wash/50 ring-2 ring-signal-blue/20 shadow-sm'
+              : 'border-slate-custom/20 hover:border-signal-blue hover:bg-sky-wash/30 bg-white'
           }`}>
             <input type="radio" value={Role.BUSINESS} {...register("role")} className="sr-only" />
-            <div className="flex flex-col w-full text-center">
-              <span className="text-sm font-bold text-graphite mb-1">Business</span>
-              <span className="text-xs text-ash font-medium">I want to hire creators</span>
+            <div className="flex flex-col w-full text-center relative z-10">
+              <span className={`text-sm font-bold mb-1 transition-colors ${selectedRole === Role.BUSINESS ? 'text-signal-blue' : 'text-graphite'}`}>Business</span>
+              <span className={`text-xs font-medium transition-colors ${selectedRole === Role.BUSINESS ? 'text-signal-blue/70' : 'text-ash'}`}>I want to hire creators</span>
             </div>
-            {/* Visual indicator handled by global css or just focus state, but radio is sr-only */}
+            {selectedRole === Role.BUSINESS && (
+              <div className="absolute top-2 right-2 w-4 h-4 bg-signal-blue rounded-full flex items-center justify-center">
+                <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            )}
           </label>
+          
           <label className={`relative flex cursor-pointer rounded-inputs border p-4 focus:outline-none transition-all ${
-            'border-slate-custom/20 hover:border-signal-blue hover:bg-sky-wash/50 bg-white'
+            selectedRole === Role.PROMOTER
+              ? 'border-signal-blue bg-sky-wash/50 ring-2 ring-signal-blue/20 shadow-sm'
+              : 'border-slate-custom/20 hover:border-signal-blue hover:bg-sky-wash/30 bg-white'
           }`}>
             <input type="radio" value={Role.PROMOTER} {...register("role")} className="sr-only" />
-            <div className="flex flex-col w-full text-center">
-              <span className="text-sm font-bold text-graphite mb-1">Creator</span>
-              <span className="text-xs text-ash font-medium">I want to get hired</span>
+            <div className="flex flex-col w-full text-center relative z-10">
+              <span className={`text-sm font-bold mb-1 transition-colors ${selectedRole === Role.PROMOTER ? 'text-signal-blue' : 'text-graphite'}`}>Creator</span>
+              <span className={`text-xs font-medium transition-colors ${selectedRole === Role.PROMOTER ? 'text-signal-blue/70' : 'text-ash'}`}>I want to get hired</span>
             </div>
+            {selectedRole === Role.PROMOTER && (
+              <div className="absolute top-2 right-2 w-4 h-4 bg-signal-blue rounded-full flex items-center justify-center">
+                <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            )}
           </label>
         </div>
       </div>
