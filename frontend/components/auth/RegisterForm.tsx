@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,15 +43,21 @@ export function RegisterForm() {
   const username = useWatch({ control, name: "username" });
   const email = useWatch({ control, name: "email" });
 
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | undefined>(undefined);
+  const [emailAvailable, setEmailAvailable] = useState<boolean | undefined>(undefined);
+
   useEffect(() => {
+    setUsernameAvailable(undefined);
     if (!username || username.length < 3) return;
     const timeout = setTimeout(async () => {
       try {
         const res = await checkAvailability({ username });
         if (!res.usernameAvailable) {
           setError("username", { type: "manual", message: "Username is already taken" });
-        } else if (errors.username?.type === "manual") {
-          clearErrors("username");
+          setUsernameAvailable(false);
+        } else {
+          if (errors.username?.type === "manual") clearErrors("username");
+          setUsernameAvailable(true);
         }
       } catch (e) {}
     }, 500);
@@ -59,14 +65,17 @@ export function RegisterForm() {
   }, [username, setError, clearErrors, errors.username]);
 
   useEffect(() => {
+    setEmailAvailable(undefined);
     if (!email || !email.includes("@")) return;
     const timeout = setTimeout(async () => {
       try {
         const res = await checkAvailability({ email });
         if (!res.emailAvailable) {
           setError("email", { type: "manual", message: "Email is already registered" });
-        } else if (errors.email?.type === "manual") {
-          clearErrors("email");
+          setEmailAvailable(false);
+        } else {
+          if (errors.email?.type === "manual") clearErrors("email");
+          setEmailAvailable(true);
         }
       } catch (e) {}
     }, 500);
@@ -117,10 +126,10 @@ export function RegisterForm() {
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input label="Full Name" {...register("fullName")} error={errors.fullName?.message} />
-        <Input label="Username" {...register("username")} error={errors.username?.message} />
+        <Input label="Username" {...register("username")} error={errors.username?.message} success={usernameAvailable} />
       </div>
       
-      <Input label="Email Address" type="email" {...register("email")} error={errors.email?.message} />
+      <Input label="Email Address" type="email" {...register("email")} error={errors.email?.message} success={emailAvailable} />
       <div>
         <Input
           label="Password"

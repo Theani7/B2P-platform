@@ -1,14 +1,15 @@
 "use client";
 
 import { type InputHTMLAttributes, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check } from "lucide-react";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  success?: boolean;
 }
 
-export function Input({ label, error, className = "", id, type, ...rest }: Props) {
+export function Input({ label, error, success, className = "", id, type, ...rest }: Props) {
   const inputId = id ?? rest.name;
   const [showPassword, setShowPassword] = useState(false);
   
@@ -27,10 +28,15 @@ export function Input({ label, error, className = "", id, type, ...rest }: Props
           id={inputId}
           type={currentType}
           className={`w-full rounded-inputs border border-steel/30 bg-white px-3 py-2.5 text-sm text-midnight-ink outline-none transition focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 ${
-            error ? "border-coral-alert focus:border-coral-alert focus:ring-coral-alert/10" : ""
-          } ${isPassword ? "pr-10" : ""} ${className}`}
+            error ? "border-coral-alert focus:border-coral-alert focus:ring-coral-alert/10" : success ? "border-emerald-status focus:border-emerald-status focus:ring-emerald-status/10" : ""
+          } ${isPassword || success ? "pr-10" : ""} ${className}`}
           {...rest}
         />
+        {success && !isPassword && !error && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-status flex items-center justify-center pointer-events-none">
+            <Check size={18} />
+          </div>
+        )}
         {isPassword && (
           <button
             type="button"
