@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
@@ -40,7 +41,7 @@ function UsersInner() {
     fn.mutate(id, { onSuccess: () => notifySuccess(ok), onError: (e: any) => notifyError(e?.response?.data?.message ?? err) });
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       <PageHeader title="Users" subtitle="Manage platform accounts." />
 
       <Card className="mb-5">
@@ -81,16 +82,16 @@ function UsersInner() {
         </div>
       </Card>
 
-      {isFetching && !data ? <Spinner /> : null}
+      {isFetching && !data ? <Spinner full /> : null}
 
       <div className="space-y-2">
         {(data?.items ?? []).map((u) => (
           <Card key={u.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
             <div>
               <div className="flex items-center gap-2">
-                <a href={`/admin/users/${u.id}`} className="text-body font-medium text-midnight-ink hover:underline">
+                <Link href={`/admin/users/${u.id}`} className="text-body font-medium text-midnight-ink hover:underline">
                   {u.fullName || u.username}
-                </a>
+                </Link>
                 <Badge tone="signal">{u.role}</Badge>
                 {!u.isActive && <Badge tone="coral">Suspended</Badge>}
                 {u.isVerified && <Badge tone="emerald">Verified</Badge>}
@@ -147,7 +148,7 @@ function UsersInner() {
           setUserToDelete(null);
         }}
       />
-    </>
+    </div>
   );
 }
 

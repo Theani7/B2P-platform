@@ -95,7 +95,7 @@ function VerificationRequests() {
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto space-y-6">
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-heading text-midnight-ink">Verification Requests</h1>
@@ -123,9 +123,7 @@ function VerificationRequests() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Spinner />
-        </div>
+        <Spinner full />
       ) : !data || data.items.length === 0 ? (
         <EmptyState title="No verification requests" description="There are currently no requests matching your criteria." />
       ) : (
