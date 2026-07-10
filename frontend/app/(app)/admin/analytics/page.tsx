@@ -11,8 +11,12 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieCha
 
 function AnalyticsInner() {
   const { data, isLoading } = useAdminAnalytics();
-  if (isLoading) return <Spinner />;
-  if (!data) return <Card><p className="text-body text-slate-custom">No analytics available.</p></Card>;
+  if (isLoading) return <Spinner full />;
+  if (!data) return (
+    <div className="flex items-center justify-center h-full">
+      <p className="text-body text-slate-custom">No analytics available.</p>
+    </div>
+  );
 
   const nicheData = Object.entries(data.topNiches).map(([k, v]) => ({ name: k, value: v as number }));
   const locData = Object.entries(data.topLocations).map(([k, v]) => ({ name: k, value: v as number }));
@@ -26,7 +30,7 @@ function AnalyticsInner() {
   const COLORS = ["#145aff", "#16ca2e", "#ffa64d"];
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       <PageHeader title="Analytics" subtitle="Platform-wide metrics and trends." />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
@@ -110,7 +114,7 @@ function AnalyticsInner() {
           </div>
         </Card>
       </div>
-    </>
+    </div>
   );
 }
 

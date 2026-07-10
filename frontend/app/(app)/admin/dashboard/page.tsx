@@ -6,6 +6,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { StatCard } from "@/components/ui/Stats";
 import { Spinner } from "@/components/ui/Spinner";
+import Link from "next/link";
 import { useAdminDashboard, useAdminAnalytics } from "@/features/admin/api";
 
 function StatGrid({ stats }: { stats: Record<string, { label: string; value: number; hint?: string }> }) {
@@ -23,7 +24,7 @@ function DashboardInner() {
   const { data: dash, isLoading } = useAdminDashboard();
   const { data: analytics } = useAdminAnalytics();
 
-  if (isLoading) return <Spinner />;
+  if (isLoading) return <Spinner full />;
 
   const stats = {
     users: { label: "Total users", value: dash?.totalUsers ?? 0 },
@@ -38,7 +39,7 @@ function DashboardInner() {
   };
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       <PageHeader
         title="Admin dashboard"
         subtitle={`Signed in as ${user?.fullName || user?.username}.`}
@@ -56,13 +57,13 @@ function DashboardInner() {
               { label: "Settings", href: "/admin/settings" },
               { label: "Analytics", href: "/admin/analytics" },
             ].map((l) => (
-              <a
+              <Link
                 key={l.href}
                 href={l.href}
-                className="rounded-pill bg-sky-wash px-4 py-2 text-body font-medium text-graphite hover:bg-steel/10"
+                className="rounded-pill bg-sky-wash px-4 py-2 text-body font-medium text-graphite hover:bg-steel/10 transition-colors"
               >
                 {l.label}
-              </a>
+              </Link>
             ))}
           </div>
         </Card>
@@ -101,7 +102,7 @@ function DashboardInner() {
           )}
         </Card>
       </div>
-    </>
+    </div>
   );
 }
 
