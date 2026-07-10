@@ -85,10 +85,10 @@ function SettingsInner() {
     ? data
     : data?.items ?? [];
 
-  if (isLoading) return <Spinner />;
+  if (isLoading) return <Spinner full />;
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       <PageHeader
         title="Platform settings"
         subtitle="Configure global platform options."
@@ -104,7 +104,7 @@ function SettingsInner() {
         ))}
         {items.length === 0 && <Card><p className="text-body text-slate-custom">No settings yet — seed defaults to populate.</p></Card>}
       </div>
-    </>
+    </div>
   );
 }
 
