@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 
 const fmtNpr = (n?: number | null) =>
-  new Intl.NumberFormat("en-NP", { style: "currency", currency: "NPR", maximumFractionDigits: 0 }).format(n ?? 0);
+  "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0);
 
 const deliverableTone: Record<string, "slate" | "signal" | "emerald" | "coral" | "amber"> = {
   DRAFT: "slate",

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 const fmtNpr = (n?: number | null) =>
-  new Intl.NumberFormat("en-NP", { style: "currency", currency: "NPR", maximumFractionDigits: 0 }).format(n ?? 0);
+  "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0);
 
 // Map filter tab labels to API status values
 const STATUS_FILTER_MAP: Record<string, string | undefined> = {

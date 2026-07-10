@@ -90,7 +90,7 @@ function InvitationsPageInner() {
     });
   };
 
-  const formatBudget = (n?: number) => (typeof n === "number" ? `$${n.toLocaleString()}` : "—");
+  const formatBudget = (n?: number) => (typeof n === "number" ? "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0) : "—");
 
   const allItems = data?.items ?? [];
   const pendingCount = allItems.filter((i: any) => i.status === "PENDING").length;

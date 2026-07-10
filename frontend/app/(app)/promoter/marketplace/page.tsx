@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 const fmtNpr = (n: number) =>
-  new Intl.NumberFormat("en-NP", { style: "currency", currency: "NPR", maximumFractionDigits: 0 }).format(n ?? 0);
+  "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0);
 
 const MARKETPLACE_CATEGORIES = [
   "Fashion", "Tech", "Beauty", "Food", "Travel",

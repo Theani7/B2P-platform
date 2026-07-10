@@ -61,7 +61,7 @@ function CampaignsInner() {
                 <a href={`/business/campaigns/${c.id}`} className="text-body font-medium text-midnight-ink hover:underline">{c.title}</a>
                 <Badge tone={STATUS_TONE[c.status] ?? "slate"}>{c.status}</Badge>
               </div>
-              <p className="text-caption text-slate-custom">{c.businessCompanyName} · {c.category} · {c.location} · ${Number(c.budget).toLocaleString()}</p>
+              <p className="text-caption text-slate-custom">{c.businessCompanyName} · {c.category} · {c.location} · Rs. {new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(Number(c.budget) || 0)}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="ghost" onClick={() => setActionCampaign({ id: c.id, title: c.title, type: "archive" })}>Archive</Button>

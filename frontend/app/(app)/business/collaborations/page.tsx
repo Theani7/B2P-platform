@@ -116,7 +116,7 @@ function CollabCard({ collab }: { collab: Collaboration }) {
     ? Math.max(0, Math.ceil((new Date(collab.campaignEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
 
-  const formatBudget = (n: number) => `$${n.toLocaleString()}`;
+  const formatBudget = (n: number) => "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0);
 
   return (
     <div className="bg-white rounded-2xl shadow-product-card-sm ring-1 ring-gray-200 hover:shadow-product-card hover:ring-signal-blue/20 transition-all group flex flex-col overflow-hidden">

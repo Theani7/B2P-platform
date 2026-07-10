@@ -345,7 +345,7 @@ function ChatPanel({
         <div className="flex items-center gap-1">
           {active.campaignBudget && (
             <span className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-emerald-status bg-emerald-status/10 px-3 py-1.5 rounded-full">
-              <Wallet size={12} /> ${formatBudget(active.campaignBudget)}
+              <Wallet size={12} /> {formatBudget(active.campaignBudget)}
             </span>
           )}
           {!isActive && (

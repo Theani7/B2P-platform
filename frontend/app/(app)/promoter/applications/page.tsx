@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 const fmtNpr = (n?: number | null) =>
-  new Intl.NumberFormat("en-NP", { style: "currency", currency: "NPR", maximumFractionDigits: 0 }).format(n ?? 0);
+  "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0);
 
 const STATUS_CONFIG: Record<string, { color: string; icon: any; label: string }> = {
   PENDING: { color: "bg-amber-50 text-amber-700 ring-amber-600/20", icon: Clock, label: "Pending Review" },
