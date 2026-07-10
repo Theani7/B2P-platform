@@ -7,14 +7,18 @@ export default function RegisterPage() {
   return (
     <GuestOnly>
       <AuthLayout>
-        <h1 className="mb-1 text-heading-lg font-semibold tracking-tight text-midnight-ink">
-          Create your account
-        </h1>
-        <p className="mb-6 text-body text-slate-custom">Join Byparsathy as a business or promoter.</p>
+        <div className="mb-10 text-center sm:text-left">
+          <h1 className="text-3xl font-extrabold tracking-tight text-graphite mb-2">
+            Create an account
+          </h1>
+          <p className="text-sm text-ash font-medium">Join Byparsathy as a business or promoter.</p>
+        </div>
+        
         <RegisterForm />
-        <p className="mt-4 text-center text-caption text-steel">
+        
+        <p className="mt-8 text-center text-sm font-medium text-ash">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/login" className="text-signal-blue hover:text-signal-blue/80 font-bold transition-colors">
             Sign in
           </Link>
         </p>
