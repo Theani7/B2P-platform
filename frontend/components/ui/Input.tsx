@@ -1,27 +1,52 @@
-import { type InputHTMLAttributes } from "react";
+"use client";
+
+import { type InputHTMLAttributes, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
 }
 
-export function Input({ label, error, className = "", id, ...rest }: Props) {
+export function Input({ label, error, className = "", id, type, ...rest }: Props) {
   const inputId = id ?? rest.name;
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const isPassword = type === "password";
+  const currentType = isPassword ? (showPassword ? "text" : "password") : type;
+
   return (
-    <label className="block">
+    <div className="block w-full">
       {label && (
-        <span className="mb-1 block text-caption font-medium uppercase tracking-wide text-steel">
+        <label htmlFor={inputId} className="mb-1 block text-caption font-medium uppercase tracking-wide text-steel">
           {label}
-        </span>
+        </label>
       )}
-      <input
-        id={inputId}
-        className={`w-full rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-          error ? "border-coral-alert" : ""
-        } ${className}`}
-        {...rest}
-      />
-      {error && <span className="mt-1 block text-caption text-coral-alert">{error}</span>}
-    </label>
+      <div className="relative">
+        <input
+          id={inputId}
+          type={currentType}
+          className={`w-full rounded-inputs border border-steel/30 bg-white px-3 py-2.5 text-sm text-midnight-ink outline-none transition focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 ${
+            error ? "border-coral-alert focus:border-coral-alert focus:ring-coral-alert/10" : ""
+          } ${isPassword ? "pr-10" : ""} ${className}`}
+          {...rest}
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowPassword(!showPassword);
+            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-steel hover:text-signal-blue transition-colors focus:outline-none flex items-center justify-center"
+            tabIndex={-1}
+            title={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+      </div>
+      {error && <span className="mt-1 block text-caption text-coral-alert font-medium">{error}</span>}
+    </div>
   );
 }

@@ -35,6 +35,38 @@ export function RegisterForm() {
   });
 
   const selectedRole = useWatch({ control, name: "role" });
+  const password = useWatch({ control, name: "password" }) || "";
+
+  const hasMinLength = password.length >= 6;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+  
+  const strengthScore = [hasMinLength, hasUpperCase, hasNumber, hasSpecialChar].filter(Boolean).length;
+  
+  const getStrengthColor = () => {
+    if (password.length === 0) return "bg-steel/20";
+    if (strengthScore <= 1) return "bg-coral-alert";
+    if (strengthScore === 2) return "bg-amber-tag";
+    if (strengthScore >= 3) return "bg-emerald-status";
+    return "bg-steel/20";
+  };
+  
+  const getStrengthTextColor = () => {
+    if (password.length === 0) return "text-ash";
+    if (strengthScore <= 1) return "text-coral-alert";
+    if (strengthScore === 2) return "text-amber-tag";
+    if (strengthScore >= 3) return "text-emerald-status";
+    return "text-ash";
+  };
+  
+  const getStrengthLabel = () => {
+    if (password.length === 0) return "Strength";
+    if (strengthScore <= 1) return "Weak";
+    if (strengthScore === 2) return "Fair";
+    if (strengthScore >= 3) return "Strong";
+    return "Strength";
+  };
 
   const onSubmit = handleSubmit(async (values) => {
     try {
@@ -53,12 +85,25 @@ export function RegisterForm() {
       </div>
       
       <Input label="Email Address" type="email" {...register("email")} error={errors.email?.message} />
-      <Input
-        label="Password"
-        type="password"
-        {...register("password")}
-        error={errors.password?.message}
-      />
+      <div>
+        <Input
+          label="Password"
+          type="password"
+          {...register("password")}
+          error={errors.password?.message}
+        />
+        <div className="mt-2.5 flex items-center gap-2">
+          <div className="flex-1 flex gap-1 h-1.5">
+            <div className={`flex-1 rounded-full transition-colors ${password.length > 0 ? getStrengthColor() : 'bg-slate-custom/10'}`} />
+            <div className={`flex-1 rounded-full transition-colors ${strengthScore >= 2 ? getStrengthColor() : 'bg-slate-custom/10'}`} />
+            <div className={`flex-1 rounded-full transition-colors ${strengthScore >= 3 ? getStrengthColor() : 'bg-slate-custom/10'}`} />
+            <div className={`flex-1 rounded-full transition-colors ${strengthScore >= 4 ? getStrengthColor() : 'bg-slate-custom/10'}`} />
+          </div>
+          <span className={`text-[10px] font-bold uppercase tracking-wider w-14 text-right transition-colors ${getStrengthTextColor()}`}>
+            {getStrengthLabel()}
+          </span>
+        </div>
+      </div>
       
       <div className="pt-2">
         <label className="block mb-2 text-xs font-bold uppercase tracking-wider text-graphite">
