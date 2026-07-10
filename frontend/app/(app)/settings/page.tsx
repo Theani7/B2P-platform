@@ -7,7 +7,7 @@ import { Role } from "@/lib/roles";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { usePublicSettings, useAccountSettings } from "@/features/settings/api";
 import {
   useAdminSettings,
@@ -108,26 +108,26 @@ function PlatformSettingsCard() {
     updateSetting.mutate(
       { key, settingValue: editValue },
       {
-        onSuccess: () => { toast.success("Setting updated"); setEditingKey(null); },
-        onError: () => toast.error("Failed to update setting"),
+        onSuccess: () => { notifySuccess("Setting updated"); setEditingKey(null); },
+        onError: () => notifyError("Failed to update setting"),
       },
     );
   };
   const handleAddSave = () => {
-    if (!newKey || !newValue) { toast.error("Key and Value are required"); return; }
+    if (!newKey || !newValue) { notifyError("Key and Value are required"); return; }
     updateSetting.mutate(
       { key: newKey, settingValue: newValue, description: newDesc },
       {
-        onSuccess: () => { toast.success("Setting created"); setIsAdding(false); setNewKey(""); setNewValue(""); setNewDesc(""); },
-        onError: () => toast.error("Failed to create setting"),
+        onSuccess: () => { notifySuccess("Setting created"); setIsAdding(false); setNewKey(""); setNewValue(""); setNewDesc(""); },
+        onError: () => notifyError("Failed to create setting"),
       },
     );
   };
   const handleDelete = (key: string) => {
     if (confirm(`Are you sure you want to delete the setting: ${key}?`)) {
       deleteSetting.mutate(key, {
-        onSuccess: () => toast.success("Setting deleted"),
-        onError: () => toast.error("Failed to delete setting"),
+        onSuccess: () => notifySuccess("Setting deleted"),
+        onError: () => notifyError("Failed to delete setting"),
       });
     }
   };

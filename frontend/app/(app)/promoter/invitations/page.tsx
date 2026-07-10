@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { usePromoterInvitations, useAcceptInvitation, useRejectInvitation } from "@/features/invitations/api";
 import {
   Mail, Building2, Clock, MapPin, Briefcase, Star, CheckCircle2, XCircle, AlertCircle, MessageCircle,
@@ -44,9 +44,9 @@ function InvitationsInner() {
   const confirmAction = () => {
     if (!actionConfirm) return;
     if (actionConfirm.action === "accept") {
-      accept.mutate(actionConfirm.id, { onSuccess: () => { toast.success("Invitation accepted! Collaboration created."); setActionConfirm(null); }, onError: (e: any) => { toast.error(e?.response?.data?.message ?? "Failed"); setActionConfirm(null); } });
+      accept.mutate(actionConfirm.id, { onSuccess: () => { notifySuccess("Invitation accepted! Collaboration created."); setActionConfirm(null); }, onError: (e: any) => { notifyError(e?.response?.data?.message ?? "Failed"); setActionConfirm(null); } });
     } else {
-      reject.mutate(actionConfirm.id, { onSuccess: () => { toast.success("Invitation declined."); setActionConfirm(null); }, onError: (e: any) => { toast.error(e?.response?.data?.message ?? "Failed"); setActionConfirm(null); } });
+      reject.mutate(actionConfirm.id, { onSuccess: () => { notifySuccess("Invitation declined."); setActionConfirm(null); }, onError: (e: any) => { notifyError(e?.response?.data?.message ?? "Failed"); setActionConfirm(null); } });
     }
   };
 

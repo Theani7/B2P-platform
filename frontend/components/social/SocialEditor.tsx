@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useCreateSocialLink, useUpdateSocialLink, type SocialLink, type SocialLinkInput } from "@/features/social/api";
 
 export function SocialEditor({ link, onDone }: { link?: SocialLink; onDone: () => void }) {
@@ -34,12 +34,12 @@ export function SocialEditor({ link, onDone }: { link?: SocialLink; onDone: () =
     if (link) {
       update.mutate(
         { id: link.id, data: payload },
-        { onSuccess: () => { toast.success("Link updated"); onDone(); }, onError: (e: any) => toast.error(e?.response?.data?.message ?? "Update failed") },
+        { onSuccess: () => { notifySuccess("Link updated"); onDone(); }, onError: (e: any) => notifyError(e?.response?.data?.message ?? "Update failed") },
       );
     } else {
       create.mutate(payload, {
-        onSuccess: () => { toast.success("Link added"); onDone(); },
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Create failed"),
+        onSuccess: () => { notifySuccess("Link added"); onDone(); },
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Create failed"),
       });
     }
   };

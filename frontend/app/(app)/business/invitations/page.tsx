@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -58,8 +58,8 @@ function InvitationsPageInner() {
   const confirmCancel = () => {
     if (!cancelConfirm) return;
     cancelMutation.mutate(cancelConfirm, {
-      onSuccess: () => { toast.success("Invitation cancelled"); setCancelConfirm(null); },
-      onError: (e: any) => { toast.error(e?.response?.data?.message ?? "Failed"); setCancelConfirm(null); },
+      onSuccess: () => { notifySuccess("Invitation cancelled"); setCancelConfirm(null); },
+      onError: (e: any) => { notifyError(e?.response?.data?.message ?? "Failed"); setCancelConfirm(null); },
     });
   };
 

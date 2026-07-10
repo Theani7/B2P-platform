@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import InvitePromoterModal from "./InvitePromoterModal";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { usePublicPromoterProfile } from "@/features/discovery/api";
 import { PortfolioGrid } from "@/components/portfolio/PortfolioGrid";
 
@@ -46,19 +46,19 @@ export function ProfilePreviewModal({ isOpen, onClose, promoter, onSave, isSaved
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success("Profile URL copied to clipboard!");
+    notifySuccess("Profile URL copied to clipboard!");
   };
 
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-gray-900/40 backdrop-blur-md"
             onClick={onClose}
           />
           <motion.div

@@ -17,6 +17,7 @@ import { useProfileCompletion } from "@/features/profile-completion/api";
 import { usePromoterProfile, useUpdatePromoterProfile } from "@/features/profile/api";
 import { useUserRating } from "@/features/reviews/api";
 import { useUpload } from "@/features/upload/api";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import {
   Handshake,
   Star,
@@ -87,9 +88,27 @@ function DashboardInner() {
   const confirmAction = () => {
     if (!actionConfirm) return;
     if (actionConfirm.action === "accept") {
-      acceptMutation.mutate(actionConfirm.id, { onSettled: () => setActionConfirm(null) });
+      acceptMutation.mutate(actionConfirm.id, { 
+        onSuccess: () => {
+          notifySuccess("Invitation accepted! A new collaboration project has been created.");
+          setActionConfirm(null);
+        },
+        onError: (e: any) => {
+          notifyError(e?.response?.data?.message ?? "Failed to accept invitation");
+          setActionConfirm(null);
+        }
+      });
     } else {
-      rejectMutation.mutate(actionConfirm.id, { onSettled: () => setActionConfirm(null) });
+      rejectMutation.mutate(actionConfirm.id, { 
+        onSuccess: () => {
+          notifySuccess("Invitation declined.");
+          setActionConfirm(null);
+        },
+        onError: (e: any) => {
+          notifyError(e?.response?.data?.message ?? "Failed to decline invitation");
+          setActionConfirm(null);
+        }
+      });
     }
   };
 

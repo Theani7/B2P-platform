@@ -5,7 +5,7 @@ import { useCampaigns } from "@/features/campaigns/api";
 import { useInvitePromoter } from "@/features/invitations/api";
 import { useBusinessInvitations } from "@/features/invitations/api";
 import { useBusinessApplications } from "@/features/applications/api";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 
 interface InvitePromoterModalProps {
   isOpen: boolean;
@@ -46,16 +46,16 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
 
   const handleSend = () => {
     if (!selectedCampaignId) {
-      toast.error("Please select a campaign first.");
+      notifyError("Please select a campaign first.");
       return;
     }
 
     if (alreadyInvitedCampaignIds.has(selectedCampaignId)) {
-      toast.error(`You have already invited ${promoter.username} to this campaign.`);
+      notifyError(`You have already invited ${promoter.username} to this campaign.`);
       return;
     }
     if (alreadyAppliedCampaignIds.has(selectedCampaignId)) {
-      toast.error(`${promoter.username} has already applied to this campaign.`);
+      notifyError(`${promoter.username} has already applied to this campaign.`);
       return;
     }
 
@@ -63,13 +63,13 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
       { promoterId: promoter.id, campaignId: selectedCampaignId, message },
       {
         onSuccess: () => {
-          toast.success(`Invitation sent to ${promoter.username}!`);
+          notifySuccess(`Invitation sent to ${promoter.username}!`);
           setSelectedCampaignId("");
           setMessage("");
           onClose();
         },
         onError: (err: any) => {
-          toast.error(err.message || "Failed to send invitation.");
+          notifyError(err.message || "Failed to send invitation.");
         }
       }
     );
@@ -78,13 +78,13 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[102] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-gray-900/60 backdrop-blur-md"
             onClick={onClose}
           />
           <motion.div
@@ -92,7 +92,7 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl flex flex-col z-[103] overflow-hidden"
+            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl flex flex-col z-[2001] overflow-hidden"
           >
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-900">Invite {promoter.username}</h3>

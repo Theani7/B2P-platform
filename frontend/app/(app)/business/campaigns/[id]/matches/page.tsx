@@ -3,7 +3,7 @@
 import { use, useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -76,8 +76,8 @@ function MatchesInner({ id }: { id: string }) {
               disabled={generate.isPending}
               onClick={() =>
                 generate.mutate(id, {
-                  onSuccess: (d) => toast.success(`Generated ${d.totalMatches} matches`),
-                  onError: (e: any) => toast.error(e?.response?.data?.message ?? "Could not generate"),
+                  onSuccess: (d) => notifySuccess(`Generated ${d.totalMatches} matches`),
+                  onError: (e: any) => notifyError(e?.response?.data?.message ?? "Could not generate"),
                 })
               }
             >
@@ -134,8 +134,8 @@ function MatchesInner({ id }: { id: string }) {
                         invite.mutate(
                           { campaignId: id, promoterId: m.promoter.id },
                           {
-                            onSuccess: () => toast.success(`Invited @${m.promoter.username}`),
-                            onError: (e: any) => toast.error(e?.response?.data?.message ?? "Invite failed"),
+                            onSuccess: () => notifySuccess(`Invited @${m.promoter.username}`),
+                            onError: (e: any) => notifyError(e?.response?.data?.message ?? "Invite failed"),
                           },
                         )
                       }

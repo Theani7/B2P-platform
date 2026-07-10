@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { register as registerUser } from "@/features/auth/api";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -39,7 +39,7 @@ export function RegisterForm() {
       const user = await registerUser(values);
       window.location.href = DashboardPath[user.role as Role] ?? "/";
     } catch {
-      toast.error("Could not create account");
+      notifyError("Could not create account");
     }
   });
 

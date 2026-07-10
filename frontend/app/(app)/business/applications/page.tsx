@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -39,16 +39,16 @@ function ApplicationsPageInner() {
 
   const handleAccept = (id: string) => {
     acceptMutation.mutate(id, {
-      onSuccess: () => { toast.success("Application accepted — collaboration created!"); setSelectedAppId(null); },
-      onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed"),
+      onSuccess: () => { notifySuccess("Application accepted — collaboration created!"); setSelectedAppId(null); },
+      onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed"),
     });
   };
 
   const confirmReject = () => {
     if (!rejectConfirm) return;
     rejectMutation.mutate(rejectConfirm, {
-      onSuccess: () => { toast.success("Application rejected"); setRejectConfirm(null); setSelectedAppId(null); },
-      onError: (e: any) => { toast.error(e?.response?.data?.message ?? "Failed"); setRejectConfirm(null); },
+      onSuccess: () => { notifySuccess("Application rejected"); setRejectConfirm(null); setSelectedAppId(null); },
+      onError: (e: any) => { notifyError(e?.response?.data?.message ?? "Failed"); setRejectConfirm(null); },
     });
   };
 

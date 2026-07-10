@@ -11,7 +11,7 @@ import { StatCard } from "@/components/ui/Stats";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Avatar } from "@/components/ui/Avatar";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { useRouter } from "next/navigation";
@@ -61,7 +61,7 @@ function PromoterDirectoryPageInner() {
   });
 
   const { data: savedData } = useSavedPromoters({ limit: 100 });
-  const savedPromoterIds = new Set(savedData?.items?.map((p: any) => p.id) || []);
+  const savedPromoterIds = new Set(savedData?.items?.map((p: any) => p.promoterProfileId) || []);
 
   const savePromoter = useSavePromoter();
   const removePromoter = useRemoveSavedPromoter();
@@ -69,13 +69,13 @@ function PromoterDirectoryPageInner() {
   const handleSave = (id: string) => {
     if (savedPromoterIds.has(id)) {
       removePromoter.mutate(id, {
-        onSuccess: () => { toast.success("Promoter removed from shortlist"); savedPromoterIds.delete(id); },
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed"),
+        onSuccess: () => { notifySuccess("Promoter removed from shortlist"); savedPromoterIds.delete(id); },
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed"),
       });
     } else {
       savePromoter.mutate(id, {
-        onSuccess: () => { toast.success("Promoter saved to shortlist!"); savedPromoterIds.add(id); },
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed"),
+        onSuccess: () => { notifySuccess("Promoter saved to shortlist!"); savedPromoterIds.add(id); },
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed"),
       });
     }
   };

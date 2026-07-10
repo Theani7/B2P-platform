@@ -7,7 +7,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Card, Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Trophy, Award, Medal, Lock } from "lucide-react";
 import {
   useMyAchievements,
@@ -153,8 +153,8 @@ function AchievementsInner() {
             variant="ghost"
             onClick={() =>
               recalc.mutate(undefined, {
-                onSuccess: (d) => toast.success(`Recalculated ${d.count} users`),
-                onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed"),
+                onSuccess: (d) => notifySuccess(`Recalculated ${d.count} users`),
+                onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed"),
               })
             }
             disabled={recalc.isPending}

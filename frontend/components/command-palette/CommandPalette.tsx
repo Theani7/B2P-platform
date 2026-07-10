@@ -102,7 +102,6 @@ export function CommandPalette() {
       cmds.push({ id: "nav-campaigns", title: "Campaign Moderation", type: "navigation", icon: "campaigns", action: () => router.push("/admin/campaigns") });
       cmds.push({ id: "nav-reviews", title: "Review Moderation", type: "navigation", icon: "reviews", action: () => router.push("/admin/reviews") });
       cmds.push({ id: "nav-analytics", title: "Analytics", type: "navigation", icon: "dashboard", action: () => router.push("/admin/analytics") });
-      cmds.push({ id: "nav-audit-logs", title: "Audit Logs", type: "navigation", icon: "clock", action: () => router.push("/admin/audit-logs") });
       cmds.push({ id: "nav-settings", title: "Platform Settings", type: "navigation", icon: "settings", action: () => router.push("/admin/settings") });
     } else if (user.role === Role.BUSINESS) {
       cmds.push({ id: "nav-campaigns", title: "Campaigns", type: "navigation", icon: "campaigns", action: () => router.push("/business/campaigns") });

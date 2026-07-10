@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Button } from "@/components/ui/Button";
 import { RatingStars } from "@/components/reviews/RatingStars";
 import { useCreateReview } from "@/features/reviews/api";
@@ -23,10 +23,10 @@ export function ReviewDialog({
       { collaborationId, data: { rating, comment: comment || undefined } },
       {
         onSuccess: () => {
-          toast.success("Review submitted");
+          notifySuccess("Review submitted");
           onClose();
         },
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Could not submit review"),
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Could not submit review"),
       },
     );
   };

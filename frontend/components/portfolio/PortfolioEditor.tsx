@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useCreatePortfolioItem, useUpdatePortfolioItem, type PortfolioItem, type PortfolioItemInput } from "@/features/portfolio/api";
 import { X } from "lucide-react";
 
@@ -62,12 +62,12 @@ export function PortfolioEditor({
     if (item) {
       update.mutate(
         { id: item.id, data: payload },
-        { onSuccess: () => { toast.success("Portfolio item updated"); onDone(); }, onError: (e: any) => toast.error(e?.response?.data?.message ?? "Update failed") },
+        { onSuccess: () => { notifySuccess("Portfolio item updated"); onDone(); }, onError: (e: any) => notifyError(e?.response?.data?.message ?? "Update failed") },
       );
     } else {
       create.mutate(payload, {
-        onSuccess: () => { toast.success("Portfolio item added"); onDone(); },
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Create failed"),
+        onSuccess: () => { notifySuccess("Portfolio item added"); onDone(); },
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Create failed"),
       });
     }
   };

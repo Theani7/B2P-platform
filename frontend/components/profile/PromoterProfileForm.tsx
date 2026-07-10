@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Card, PageHeader } from "@/components/ui/Card";
@@ -53,8 +53,8 @@ export function PromoterProfileForm() {
     };
     const mutation = hasProfile ? updateMutation : createMutation;
     mutation.mutate(payload, {
-      onSuccess: () => toast.success(hasProfile ? "Profile updated" : "Profile created"),
-      onError: (err: any) => toast.error(err?.response?.data?.message ?? "Something went wrong"),
+      onSuccess: () => notifySuccess(hasProfile ? "Profile updated" : "Profile created"),
+      onError: (err: any) => notifyError(err?.response?.data?.message ?? "Something went wrong"),
     });
   };
 

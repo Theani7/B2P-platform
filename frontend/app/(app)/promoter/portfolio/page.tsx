@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useMyPortfolio, useDeletePortfolioItem } from "@/features/portfolio/api";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -73,8 +73,8 @@ function PortfolioPageInner() {
                   variant="danger"
                   onClick={() =>
                     del.mutate(item.id, {
-                      onSuccess: () => toast.success("Deleted"),
-                      onError: (e: any) => toast.error(e?.response?.data?.message ?? "Delete failed"),
+                      onSuccess: () => notifySuccess("Deleted"),
+                      onError: (e: any) => notifyError(e?.response?.data?.message ?? "Delete failed"),
                     })
                   }
                 >

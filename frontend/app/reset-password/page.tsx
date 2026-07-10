@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import api from "@/lib/apiClient";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -30,15 +30,15 @@ function ResetForm() {
 
   const onSubmit = handleSubmit(async (values) => {
     if (!token) {
-      toast.error("Missing reset token.");
+      notifyError("Missing reset token.");
       return;
     }
     try {
       await api.post("/auth/reset-password", { token, password: values.password });
-      toast.success("Password reset. Please sign in.");
+      notifySuccess("Password reset. Please sign in.");
       router.push("/login");
     } catch {
-      toast.error("Reset failed or link expired.");
+      notifyError("Reset failed or link expired.");
     }
   });
 

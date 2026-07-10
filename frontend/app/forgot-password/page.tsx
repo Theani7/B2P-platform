@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import Link from "next/link";
 import api from "@/lib/apiClient";
 import { Input } from "@/components/ui/Input";
@@ -23,9 +23,9 @@ export default function ForgotPasswordPage() {
   const onSubmit = handleSubmit(async (values) => {
     try {
       await api.post("/auth/forgot-password", values);
-      toast.success("If an account exists, a reset email was sent.");
+      notifySuccess("If an account exists, a reset email was sent.");
     } catch {
-      toast.error("Something went wrong.");
+      notifyError("Something went wrong.");
     }
   });
 

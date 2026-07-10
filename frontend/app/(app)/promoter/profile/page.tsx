@@ -8,7 +8,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Role } from "@/lib/roles";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { motion, AnimatePresence } from "framer-motion";
-import toast from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -124,10 +124,10 @@ function PromoterProfileInner() {
     const mutation = hasProfile ? updateProfile : createProfile;
     mutation.mutate(payload, {
       onSuccess: () => {
-        toast.success("Profile saved successfully");
+        notifySuccess("Profile saved successfully");
         reset(data);
       },
-      onError: () => toast.error("Failed to save profile"),
+      onError: () => notifyError("Failed to save profile"),
     });
   };
 
@@ -139,9 +139,9 @@ function PromoterProfileInner() {
       const payload: PromoterProfileInput = { ...getValues(), avatarUrl: res.url };
       const mutation = hasProfile ? updateProfile : createProfile;
       await mutation.mutateAsync(payload);
-      toast.success("Avatar updated successfully");
+      notifySuccess("Avatar updated successfully");
     } catch {
-      toast.error("Failed to upload avatar");
+      notifyError("Failed to upload avatar");
     } finally {
       setAvatarUploading(false);
       if (fileInputRef.current) {

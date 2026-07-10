@@ -6,7 +6,7 @@ import { Role } from "@/lib/roles";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import {
   useAdminSettings,
@@ -43,7 +43,7 @@ function SettingRow({ setting }: { setting: PlatformSetting }) {
             onClick={() =>
               update.mutate(
                 { key: setting.settingKey, settingValue: value, description: setting.description ?? undefined },
-                { onSuccess: () => toast.success("Saved"), onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") },
+                { onSuccess: () => notifySuccess("Saved"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") },
               )
             }
           >
@@ -67,8 +67,8 @@ function SettingRow({ setting }: { setting: PlatformSetting }) {
         onCancel={() => setShowConfirm(false)}
         onConfirm={() => {
           del.mutate(setting.settingKey, { 
-            onSuccess: () => toast.success("Deleted"), 
-            onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") 
+            onSuccess: () => notifySuccess("Deleted"), 
+            onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") 
           });
           setShowConfirm(false);
         }}
@@ -93,7 +93,7 @@ function SettingsInner() {
         title="Platform settings"
         subtitle="Configure global platform options."
         action={
-          <Button variant="ghost" onClick={() => seed.mutate(undefined, { onSuccess: () => toast.success("Seeded defaults"), onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") })}>
+          <Button variant="ghost" onClick={() => seed.mutate(undefined, { onSuccess: () => notifySuccess("Seeded defaults"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") })}>
             Seed defaults
           </Button>
         }

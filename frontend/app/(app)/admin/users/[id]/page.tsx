@@ -6,7 +6,7 @@ import { Role } from "@/lib/roles";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useAdminUser, useSuspendUser, useActivateUser, useDeleteUser } from "@/features/admin/api";
 
@@ -44,11 +44,11 @@ function UserDetailInner({ userId }: { userId: string }) {
 
         <div className="mt-4 flex flex-wrap gap-2">
           {data.isActive ? (
-            <Button variant="ghost" onClick={() => suspend.mutate(data.id, { onSuccess: () => toast.success("Suspended"), onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") })}>
+            <Button variant="ghost" onClick={() => suspend.mutate(data.id, { onSuccess: () => notifySuccess("Suspended"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") })}>
               Suspend
             </Button>
           ) : (
-            <Button variant="subtle" onClick={() => activate.mutate(data.id, { onSuccess: () => toast.success("Activated"), onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") })}>
+            <Button variant="subtle" onClick={() => activate.mutate(data.id, { onSuccess: () => notifySuccess("Activated"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") })}>
               Activate
             </Button>
           )}
@@ -67,8 +67,8 @@ function UserDetailInner({ userId }: { userId: string }) {
         onCancel={() => setShowConfirm(false)}
         onConfirm={() => {
           del.mutate(data.id, { 
-            onSuccess: () => { toast.success("Deleted"); window.location.href = "/admin/users"; }, 
-            onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") 
+            onSuccess: () => { notifySuccess("Deleted"); window.location.href = "/admin/users"; }, 
+            onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") 
           });
           setShowConfirm(false);
         }}

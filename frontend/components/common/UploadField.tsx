@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useUpload, type UploadKind } from "@/features/upload/api";
 import { Button } from "@/components/ui/Button";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 
 export function UploadField({
   kind,
@@ -39,11 +39,11 @@ export function UploadField({
           if (!file) return;
           upload.mutate(file, {
             onSuccess: (res) => {
-              toast.success("Uploaded");
+              notifySuccess("Uploaded");
               onUploaded?.(res.url);
             },
             onError: (err: any) =>
-              toast.error(err?.response?.data?.message ?? "Upload failed"),
+              notifyError(err?.response?.data?.message ?? "Upload failed"),
           });
           e.target.value = "";
         }}

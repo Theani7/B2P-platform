@@ -4,7 +4,7 @@ import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Card, PageHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Download, FileText, FileDown, CheckCircle2 } from "lucide-react";
 import { useExport, type ExportModule, type ExportFormat } from "@/features/export/api";
 import { useAuth } from "@/providers/AuthProvider";
@@ -34,7 +34,7 @@ function ExportInner() {
       { module, format },
       {
         onSuccess: () =>
-          toast.success(
+          notifySuccess(
             <span>
               Exported —{" "}
               <a className="underline" href={exp.data?.downloadUrl} target="_blank" rel="noreferrer">
@@ -42,7 +42,7 @@ function ExportInner() {
               </a>
             </span> as any,
           ),
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Export failed"),
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Export failed"),
       },
     );
   };

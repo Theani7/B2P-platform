@@ -16,7 +16,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Card, PageHeader } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Building2, Globe, MapPin, Briefcase, Upload, Save, AlertTriangle, RefreshCw, BadgeCheck, Clock, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
@@ -95,10 +95,10 @@ export default function BusinessProfilePage() {
       } else {
         await createMutation.mutateAsync(data);
       }
-      toast.success("Profile updated successfully");
+      notifySuccess("Profile updated successfully");
       reset(data);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? "Failed to update profile");
+      notifyError(err?.response?.data?.message ?? "Failed to update profile");
     }
   };
 
@@ -106,7 +106,7 @@ export default function BusinessProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
+      notifyError("Image size should be less than 5MB");
       return;
     }
     try {
@@ -117,9 +117,9 @@ export default function BusinessProfilePage() {
       } else {
         await createMutation.mutateAsync({ ...currentValues, logoUrl: url });
       }
-      toast.success("Logo updated");
+      notifySuccess("Logo updated");
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? "Failed to upload logo");
+      notifyError(err?.response?.data?.message ?? "Failed to upload logo");
     } finally {
       if (fileRef.current) {
         fileRef.current.value = "";
@@ -131,10 +131,10 @@ export default function BusinessProfilePage() {
     setVerifying(true);
     try {
       await api.post("/business/verification-request");
-      toast.success("Verification request submitted!");
+      notifySuccess("Verification request submitted!");
       setPendingVerification(true);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? "Failed to submit request");
+      notifyError(err?.response?.data?.message ?? "Failed to submit request");
     } finally {
       setVerifying(false);
     }
@@ -349,7 +349,7 @@ export default function BusinessProfilePage() {
                           <p className="text-caption text-steel truncate">({l.url})</p>
                         </div>
                         <button
-                          onClick={() => deleteLink.mutate(l.id, { onSuccess: () => toast.success("Link removed"), onError: () => toast.error("Failed to remove") })}
+                          onClick={() => deleteLink.mutate(l.id, { onSuccess: () => notifySuccess("Link removed"), onError: () => notifyError("Failed to remove") })}
                           className="text-coral-alert text-xs font-medium hover:underline"
                         >
                           Remove

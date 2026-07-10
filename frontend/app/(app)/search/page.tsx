@@ -6,7 +6,7 @@ import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import {
   useSearch,
   useSearchHistory,
@@ -56,7 +56,7 @@ function SearchInner() {
 
   const run = () => {
     if (!q.trim()) {
-      toast.error("Enter a search term");
+      notifyError("Enter a search term");
       return;
     }
     setActive({ q, type });
@@ -110,7 +110,7 @@ function SearchInner() {
               onClick={() =>
                 clearHistory.mutate(undefined, {
                   onSuccess: () => {
-                    toast.success("History cleared");
+                    notifySuccess("History cleared");
                     refetchHistory();
                   },
                 })

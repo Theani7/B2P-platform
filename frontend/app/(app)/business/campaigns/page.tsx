@@ -18,8 +18,9 @@ import {
   useReopenCampaign,
   usePublishCampaign,
   useCampaignDashboardStats,
+  useUpdateCampaign,
 } from "@/features/campaigns/api";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useRouter } from "next/navigation";
 import {
   Megaphone, Plus, Search, Edit3, Archive, Trash2,
@@ -38,7 +39,7 @@ function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () =
   }, [ref, handler]);
 }
 
-function ActionMenu({ campaign, onPublish, onArchive, onReopen, onDelete }: any) {
+function ActionMenu({ campaign, onPublish, onArchive, onReopen, onCancel, onDelete }: any) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useClickOutside(menuRef, () => setOpen(false));
@@ -75,12 +76,20 @@ function ActionMenu({ campaign, onPublish, onArchive, onReopen, onDelete }: any)
               <Rocket size={16} /> Publish
             </button>
           ) : campaign.status !== "ARCHIVED" && campaign.status !== "CANCELLED" ? (
-            <button
-              onClick={(e) => { e.stopPropagation(); setOpen(false); onArchive(campaign.id); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-amber-tag hover:bg-amber-tag/10 transition-colors"
-            >
-              <Archive size={16} /> Archive
-            </button>
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); setOpen(false); onArchive(campaign.id); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-amber-tag hover:bg-amber-tag/10 transition-colors"
+              >
+                <Archive size={16} /> Archive
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setOpen(false); onCancel(campaign.id); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-coral-alert hover:bg-coral-alert/10 transition-colors"
+              >
+                <Trash2 size={16} /> Cancel
+              </button>
+            </>
           ) : (
             <button
               onClick={(e) => { e.stopPropagation(); setOpen(false); onReopen(campaign.id); }}
@@ -125,6 +134,7 @@ function CampaignsPageInner() {
   const archiveCampaign = useArchiveCampaign();
   const reopenCampaign = useReopenCampaign();
   const publishCampaign = usePublishCampaign();
+  const updateCampaign = useUpdateCampaign();
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
 
@@ -132,25 +142,27 @@ function CampaignsPageInner() {
   const confirmDelete = () => {
     if (!deleteConfirm) return;
     deleteCampaign.mutate(deleteConfirm.id, {
-      onSuccess: () => { toast.success("Campaign deleted"); setDeleteConfirm(null); },
-      onError: () => { toast.error("Failed to delete campaign"); setDeleteConfirm(null); },
+      onSuccess: () => { notifySuccess("Campaign deleted"); setDeleteConfirm(null); },
+      onError: () => { notifyError("Failed to delete campaign"); setDeleteConfirm(null); },
     });
   };
   const handleArchive = (id: string) =>
-    archiveCampaign.mutate(id, { onSuccess: () => toast.success("Campaign archived"), onError: () => toast.error("Failed to archive campaign") });
+    archiveCampaign.mutate(id, { onSuccess: () => notifySuccess("Campaign archived"), onError: () => notifyError("Failed to archive campaign") });
   const handleReopen = (id: string) =>
-    reopenCampaign.mutate(id, { onSuccess: () => toast.success("Campaign reopened"), onError: () => toast.error("Failed to reopen campaign") });
+    reopenCampaign.mutate(id, { onSuccess: () => notifySuccess("Campaign reopened"), onError: () => notifyError("Failed to reopen campaign") });
+  const handleCancel = (id: string) =>
+    updateCampaign.mutate({ id, data: { status: "CANCELLED" as any } }, { onSuccess: () => notifySuccess("Campaign cancelled"), onError: () => notifyError("Failed to cancel campaign") });
   const handlePublish = (id: string) =>
     publishCampaign.mutate(id, {
-      onSuccess: () => toast.success("Campaign published! It's now visible in the marketplace."),
-      onError: (e: any) => toast.error(e?.response?.data?.message || "Failed to publish campaign"),
+      onSuccess: () => notifySuccess("Campaign published! It's now visible in the marketplace."),
+      onError: (e: any) => notifyError(e?.response?.data?.message || "Failed to publish campaign"),
     });
 
   const campaigns = data?.items || [];
   const totalCampaigns = data?.total || 0;
-  const openCount = campaigns.filter((c: any) => c.status === "OPEN").length;
-  const draftCount = campaigns.filter((c: any) => c.status === "DRAFT").length;
-  const activeCount = campaigns.filter((c: any) => c.status === "ACTIVE").length;
+  const openCount = stats.data?.open_campaigns ?? 0;
+  const draftCount = stats.data?.draft_campaigns ?? 0;
+  const activeCount = stats.data?.active_campaigns ?? 0;
 
   const TABS = ["ALL", "DRAFT", "OPEN", "ACTIVE", "COMPLETED"];
 
@@ -259,6 +271,7 @@ function CampaignsPageInner() {
                     onPublish={handlePublish}
                     onArchive={handleArchive}
                     onReopen={handleReopen}
+                    onCancel={handleCancel}
                     onDelete={handleDelete}
                   />
                 </div>

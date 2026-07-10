@@ -2,22 +2,6 @@ import { prisma } from "../../config/db.js";
 import { AppError } from "../../shared/errors.js";
 import { ROLE } from "../../shared/enums.js";
 
-async function logAction(adminUser, action, entityType, entityId, req) {
-  try {
-    await prisma.auditLog.create({
-      data: {
-        userId: adminUser.id,
-        action,
-        entityType,
-        entityId: entityId ? String(entityId) : null,
-        ipAddress: req?.ip || null,
-        userAgent: req?.headers?.["user-agent"] || null,
-      },
-    });
-  } catch (e) {
-    console.error("audit log failed", e?.message || e);
-  }
-}
 
 async function getUserOr404(userId) {
   const user = await prisma.user.findUnique({
@@ -134,14 +118,12 @@ export async function suspendUser(adminUser, userId, req) {
   const user = await getUserOr404(userId);
   if (user.role === ROLE.ADMIN) throw new AppError("Cannot suspend admin users", 400);
   await prisma.user.update({ where: { id: user.id }, data: { isActive: false } });
-  await logAction(adminUser, "USER_SUSPENDED", "user", user.id, req);
   return { success: true };
 }
 
 export async function activateUser(adminUser, userId, req) {
   const user = await getUserOr404(userId);
   await prisma.user.update({ where: { id: user.id }, data: { isActive: true } });
-  await logAction(adminUser, "USER_ACTIVATED", "user", user.id, req);
   return { success: true };
 }
 
@@ -149,7 +131,6 @@ export async function deleteUser(adminUser, userId, req) {
   const user = await getUserOr404(userId);
   if (user.role === ROLE.ADMIN) throw new AppError("Cannot delete admin users", 400);
   await prisma.user.delete({ where: { id: user.id } });
-  await logAction(adminUser, "USER_DELETED", "user", user.id, req);
   return { success: true };
 }
 
@@ -194,14 +175,12 @@ async function getCampaignOr404(campaignId) {
 export async function archiveCampaign(adminUser, campaignId, req) {
   await getCampaignOr404(campaignId);
   await prisma.campaign.update({ where: { id: campaignId }, data: { status: "ARCHIVED" } });
-  await logAction(adminUser, "CAMPAIGN_ARCHIVED", "campaign", campaignId, req);
   return { success: true };
 }
 
 export async function cancelCampaign(adminUser, campaignId, req) {
   await getCampaignOr404(campaignId);
   await prisma.campaign.update({ where: { id: campaignId }, data: { status: "CANCELLED" } });
-  await logAction(adminUser, "CAMPAIGN_CANCELLED", "campaign", campaignId, req);
   return { success: true };
 }
 
@@ -238,52 +217,10 @@ export async function deleteReview(adminUser, reviewId, req) {
   const review = await prisma.review.findUnique({ where: { id: reviewId } });
   if (!review) throw new AppError("Review not found", 404);
   await prisma.review.delete({ where: { id: reviewId } });
-  await logAction(adminUser, "REVIEW_DELETED", "review", reviewId, req);
   return { success: true };
 }
 
-// --- Audit Logs ---
-export async function getAuditLogs({ page = 1, limit = 20, search, action, userId, dateFrom, dateTo }) {
-  const where = {};
-  if (search) {
-    where.OR = [
-      { action: { contains: search, mode: "insensitive" } },
-      { entityType: { contains: search, mode: "insensitive" } },
-    ];
-  }
-  if (action) where.action = action;
-  if (userId) where.userId = userId;
-  if (dateFrom || dateTo) {
-    where.createdAt = {};
-    if (dateFrom) where.createdAt.gte = new Date(dateFrom);
-    if (dateTo) where.createdAt.lte = new Date(dateTo);
-  }
 
-  const [rows, total] = await Promise.all([
-    prisma.auditLog.findMany({
-      where,
-      include: { user: true },
-      orderBy: { createdAt: "desc" },
-      skip: (Number(page) - 1) * Number(limit),
-      take: Number(limit),
-    }),
-    prisma.auditLog.count({ where }),
-  ]);
-
-  const items = rows.map((log) => ({
-    id: log.id,
-    userId: log.userId,
-    username: log.user?.username || "",
-    action: log.action,
-    entityType: log.entityType,
-    entityId: log.entityId,
-    ipAddress: log.ipAddress,
-    metadata: log.extraData,
-    createdAt: log.createdAt,
-  }));
-
-  return [items, total];
-}
 
 // --- Platform Settings ---
 export async function getSettings() {
@@ -337,7 +274,6 @@ export async function updateSetting(adminUser, settingKey, settingValue, descrip
     update: { settingValue, description: description ?? undefined },
     create: { settingKey, settingValue, description },
   });
-  await logAction(adminUser, "SETTING_UPDATED", "setting", settingKey, req);
   return {
     id: setting.id,
     settingKey: setting.settingKey,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -90,8 +90,8 @@ export function ReviewsView() {
                 tab === "written"
                   ? () =>
                       del.mutate(r.id, {
-                        onSuccess: () => toast.success("Review deleted"),
-                        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Delete failed"),
+                        onSuccess: () => notifySuccess("Review deleted"),
+                        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Delete failed"),
                       })
                   : undefined
               }

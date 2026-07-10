@@ -7,7 +7,7 @@ import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import {
   useAdminUsers,
@@ -37,7 +37,7 @@ function UsersInner() {
   const del = useDeleteUser();
 
   const act = (fn: any, id: string, ok: string, err: string) =>
-    fn.mutate(id, { onSuccess: () => toast.success(ok), onError: (e: any) => toast.error(e?.response?.data?.message ?? err) });
+    fn.mutate(id, { onSuccess: () => notifySuccess(ok), onError: (e: any) => notifyError(e?.response?.data?.message ?? err) });
 
   return (
     <>

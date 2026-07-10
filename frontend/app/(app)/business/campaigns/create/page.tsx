@@ -2,7 +2,7 @@
 
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useRouter } from "next/navigation";
 import { Card, PageHeader } from "@/components/ui/Card";
 import { CampaignForm } from "@/components/campaigns/CampaignForm";
@@ -16,10 +16,10 @@ function NewCampaignInner() {
   const onSubmit = (data: CampaignCreatePayload) => {
     create.mutate(data, {
       onSuccess: (c) => {
-        toast.success("Campaign created");
+        notifySuccess("Campaign created");
         router.push(`/business/campaigns/${c.id}`);
       },
-      onError: (e: any) => toast.error(e?.response?.data?.message ?? "Could not create campaign"),
+      onError: (e: any) => notifyError(e?.response?.data?.message ?? "Could not create campaign"),
     });
   };
 

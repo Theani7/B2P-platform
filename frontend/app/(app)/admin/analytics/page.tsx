@@ -6,7 +6,7 @@ import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { StatCard } from "@/components/ui/Stats";
 import { Spinner } from "@/components/ui/Spinner";
 import { useAdminAnalytics } from "@/features/admin/api";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
 
 
 function AnalyticsInner() {
@@ -16,6 +16,14 @@ function AnalyticsInner() {
 
   const nicheData = Object.entries(data.topNiches).map(([k, v]) => ({ name: k, value: v as number }));
   const locData = Object.entries(data.topLocations).map(([k, v]) => ({ name: k, value: v as number }));
+  
+  const userData = [
+    { name: "Promoters", value: data.totalPromoters },
+    { name: "Businesses", value: data.totalBusinesses },
+    { name: "Admins", value: data.totalUsers - data.totalPromoters - data.totalBusinesses }
+  ].filter(d => d.value > 0);
+  
+  const COLORS = ["#145aff", "#16ca2e", "#ffa64d"];
 
   return (
     <>
@@ -72,6 +80,29 @@ function AnalyticsInner() {
                     ))}
                   </Bar>
                 </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-caption text-slate-custom">No data.</p>
+            )}
+          </div>
+        </Card>
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <Card className="h-[400px] flex flex-col">
+          <h2 className="mb-6 text-heading-sm font-semibold text-midnight-ink">User distribution</h2>
+          <div className="flex-1 min-h-0">
+            {userData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={userData} cx="50%" cy="50%" innerRadius={80} outerRadius={120} paddingAngle={5} dataKey="value">
+                    {userData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }} />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: "12px" }} />
+                </PieChart>
               </ResponsiveContainer>
             ) : (
               <p className="text-caption text-slate-custom">No data.</p>

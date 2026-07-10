@@ -1,6 +1,6 @@
 "use client";
 
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Button } from "@/components/ui/Button";
 import { useProfileShare, useCampaignShare } from "@/features/sharing/api";
 
@@ -26,9 +26,9 @@ export function ShareDialog({
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      toast.success("Link copied");
+      notifySuccess("Link copied");
     } catch {
-      toast.error("Could not copy");
+      notifyError("Could not copy");
     }
   };
 

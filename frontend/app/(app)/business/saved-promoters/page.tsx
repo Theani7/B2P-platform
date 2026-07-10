@@ -12,7 +12,7 @@ import { StatCard } from "@/components/ui/Stats";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Avatar } from "@/components/ui/Avatar";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useRouter } from "next/navigation";
 import {
   Search, MapPin, Users, TrendingUp, BadgeCheck, ArrowRight, BookmarkX,
@@ -54,14 +54,17 @@ function SavedPromotersPageInner() {
 
   const handleRemove = (id: string, username: string) => {
     removeSaved.mutate(id, {
-      onSuccess: () => toast.success(`${username} removed from shortlist`),
-      onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed to remove"),
+      onSuccess: () => notifySuccess(`${username} removed from shortlist`),
+      onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed to remove"),
     });
   };
 
   const filteredPromoters = (() => {
     if (!data?.items) return [];
-    let items = [...data.items];
+    let items = data.items.map((item: any) => ({
+      ...(item.promoterProfile || item.promoter || {}),
+      savedId: item.id
+    }));
     if (nicheFilter) items = items.filter((p: any) => p.niche === nicheFilter);
     if (sortFilter === "followers") items.sort((a: any, b: any) => (b.followersCount || 0) - (a.followersCount || 0));
     else if (sortFilter === "engagement") items.sort((a: any, b: any) => (b.engagementRate || 0) - (a.engagementRate || 0));

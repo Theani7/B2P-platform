@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { login } from "@/features/auth/api";
 import { DashboardPath, Role } from "@/lib/roles";
 import { Input } from "@/components/ui/Input";
@@ -30,7 +30,7 @@ export function LoginForm() {
       const user = await login(values);
       window.location.href = DashboardPath[user.role as Role] ?? "/";
     } catch {
-      toast.error("Invalid email or password");
+      notifyError("Invalid email or password");
     }
   });
 

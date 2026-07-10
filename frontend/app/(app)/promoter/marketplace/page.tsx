@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useMarketplace, useBookmarkCampaign, useRemoveBookmark, type MarketplaceParams } from "@/features/marketplace/api";
 import { useApplyToCampaign } from "@/features/applications/api";
 import {
@@ -28,7 +28,7 @@ function CardMenu({ campaignId, campaignTitle }: { campaignId: string; campaignT
     if (navigator.share) navigator.share({ title: campaignTitle, url }).catch(() => {});
     else {
       navigator.clipboard.writeText(url);
-      toast.success("Campaign link copied to clipboard!");
+      notifySuccess("Campaign link copied to clipboard!");
     }
   };
   return (
@@ -45,13 +45,13 @@ function CardMenu({ campaignId, campaignTitle }: { campaignId: string; campaignT
             <Share2 size={14} /> Share
           </button>
           <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); navigator.clipboard.writeText(`${window.location.origin}/promoter/marketplace?campaignId=${campaignId}`); toast.success("Campaign link copied to clipboard!"); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); navigator.clipboard.writeText(`${window.location.origin}/promoter/marketplace?campaignId=${campaignId}`); notifySuccess("Campaign link copied to clipboard!"); }}
             className="w-full text-left px-4 py-2 text-sm text-graphite hover:bg-sky-wash flex items-center gap-2"
           >
             <LinkIcon size={14} /> Copy Link
           </button>
           <div className="h-px bg-slate-custom/10 my-1" />
-          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); toast.success("Campaign reported successfully."); }} className="w-full text-left px-4 py-2 text-sm text-coral-alert hover:bg-coral-alert/10 flex items-center gap-2">
+          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); notifySuccess("Campaign reported successfully."); }} className="w-full text-left px-4 py-2 text-sm text-coral-alert hover:bg-coral-alert/10 flex items-center gap-2">
             <Flag size={14} /> Report
           </button>
         </div>
@@ -90,8 +90,8 @@ function MarketplaceInner() {
     apply.mutate(
       { campaignId: selectedCampaignId, message: applyMessage || undefined },
       {
-        onSuccess: () => { toast.success("Application submitted successfully!"); setShowApplyModal(false); setApplyMessage(""); setSelectedCampaignId(null); setSelectedCampaignTitle(""); },
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Could not apply"),
+        onSuccess: () => { notifySuccess("Application submitted successfully!"); setShowApplyModal(false); setApplyMessage(""); setSelectedCampaignId(null); setSelectedCampaignTitle(""); },
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Could not apply"),
       },
     );
   };
@@ -99,8 +99,8 @@ function MarketplaceInner() {
   const toggleBookmark = (e: React.MouseEvent, c: any) => {
     e.preventDefault();
     e.stopPropagation();
-    if (c.isBookmarked) { removeBookmark.mutate(c.id); toast.success("Bookmark removed"); }
-    else { bookmark.mutate(c.id); toast.success("Bookmarked"); }
+    if (c.isBookmarked) { removeBookmark.mutate(c.id); notifySuccess("Bookmark removed"); }
+    else { bookmark.mutate(c.id); notifySuccess("Bookmarked"); }
   };
 
   return (

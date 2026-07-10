@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -42,7 +42,7 @@ function DeliverablesPanel({ collaborationId }: { collaborationId: string }) {
   const act = (deliverableId: string, status: DeliverableStatus, feedback?: string) =>
     review.mutate(
       { collaborationId, deliverableId, status, feedback },
-      { onSuccess: () => toast.success("Deliverable updated"), onError: (e: any) => toast.error(e?.response?.data?.message ?? "Update failed") },
+      { onSuccess: () => notifySuccess("Deliverable updated"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Update failed") },
     );
 
   return (
@@ -153,7 +153,7 @@ function CollabCard({ collab }: { collab: Collaboration }) {
 
       <div className="bg-linen-canvas border-t border-slate-custom/10 p-4 flex gap-3">
         {isActive && (
-          <button onClick={() => complete.mutate(collab.id, { onSuccess: () => toast.success("Collaboration completed"), onError: (e: any) => toast.error(e?.response?.data?.message ?? "Could not complete") })} className="flex-1 h-10 rounded-xl bg-gray-900 text-white text-sm font-bold hover:opacity-90 transition-colors flex items-center justify-center gap-2">
+          <button onClick={() => complete.mutate(collab.id, { onSuccess: () => notifySuccess("Collaboration completed"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Could not complete") })} className="flex-1 h-10 rounded-xl bg-gray-900 text-white text-sm font-bold hover:opacity-90 transition-colors flex items-center justify-center gap-2">
             <CheckCircle2 size={16} /> Complete
           </button>
         )}

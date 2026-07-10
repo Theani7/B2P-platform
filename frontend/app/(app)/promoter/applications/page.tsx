@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useMyApplications, useWithdrawApplication } from "@/features/applications/api";
 import {
   FileText, Building2, MapPin, Clock, CheckCircle, CircleDashed, XCircle, MessageSquare,
@@ -41,8 +41,8 @@ function ApplicationsInner() {
   const confirmWithdraw = () => {
     if (!withdrawConfirm) return;
     withdraw.mutate(withdrawConfirm, {
-      onSuccess: () => { toast.success("Application withdrawn"); setWithdrawConfirm(null); },
-      onError: (e: any) => { toast.error(e?.response?.data?.message ?? "Failed to withdraw"); setWithdrawConfirm(null); },
+      onSuccess: () => { notifySuccess("Application withdrawn"); setWithdrawConfirm(null); },
+      onError: (e: any) => { notifyError(e?.response?.data?.message ?? "Failed to withdraw"); setWithdrawConfirm(null); },
     });
   };
 

@@ -7,7 +7,7 @@ import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useAdminReviews, useDeleteReview } from "@/features/admin/api";
 import { Star } from "lucide-react";
@@ -64,8 +64,8 @@ function ReviewsInner() {
         onConfirm={() => {
           if (reviewToDelete) {
             del.mutate(reviewToDelete, { 
-              onSuccess: () => toast.success("Deleted"), 
-              onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") 
+              onSuccess: () => notifySuccess("Deleted"), 
+              onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") 
             });
           }
           setReviewToDelete(null);

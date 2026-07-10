@@ -6,7 +6,7 @@ import { useCampaigns } from "@/features/campaigns/api";
 import { useInvitePromoter } from "@/features/invitations/api";
 import { useAuth } from "@/providers/AuthProvider";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 
 interface InvitePromoterModalProps {
   isOpen: boolean;
@@ -32,23 +32,23 @@ export function InvitePromoterModal({ isOpen, onClose, promoter }: InvitePromote
 
   const handleSend = () => {
     if (!selectedCampaignId) {
-      toast.error("Please select a campaign first.");
+      notifyError("Please select a campaign first.");
       return;
     }
     invitePromoter.mutate(
       { campaignId: selectedCampaignId, promoterId: promoter.id, message },
       {
         onSuccess: () => {
-          toast.success(`Invitation sent to ${promoter.username}!`);
+          notifySuccess(`Invitation sent to ${promoter.username}!`);
           setSelectedCampaignId("");
           setMessage("");
           onClose();
         },
         onError: (err: any) => {
           if (err?.response?.status === 409) {
-            toast.error(`You have already invited ${promoter.username} to this campaign.`);
+            notifyError(`You have already invited ${promoter.username} to this campaign.`);
           } else {
-            toast.error(err?.response?.data?.message ?? "Failed to send invitation.");
+            notifyError(err?.response?.data?.message ?? "Failed to send invitation.");
           }
         },
       },
@@ -56,9 +56,9 @@ export function InvitePromoterModal({ isOpen, onClose, promoter }: InvitePromote
   };
 
   return (
-    <div className="fixed inset-0 z-[103] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-[104] flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onClick={onClose} />
+      <div className="relative z-[2001] flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-100 p-6">
           <h3 className="text-lg font-bold text-graphite">Invite {promoter.username}</h3>
           <button onClick={onClose} className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100">

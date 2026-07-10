@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useMySocialLinks, useDeleteSocialLink } from "@/features/social/api";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -61,8 +61,8 @@ function SocialPageInner() {
                   variant="danger"
                   onClick={() =>
                     del.mutate(link.id, {
-                      onSuccess: () => toast.success("Removed"),
-                      onError: (e: any) => toast.error(e?.response?.data?.message ?? "Delete failed"),
+                      onSuccess: () => notifySuccess("Removed"),
+                      onError: (e: any) => notifyError(e?.response?.data?.message ?? "Delete failed"),
                     })
                   }
                 >

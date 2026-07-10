@@ -6,7 +6,7 @@ import { useState } from "react";
 import { use } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useRouter } from "next/navigation";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -47,8 +47,8 @@ function ApplicantRow({ app }: { app: any }) {
         <Badge tone={app.status === "ACCEPTED" ? "emerald" : app.status === "REJECTED" ? "coral" : "slate"}>{app.status}</Badge>
         {app.status === "PENDING" && (
           <>
-            <Button onClick={() => accept.mutate(app.id, { onError: (e: any) => toast.error(e?.response?.data?.message) })}>Accept</Button>
-            <Button variant="danger" onClick={() => reject.mutate(app.id, { onError: (e: any) => toast.error(e?.response?.data?.message) })}>Reject</Button>
+            <Button onClick={() => accept.mutate(app.id, { onError: (e: any) => notifyError(e?.response?.data?.message) })}>Accept</Button>
+            <Button variant="danger" onClick={() => reject.mutate(app.id, { onError: (e: any) => notifyError(e?.response?.data?.message) })}>Reject</Button>
           </>
         )}
       </div>
@@ -70,12 +70,12 @@ function InvitePanel({ campaignId }: { campaignId: string }) {
       invite.mutate(
         { campaignId, promoterId: promoter.id, message: "" },
         {
-          onSuccess: () => { toast.success(`Invited @${username}`); setUsername(""); },
-          onError: (e: any) => toast.error(e?.response?.data?.message ?? "Invite failed"),
+          onSuccess: () => { notifySuccess(`Invited @${username}`); setUsername(""); },
+          onError: (e: any) => notifyError(e?.response?.data?.message ?? "Invite failed"),
         },
       );
     } catch {
-      toast.error("Promoter not found");
+      notifyError("Promoter not found");
     } finally {
       setBusy(false);
     }
@@ -117,22 +117,22 @@ function CampaignDetailInner({ id }: { id: string }) {
 
   const run = (m: { mutate: (id: string, o?: any) => void }, msg: string) =>
     m.mutate(id, {
-      onSuccess: () => toast.success(msg),
-      onError: (e: any) => toast.error(e?.response?.data?.message ?? "Action failed"),
+      onSuccess: () => notifySuccess(msg),
+      onError: (e: any) => notifyError(e?.response?.data?.message ?? "Action failed"),
     });
 
   const onDelete = () => {
     if (!confirm("Delete this campaign? This cannot be undone.")) return;
     del.mutate(id, {
-      onSuccess: () => { toast.success("Campaign deleted"); router.push("/business/campaigns"); },
-      onError: (e: any) => toast.error(e?.response?.data?.message),
+      onSuccess: () => { notifySuccess("Campaign deleted"); router.push("/business/campaigns"); },
+      onError: (e: any) => notifyError(e?.response?.data?.message),
     });
   };
 
   const onUpdate = (data: CampaignUpdatePayload) =>
     update.mutate({ id, data }, {
-      onSuccess: () => { toast.success("Saved"); setEditing(false); },
-      onError: (e: any) => toast.error(e?.response?.data?.message),
+      onSuccess: () => { notifySuccess("Saved"); setEditing(false); },
+      onError: (e: any) => notifyError(e?.response?.data?.message),
     });
 
   const campaignInvites = invites?.items.filter((i) => i.campaign?.id === id) ?? [];
@@ -172,10 +172,15 @@ function CampaignDetailInner({ id }: { id: string }) {
                   Unpublish
                 </button>
               )}
-              {campaign.status !== CampaignStatus.ARCHIVED && (
-                <button onClick={() => run(archive, "Archived")} className="bg-amber-tag/10 text-amber-tag border border-amber-tag/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-amber-tag/20 transition-colors">
-                  Archive
-                </button>
+              {campaign.status !== CampaignStatus.ARCHIVED && campaign.status !== CampaignStatus.CANCELLED && (
+                <>
+                  <button onClick={() => run(archive, "Archived")} className="bg-amber-tag/10 text-amber-tag border border-amber-tag/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-amber-tag/20 transition-colors">
+                    Archive
+                  </button>
+                  <button onClick={() => update.mutate({ id, data: { status: "CANCELLED" as any } }, { onSuccess: () => notifySuccess("Cancelled"), onError: (e: any) => notifyError(e?.response?.data?.message) })} className="bg-coral-alert/10 text-coral-alert border border-coral-alert/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors">
+                    Cancel
+                  </button>
+                </>
               )}
               {campaign.status === CampaignStatus.ARCHIVED && (
                 <button onClick={() => run(reopen, "Reopened")} className="bg-emerald-status/10 text-emerald-status border border-emerald-status/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-emerald-status/20 transition-colors">
@@ -301,7 +306,7 @@ function CampaignDetailInner({ id }: { id: string }) {
                   <Badge tone={i.status === "ACCEPTED" ? "emerald" : i.status === "REJECTED" ? "coral" : "slate"}>{i.status}</Badge>
                 </div>
                 {i.status === "PENDING" && (
-                  <Button variant="ghost" onClick={() => cancelInvite.mutate(i.id, { onError: (e: any) => toast.error(e?.response?.data?.message) })}>Cancel</Button>
+                  <Button variant="ghost" onClick={() => cancelInvite.mutate(i.id, { onError: (e: any) => notifyError(e?.response?.data?.message) })}>Cancel</Button>
                 )}
               </div>
             ))}

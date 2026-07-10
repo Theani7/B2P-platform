@@ -150,11 +150,12 @@ export async function dashboardStats(user) {
   const profile = await businessProfileOf(user);
   const base = { businessProfileId: profile.id };
 
-  const [total, open, active, completed, recent] = await Promise.all([
+  const [total, open, active, completed, draft, recent] = await Promise.all([
     prisma.campaign.count({ where: base }),
     prisma.campaign.count({ where: { ...base, status: "OPEN" } }),
     prisma.campaign.count({ where: { ...base, status: "ACTIVE" } }),
     prisma.campaign.count({ where: { ...base, status: "COMPLETED" } }),
+    prisma.campaign.count({ where: { ...base, status: "DRAFT" } }),
     prisma.campaign.findMany({ where: base, orderBy: { createdAt: "desc" }, take: 5 }),
   ]);
 
@@ -163,6 +164,7 @@ export async function dashboardStats(user) {
     open_campaigns: open,
     active_campaigns: active,
     completed_campaigns: completed,
+    draft_campaigns: draft,
     recent_campaigns: recent.map((c) => ({
       id: c.id,
       title: c.title,

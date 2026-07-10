@@ -59,5 +59,6 @@ export interface CampaignDashboardStats {
   open_campaigns: number;
   active_campaigns: number;
   completed_campaigns: number;
+  draft_campaigns?: number;
   recent_campaigns: { id: string; title: string; status: CampaignStatus; budget: number; created_at: string }[];
 }

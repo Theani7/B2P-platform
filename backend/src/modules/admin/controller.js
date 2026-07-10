@@ -75,10 +75,7 @@ export const deleteReview = wrap(async (req, res) => {
   return ok(res, data, "Review deleted");
 });
 
-export const auditLogs = wrap(async (req, res) => {
-  const [items, total] = await adminService.getAuditLogs(req.query);
-  return paginated(res, items, total, req.query, "Audit logs");
-});
+
 
 export const settings = wrap(async (req, res) => {
   const data = await adminService.getSettings();

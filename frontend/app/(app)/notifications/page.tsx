@@ -8,7 +8,7 @@ import { Role } from "@/lib/roles";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import {
   useNotifications,
   useMarkRead,
@@ -72,8 +72,8 @@ function NotificationsInner() {
     updatePrefs.mutate(
       { preferences: [{ type, enabled: !enabled }] },
       {
-        onSuccess: () => toast.success("Preference updated"),
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Update failed"),
+        onSuccess: () => notifySuccess("Preference updated"),
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Update failed"),
       },
     );
   };

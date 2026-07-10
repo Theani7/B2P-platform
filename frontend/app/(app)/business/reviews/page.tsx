@@ -4,7 +4,7 @@ import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { useAuth } from "@/providers/AuthProvider";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -82,7 +82,7 @@ function EditModal({ review, onClose }: { review: ReviewRead; onClose: () => voi
             onClick={() =>
               update.mutate(
                 { reviewId: review.id, data: { rating, comment: comment || undefined } },
-                { onSuccess: () => { toast.success("Review updated"); onClose(); }, onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") },
+                { onSuccess: () => { notifySuccess("Review updated"); onClose(); }, onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") },
               )
             }
           >
@@ -109,7 +109,7 @@ export default function BusinessReviewsPage() {
 
   const handleDelete = (id: string) => {
     if (!confirm("Delete this review? This cannot be undone.")) return;
-    del.mutate(id, { onSuccess: () => toast.success("Review deleted"), onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed") });
+    del.mutate(id, { onSuccess: () => notifySuccess("Review deleted"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") });
   };
 
   return (

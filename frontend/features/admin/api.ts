@@ -87,27 +87,7 @@ export interface AdminReviewQuery {
   search?: string;
 }
 
-export interface AuditLog {
-  id: string;
-  userId: string | null;
-  username: string;
-  action: string;
-  entityType: string | null;
-  entityId: string | null;
-  ipAddress: string | null;
-  metadata: Record<string, unknown> | null;
-  createdAt: string;
-}
 
-export interface AuditLogQuery {
-  page?: number;
-  limit?: number;
-  search?: string;
-  action?: string;
-  userId?: string;
-  dateFrom?: string;
-  dateTo?: string;
-}
 
 export interface PlatformSetting {
   id: string;

@@ -13,7 +13,7 @@ import { InvitePromoterModal } from "@/components/InvitePromoterModal";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { MapPin, Users, TrendingUp, Briefcase, LinkIcon, Camera, Music, Video, Globe, MessageSquare, Trophy, Send, Check, Medal } from "lucide-react";
 
 function formatCompactNumber(n: number) {
@@ -49,8 +49,8 @@ function PromoterProfileInner({ username }: { username: string }) {
   const handleSave = () => {
     if (!profile) return;
     savePromoter.mutate(profile.id, {
-      onSuccess: () => toast.success("Promoter saved to shortlist"),
-      onError: (e: any) => toast.error(e?.message ?? "Failed to save"),
+      onSuccess: () => notifySuccess("Promoter saved to shortlist"),
+      onError: (e: any) => notifyError(e?.message ?? "Failed to save"),
     });
   };
 

@@ -3,7 +3,7 @@
 import { use, useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { toast } from "react-hot-toast";
+import { notifySuccess, notifyError } from "@/lib/notify";
 import { useRouter } from "next/navigation";
 import { Card, PageHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -25,10 +25,10 @@ function EditCampaignInner({ id }: { id: string }) {
       { id, data },
       {
         onSuccess: () => {
-          toast.success("Campaign updated");
+          notifySuccess("Campaign updated");
           router.push(`/business/campaigns/${id}`);
         },
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed to update campaign"),
+        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed to update campaign"),
       },
     );
   };

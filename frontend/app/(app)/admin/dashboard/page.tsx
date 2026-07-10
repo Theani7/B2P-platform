@@ -53,7 +53,6 @@ function DashboardInner() {
               { label: "Users", href: "/admin/users" },
               { label: "Campaigns", href: "/admin/campaigns" },
               { label: "Reviews", href: "/admin/reviews" },
-              { label: "Audit logs", href: "/admin/audit-logs" },
               { label: "Settings", href: "/admin/settings" },
               { label: "Analytics", href: "/admin/analytics" },
             ].map((l) => (
