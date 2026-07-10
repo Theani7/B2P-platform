@@ -18,30 +18,8 @@ const features = [
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex bg-white selection:bg-signal-blue/20">
-      {/* Left side: Form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 sm:px-12 lg:flex-none lg:w-1/2 xl:w-5/12 bg-white relative z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.3]" />
-        
-        <div className="mx-auto w-full max-w-sm relative">
-          <Link href="/" className="flex items-center gap-2 text-2xl font-black tracking-tighter text-midnight-ink mb-12">
-            <div className="w-8 h-8 rounded-lg bg-signal-blue flex items-center justify-center">
-              <span className="text-white font-bold leading-none">B</span>
-            </div>
-            Byparsathy
-          </Link>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {children}
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Right side: Premium Visual */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-midnight-ink rounded-l-[40px] m-4 shadow-2xl">
+      {/* Left side: Premium Visual */}
+      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-midnight-ink rounded-r-[40px] m-4 ml-0 shadow-2xl">
         <div className="absolute inset-0 hero-radial-wash opacity-80" />
         
         {/* Abstract decorative shapes */}
@@ -49,7 +27,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-emerald-status/20 blur-[100px] pointer-events-none" />
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full h-full">
-          <div className="flex justify-end">
+          <div className="flex justify-start">
             <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-xs font-semibold text-white/90 tracking-wide uppercase">
               Creator Platform
             </div>
@@ -99,6 +77,28 @@ export function AuthLayout({ children }: { children: ReactNode }) {
               <Link href="#" className="hover:text-white transition-colors">Terms</Link>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Right side: Form */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 sm:px-12 lg:flex-none lg:w-1/2 xl:w-5/12 bg-white relative z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.3]" />
+        
+        <div className="mx-auto w-full max-w-sm relative">
+          <Link href="/" className="flex items-center gap-2 text-2xl font-black tracking-tighter text-midnight-ink mb-12">
+            <div className="w-8 h-8 rounded-lg bg-signal-blue flex items-center justify-center">
+              <span className="text-white font-bold leading-none">B</span>
+            </div>
+            Byparsathy
+          </Link>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {children}
+          </motion.div>
         </div>
       </div>
     </div>
