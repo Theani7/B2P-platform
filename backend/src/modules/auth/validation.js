@@ -40,3 +40,8 @@ export const updateMeSchema = z.object({
   fullName: z.string().max(255).optional(),
   email: z.string().email().optional(),
 });
+
+export const checkSchema = z.object({
+  username: z.string().optional(),
+  email: z.string().email().optional(),
+});

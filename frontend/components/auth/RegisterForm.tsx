@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { notifySuccess, notifyError } from "@/lib/notify";
-import { register as registerUser } from "@/features/auth/api";
+import { register as registerUser, checkAvailability } from "@/features/auth/api";
 import { Input } from "@/components/ui/Input";
 import { DashboardPath, Role } from "@/lib/roles";
 
@@ -28,6 +30,8 @@ export function RegisterForm() {
     register,
     handleSubmit,
     control,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -36,6 +40,38 @@ export function RegisterForm() {
 
   const selectedRole = useWatch({ control, name: "role" });
   const password = useWatch({ control, name: "password" }) || "";
+  const username = useWatch({ control, name: "username" });
+  const email = useWatch({ control, name: "email" });
+
+  useEffect(() => {
+    if (!username || username.length < 3) return;
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await checkAvailability({ username });
+        if (!res.usernameAvailable) {
+          setError("username", { type: "manual", message: "Username is already taken" });
+        } else if (errors.username?.type === "manual") {
+          clearErrors("username");
+        }
+      } catch (e) {}
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [username, setError, clearErrors, errors.username]);
+
+  useEffect(() => {
+    if (!email || !email.includes("@")) return;
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await checkAvailability({ email });
+        if (!res.emailAvailable) {
+          setError("email", { type: "manual", message: "Email is already registered" });
+        } else if (errors.email?.type === "manual") {
+          clearErrors("email");
+        }
+      } catch (e) {}
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [email, setError, clearErrors, errors.email]);
 
   const hasMinLength = password.length >= 6;
   const hasUpperCase = /[A-Z]/.test(password);

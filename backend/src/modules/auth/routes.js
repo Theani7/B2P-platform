@@ -8,6 +8,7 @@ import { ROLE } from "../../shared/enums.js";
 
 const router = express.Router();
 
+router.get("/check", validate(validators.checkSchema, "query"), controllers.check);
 router.post("/register", validate(validators.registerSchema), controllers.register);
 router.post("/login", validate(validators.loginSchema), controllers.login);
 router.post("/logout", authenticate, controllers.logout);

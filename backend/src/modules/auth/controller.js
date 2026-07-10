@@ -19,6 +19,11 @@ export const register = wrap(async (req, res) => {
   return ok(res, tokens, "Registered", 201);
 });
 
+export const check = wrap(async (req, res) => {
+  const result = await authService.checkAvailability(req.query);
+  return ok(res, result, "Availability check");
+});
+
 export const login = wrap(async (req, res) => {
   const tokens = await authService.login(req.body);
   return ok(res, tokens, "Logged in");

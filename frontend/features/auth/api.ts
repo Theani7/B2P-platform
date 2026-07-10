@@ -15,6 +15,13 @@ export interface RegisterPayload {
   fullName: string;
 }
 
+export async function checkAvailability(params: { username?: string; email?: string }): Promise<{ usernameAvailable: boolean; emailAvailable: boolean }> {
+  const query = new URLSearchParams();
+  if (params.username) query.append("username", params.username);
+  if (params.email) query.append("email", params.email);
+  return (await api.get<{ usernameAvailable: boolean; emailAvailable: boolean }>(`/auth/check?${query.toString()}`)).data;
+}
+
 export async function login(payload: LoginPayload): Promise<User> {
   const res = await api.post<AuthTokens>("/auth/login", payload);
   setTokens(res.data.access_token, res.data.refresh_token);

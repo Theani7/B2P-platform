@@ -48,6 +48,19 @@ export async function register(payload) {
   return tokens(user);
 }
 
+export async function checkAvailability(query) {
+  const result = { usernameAvailable: true, emailAvailable: true };
+  if (query.username) {
+    const user = await prisma.user.findUnique({ where: { username: query.username } });
+    if (user) result.usernameAvailable = false;
+  }
+  if (query.email) {
+    const user = await prisma.user.findUnique({ where: { email: query.email } });
+    if (user) result.emailAvailable = false;
+  }
+  return result;
+}
+
 export async function login(payload) {
   const user = await prisma.user.findUnique({ where: { email: payload.email } });
   if (!user) throw new AppError("Invalid credentials", 401);
