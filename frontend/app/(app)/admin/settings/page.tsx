@@ -12,15 +12,26 @@ import {
   useAdminSettings,
   useSeedSettings,
   useUpdateSetting,
-  useDeleteSetting,
   type PlatformSetting,
 } from "@/features/admin/api";
+import { X } from "lucide-react";
 
 function SettingRow({ setting }: { setting: PlatformSetting }) {
   const [value, setValue] = useState(setting.settingValue);
   const update = useUpdateSetting();
-  const del = useDeleteSetting();
-  const [showConfirm, setShowConfirm] = useState(false);
+
+  const isTagList = ["campaign_categories", "industries", "promoter_niches"].includes(setting.settingKey);
+  const tags = isTagList ? value.split(",").map((s) => s.trim()).filter(Boolean) : [];
+
+  const addTag = (newTag: string) => {
+    if (!newTag.trim()) return;
+    if (tags.includes(newTag.trim())) return;
+    setValue([...tags, newTag.trim()].join(","));
+  };
+
+  const removeTag = (index: number) => {
+    setValue(tags.filter((_, i) => i !== index).join(","));
+  };
 
   return (
     <Card className="py-4">
@@ -30,14 +41,41 @@ function SettingRow({ setting }: { setting: PlatformSetting }) {
             <span className="text-body font-medium text-midnight-ink">{setting.settingKey}</span>
             {setting.description && <Badge tone="signal">{setting.description}</Badge>}
           </div>
-          <textarea
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="mt-2 w-full rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink outline-none focus:border-primary"
-            rows={2}
-          />
+          {isTagList ? (
+            <div className="mt-2 w-full rounded-inputs border border-steel/30 bg-white p-2">
+              <div className="flex flex-wrap gap-2 mb-2">
+                {tags.map((tag, i) => (
+                  <span key={i} className="inline-flex items-center gap-1 bg-sky-wash text-signal-blue font-medium px-2 py-1 rounded-md text-sm">
+                    {tag}
+                    <button onClick={() => removeTag(i)} className="text-signal-blue/70 hover:text-signal-blue focus:outline-none">
+                      <X size={14} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Type and press Enter to add..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTag(e.currentTarget.value);
+                    e.currentTarget.value = "";
+                  }
+                }}
+                className="w-full text-sm text-midnight-ink outline-none bg-transparent placeholder-slate-custom"
+              />
+            </div>
+          ) : (
+            <textarea
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              className="mt-2 w-full rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink outline-none focus:border-primary"
+              rows={2}
+            />
+          )}
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 mt-7">
           <Button
             variant="subtle"
             onClick={() =>
@@ -49,30 +87,8 @@ function SettingRow({ setting }: { setting: PlatformSetting }) {
           >
             Save
           </Button>
-          <Button
-            variant="danger"
-            onClick={() => setShowConfirm(true)}
-          >
-            Delete
-          </Button>
         </div>
       </div>
-
-      <ConfirmModal
-        isOpen={showConfirm}
-        title="Delete Setting"
-        message={`Are you sure you want to delete ${setting.settingKey}?`}
-        confirmText="Delete Setting"
-        isDanger={true}
-        onCancel={() => setShowConfirm(false)}
-        onConfirm={() => {
-          del.mutate(setting.settingKey, { 
-            onSuccess: () => notifySuccess("Deleted"), 
-            onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed") 
-          });
-          setShowConfirm(false);
-        }}
-      />
     </Card>
   );
 }
