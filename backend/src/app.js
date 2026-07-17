@@ -32,6 +32,7 @@ import searchRouter from "./modules/search/routes.js";
 import exportRouter from "./modules/export/routes.js";
 import settingsRouter, { accountRouter as settingsAccountRouter } from "./modules/settings/routes.js";
 import adminRouter from "./modules/admin/routes.js";
+import aiRouter from "./modules/ai/routes.js";
 import { uploadBaseDir } from "./modules/upload/service.js";
 
 export function createApp() {
@@ -114,6 +115,7 @@ export function createApp() {
   app.use(`${config.apiV1}/search`, searchRouter);
   app.use(`${config.apiV1}/export`, exportRouter);
   app.use(`${config.apiV1}/admin`, adminRouter);
+  app.use(`${config.apiV1}/ai`, aiRouter);
 
   // TODO: mount additional routers as ported:
   // app.use(`${config.apiV1}/campaigns`, campaignRouter);

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import AIGenerateButton from "@/components/ui/AIGenerateButton";
 import { usePublicSettings } from "@/features/settings/api";
 import { CampaignStatus, CampaignVisibility, type CampaignRead, type CampaignCreatePayload } from "@/features/campaigns/types";
 
@@ -91,13 +92,29 @@ export function CampaignForm({
     onSubmit(payload);
   };
 
+  const aiContext = [
+    form.category && `Category: ${form.category}`,
+    form.budget && `Budget: $${form.budget}`,
+    form.location && `Location: ${form.location}`,
+    form.targetAudience && `Target Audience: ${form.targetAudience}`,
+  ].filter(Boolean).join("\n");
+
   return (
     <form className="grid gap-4" onSubmit={submit}>
       <Input label="Title" value={form.title} onChange={set("title")} maxLength={255} required />
       <label className="block">
-        <span className="mb-1 block text-caption font-medium uppercase tracking-wide text-steel">
-          Description
-        </span>
+        <div className="flex justify-between items-end mb-1">
+          <span className="block text-caption font-medium uppercase tracking-wide text-steel">
+            Description
+          </span>
+          <AIGenerateButton 
+            title={form.title} 
+            currentText={form.description}
+            contextData={aiContext}
+            contextType="description"
+            onUpdate={(desc) => setForm(f => ({ ...f, description: desc }))} 
+          />
+        </div>
         <textarea
           value={form.description}
           onChange={set("description")}
@@ -125,10 +142,39 @@ export function CampaignForm({
         </label>
         <Input label="Budget" type="number" min={1} max={1000000000} value={form.budget} onChange={set("budget")} required />
         <Input label="Location" value={form.location} onChange={set("location")} maxLength={255} placeholder="e.g., Kathmandu, Nepal or Online" required />
-        <Input label="Target audience" value={form.targetAudience} onChange={set("targetAudience")} maxLength={5000} />
+        <label className="block">
+          <div className="flex justify-between items-end mb-1">
+            <span className="block text-caption font-medium uppercase tracking-wide text-steel">Target Audience</span>
+            <AIGenerateButton 
+              title={form.title} 
+              currentText={form.targetAudience}
+              contextData={aiContext}
+              contextType="target audience"
+              onUpdate={(ta) => setForm(f => ({ ...f, targetAudience: ta }))} 
+            />
+          </div>
+          <input
+            type="text"
+            value={form.targetAudience}
+            onChange={set("targetAudience")}
+            maxLength={5000}
+            className="w-full rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </label>
       </div>
       <label className="block">
-        <span className="mb-1 block text-caption font-medium uppercase tracking-wide text-steel">Requirements</span>
+        <div className="flex justify-between items-end mb-1">
+          <span className="block text-caption font-medium uppercase tracking-wide text-steel">
+            Requirements
+          </span>
+          <AIGenerateButton 
+            title={form.title} 
+            currentText={form.requirements}
+            contextData={aiContext}
+            contextType="requirements"
+            onUpdate={(req) => setForm(f => ({ ...f, requirements: req }))} 
+          />
+        </div>
         <textarea
           value={form.requirements}
           onChange={set("requirements")}
