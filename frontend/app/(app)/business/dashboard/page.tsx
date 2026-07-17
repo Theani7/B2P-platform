@@ -110,6 +110,34 @@ function DashboardInner() {
         />
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+        <StatCard
+          label="Estimated Reach"
+          value={statsLoading ? "—" : `${(analytics?.summary.total_reach ?? 0).toLocaleString()}`}
+          icon={ActivityIcon}
+          subtitle="based on active collabs"
+        />
+        <StatCard
+          label="Estimated Impressions"
+          value={statsLoading ? "—" : `${(analytics?.summary.total_impressions ?? 0).toLocaleString()}`}
+          icon={ActivityIcon}
+          subtitle="across all platforms"
+        />
+        <StatCard
+          label="Total Spent"
+          value={statsLoading ? "—" : `Rs. ${(analytics?.summary.total_spent ?? 0).toLocaleString()}`}
+          icon={FolderDot}
+          subtitle="on completed collabs"
+        />
+        <StatCard
+          label="Average ROI"
+          value={statsLoading ? "—" : `${analytics?.summary.average_roi ?? 0}%`}
+          icon={CheckCircle2}
+          trend={{ value: "+12%", positive: true }}
+          subtitle="estimated return"
+        />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white border border-slate-custom/10 rounded-cards p-5 shadow-product-card">

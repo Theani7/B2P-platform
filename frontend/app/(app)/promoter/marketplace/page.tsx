@@ -351,11 +351,11 @@ function MarketplaceInner() {
                     <span className="px-2.5 py-1 rounded-inputs bg-linen-canvas text-graphite text-xs font-semibold border border-slate-custom/10">
                       {c.category}
                     </span>
-                    {c.requirements && c.requirements.split(",").slice(0, 2).map((req: string, i: number) => (
-                      <span key={i} className="px-2.5 py-1 rounded-inputs bg-linen-canvas text-graphite text-xs font-semibold border border-slate-custom/10">
-                        {req.trim().substring(0, 20)}{req.trim().length > 20 ? "..." : ""}
+                    {c.requirements && (
+                      <span className="px-2.5 py-1 rounded-inputs bg-linen-canvas text-graphite text-xs font-semibold border border-slate-custom/10 max-w-[200px] truncate">
+                        {c.requirements}
                       </span>
-                    ))}
+                    )}
                   </div>
 
                   <div className="mt-auto border-t border-slate-custom/10 pt-4 flex items-center justify-between">
@@ -541,13 +541,7 @@ function MarketplaceInner() {
                 {selectedCampaignDetails.requirements && (
                   <div>
                     <h3 className="text-xs font-bold text-ash uppercase tracking-wider mb-2">Requirements</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCampaignDetails.requirements.split(",").map((req: string, i: number) => (
-                        <span key={i} className="px-3 py-1.5 rounded-inputs bg-sky-wash text-signal-blue text-xs font-semibold border border-signal-blue/20">
-                          {req.trim()}
-                        </span>
-                      ))}
-                    </div>
+                    <p className="text-sm text-graphite leading-relaxed whitespace-pre-wrap">{selectedCampaignDetails.requirements}</p>
                   </div>
                 )}
               </div>

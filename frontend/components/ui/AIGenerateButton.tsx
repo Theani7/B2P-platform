@@ -11,12 +11,18 @@ export default function AIGenerateButton({
   contextData,
   onUpdate,
   contextType,
+  refineOnly,
+  disableGenerate,
+  disableGenerateReason,
 }: {
   title: string;
   currentText: string;
   contextData?: string;
   onUpdate: (text: string) => void;
-  contextType: "description" | "requirements" | "target audience";
+  contextType: "description" | "requirements" | "target audience" | "bio" | "creator headline";
+  refineOnly?: boolean;
+  disableGenerate?: boolean;
+  disableGenerateReason?: string;
 }) {
   const [isLoadingGen, setIsLoadingGen] = useState(false);
   const [isLoadingRefine, setIsLoadingRefine] = useState(false);
@@ -38,10 +44,18 @@ export default function AIGenerateButton({
     const extraContext = contextData ? `\n\nAdditional Campaign Details to incorporate:\n${contextData}` : "";
     let prompt = "";
     if (mode === "generate") {
-      const lengthHint = contextType === "description" ? "2-3 paragraphs" : contextType === "requirements" ? "3-5 bullet points" : "1-2 sentences";
-      prompt = `Write an engaging and professional campaign ${contextType} for a campaign titled: "${title}". Ensure it is around ${lengthHint}. Just output the text.${extraContext}`;
+      const lengthHint = contextType === "description" ? "2-3 paragraphs" : contextType === "requirements" ? "3-5 bullet points" : contextType === "bio" ? "1 short paragraph" : "1 punchy sentence";
+      const subject = (contextType === "bio" || contextType === "creator headline") 
+          ? `creator/influencer named ${title}` 
+          : `campaign titled: "${title}"`;
+          
+      prompt = `Write an engaging and professional ${contextType} for a ${subject}. Ensure it is around ${lengthHint}. Just output the text.${extraContext}`;
     } else {
-      prompt = `Refine and improve the following campaign ${contextType} for a campaign titled "${title}". Make it professional, fix any grammar issues, and improve the flow. Do not add conversational filler, just return the refined text.${extraContext}\n\nCurrent text:\n"${currentText}"`;
+      const subject = (contextType === "bio" || contextType === "creator headline") 
+          ? `creator/influencer named ${title}` 
+          : `campaign titled "${title}"`;
+          
+      prompt = `Refine and improve the following ${contextType} for a ${subject}. Make it professional, fix any grammar issues, and improve the flow. Do not add conversational filler, just return the refined text.${extraContext}\n\nCurrent text:\n"${currentText}"`;
     }
 
     try {
@@ -61,16 +75,28 @@ export default function AIGenerateButton({
 
   return (
     <div className="flex items-center gap-2">
-      <button
-        onClick={() => callAI("generate")}
-        disabled={isLoadingGen || isLoadingRefine}
-        type="button"
-        title={`Generate ${contextType} with AI`}
-        className="flex items-center gap-1.5 text-xs font-medium text-signal-blue bg-signal-blue/10 px-3 py-1.5 rounded-pill hover:bg-signal-blue/20 transition-colors disabled:opacity-50"
-      >
-        {isLoadingGen ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-        {isLoadingGen ? "Wait..." : "Generate"}
-      </button>
+      {!refineOnly && (
+        <button
+          onClick={() => {
+            if (disableGenerate) {
+              toast.error(disableGenerateReason || "Cannot generate right now.");
+              return;
+            }
+            callAI("generate");
+          }}
+          disabled={isLoadingGen || isLoadingRefine}
+          type="button"
+          title={`Generate ${contextType} with AI`}
+          className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-pill transition-colors ${
+            disableGenerate 
+              ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+              : "text-signal-blue bg-signal-blue/10 hover:bg-signal-blue/20 disabled:opacity-50"
+          }`}
+        >
+          {isLoadingGen ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+          {isLoadingGen ? "Wait..." : "Generate"}
+        </button>
+      )}
 
       <button
         onClick={() => callAI("refine")}

@@ -132,7 +132,7 @@ export function Sidebar({ role }: SidebarProps) {
     conversationsData?.reduce((acc, conv) => acc + (conv.unreadCount || 0), 0) || 0;
 
   return (
-    <aside className="hidden md:flex w-56 flex-shrink-0 bg-white border-r border-slate-custom/10 flex-col h-screen fixed left-0 top-0 z-[200]">
+    <aside className="hidden md:flex w-56 flex-shrink-0 bg-white/70 backdrop-blur-xl border-r border-slate-custom/10 flex-col h-screen fixed left-0 top-0 z-[200]">
       <div className="h-16 flex items-center px-6 border-b border-slate-custom/10">
         <Link
           href={user ? `/${user.role.toLowerCase()}/dashboard` : "/"}
@@ -173,15 +173,15 @@ export function Sidebar({ role }: SidebarProps) {
                   <Link
                     key={link.to}
                     href={link.to}
-                    className={`flex items-center gap-3 px-4 py-2 rounded-button text-sm font-medium transition-all duration-150 ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-inputs text-sm font-medium transition-all duration-200 group ${
                       isActive
-                        ? "bg-sky-wash text-signal-blue font-medium"
-                        : "text-slate-custom hover:bg-sky-wash hover:text-signal-blue"
+                        ? "bg-signal-blue/10 text-signal-blue"
+                        : "text-steel hover:bg-slate-custom/5 hover:text-graphite"
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-3">
-                        <Icon size={18} className={isActive ? "text-signal-blue" : "text-slate-custom"} />
+                        <Icon size={18} className={`transition-colors duration-200 ${isActive ? "text-signal-blue" : "text-ash group-hover:text-signal-blue/70"}`} />
                         {link.label}
                       </div>
                       {link.to === "/messages" && unreadMessagesCount > 0 && (

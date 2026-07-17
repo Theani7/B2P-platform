@@ -25,6 +25,7 @@ import { ProfileCompletionWidget } from "@/components/profile/ProfileCompletionW
 import { Spinner } from "@/components/ui/Spinner";
 import { ShareDialog } from "@/components/sharing/ShareDialog";
 import { Avatar } from "@/components/ui/Avatar";
+import AIGenerateButton from "@/components/ui/AIGenerateButton";
 import {
   BadgeCheck, Save, Trophy, AlertTriangle, MapPin, Briefcase, Upload, RefreshCw, Share
 } from "lucide-react";
@@ -78,6 +79,8 @@ function PromoterProfileInner() {
     formState: { isDirty, isSubmitting, errors },
     reset,
     getValues,
+    setValue,
+    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -92,11 +95,23 @@ function PromoterProfileInner() {
     },
   });
 
-  const headline = useWatch({ control, name: "headline" });
-  const niche = useWatch({ control, name: "niche" });
-  const location = useWatch({ control, name: "location" });
-  const followersCount = useWatch({ control, name: "followersCount" });
-  const engagementRate = useWatch({ control, name: "engagementRate" });
+  const headline = watch("headline");
+  const niche = watch("niche");
+  const location = watch("location");
+  const followersCount = watch("followersCount");
+  const engagementRate = watch("engagementRate");
+  const yearsExperience = watch("yearsExperience");
+
+  const hasEnoughDetails = !!(niche && niche !== "OTHER" && location && followersCount > 0);
+  const disableGenerateReason = "Please fill out your Primary Niche, Location, and Followers count in the Creator Details section before generating!";
+  
+  const aiContext = [
+    niche && niche !== "OTHER" && `Primary Niche: ${niche}`,
+    location && `Location: ${location}`,
+    followersCount > 0 && `Followers: ${followersCount}`,
+    engagementRate > 0 && `Engagement Rate: ${engagementRate}%`,
+    yearsExperience > 0 && `Years Experience: ${yearsExperience}`,
+  ].filter(Boolean).join("\n");
 
   useEffect(() => {
     if (profile) {
@@ -294,11 +309,33 @@ function PromoterProfileInner() {
                     {errors.username && <p className="text-xs text-coral-alert">{errors.username.message}</p>}
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <label className="text-sm font-medium text-graphite">Creator Headline</label>
+                    <div className="flex justify-between items-end mb-1">
+                      <label className="text-sm font-medium text-graphite">Creator Headline</label>
+                      <AIGenerateButton 
+                        title={user?.fullName || "Promoter"}
+                        currentText={headline || ""}
+                        contextData={aiContext}
+                        disableGenerate={!hasEnoughDetails}
+                        disableGenerateReason={disableGenerateReason}
+                        contextType="creator headline"
+                        onUpdate={(val) => setValue("headline", val, { shouldDirty: true })}
+                      />
+                    </div>
                     <input type="text" {...register("headline")} placeholder="e.g. Food & Travel Creator" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <label className="text-sm font-medium text-graphite">Bio</label>
+                    <div className="flex justify-between items-end mb-1">
+                      <label className="text-sm font-medium text-graphite">Bio</label>
+                      <AIGenerateButton 
+                        title={user?.fullName || "Promoter"}
+                        currentText={watch("bio") || ""}
+                        contextData={aiContext}
+                        disableGenerate={!hasEnoughDetails}
+                        disableGenerateReason={disableGenerateReason}
+                        contextType="bio"
+                        onUpdate={(val) => setValue("bio", val, { shouldDirty: true })}
+                      />
+                    </div>
                     <textarea {...register("bio")} rows={4} placeholder="Tell brands about yourself..." className="w-full p-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm resize-none"></textarea>
                   </div>
                 </div>

@@ -26,7 +26,7 @@ export function TopHeader() {
   const colorIndex = user?.id ? Math.floor(parseInt(user.id) % 5) : 0;
 
   return (
-    <header className="h-16 px-6 border-b border-slate-custom/10 bg-white flex items-center justify-between sticky top-0 z-[200]">
+    <header className="h-16 px-6 border-b border-slate-custom/10 bg-white/70 backdrop-blur-lg flex items-center justify-between sticky top-0 z-[200]">
       <div className="flex-1 max-w-lg flex items-center">
         <CommandPalette />
       </div>

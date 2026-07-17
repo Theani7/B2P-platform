@@ -387,13 +387,7 @@ function InvitationsInner() {
                 {selectedCampaignDetails.requirements && (
                   <div>
                     <h3 className="text-xs font-bold text-ash uppercase tracking-wider mb-2">Requirements</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCampaignDetails.requirements.split(",").map((req: string, i: number) => (
-                        <span key={i} className="px-3 py-1.5 rounded-inputs bg-sky-wash text-signal-blue text-xs font-semibold border border-signal-blue/20">
-                          {req.trim()}
-                        </span>
-                      ))}
-                    </div>
+                    <p className="text-sm text-graphite leading-relaxed whitespace-pre-wrap">{selectedCampaignDetails.requirements}</p>
                   </div>
                 )}
               </div>

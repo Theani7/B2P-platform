@@ -260,7 +260,7 @@ function CampaignsPageInner() {
             <div
               key={campaign.id}
               onClick={() => router.push(`/business/campaigns/${campaign.id}`)}
-              className="group bg-white border border-slate-custom/10 rounded-xl shadow-sm hover:border-signal-blue/30 hover:shadow-md transition-all cursor-pointer flex flex-col h-[240px] overflow-hidden relative"
+              className="group bg-white border border-slate-custom/10 rounded-xl shadow-product-card hover:-translate-y-1 hover:border-signal-blue/30 hover:shadow-elevated transition-all duration-300 cursor-pointer flex flex-col h-[240px] overflow-hidden relative"
             >
               <div className={`h-1.5 w-full absolute top-0 left-0 ${campaign.status === "OPEN" ? "bg-signal-blue" : campaign.status === "ACTIVE" ? "bg-emerald-status" : "bg-slate-custom/20"}`} />
               <div className="p-5 flex-1 flex flex-col">
