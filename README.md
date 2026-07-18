@@ -63,7 +63,14 @@ A full-stack SaaS platform connecting brands (businesses) with social media prom
 
 ### Run both apps with one command (Bun)
 
-After installing deps in `backend/` and `frontend/`, from the repo root:
+Install deps for both workspaces at once, from the repo root:
+
+```bash
+bun install            # installs backend + frontend workspaces
+bunx prisma generate --schema backend/prisma/schema.prisma  # if Prisma client is missing
+```
+
+Then run both apps together, from the repo root:
 
 ```bash
 bun run dev            # backend :8000 + frontend :3000 together
