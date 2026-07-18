@@ -86,3 +86,6 @@ frontend/.next/
 backend/node_modules/
 frontend/node_modules/
 
+
+# Stray nested dir
+theani7/
