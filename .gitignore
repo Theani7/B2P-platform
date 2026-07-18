@@ -5,6 +5,9 @@ opencode.json
 .kilocode/
 kilo.json
 
+# Dependencies (bun hoists to root node_modules)
+/node_modules/
+
 # Test files
 backend/tests/
 
