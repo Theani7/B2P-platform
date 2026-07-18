@@ -7,6 +7,7 @@ import { Role, DashboardPath } from "@/lib/roles";
 import { Spinner } from "@/components/ui/Spinner";
 import { PageShell } from "./PageShell";
 import { AIAssistant } from "@/components/ai/AIAssistant";
+import { FirstLoginWelcome } from "@/components/ai/FirstLoginWelcome";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { user, token, isLoading, hasProfile } = useAuth();
@@ -34,6 +35,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     <PageShell role={role}>
       {children}
       <AIAssistant />
+      <FirstLoginWelcome />
     </PageShell>
   );
 }
