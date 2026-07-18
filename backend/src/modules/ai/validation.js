@@ -15,5 +15,15 @@ export const generateSocialSchema = z.object({
 });
 
 export const chatSchema = z.object({
-  message: z.string().min(2)
+  message: z.string().min(2),
+  role: z.enum(["BUSINESS", "PROMOTER", "ADMIN"]).optional(),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().min(1),
+      })
+    )
+    .max(20)
+    .optional(),
 });

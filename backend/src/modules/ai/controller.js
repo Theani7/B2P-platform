@@ -30,7 +30,11 @@ export const generateSocial = async (req, res, next) => {
 
 export const chat = async (req, res, next) => {
   try {
-    const result = await aiService.chatWithAssistant(req.body.message);
+    const result = await aiService.chatWithAssistant({
+      message: req.body.message,
+      role: req.body.role,
+      history: req.body.history,
+    });
     return ok(res, result, "Response generated successfully");
   } catch (err) {
     next(err);
