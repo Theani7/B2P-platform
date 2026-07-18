@@ -6,6 +6,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Role, DashboardPath } from "@/lib/roles";
 import { Spinner } from "@/components/ui/Spinner";
 import { PageShell } from "./PageShell";
+import { AIAssistant } from "@/components/ai/AIAssistant";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { user, token, isLoading, hasProfile } = useAuth();
@@ -29,5 +30,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
   if (!token) return <Spinner full />;
 
   const role = user?.role ?? Role.BUSINESS;
-  return <PageShell role={role}>{children}</PageShell>;
+  return (
+    <PageShell role={role}>
+      {children}
+      <AIAssistant />
+    </PageShell>
+  );
 }

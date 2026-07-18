@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
           </div>
           <h1 className="text-heading font-bold text-graphite mb-2">Forgot Password?</h1>
           <p className="text-ash text-sm">
-            {success ? "Check your email for a link to reset your password." : "Enter your email address and we'll send you a link to reset your password."}
+            {success ? "Check your email for a 6-digit code to reset your password." : "Enter your email address and we'll send you a 6-digit code to reset your password."}
           </p>
         </div>
 
@@ -53,12 +53,12 @@ export default function ForgotPasswordPage() {
               error={errors.email?.message}
               {...register("email")}
             />
-            <Button type="submit" isLoading={isSubmitting} className="w-full h-12 text-sm font-semibold">
-              Send Reset Link
-            </Button>
+              <Button type="submit" loading={isSubmitting} className="w-full h-12 text-sm font-semibold">
+                Send Reset Code
+              </Button>
           </form>
         ) : (
-          <Button onClick={() => window.location.href = "/login"} variant="outline" className="w-full h-12 text-sm font-semibold">
+          <Button onClick={() => window.location.href = "/login"} variant="secondary" className="w-full h-12 text-sm font-semibold">
             Back to Login
           </Button>
         )}

@@ -29,6 +29,8 @@ class User(Base):
     is_verified = Column(Boolean, default=False, nullable=False)
     verification_token = Column(String(255), nullable=True)
     verification_token_expiry = Column(DateTime(timezone=True), nullable=True)
+    reset_code = Column(String(16), nullable=True, index=True)
+    reset_code_expiry = Column(DateTime(timezone=True), nullable=True)
     failed_login_attempts = Column(Integer, default=0, nullable=False)
     locked_until = Column(DateTime(timezone=True), nullable=True)
     last_login_at = Column(DateTime(timezone=True), nullable=True)
