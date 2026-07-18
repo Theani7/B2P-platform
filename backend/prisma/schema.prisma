@@ -1,0 +1,642 @@
+// B2P Connect — Prisma schema (PostgreSQL)
+// Translated from the FastAPI/SQLAlchemy models.
+// Run `npm run prisma:generate` then `npm run prisma:migrate`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================== Enums =====================
+
+enum Role {
+  BUSINESS
+  PROMOTER
+  ADMIN
+}
+
+enum CampaignStatus {
+  DRAFT
+  OPEN
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+  CANCELLED
+}
+
+enum CampaignVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum CollaborationStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum NicheEnum {
+  LIFESTYLE
+  TECH
+  FASHION
+  FOOD
+  TRAVEL
+  FITNESS
+  GAMING
+  BUSINESS
+  OTHER
+}
+
+enum PlatformEnum {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  FACEBOOK
+  LINKEDIN
+  X
+  GITHUB
+  WEBSITE
+}
+
+enum DeliverableStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  REVISION_REQUESTED
+  PUBLISHED
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  APPLICATION_RECEIVED
+  APPLICATION_ACCEPTED
+  APPLICATION_REJECTED
+  INVITATION_RECEIVED
+  INVITATION_ACCEPTED
+  INVITATION_DECLINED
+  NEW_MESSAGE
+  REVIEW_RECEIVED
+  COLLABORATION_STARTED
+  COLLABORATION_COMPLETED
+  CAMPAIGN_MATCH_READY
+  SYSTEM
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  SYSTEM
+}
+
+// ===================== Users & Auth =====================
+
+model User {
+  id                      String    @id @default(uuid()) @db.Uuid
+  username                String    @unique @db.VarChar(150)
+  fullName                String    @map("full_name") @db.VarChar(255)
+  email                   String    @unique @db.VarChar(255)
+  passwordHash            String    @map("password_hash") @db.VarChar(255)
+  role                    Role
+  isActive                Boolean   @default(true) @map("is_active")
+  isVerified              Boolean   @default(false) @map("is_verified")
+  verificationToken       String?   @map("verification_token") @db.VarChar(255)
+  verificationTokenExpiry DateTime? @map("verification_token_expiry") @db.Timestamptz
+  resetCode               String?   @map("reset_code") @db.VarChar(255)
+  resetCodeExpiry         DateTime? @map("reset_code_expiry") @db.Timestamptz
+  failedLoginAttempts     Int       @default(0) @map("failed_login_attempts")
+  lockedUntil             DateTime? @map("locked_until") @db.Timestamptz
+  lastLoginAt             DateTime? @map("last_login_at") @db.Timestamptz
+  createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt               DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  businessProfile         BusinessProfile?
+  promoterProfile         PromoterProfile?
+  socialLinks             SocialLink[]
+  userAchievements        UserAchievement[]
+  notificationPreferences NotificationPreference[]
+  auditLogs               AuditLog[]
+  activityLogs            ActivityLog[]            @relation("ActivityActor")
+  searchHistory           SearchHistory[]
+  receivedNotifications   Notification[]           @relation("NotificationRecipient")
+  sentNotifications       Notification[]           @relation("NotificationActor")
+  writtenReviews          Review[]                 @relation("ReviewAuthor")
+  receivedReviews         Review[]                 @relation("ReviewTarget")
+  verificationReviews     VerificationRequest[]    @relation("VerificationReviewer")
+  Message                 Message[]
+
+  @@index([role])
+  @@map("users")
+}
+
+model RevokedRefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  tokenHash String   @unique @map("token_hash") @db.VarChar(255)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([tokenHash])
+  @@map("revoked_refresh_tokens")
+}
+
+// ===================== Profiles =====================
+
+model BusinessProfile {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @unique @map("user_id") @db.Uuid
+  companyName String   @map("company_name") @db.VarChar(255)
+  industry    String   @db.VarChar(100)
+  description String?  @db.Text
+  location    String?  @db.VarChar(255)
+  website     String?  @db.VarChar(255)
+  logoUrl     String?  @map("logo_url") @db.VarChar(500)
+  companySize String?  @map("company_size") @db.VarChar(50)
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaigns            Campaign[]
+  collaborations       Collaboration[]
+  verificationRequests VerificationRequest[]
+  SavedPromoter        SavedPromoter[]
+
+  @@index([userId])
+  @@map("business_profiles")
+}
+
+model PromoterProfile {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @unique @map("user_id") @db.Uuid
+  username        String   @unique @db.VarChar(150)
+  headline        String?  @db.VarChar(255)
+  bio             String?  @db.Text
+  niche           String   @db.VarChar(50)
+  location        String?  @db.VarChar(255)
+  avatarUrl       String?  @map("avatar_url") @db.VarChar(500)
+  followersCount  Int      @default(0) @map("followers_count")
+  engagementRate  Float    @default(0) @map("engagement_rate")
+  yearsExperience Int?     @map("years_experience")
+  verified        Boolean  @default(false)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolioItems       PortfolioItem[]
+  applications         CampaignApplication[]
+  invitations          CampaignInvitation[]
+  collaborations       Collaboration[]
+  matchResults         MatchResult[]
+  savedByBusinesses    SavedPromoter[]
+  savedCampaigns       SavedCampaign[]
+  verificationRequests VerificationRequest[]
+
+  @@index([userId])
+  @@index([username])
+  @@map("promoter_profiles")
+}
+
+model PortfolioItem {
+  id             String   @id @default(uuid()) @db.Uuid
+  promoterId     String   @map("promoter_profile_id") @db.Uuid
+  title          String   @db.VarChar(255)
+  clientName     String?  @map("client_name") @db.VarChar(255)
+  campaignType   String?  @map("campaign_type") @db.VarChar(100)
+  description    String?  @db.Text
+  coverImage     String?  @map("cover_image") @db.VarChar(500)
+  featured       Boolean  @default(false)
+  views          Int      @default(0)
+  likes          Int      @default(0)
+  engagementRate Float    @default(0) @map("engagement_rate")
+  platforms      Json?
+  tags           Json?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  promoterProfile PromoterProfile  @relation(fields: [promoterId], references: [id], onDelete: Cascade)
+  media           PortfolioMedia[]
+
+  @@index([promoterId])
+  @@map("portfolio_items")
+}
+
+model PortfolioMedia {
+  id              String   @id @default(uuid()) @db.Uuid
+  portfolioItemId String   @map("portfolio_item_id") @db.Uuid
+  filePath        String   @map("file_path") @db.VarChar(500)
+  mediaType       String   @map("media_type") @db.VarChar(50)
+  displayOrder    Int      @default(0) @map("display_order")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  portfolioItem PortfolioItem @relation(fields: [portfolioItemId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioItemId])
+  @@map("portfolio_media")
+}
+
+model SocialLink {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  platform       String   @db.VarChar(50)
+  username       String?  @db.VarChar(255)
+  url            String   @db.VarChar(500)
+  followersCount Int?     @default(0) @map("followers_count")
+  isVerified     Boolean  @default(false) @map("is_verified")
+  displayOrder   Int      @default(0) @map("display_order")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@map("social_links")
+}
+
+// ===================== Campaigns & Matching =====================
+
+model Campaign {
+  id                String             @id @default(uuid()) @db.Uuid
+  businessProfileId String             @map("business_profile_id") @db.Uuid
+  title             String             @db.VarChar(255)
+  description       String             @db.Text
+  category          String             @db.VarChar(100)
+  budget            Float
+  location          String             @db.VarChar(255)
+  targetAudience    String?            @map("target_audience") @db.Text
+  requirements      String?            @db.Text
+  startDate         DateTime           @map("start_date") @db.Timestamptz
+  endDate           DateTime           @map("end_date") @db.Timestamptz
+  status            CampaignStatus     @default(DRAFT)
+  visibility        CampaignVisibility @default(PUBLIC)
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+
+  businessProfile BusinessProfile       @relation(fields: [businessProfileId], references: [id])
+  applications    CampaignApplication[]
+  invitations     CampaignInvitation[]
+  collaborations  Collaboration[]
+  matchResults    MatchResult[]
+  savedCampaigns  SavedCampaign[]
+
+  @@index([businessProfileId])
+  @@index([status])
+  @@map("campaigns")
+}
+
+model SavedPromoter {
+  id                String   @id @default(uuid()) @db.Uuid
+  businessProfileId String   @map("business_profile_id") @db.Uuid
+  promoterProfileId String   @map("promoter_profile_id") @db.Uuid
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  businessProfile BusinessProfile @relation(fields: [businessProfileId], references: [id])
+  promoterProfile PromoterProfile @relation(fields: [promoterProfileId], references: [id])
+
+  @@unique([businessProfileId, promoterProfileId])
+  @@map("saved_promoters")
+}
+
+model SavedCampaign {
+  id                String   @id @default(uuid()) @db.Uuid
+  promoterProfileId String   @map("promoter_profile_id") @db.Uuid
+  campaignId        String   @map("campaign_id") @db.Uuid
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  promoterProfile PromoterProfile @relation(fields: [promoterProfileId], references: [id])
+  campaign        Campaign        @relation(fields: [campaignId], references: [id])
+
+  @@unique([promoterProfileId, campaignId])
+  @@map("saved_campaigns")
+}
+
+model CampaignApplication {
+  id                String            @id @default(uuid()) @db.Uuid
+  campaignId        String            @map("campaign_id") @db.Uuid
+  promoterProfileId String            @map("promoter_profile_id") @db.Uuid
+  message           String?           @db.Text
+  status            ApplicationStatus @default(PENDING)
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  campaign        Campaign        @relation(fields: [campaignId], references: [id])
+  promoterProfile PromoterProfile @relation(fields: [promoterProfileId], references: [id])
+  collaborations  Collaboration[]
+
+  @@unique([campaignId, promoterProfileId])
+  @@index([campaignId])
+  @@index([promoterProfileId])
+  @@map("campaign_applications")
+}
+
+model CampaignInvitation {
+  id                String           @id @default(uuid()) @db.Uuid
+  campaignId        String           @map("campaign_id") @db.Uuid
+  promoterProfileId String           @map("promoter_profile_id") @db.Uuid
+  message           String?          @db.Text
+  status            InvitationStatus @default(PENDING)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+
+  campaign        Campaign        @relation(fields: [campaignId], references: [id])
+  promoterProfile PromoterProfile @relation(fields: [promoterProfileId], references: [id])
+  collaborations  Collaboration[]
+
+  @@unique([campaignId, promoterProfileId])
+  @@index([campaignId])
+  @@index([promoterProfileId])
+  @@map("campaign_invitations")
+}
+
+model Collaboration {
+  id                String              @id @default(uuid()) @db.Uuid
+  campaignId        String              @map("campaign_id") @db.Uuid
+  businessProfileId String              @map("business_profile_id") @db.Uuid
+  promoterProfileId String              @map("promoter_profile_id") @db.Uuid
+  applicationId     String?             @map("application_id") @db.Uuid
+  invitationId      String?             @map("invitation_id") @db.Uuid
+  status            CollaborationStatus @default(ACTIVE)
+  startedAt         DateTime            @default(now()) @map("started_at") @db.Timestamptz
+  completedAt       DateTime?           @map("completed_at") @db.Timestamptz
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz
+
+  campaign        Campaign             @relation(fields: [campaignId], references: [id])
+  businessProfile BusinessProfile      @relation(fields: [businessProfileId], references: [id])
+  promoterProfile PromoterProfile      @relation(fields: [promoterProfileId], references: [id])
+  application     CampaignApplication? @relation(fields: [applicationId], references: [id])
+  invitation      CampaignInvitation?  @relation(fields: [invitationId], references: [id])
+  reviews         Review[]
+  deliverables    Deliverable[]
+  conversation    Conversation?
+
+  @@index([campaignId])
+  @@index([businessProfileId])
+  @@index([promoterProfileId])
+  @@map("collaborations")
+}
+
+model MatchResult {
+  id                String   @id @default(uuid()) @db.Uuid
+  campaignId        String   @map("campaign_id") @db.Uuid
+  promoterProfileId String   @map("promoter_profile_id") @db.Uuid
+  score             Float    @default(0)
+  classification    String   @default("LOW_MATCH") @db.VarChar(20)
+  scoreBreakdown    Json     @map("score_breakdown")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  campaign        Campaign        @relation(fields: [campaignId], references: [id])
+  promoterProfile PromoterProfile @relation(fields: [promoterProfileId], references: [id])
+
+  @@index([campaignId])
+  @@index([promoterProfileId])
+  @@map("match_results")
+}
+
+// ===================== Reviews & Admin =====================
+
+model Review {
+  id              String   @id @default(uuid()) @db.Uuid
+  collaborationId String   @map("collaboration_id") @db.Uuid
+  reviewerId      String   @map("reviewer_id") @db.Uuid
+  revieweeId      String   @map("reviewee_id") @db.Uuid
+  rating          Int
+  comment         String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  collaboration Collaboration @relation(fields: [collaborationId], references: [id])
+  reviewer      User          @relation("ReviewAuthor", fields: [reviewerId], references: [id])
+  reviewee      User          @relation("ReviewTarget", fields: [revieweeId], references: [id])
+
+  @@unique([collaborationId, reviewerId])
+  @@index([reviewerId])
+  @@index([revieweeId])
+  @@map("reviews")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  action     String   @db.VarChar(100)
+  entityType String?  @map("entity_type") @db.VarChar(50)
+  entityId   String?  @map("entity_id") @db.VarChar(100)
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.VarChar(500)
+  extraData  Json?    @map("extra_data")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+model ActivityLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  actorId      String?  @map("actor_id") @db.Uuid
+  actorRole    String?  @map("actor_role") @db.VarChar(50)
+  entityType   String?  @map("entity_type") @db.VarChar(100)
+  entityId     String?  @map("entity_id") @db.VarChar(100)
+  action       String   @db.VarChar(100)
+  title        String   @db.VarChar(255)
+  description  String?  @db.Text
+  metadataInfo Json?    @map("metadata_info")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  actor User? @relation("ActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([entityType])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+model PlatformSetting {
+  id           String   @id @default(uuid()) @db.Uuid
+  settingKey   String   @unique @map("setting_key") @db.VarChar(100)
+  settingValue String   @default("") @map("setting_value")
+  description  String?  @db.VarChar(500)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([settingKey])
+  @@map("platform_settings")
+}
+
+model VerificationRequest {
+  id                String             @id @default(uuid()) @db.Uuid
+  promoterProfileId String?            @map("promoter_profile_id") @db.Uuid
+  businessProfileId String?            @map("business_profile_id") @db.Uuid
+  status            VerificationStatus @default(PENDING)
+  submittedAt       DateTime           @default(now()) @map("submitted_at") @db.Timestamptz
+  reviewedAt        DateTime?          @map("reviewed_at") @db.Timestamptz
+  reviewedBy        String?            @map("reviewed_by") @db.Uuid
+  adminNotes        String?            @map("admin_notes") @db.Text
+
+  promoterProfile PromoterProfile? @relation(fields: [promoterProfileId], references: [id])
+  businessProfile BusinessProfile? @relation(fields: [businessProfileId], references: [id])
+  reviewer        User?            @relation("VerificationReviewer", fields: [reviewedBy], references: [id])
+
+  @@index([promoterProfileId])
+  @@index([businessProfileId])
+  @@index([status])
+  @@map("verification_requests")
+}
+
+// ===================== Chat =====================
+
+model Conversation {
+  id         String   @id @default(uuid()) @db.Uuid
+  campaignId String   @map("campaign_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  collaboration Collaboration @relation(fields: [campaignId], references: [id])
+  messages      Message[]
+
+  @@unique([campaignId])
+  @@index([campaignId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String      @id @default(uuid()) @db.Uuid
+  conversationId String      @map("conversation_id") @db.Uuid
+  senderId       String      @map("sender_id") @db.Uuid
+  message        String      @db.Text
+  messageType    MessageType @default(TEXT) @map("message_type")
+  editedAt       DateTime?   @map("edited_at") @db.Timestamptz
+  readAt         DateTime?   @map("read_at") @db.Timestamptz
+  isDeleted      Boolean     @default(false) @map("is_deleted")
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// ===================== Notifications & Achievements =====================
+
+model Notification {
+  id          String           @id @default(uuid()) @db.Uuid
+  recipientId String           @map("recipient_id") @db.Uuid
+  actorId     String?          @map("actor_id") @db.Uuid
+  type        NotificationType
+  title       String           @db.VarChar(255)
+  message     String           @db.Text
+  entityType  String?          @map("entity_type") @db.VarChar(50)
+  entityId    String?          @map("entity_id") @db.Uuid
+  isRead      Boolean          @default(false) @map("is_read")
+  readAt      DateTime?        @map("read_at") @db.Timestamptz
+  metadata    Json?
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz
+
+  recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor     User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String   @db.VarChar(50)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model Achievement {
+  id               Int               @id @default(autoincrement())
+  key              String            @unique @db.VarChar(50)
+  title            String            @db.VarChar(100)
+  description      String            @db.VarChar(500)
+  icon             String?           @db.VarChar(200)
+  category         String            @db.VarChar(50)
+  points           Int               @default(0)
+  isActive         Boolean           @default(true) @map("is_active")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  userAchievements UserAchievement[]
+
+  @@index([key])
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            Int         @id @default(autoincrement())
+  userId        String      @map("user_id") @db.Uuid
+  achievementId Int         @map("achievement_id")
+  earnedAt      DateTime?   @map("earned_at")
+  progress      Float       @default(0)
+  metadata      Json?
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([achievementId])
+  @@map("user_achievements")
+}
+
+// ===================== Search & Deliverables =====================
+
+model SearchHistory {
+  id        Int      @id @default(autoincrement()) @db.Integer
+  userId    String   @map("user_id") @db.Uuid
+  query     String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("search_history")
+}
+
+model Deliverable {
+  id              String            @id @default(uuid()) @db.Uuid
+  collaborationId String            @map("collaboration_id") @db.Uuid
+  title           String            @db.VarChar(255)
+  description     String?
+  contentUrl      String            @map("content_url")
+  status          DeliverableStatus @default(IN_REVIEW)
+  feedback        String?
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  collaboration Collaboration @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
+
+  @@index([collaborationId])
+  @@map("deliverables")
+}
