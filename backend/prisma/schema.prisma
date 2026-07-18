@@ -411,6 +411,7 @@ model MatchResult {
 
   @@index([campaignId])
   @@index([promoterProfileId])
+  @@unique([campaignId, promoterProfileId])
   @@map("match_results")
 }
 

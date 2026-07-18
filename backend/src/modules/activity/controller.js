@@ -1,11 +1,6 @@
 import * as activityService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try { await fn(req, res, next); } catch (e) { next(e); }
-  };
-}
 
 function paginated(res, items, total, query, message) {
   const { page = 1, size = 20 } = query;

@@ -16,10 +16,7 @@ import {
   useCampaign,
   useUpdateCampaign,
   useDeleteCampaign,
-  usePublishCampaign,
-  useUnpublishCampaign,
-  useArchiveCampaign,
-  useReopenCampaign,
+  useCampaignStatusAction,
 } from "@/features/campaigns/api";
 import { CampaignStatus, type CampaignUpdatePayload } from "@/features/campaigns/types";
 import { StatusBadge, formatBudget } from "@/components/campaigns/StatusBadge";
@@ -102,10 +99,10 @@ function CampaignDetailInner({ id }: { id: string }) {
   const { data: campaign, isLoading, isError } = useCampaign(id);
   const update = useUpdateCampaign();
   const del = useDeleteCampaign();
-  const publish = usePublishCampaign();
-  const unpublish = useUnpublishCampaign();
-  const archive = useArchiveCampaign();
-  const reopen = useReopenCampaign();
+  const publish = useCampaignStatusAction("publish");
+  const unpublish = useCampaignStatusAction("unpublish");
+  const archive = useCampaignStatusAction("archive");
+  const reopen = useCampaignStatusAction("reopen");
   const [editing, setEditing] = useState(false);
   const [share, setShare] = useState(false);
   const { data: apps } = useCampaignApplications(id);

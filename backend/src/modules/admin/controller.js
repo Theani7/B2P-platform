@@ -1,15 +1,6 @@
 import * as adminService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try {
-      await fn(req, res, next);
-    } catch (e) {
-      next(e);
-    }
-  };
-}
 
 function paginated(res, items, total, query, message) {
   const { page = 1, limit = 20 } = query;
@@ -74,8 +65,6 @@ export const deleteReview = wrap(async (req, res) => {
   const data = await adminService.deleteReview(req.user, req.params.reviewId, req);
   return ok(res, data, "Review deleted");
 });
-
-
 
 export const settings = wrap(async (req, res) => {
   const data = await adminService.getSettings();

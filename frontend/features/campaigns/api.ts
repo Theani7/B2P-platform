@@ -58,43 +58,10 @@ export const useDeleteCampaign = () => {
   });
 };
 
-export const useArchiveCampaign = () => {
+export const useCampaignStatusAction = (action: "archive" | "reopen" | "publish" | "unpublish") => {
   const qc = useQueryClient();
   return useMutation<CampaignRead, Error, string>({
-    mutationFn: (id) => api.post<CampaignRead>(`/campaigns/${id}/archive`).then((r) => r.data),
-    onSuccess: (_d, id) => {
-      qc.invalidateQueries({ queryKey: ["campaigns"] });
-      qc.invalidateQueries({ queryKey: ["campaign", id] });
-    },
-  });
-};
-
-export const useReopenCampaign = () => {
-  const qc = useQueryClient();
-  return useMutation<CampaignRead, Error, string>({
-    mutationFn: (id) => api.post<CampaignRead>(`/campaigns/${id}/reopen`).then((r) => r.data),
-    onSuccess: (_d, id) => {
-      qc.invalidateQueries({ queryKey: ["campaigns"] });
-      qc.invalidateQueries({ queryKey: ["campaign", id] });
-    },
-  });
-};
-
-export const usePublishCampaign = () => {
-  const qc = useQueryClient();
-  return useMutation<CampaignRead, Error, string>({
-    mutationFn: (id) => api.post<CampaignRead>(`/campaigns/${id}/publish`).then((r) => r.data),
-    onSuccess: (_d, id) => {
-      qc.invalidateQueries({ queryKey: ["campaigns"] });
-      qc.invalidateQueries({ queryKey: ["campaign", id] });
-    },
-  });
-};
-
-export const useUnpublishCampaign = () => {
-  const qc = useQueryClient();
-  return useMutation<CampaignRead, Error, string>({
-    mutationFn: (id) => api.post<CampaignRead>(`/campaigns/${id}/unpublish`).then((r) => r.data),
+    mutationFn: (id) => api.post<CampaignRead>(`/campaigns/${id}/${action}`).then((r) => r.data),
     onSuccess: (_d, id) => {
       qc.invalidateQueries({ queryKey: ["campaigns"] });
       qc.invalidateQueries({ queryKey: ["campaign", id] });

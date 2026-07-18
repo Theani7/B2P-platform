@@ -1,18 +1,6 @@
 import * as authService from "./service.js";
-import { authenticate } from "../../shared/auth.js";
-import { requireRole } from "../../shared/auth.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
-import { ROLE } from "../../shared/enums.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try {
-      await fn(req, res, next);
-    } catch (e) {
-      next(e);
-    }
-  };
-}
 
 export const register = wrap(async (req, res) => {
   const tokens = await authService.register(req.body);
@@ -62,6 +50,4 @@ export const updateMe = wrap(async (req, res) => {
   return ok(res, user, "Profile updated");
 });
 
-export const adminDebug = (req, res) => ok(res, { admin: true }, "Admin debug");
-export const businessReports = (req, res) => ok(res, { reports: [] }, "Business reports");
-export const promoterCampaigns = (req, res) => ok(res, { campaigns: [] }, "Promoter campaigns");
+

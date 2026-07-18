@@ -14,7 +14,6 @@ export const config = {
   projectName: process.env.PROJECT_NAME || "Byparsathy",
   apiV1: process.env.API_V1_STR || "/api/v1",
   secretKey,
-  algorithm: "HS256",
   accessTokenExpireMinutes: Number(process.env.ACCESS_TOKEN_EXPIRE_MINUTES || 30),
   refreshTokenExpireDays: Number(process.env.REFRESH_TOKEN_EXPIRE_DAYS || 7),
   jwtAudience: process.env.JWT_AUDIENCE || "api.b2p.com",

@@ -1,16 +1,11 @@
 import * as portfolioService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
 import { validate } from "../../shared/validate.js";
 import { authenticate } from "../../shared/auth.js";
 import { requireRole } from "../../shared/auth.js";
 import { ROLE } from "../../shared/enums.js";
 import { portfolioItemCreateSchema, portfolioItemUpdateSchema } from "./validation.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try { await fn(req, res, next); } catch (e) { next(e); }
-  };
-}
 
 export const listItems = wrap(async (req, res) => {
   const data = await portfolioService.list(req.user);

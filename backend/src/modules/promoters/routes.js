@@ -1,4 +1,5 @@
 import express from "express";
+import { wrap } from "../../shared/errors.js";
 import * as discovery from "../discovery/service.js";
 import { authenticate } from "../../shared/auth.js";
 import { requireRole } from "../../shared/auth.js";
@@ -6,12 +7,6 @@ import { validate } from "../../shared/validate.js";
 import { ok } from "../../shared/response.js";
 import { ROLE } from "../../shared/enums.js";
 import { directoryQuerySchema } from "../discovery/validation.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try { await fn(req, res, next); } catch (e) { next(e); }
-  };
-}
 
 const router = express.Router();
 

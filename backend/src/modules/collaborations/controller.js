@@ -1,11 +1,6 @@
 import * as collaborationService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try { await fn(req, res, next); } catch (e) { next(e); }
-  };
-}
 
 export const businessList = wrap(async (req, res) => {
   const [items, total] = await collaborationService.listBusinessCollaborations(req.user, req.query);

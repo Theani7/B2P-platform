@@ -3,8 +3,6 @@ import { AppError } from "../../shared/errors.js";
 import { ROLE } from "../../shared/enums.js";
 import { createNotification } from "../../shared/notify.js";
 
-const MAX_SCORE = 100;
-
 const RELATED_NICHES = {
   LIFESTYLE: ["FASHION", "TRAVEL", "FOOD", "FITNESS"],
   TECH: ["GAMING", "BUSINESS"],
@@ -91,9 +89,6 @@ export async function generateMatches(user, campaignId) {
   const campaign = await campaignForBusiness(campaignId, profile.id);
 
   const promoters = await prisma.promoterProfile.findMany();
-  const existingMap = Object.fromEntries(
-    (await prisma.matchResult.findMany({ where: { campaignId: campaign.id } })).map((m) => [m.promoterProfileId, m])
-  );
 
   const ops = [];
   for (const promoter of promoters) {
@@ -107,27 +102,19 @@ export async function generateMatches(user, campaignId) {
     const score = Object.values(breakdown).reduce((a, b) => a + b, 0);
     const classification = classify(score);
 
-    const existing = existingMap[promoter.id];
-    if (existing) {
-      ops.push(
-        prisma.matchResult.update({
-          where: { id: existing.id },
-          data: { score, classification, scoreBreakdown: breakdown },
-        })
-      );
-    } else {
-      ops.push(
-        prisma.matchResult.create({
-          data: {
-            campaignId: campaign.id,
-            promoterProfileId: promoter.id,
-            score,
-            classification,
-            scoreBreakdown: breakdown,
-          },
-        })
-      );
-    }
+    ops.push(
+      prisma.matchResult.upsert({
+        where: { campaignId_promoterProfileId: { campaignId: campaign.id, promoterProfileId: promoter.id } },
+        create: {
+          campaignId: campaign.id,
+          promoterProfileId: promoter.id,
+          score,
+          classification,
+          scoreBreakdown: breakdown,
+        },
+        update: { score, classification, scoreBreakdown: breakdown },
+      })
+    );
   }
 
   // Persist all match results atomically in a single transaction.

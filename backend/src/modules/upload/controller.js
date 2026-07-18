@@ -1,16 +1,7 @@
 import * as uploadService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
 import { AppError } from "../../shared/errors.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try {
-      await fn(req, res, next);
-    } catch (e) {
-      next(e);
-    }
-  };
-}
 
 function handle(subfolder) {
   return wrap(async (req, res) => {

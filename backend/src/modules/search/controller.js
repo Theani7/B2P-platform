@@ -1,15 +1,6 @@
 import * as searchService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try {
-      await fn(req, res, next);
-    } catch (e) {
-      next(e);
-    }
-  };
-}
 
 export const search = wrap(async (req, res) => {
   const data = await searchService.performSearch(req.user, req.query);

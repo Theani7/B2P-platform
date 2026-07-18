@@ -3,5 +3,3 @@ export const ROLE = {
   PROMOTER: "PROMOTER",
   ADMIN: "ADMIN",
 };
-
-export const ROLES = ["BUSINESS", "PROMOTER", "ADMIN"];

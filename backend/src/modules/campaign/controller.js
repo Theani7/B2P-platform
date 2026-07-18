@@ -1,11 +1,6 @@
 import * as campaignService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try { await fn(req, res, next); } catch (e) { next(e); }
-  };
-}
 
 export const create = wrap(async (req, res) => {
   const data = await campaignService.create(req.user, req.body);

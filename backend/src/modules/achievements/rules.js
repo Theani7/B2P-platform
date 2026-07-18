@@ -9,9 +9,7 @@ import { ROLE } from "../../shared/enums.js";
 export async function evaluateAll(user) {
   const earned = [];
 
-  if (user.role === ROLE.BUSINESS) {
-    earned.push(...(await evaluateBusinessRules(user)));
-  } else if (user.role === ROLE.PROMOTER) {
+  if (user.role === ROLE.PROMOTER) {
     earned.push(...(await evaluatePromoterRules(user)));
   }
 
@@ -32,11 +30,6 @@ async function evaluateGeneralRules(user) {
     earned.push({ key: "FIRST_SOCIAL_LINK", progress: 100 });
   }
   return earned;
-}
-
-// eslint-disable-next-line no-unused-vars
-async function evaluateBusinessRules(user) {
-  return [];
 }
 
 async function evaluatePromoterRules(user) {

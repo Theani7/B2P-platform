@@ -1,16 +1,7 @@
 import * as chatService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
 import { AppError } from "../../shared/errors.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try {
-      await fn(req, res, next);
-    } catch (e) {
-      next(e);
-    }
-  };
-}
 
 export const listConversations = wrap(async (req, res) => {
   const data = await chatService.getConversations(req.user, req.query);

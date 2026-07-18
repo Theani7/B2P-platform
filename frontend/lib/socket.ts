@@ -22,12 +22,6 @@ export function getSocket(): Socket {
   return socket;
 }
 
-/** Update the auth token on the live socket (e.g. after login/refresh). */
-export function refreshSocketToken() {
-  const s = socket;
-  if (s) s.auth = { token: getToken() ?? undefined };
-}
-
 export function useSocketEvent(event: string, handler: (payload: any) => void) {
   const ref = useRef(handler);
   ref.current = handler;

@@ -17,10 +17,6 @@ import { verifyToken } from "./jwt.js";
  */
 let io = null;
 
-export function getIO() {
-  return io;
-}
-
 function userIdFromSocket(socket) {
   const token = socket.handshake.auth?.token || socket.handshake.query?.token;
   if (!token) return null;

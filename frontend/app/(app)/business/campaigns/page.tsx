@@ -15,9 +15,7 @@ import { ExportButton } from "@/components/export/ExportButton";
 import {
   useCampaigns,
   useDeleteCampaign,
-  useArchiveCampaign,
-  useReopenCampaign,
-  usePublishCampaign,
+  useCampaignStatusAction,
   useCampaignDashboardStats,
   useUpdateCampaign,
 } from "@/features/campaigns/api";
@@ -132,9 +130,9 @@ function CampaignsPageInner() {
   const stats = useCampaignDashboardStats();
 
   const deleteCampaign = useDeleteCampaign();
-  const archiveCampaign = useArchiveCampaign();
-  const reopenCampaign = useReopenCampaign();
-  const publishCampaign = usePublishCampaign();
+  const archiveCampaign = useCampaignStatusAction("archive");
+  const reopenCampaign = useCampaignStatusAction("reopen");
+  const publishCampaign = useCampaignStatusAction("publish");
   const updateCampaign = useUpdateCampaign();
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);

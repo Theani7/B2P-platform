@@ -11,7 +11,6 @@ import {
   settingUpdateSchema,
 } from "./validation.js";
 
-
 const router = express.Router();
 router.use(authenticate, requireRole(ROLE.ADMIN));
 
@@ -28,8 +27,6 @@ router.patch("/campaigns/:campaignId/cancel", controllers.cancelCampaign);
 
 router.get("/reviews", validate(adminReviewQuerySchema, "query"), controllers.listReviews);
 router.delete("/reviews/:reviewId", controllers.deleteReview);
-
-
 
 router.get("/settings", controllers.settings);
 router.post("/settings/seed", controllers.seedSettings);

@@ -1,4 +1,5 @@
 import * as businessService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { authenticate } from "../../shared/auth.js";
 import * as discovery from "../discovery/service.js";
 import { ok } from "../../shared/response.js";
@@ -7,12 +8,6 @@ import { requireRole } from "../../shared/auth.js";
 import { ROLE } from "../../shared/enums.js";
 import { businessProfileCreateSchema, businessProfileUpdateSchema } from "./validation.js";
 import { savedQuerySchema } from "../discovery/validation.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try { await fn(req, res, next); } catch (e) { next(e); }
-  };
-}
 
 export const createProfile = wrap(async (req, res) => {
   const data = await businessService.createOrUpdate(req.user, req.body);

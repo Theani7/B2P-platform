@@ -1,14 +1,9 @@
 import * as socialService from "./service.js";
+import { wrap } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
 import { validate } from "../../shared/validate.js";
 import { authenticate } from "../../shared/auth.js";
 import { socialLinkCreateSchema, socialLinkUpdateSchema } from "./validation.js";
-
-function wrap(fn) {
-  return async (req, res, next) => {
-    try { await fn(req, res, next); } catch (e) { next(e); }
-  };
-}
 
 export const listLinks = wrap(async (req, res) => {
   const data = await socialService.list(req.user);

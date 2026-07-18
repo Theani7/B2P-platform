@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/apiClient";
+import { type PlatformSetting } from "@/features/settings/api";
+export type { PlatformSetting };
 
 export interface AdminDashboardStats {
   totalUsers: number;
@@ -87,16 +89,6 @@ export interface AdminReviewQuery {
   search?: string;
 }
 
-
-
-export interface PlatformSetting {
-  id: string;
-  settingKey: string;
-  settingValue: string;
-  description: string | null;
-  updatedAt: string;
-}
-
 // --- Dashboard & analytics ---
 export const useAdminDashboard = () =>
   useQuery<AdminDashboardStats>({
@@ -134,45 +126,35 @@ export const useSuspendUser = () => {
   });
 };
 
-export const useActivateUser = () => {
+// Optimistic list mutation: remove (delete) or patch (status) an item, with rollback.
+function useOptimisticList<T>(
+  key: string[],
+  method: "delete" | "patch",
+  urlFor: (id: string) => string,
+  apply: (item: any, id: string) => any
+) {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
-    mutationFn: (userId) => api.patch(`/admin/users/${userId}/activate`),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-users"] });
-    },
-  });
-};
-
-export const useDeleteUser = () => {
-  const qc = useQueryClient();
-  return useMutation<void, Error, string>({
-    mutationFn: (userId) => api.delete(`/admin/users/${userId}`),
-    onMutate: async (userId) => {
-      await qc.cancelQueries({ queryKey: ["admin-users"] });
-      
-      const previousUsers = qc.getQueryData(["admin-users"]);
-      
-      qc.setQueriesData({ queryKey: ["admin-users"] }, (old: any) => {
+    mutationFn: (id) => (method === "delete" ? api.delete(urlFor(id)) : api.patch(urlFor(id))),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData(key);
+      qc.setQueriesData({ queryKey: key }, (old: any) => {
         if (!old || !old.items) return old;
-        return {
-          ...old,
-          items: old.items.filter((u: any) => u.id !== userId)
-        };
+        return { ...old, items: old.items.map((x: any) => (x.id === id ? apply(x, id) : x)).filter((x: any) => x !== null) };
       });
-      
-      return { previousUsers };
+      return { previous };
     },
-    onError: (err, userId, context: any) => {
-      if (context?.previousUsers) {
-        qc.setQueryData(["admin-users"], context.previousUsers);
-      }
+    onError: (err, id, context: any) => {
+      if (context?.previous) qc.setQueryData(key, context.previous);
     },
     onSettled: () => {
-      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: key });
     },
   });
-};
+}
+
+export const useDeleteUser = () => useOptimisticList(["admin-users"], "delete", (id) => `/admin/users/${id}`, () => null);
 
 // --- Campaigns ---
 export const useAdminCampaigns = (params: AdminCampaignQuery) =>
@@ -181,52 +163,15 @@ export const useAdminCampaigns = (params: AdminCampaignQuery) =>
     queryFn: () => api.get<Paginated<AdminCampaign>>("/admin/campaigns", { params }).then((r) => r.data),
   });
 
-export const useArchiveCampaign = () => {
-  const qc = useQueryClient();
-  return useMutation<void, Error, string>({
-    mutationFn: (id) => api.patch(`/admin/campaigns/${id}/archive`),
-    onMutate: async (id) => {
-      await qc.cancelQueries({ queryKey: ["admin-campaigns"] });
-      const previous = qc.getQueryData(["admin-campaigns"]);
-      qc.setQueriesData({ queryKey: ["admin-campaigns"] }, (old: any) => {
-        if (!old || !old.items) return old;
-        return {
-          ...old,
-          items: old.items.map((c: any) => c.id === id ? { ...c, status: "ARCHIVED" } : c)
-        };
-      });
-      return { previous };
-    },
-    onError: (err, id, context: any) => {
-      if (context?.previous) qc.setQueryData(["admin-campaigns"], context.previous);
-    },
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ["admin-campaigns"] });
-    },
-  });
-};
+export const useArchiveCampaign = () => useOptimisticList(["admin-campaigns"], "patch", (id) => `/admin/campaigns/${id}/archive`, (c) => ({ ...c, status: "ARCHIVED" }));
+export const useCancelCampaign = () => useOptimisticList(["admin-campaigns"], "patch", (id) => `/admin/campaigns/${id}/cancel`, (c) => ({ ...c, status: "CANCELLED" }));
 
-export const useCancelCampaign = () => {
+export const useActivateUser = () => {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
-    mutationFn: (id) => api.patch(`/admin/campaigns/${id}/cancel`),
-    onMutate: async (id) => {
-      await qc.cancelQueries({ queryKey: ["admin-campaigns"] });
-      const previous = qc.getQueryData(["admin-campaigns"]);
-      qc.setQueriesData({ queryKey: ["admin-campaigns"] }, (old: any) => {
-        if (!old || !old.items) return old;
-        return {
-          ...old,
-          items: old.items.map((c: any) => c.id === id ? { ...c, status: "CANCELLED" } : c)
-        };
-      });
-      return { previous };
-    },
-    onError: (err, id, context: any) => {
-      if (context?.previous) qc.setQueryData(["admin-campaigns"], context.previous);
-    },
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ["admin-campaigns"] });
+    mutationFn: (userId) => api.patch(`/admin/users/${userId}/activate`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
   });
 };
