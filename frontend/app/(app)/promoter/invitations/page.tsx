@@ -10,6 +10,7 @@ import { notifySuccess, notifyError } from "@/lib/notify";
 import { usePromoterInvitations, useAcceptInvitation, useRejectInvitation } from "@/features/invitations/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonList } from "@/components/ui/Skeleton";
 import {
   Mail, Building2, Clock, MapPin, Star, CheckCircle2, XCircle, AlertCircle, MessageCircle,
   ChevronRight, ChevronLeft, Search, Inbox, X,
@@ -163,7 +164,7 @@ function InvitationsInner() {
 
       {/* INVITATION LIST */}
       {isLoading ? (
-        <div className="space-y-4">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-white rounded-2xl h-64 animate-pulse ring-1 ring-slate-custom/10" />)}</div>
+        <SkeletonList count={4} rowHeight="h-64" />
       ) : !invites || invites.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-custom/10 p-16 text-center flex flex-col items-center">
           <div className="w-20 h-20 bg-linen-canvas rounded-full flex items-center justify-center text-ash mb-4"><Inbox size={32} /></div>

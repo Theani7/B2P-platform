@@ -8,6 +8,7 @@ import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonList } from "@/components/ui/Skeleton";
 import { RatingStars } from "@/components/reviews/RatingStars";
 import {
   useMyReviews,
@@ -167,11 +168,7 @@ export default function BusinessReviewsPage() {
 
         <div className="space-y-4">
           {active.isLoading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-cards h-48 animate-pulse border border-slate-custom/10" />
-              ))}
-            </div>
+            <SkeletonList count={3} rowHeight="h-48" />
           ) : items.length === 0 ? (
             <div className="bg-white rounded-cards border border-slate-custom/10 shadow-product-card p-16 text-center flex flex-col items-center">
               <div className="w-20 h-20 bg-sky-wash rounded-full flex items-center justify-center text-signal-blue mb-4">

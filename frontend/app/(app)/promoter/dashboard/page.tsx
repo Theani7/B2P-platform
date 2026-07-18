@@ -13,6 +13,7 @@ import { ProfileCompletionWidget } from "@/components/profile/ProfileCompletionW
 import { usePromoterCollaborations } from "@/features/collaborations/api";
 import { usePromoterInvitations, useAcceptInvitation, useRejectInvitation } from "@/features/invitations/api";
 import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonList } from "@/components/ui/Skeleton";
 import { useMyActivities } from "@/features/activity/api";
 import { usePromoterProfile, useUpdatePromoterProfile } from "@/features/profile/api";
 import { useUserRating } from "@/features/reviews/api";
@@ -224,11 +225,7 @@ function DashboardInner() {
 
             <div className="p-6">
               {collabsLoading ? (
-                <div className="space-y-3">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="h-16 bg-sky-wash/50 rounded-xl animate-pulse" />
-                  ))}
-                </div>
+                <SkeletonList count={3} rowHeight="h-16" roundedWrapper="rounded-xl" />
               ) : !collabs || collabs.items.length === 0 ? (
                 <div className="bg-sky-wash/30 border border-slate-custom/10 border-dashed rounded-xl p-8 text-center flex flex-col items-center justify-center">
                   <div className="w-12 h-12 bg-white shadow-sm rounded-full flex items-center justify-center text-signal-blue mb-3">
@@ -287,11 +284,7 @@ function DashboardInner() {
                 </div>
               </div>
               {activityLoading ? (
-                <div className="p-6 space-y-3">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="h-12 bg-sky-wash/50 rounded-lg animate-pulse" />
-                  ))}
-                </div>
+                <div className="p-6"><SkeletonList count={3} rowHeight="h-12" roundedWrapper="rounded-lg" /></div>
               ) : !activityData?.items?.length ? (
                 <div className="p-12 text-center border-t border-slate-custom/5 flex flex-col items-center justify-center">
                   <div className="w-16 h-16 rounded-full bg-sky-wash flex items-center justify-center mx-auto mb-4">
@@ -338,10 +331,7 @@ function DashboardInner() {
 
               <div className="p-6 flex flex-col">
                 {invsLoading ? (
-                  <div className="space-y-3">
-                    <div className="h-16 bg-sky-wash/50 rounded-lg animate-pulse" />
-                    <div className="h-16 bg-sky-wash/50 rounded-lg animate-pulse" />
-                  </div>
+                  <SkeletonList count={2} rowHeight="h-16" roundedWrapper="rounded-lg" />
                 ) : !invitations || invitations.items.length === 0 ? (
                   <div className="text-center py-8 bg-sky-wash/30 rounded-xl border border-dashed border-slate-custom/10 flex flex-col items-center justify-center">
                     <p className="text-sm font-bold text-graphite">You're all caught up!</p>

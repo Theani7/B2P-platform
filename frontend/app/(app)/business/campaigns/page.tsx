@@ -6,6 +6,7 @@ import { Role } from "@/lib/roles";
 import { Button } from "@/components/ui/Button";
 import { Card, PageHeader } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonCards } from "@/components/ui/Skeleton";
 import { StatCard } from "@/components/ui/Stats";
 import { Avatar } from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -237,11 +238,7 @@ function CampaignsPageInner() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-[220px] bg-sky-wash/50 rounded-xl animate-pulse" />
-          ))}
-        </div>
+        <SkeletonCards count={6} />
       ) : campaigns.length === 0 ? (
         <div className="bg-white border border-slate-custom/10 rounded-xl p-12 shadow-sm">
           <EmptyState

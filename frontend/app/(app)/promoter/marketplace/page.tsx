@@ -10,6 +10,7 @@ import { notifySuccess, notifyError } from "@/lib/notify";
 import { useMarketplace, useBookmarkCampaign, useRemoveBookmark } from "@/features/marketplace/api";
 import { useApplyToCampaign } from "@/features/applications/api";
 import { useQueryClient } from "@tanstack/react-query";
+import { SkeletonCards } from "@/components/ui/Skeleton";
 import {
   Search, Calendar, Clock, Bookmark, Share2, Filter, Sparkles,
   CheckCircle, X, Send, MoreVertical, Link as LinkIcon, Flag, Globe,
@@ -281,11 +282,7 @@ function MarketplaceInner() {
 
       {/* CAMPAIGN GRID */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-xl h-[320px] animate-pulse shadow-sm border border-slate-custom/10" />
-          ))}
-        </div>
+        <SkeletonCards count={6} />
       ) : !data || data.items.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-slate-custom/10 p-16 text-center flex flex-col items-center">
           <div className="w-20 h-20 bg-linen-canvas rounded-full flex items-center justify-center text-ash mb-4">

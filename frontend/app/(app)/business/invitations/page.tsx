@@ -7,6 +7,7 @@ import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonList } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Avatar } from "@/components/ui/Avatar";
 import { StatCard } from "@/components/ui/Stats";
@@ -162,18 +163,7 @@ function InvitationsPageInner() {
 
       <div className="flex flex-col gap-4">
         {isLoading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 ring-1 ring-gray-100 shadow-product-card-sm animate-pulse flex items-center gap-8">
-                <div className="w-16 h-16 bg-sky-wash rounded-lg flex-shrink-0" />
-                <div className="flex-1 space-y-3">
-                  <div className="h-5 bg-sky-wash rounded w-1/4" />
-                  <div className="h-4 bg-sky-wash rounded w-1/3" />
-                </div>
-                <div className="w-32 h-10 bg-sky-wash rounded-lg flex-shrink-0" />
-              </div>
-            ))}
-          </div>
+          <SkeletonList count={5} rowHeight="h-[104px]" />
         ) : filteredItems.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center py-20 text-center bg-white rounded-xl shadow-product-card-sm ring-1 ring-gray-200">
             <div className="w-20 h-20 rounded-full bg-linen-canvas flex items-center justify-center mb-5 ring-1 ring-gray-900/5">

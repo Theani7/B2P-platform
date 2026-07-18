@@ -7,6 +7,7 @@ import { notifySuccess, notifyError } from "@/lib/notify";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonCards } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Avatar } from "@/components/ui/Avatar";
 import {
@@ -304,9 +305,7 @@ function CollaborationsPageInner() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="bg-white rounded-2xl h-80 animate-pulse ring-1 ring-gray-100" />)}
-        </div>
+        <SkeletonCards count={6} />
       ) : isError ? (
         <p className="text-body text-coral-alert">Could not load collaborations.</p>
       ) : filtered.length === 0 ? (

@@ -112,14 +112,14 @@ function DashboardInner() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
         <StatCard
-          label="Estimated Reach"
-          value={statsLoading ? "—" : `${(analytics?.summary.total_reach ?? 0).toLocaleString()}`}
+          label="Profile Views"
+          value={statsLoading ? "—" : `${(analytics?.summary.profile_views ?? 0).toLocaleString()}`}
           icon={ActivityIcon}
           subtitle="based on active collabs"
         />
         <StatCard
-          label="Estimated Impressions"
-          value={statsLoading ? "—" : `${(analytics?.summary.total_impressions ?? 0).toLocaleString()}`}
+          label="Completed Collabs"
+          value={statsLoading ? "—" : `${(analytics?.summary.collaborations_completed ?? 0).toLocaleString()}`}
           icon={ActivityIcon}
           subtitle="across all platforms"
         />

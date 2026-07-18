@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, PageHeader, Badge } from "@/components/ui/Card";
 import { StatCard } from "@/components/ui/Stats";
 import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonCards } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Avatar } from "@/components/ui/Avatar";
 import { notifySuccess, notifyError } from "@/lib/notify";
@@ -143,25 +144,7 @@ function SavedPromotersPageInner() {
 
       <div className="min-h-[400px]">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-cards-lg p-6 shadow-product-card animate-pulse flex flex-col">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-16 h-16 bg-sky-wash rounded-full" />
-                  <div className="flex-1 space-y-2 mt-2">
-                    <div className="h-4 bg-sky-wash rounded w-1/2" />
-                    <div className="h-3 bg-sky-wash rounded w-1/3" />
-                  </div>
-                </div>
-                <div className="h-3 bg-sky-wash rounded w-full mb-2" />
-                <div className="h-3 bg-sky-wash rounded w-3/4 mb-6" />
-                <div className="mt-auto flex gap-2">
-                  <div className="h-10 bg-linen-canvas rounded-inputs flex-1" />
-                  <div className="h-10 bg-linen-canvas rounded-inputs w-10" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <SkeletonCards count={6} />
         ) : !data || data.items.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-cards-lg shadow-product-card border border-slate-custom/10">
             <div className="w-20 h-20 rounded-full bg-linen-canvas flex items-center justify-center mb-5 shadow-product-card-sm border border-slate-custom/10">

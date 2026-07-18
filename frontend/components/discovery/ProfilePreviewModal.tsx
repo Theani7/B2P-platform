@@ -6,6 +6,7 @@ import {
   Bookmark, Share2, Play, Image as ImageIcon, ExternalLink, Mail, Send
 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
+import { Skeleton, SkeletonCards } from "@/components/ui/Skeleton";
 import InvitePromoterModal from "./InvitePromoterModal";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { usePublicPromoterProfile } from "@/features/discovery/api";
@@ -161,7 +162,7 @@ export function ProfilePreviewModal({ isOpen, onClose, promoter, onSave, isSaved
                     <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Social Channels</h3>
                     <div className="space-y-3">
                       {isLoading ? (
-                        <div className="animate-pulse h-12 bg-gray-100 rounded-xl"></div>
+                        <Skeleton className="h-12 rounded-xl" />
                       ) : fullProfile?.socialLinks?.length ? (
                         fullProfile.socialLinks.map((link: any, idx: number) => (
                           <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-signal-blue/20 hover:bg-sky-wash transition-colors group">
@@ -188,11 +189,7 @@ export function ProfilePreviewModal({ isOpen, onClose, promoter, onSave, isSaved
                   </div>
                   
                   {isLoading ? (
-                    <div className="grid grid-cols-2 gap-4 animate-pulse">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="aspect-[4/5] rounded-xl bg-gray-100"></div>
-                      ))}
-                    </div>
+                    <SkeletonCards count={4} gridClassName="grid grid-cols-2 gap-4" />
                   ) : fullProfile?.portfolioItems?.length ? (
                     <PortfolioGrid items={fullProfile.portfolioItems} isOwner={false} />
                   ) : (

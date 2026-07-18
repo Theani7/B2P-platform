@@ -10,6 +10,7 @@ import { StatCard } from "@/components/ui/Stats";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { Spinner } from "@/components/ui/Spinner";
+import { SkeletonCards } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { Badge as ToneBadge } from "@/components/ui/Card";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
@@ -337,11 +338,7 @@ function PromoterCollaborationsInner() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-cards-lg h-80 animate-pulse border border-slate-custom/10" />
-              ))}
-            </div>
+            <SkeletonCards count={6} />
           ) : isError ? (
             <div className="flex flex-col items-center justify-center py-16">
               <div className="w-16 h-16 rounded-cards bg-coral-alert/10 flex items-center justify-center mb-4">

@@ -102,15 +102,15 @@ function PromoterProfileInner() {
   const engagementRate = watch("engagementRate");
   const yearsExperience = watch("yearsExperience");
 
-  const hasEnoughDetails = !!(niche && niche !== "OTHER" && location && followersCount > 0);
+  const hasEnoughDetails = !!(niche && niche !== "OTHER" && location && (followersCount ?? 0) > 0);
   const disableGenerateReason = "Please fill out your Primary Niche, Location, and Followers count in the Creator Details section before generating!";
   
   const aiContext = [
     niche && niche !== "OTHER" && `Primary Niche: ${niche}`,
     location && `Location: ${location}`,
-    followersCount > 0 && `Followers: ${followersCount}`,
-    engagementRate > 0 && `Engagement Rate: ${engagementRate}%`,
-    yearsExperience > 0 && `Years Experience: ${yearsExperience}`,
+    (followersCount ?? 0) > 0 && `Followers: ${followersCount}`,
+    (engagementRate ?? 0) > 0 && `Engagement Rate: ${engagementRate}%`,
+    (yearsExperience ?? 0) > 0 && `Years Experience: ${yearsExperience}`,
   ].filter(Boolean).join("\n");
 
   useEffect(() => {
