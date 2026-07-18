@@ -58,8 +58,20 @@ A full-stack SaaS platform connecting brands (businesses) with social media prom
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 18+ (or [Bun](https://bun.sh) 1.3+)
 - PostgreSQL 16 (or Docker)
+
+### Run both apps with one command (Bun)
+
+After installing deps in `backend/` and `frontend/`, from the repo root:
+
+```bash
+bun run dev            # backend :8000 + frontend :3000 together
+bun run dev:backend    # backend only
+bun run dev:frontend   # frontend only
+```
+
+Steps below use `npm`; substitute `bun` anywhere (`bun install`, `bun run dev`).
 
 ### 1. Clone the Repository
 

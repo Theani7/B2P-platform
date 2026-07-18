@@ -1,0 +1,10 @@
+{
+  "name": "b2p",
+  "private": true,
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "dev": "bun --filter '*' dev",
+    "dev:backend": "bun --filter byparsathy-backend dev",
+    "dev:frontend": "bun --filter byparsathy-frontend dev"
+  }
+}
