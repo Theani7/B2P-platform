@@ -8,6 +8,10 @@ kilo.json
 # Dependencies (bun hoists to root node_modules)
 /node_modules/
 
+# Scratch / doc dumps
+temp.txt
+project_doc.txt
+
 # Test files
 backend/tests/
 
