@@ -66,7 +66,7 @@ A full-stack SaaS platform connecting brands (businesses) with social media prom
 ## Quick Start
 
 ### Prerequisites
-- [Bun](https://bun.sh) 1.3+ (recommended) — or Node.js 18+
+- [Bun](https://bun.sh) 1.3+ — used for installing deps (`bun.lock`) and running both apps
 - PostgreSQL 16 (or Docker)
 
 ### 1. Clone the Repository
@@ -91,13 +91,13 @@ docker run -d --name byparsathy-db -e POSTGRES_DB=b2p_db \
 
 ### 3. Install Dependencies
 
-From the repo root, install both workspaces at once:
+From the repo root, install both workspaces at once (writes a single `bun.lock`):
 
 ```bash
 bun install            # installs backend + frontend workspaces
 ```
 
-> Using npm instead? Run `npm install` separately in `backend/` and `frontend/`.
+> Re-run only when dependencies change (e.g. after a `git pull` that edits a `package.json`).
 
 ### 4. Configure Environment
 
@@ -110,10 +110,12 @@ cp frontend/.env.example frontend/.env    # defaults point at http://localhost:8
 
 ```bash
 cd backend
-bunx prisma db push        # or: npx prisma db push
+bunx prisma db push        # sync schema to the database
 bunx prisma generate       # regenerate the Prisma client (usually runs on install)
 cd ..
 ```
+
+> One-time on fresh setup. Re-run only after `prisma/schema.prisma` changes — `db push` is a safe no-op when already in sync.
 
 ### 6. Run
 
@@ -125,12 +127,7 @@ bun run dev:backend    # backend only
 bun run dev:frontend   # frontend only
 ```
 
-Or per app with npm:
-
-```bash
-cd backend && npm run dev      # http://localhost:8000
-cd frontend && npm run dev     # http://localhost:3000
-```
+Steps 1–5 are one-time setup; day-to-day you only run `bun run dev`.
 
 ### 7. Seed Data
 
