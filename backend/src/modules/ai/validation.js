@@ -17,6 +17,7 @@ export const generateSocialSchema = z.object({
 export const chatSchema = z.object({
   message: z.string().min(2),
   role: z.enum(["BUSINESS", "PROMOTER", "ADMIN"]).optional(),
+  campaignId: z.string().optional(),
   history: z
     .array(
       z.object({

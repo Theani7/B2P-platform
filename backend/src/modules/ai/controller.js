@@ -32,8 +32,10 @@ export const chat = async (req, res, next) => {
   try {
     const result = await aiService.chatWithAssistant({
       message: req.body.message,
-      role: req.body.role,
+      role: req.body.role || req.user?.role,
       history: req.body.history,
+      user: req.user,
+      campaignId: req.body.campaignId,
     });
     return ok(res, result, "Response generated successfully");
   } catch (err) {

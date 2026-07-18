@@ -9,6 +9,7 @@ export interface ChatHistoryItem {
 export interface AssistantMessage {
   message: string;
   role?: string | null;
+  campaignId?: string;
   history?: ChatHistoryItem[];
 }
 

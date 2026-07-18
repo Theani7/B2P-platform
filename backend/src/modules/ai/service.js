@@ -1,6 +1,11 @@
 import { Groq } from "groq-sdk";
 import { AppError } from "../../shared/errors.js";
 import { config } from "../../config/env.js";
+import { prisma } from "../../config/db.js";
+import * as matchingService from "../matching/service.js";
+import { listMarketplaceCampaigns } from "../marketplace/service.js";
+
+const { generateMatches, getMatches } = matchingService;
 
 const getGroqClient = () => {
   if (!process.env.GROQ_API_KEY) {
@@ -42,10 +47,130 @@ const GUARDRAILS = `Guardrails:
 - You are a user-facing product assistant. NEVER mention internal implementation details, backend architecture, third-party providers, APIs, model names, keys, or infrastructure (e.g. Groq, socket.io, Prisma, PostgreSQL, tokens).
 - Speak only as a helpful guide for using the ${PLATFORM_NAME} product. If asked about technical internals, politely decline and redirect to how features help the user.`;
 
-export const chatWithAssistant = async ({ message, role, history = [] }) => {
+// --- Live data context (so the assistant can answer account-specific questions) ---
+
+async function buildBusinessContext(user, campaignId) {
+  if (!user.businessProfile) return null;
+  const bpId = user.businessProfile.id;
+
+  const [all, open, active, draft] = await Promise.all([
+    prisma.campaign.count({ where: { businessProfileId: bpId } }),
+    prisma.campaign.count({ where: { businessProfileId: bpId, status: "OPEN" } }),
+    prisma.campaign.count({ where: { businessProfileId: bpId, status: "ACTIVE" } }),
+    prisma.campaign.count({ where: { businessProfileId: bpId, status: "DRAFT" } }),
+  ]);
+  const activeCollabs = await prisma.collaboration.count({
+    where: { businessProfileId: bpId, status: "ACTIVE" },
+  });
+
+  const ctx = {
+    role: "BUSINESS",
+    companyName: user.businessProfile.companyName,
+    campaigns: { total: all, open: open, active: active, draft: draft },
+    activeCollaborations: activeCollabs,
+  };
+
+  if (campaignId) {
+    const campaign = await prisma.campaign.findFirst({
+      where: { id: campaignId, businessProfileId: bpId },
+      select: { id: true, title: true, category: true, location: true, status: true },
+    });
+    if (campaign) {
+      await generateMatches(user, campaign.id);
+      const [matches] = await getMatches(user, campaign.id, { limit: 5, minScore: 50 });
+      ctx.campaignFocus = {
+        ...campaign,
+        topPromoters: matches.map((m) => ({
+          username: m.promoter.username,
+          niche: m.promoter.niche,
+          location: m.promoter.location,
+          followersCount: m.promoter.followersCount,
+          verified: m.promoter.verified,
+          score: m.score,
+          classification: m.classification,
+          explanation: m.explanation,
+        })),
+      };
+    }
+  }
+  return ctx;
+}
+
+async function buildPromoterContext(user) {
+  if (!user.promoterProfile) return null;
+  const [openCount, activeCollabs, totalReviews, avgRating] = await Promise.all([
+    prisma.campaign.count({ where: { status: "OPEN", visibility: "PUBLIC" } }),
+    prisma.collaboration.count({ where: { promoterProfileId: user.promoterProfile.id, status: "ACTIVE" } }),
+    prisma.review.count({ where: { revieweeId: user.id } }),
+    prisma.review.aggregate({ where: { revieweeId: user.id }, _avg: { rating: true } }),
+  ]);
+
+  const [campaigns] = await listMarketplaceCampaigns(user, { limit: 5, sort: "createdAt" });
+  const ctx = {
+    role: "PROMOTER",
+    username: user.promoterProfile.username,
+    niche: user.promoterProfile.niche,
+    openCampaignsAvailable: openCount,
+    activeCollaborations: activeCollabs,
+    reviewsReceived: totalReviews,
+    averageRating: avgRating._avg.rating ? Number(avgRating._avg.rating.toFixed(1)) : 0,
+    suggestedCampaigns: campaigns.map((c) => ({
+      title: c.title,
+      category: c.category,
+      budget: c.budget,
+      location: c.location,
+      businessName: c.businessName,
+      applicantCount: c.applicantCount,
+      hasApplied: c.hasApplied,
+    })),
+  };
+  return ctx;
+}
+
+async function buildAdminContext() {
+  const [users, businesses, promoters, campaigns, activeCampaigns] = await Promise.all([
+    prisma.user.count(),
+    prisma.businessProfile.count(),
+    prisma.promoterProfile.count(),
+    prisma.campaign.count(),
+    prisma.campaign.count({ where: { status: "ACTIVE" } }),
+  ]);
+  return {
+    role: "ADMIN",
+    totals: {
+      users,
+      businesses,
+      promoters,
+      campaigns,
+      activeCampaigns,
+    },
+  };
+}
+
+export async function buildAssistantContext(user, campaignId) {
+  try {
+    if (user.role === "BUSINESS") return await buildBusinessContext(user, campaignId);
+    if (user.role === "PROMOTER") return await buildPromoterContext(user);
+    if (user.role === "ADMIN") return await buildAdminContext();
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+const contextBlock = (ctx) =>
+  ctx
+    ? `\n\nLIVE ACCOUNT DATA (use this to answer account-specific questions; never invent numbers not shown here):\n${JSON.stringify(ctx, null, 2)}`
+    : "";
+
+export const chatWithAssistant = async ({ message, role, history = [], user, campaignId }) => {
+  const ctx = user ? await buildAssistantContext(user, campaignId) : null;
   const groq = getGroqClient();
   const messages = [
-    { role: "system", content: `${rolePrompt(role)}\n\nPlatform reference:\n${PLATFORM_KNOWLEDGE}\n\n${GUARDRAILS}\n\nKeep answers friendly, concise, and actionable. If you don't know a specific account detail, say so and point them to the right section.` },
+    {
+      role: "system",
+      content: `${rolePrompt(role)}\n\nPlatform reference:\n${PLATFORM_KNOWLEDGE}\n\n${GUARDRAILS}\n\nWhen LIVE ACCOUNT DATA is provided, ground every account-specific answer in it (campaign counts, matches, suggestions). If the user asks about a specific campaign's promoters, reference the topPromoters list. If data is missing for what they ask, say so and point them to the right page.${contextBlock(ctx)}\n\nKeep answers friendly, concise, and actionable.`,
+    },
     ...history.slice(-10).map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.content })),
     { role: "user", content: message },
   ];

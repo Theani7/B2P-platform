@@ -3,20 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useAssistantChat, type ChatHistoryItem } from "@/features/ai/api";
-import { Sparkles, Send, X, Loader2 } from "lucide-react";
+import { useCampaigns } from "@/features/campaigns/api";
+import { Sparkles, Send, X, Loader2, Target } from "lucide-react";
 import { notifyError } from "@/lib/notify";
 import { renderMarkdown } from "@/lib/renderMarkdown";
 
 const SUGGESTIONS: Record<string, string[]> = {
   BUSINESS: [
-    "How do I create and publish a campaign?",
+    "How many campaigns do I have and what's their status?",
     "How do I find and invite promoters?",
     "What are AI match scores?",
     "How do I review submitted deliverables?",
   ],
   PROMOTER: [
+    "What open campaigns can I apply to right now?",
     "How do I complete my profile?",
-    "How do I apply to a campaign?",
     "What is the verified badge?",
     "How do I submit deliverables?",
   ],
@@ -36,16 +37,19 @@ export function AIAssistant() {
   const role = user?.role ?? "BUSINESS";
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [focusCampaignId, setFocusCampaignId] = useState<string>("");
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
       content:
-        "Hi! I'm B2P Assistant. Ask me anything about how the platform works, or how to get the most out of it.",
+        "Hi! I'm B2P Assistant. I can see your live account data — ask me about your campaigns, suggest the best promoters for a campaign, or recommend open campaigns for you to apply to.",
     },
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const chat = useAssistantChat();
+  const { data: campaignsData } = useCampaigns({ limit: 50 });
+  const campaigns = campaignsData?.items ?? [];
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -61,7 +65,12 @@ export function AIAssistant() {
     setMessages(next);
     setInput("");
     try {
-      const res = await chat.mutateAsync({ message: content, role, history });
+      const res = await chat.mutateAsync({
+        message: content,
+        role,
+        history,
+        campaignId: focusCampaignId || undefined,
+      });
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: res?.text || "Sorry, I couldn't respond." },
@@ -75,6 +84,18 @@ export function AIAssistant() {
   const suggestions = (SUGGESTIONS[role] ?? SUGGESTIONS.BUSINESS).filter(
     (s) => !messages.some((m) => m.role === "user" && m.content === s)
   );
+
+  const contextActions: string[] =
+    role === "BUSINESS"
+      ? focusCampaignId
+        ? [
+            `Who are the best promoters for ${campaigns.find((c) => c.id === focusCampaignId)?.title || "this campaign"} and why?`,
+            "Summarize this campaign's match analysis.",
+          ]
+        : ["Pick a campaign above to get promoter suggestions."]
+      : role === "PROMOTER"
+        ? ["Which open campaigns fit my niche best?", "Recommend campaigns I haven't applied to yet."]
+        : [];
 
   return (
     <>
@@ -97,6 +118,26 @@ export function AIAssistant() {
               <X size={18} />
             </button>
           </div>
+
+          {role === "BUSINESS" && (
+            <div className="px-3 py-2 border-b border-slate-custom/10 bg-linen-canvas/60">
+              <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-ash mb-1">
+                <Target size={12} className="text-signal-blue" /> Focus campaign (for promoter suggestions)
+              </label>
+              <select
+                value={focusCampaignId}
+                onChange={(e) => setFocusCampaignId(e.target.value)}
+                className="w-full h-9 px-2 text-xs rounded-inputs border border-slate-custom/10 bg-white outline-none focus:border-signal-blue/40"
+              >
+                <option value="">No specific campaign</option>
+                {campaigns.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.title} · {c.status}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.map((m, i) => (
@@ -132,6 +173,20 @@ export function AIAssistant() {
                     key={s}
                     onClick={() => send(s)}
                     className="block w-full text-left text-xs text-signal-blue bg-signal-blue/5 hover:bg-signal-blue/10 border border-signal-blue/10 rounded-button px-3 py-2 transition-colors"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {contextActions.length > 0 && messages.length > 1 && (
+              <div className="pt-1 space-y-2">
+                {contextActions.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => send(s)}
+                    className="block w-full text-left text-xs text-graphite bg-sky-wash/60 hover:bg-sky-wash border border-slate-custom/10 rounded-button px-3 py-2 transition-colors"
                   >
                     {s}
                   </button>
