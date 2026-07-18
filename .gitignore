@@ -12,6 +12,9 @@ kilo.json
 temp.txt
 project_doc.txt
 
+# Build artifacts
+*.tsbuildinfo
+
 # Test files
 backend/tests/
 
