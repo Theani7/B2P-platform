@@ -182,3 +182,32 @@ export const chatWithAssistant = async ({ message, role, history = [], user, cam
   });
   return { text: response.choices[0]?.message?.content || "", role: role || null };
 };
+
+const generateText = async (system, user) => {
+  const groq = getGroqClient();
+  const response = await groq.chat.completions.create({
+    messages: [{ role: "system", content: system }, { role: "user", content: user }],
+    model: "llama-3.3-70b-versatile",
+    temperature: 0.7,
+    max_tokens: 800,
+  });
+  return { text: response.choices[0]?.message?.content || "" };
+};
+
+export const generateCampaignDescription = (prompt) =>
+  generateText(
+    `You are a senior copywriter for ${PLATFORM_NAME}, a brand-to-promoter marketing platform. Write a clear, compelling campaign description (2-4 short paragraphs) based on the user's brief. Focus on goals, audience, deliverables, and tone. No preamble, no headings.`,
+    prompt
+  );
+
+export const generateProposalMessage = (campaignDescription, promoterBackground) =>
+  generateText(
+    `You are a promoter on ${PLATFORM_NAME} writing a personalized proposal message to a business whose campaign is described. Be concise, confident, and specific about fit. No preamble.`,
+    `Campaign:\n${campaignDescription}\n\nMy background:\n${promoterBackground}`
+  );
+
+export const generateSocialContent = (topic, platform) =>
+  generateText(
+    `You are a social media expert on ${PLATFORM_NAME}. Create engaging ${platform} content (caption + 3-5 hashtags) about the given topic. Match ${platform} tone. No preamble.`,
+    `Topic: ${topic}\nPlatform: ${platform}`
+  );
