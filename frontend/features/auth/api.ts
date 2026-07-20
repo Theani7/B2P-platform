@@ -28,10 +28,17 @@ export async function login(payload: LoginPayload): Promise<User> {
   return (await api.get<User>("/auth/me")).data;
 }
 
-export async function register(payload: RegisterPayload): Promise<User> {
-  const res = await api.post<AuthTokens>("/auth/register", payload);
-  setTokens(res.data.access_token, res.data.refresh_token);
-  return (await api.get<User>("/auth/me")).data;
+export async function register(payload: RegisterPayload): Promise<{ email: string; role: string }> {
+  const res = await api.post<{ email: string; role: string }>("/auth/register", payload);
+  return res.data;
+}
+
+export async function resendVerification(payload: { email: string }): Promise<void> {
+  await api.post("/auth/resend-verification", payload);
+}
+
+export async function forgotPassword(payload: { email: string }): Promise<void> {
+  await api.post("/auth/forgot-password", payload);
 }
 
 export async function logout(): Promise<void> {
@@ -62,13 +69,31 @@ export function useLogout() {
   });
 }
 
-export function useUpdateMe() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: Partial<User>) =>
-      (await api.patch<User>("/auth/me", payload)).data,
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["currentUser"] });
-    },
-  });
+export async function verifyResetCode(payload: { email: string; code: string }): Promise<{ token: string }> {
+  const res = await api.post<{ token: string }>("/auth/verify-reset-code", payload);
+  return res.data;
+}
+
+export async function resetPassword(payload: { token: string; new_password: string }): Promise<void> {
+  await api.post("/auth/reset-password", payload);
+}
+
+export async function requestOtp(payload: { email: string }): Promise<void> {
+  await api.post("/auth/request-otp", payload);
+}
+
+export async function verifyOtp(payload: { email: string; code: string }): Promise<AuthTokens> {
+  const res = await api.post<AuthTokens>("/auth/verify-otp", payload);
+  setTokens(res.data.access_token, res.data.refresh_token);
+  return res.data;
+}
+
+export async function verifyRegistrationOtp(payload: { email: string; code: string }): Promise<User> {
+  const res = await api.post<AuthTokens>("/auth/verify-registration-otp", payload);
+  setTokens(res.data.access_token, res.data.refresh_token);
+  return (await api.get<User>("/auth/me")).data;
+}
+
+export async function resendRegistrationOtp(payload: { email: string }): Promise<void> {
+  await api.post("/auth/resend-registration-otp", payload);
 }

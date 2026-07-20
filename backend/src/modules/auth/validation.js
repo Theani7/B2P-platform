@@ -27,8 +27,26 @@ export const verifyEmailSchema = z.object({
   token: z.string(),
 });
 
+export const resendVerificationSchema = z.object({
+  email: z.string().email(),
+});
+
 export const forgotPasswordSchema = z.object({
   email: z.string().email(),
+});
+
+export const requestOtpSchema = z.object({
+  email: z.string().email(),
+});
+
+export const verifyOtpSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
+});
+
+export const verifyResetCodeSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
 });
 
 export const resetPasswordSchema = z.object({

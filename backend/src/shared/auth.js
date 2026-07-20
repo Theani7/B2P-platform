@@ -19,6 +19,7 @@ export async function authenticate(req, res, next) {
     });
 
     if (!user || !user.isActive) throw new AppError("Inactive user", 401);
+    if (!user.isVerified) throw new AppError("Please verify your email before continuing", 403);
     if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
       throw new AppError("Account locked", 403);
     }

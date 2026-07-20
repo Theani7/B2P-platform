@@ -126,6 +126,10 @@ model User {
   verificationTokenExpiry DateTime? @map("verification_token_expiry") @db.Timestamptz
   resetCode               String?   @map("reset_code") @db.VarChar(255)
   resetCodeExpiry         DateTime? @map("reset_code_expiry") @db.Timestamptz
+  resetVerifyToken        String?   @map("reset_verify_token") @db.VarChar(255)
+  resetVerifyTokenExpiry  DateTime? @map("reset_verify_token_expiry") @db.Timestamptz
+  otpCode                 String?   @map("otp_code") @db.VarChar(6)
+  otpExpiry               DateTime? @map("otp_expiry") @db.Timestamptz
   failedLoginAttempts     Int       @default(0) @map("failed_login_attempts")
   lockedUntil             DateTime? @map("locked_until") @db.Timestamptz
   lastLoginAt             DateTime? @map("last_login_at") @db.Timestamptz
@@ -149,6 +153,20 @@ model User {
 
   @@index([role])
   @@map("users")
+}
+
+model PendingRegistration {
+  id           String   @id @default(uuid()) @db.Uuid
+  username     String   @unique @db.VarChar(150)
+  fullName     String   @map("full_name") @db.VarChar(255)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         Role
+  otpCode      String?  @map("otp_code") @db.VarChar(6)
+  otpExpiry    DateTime? @map("otp_expiry") @db.Timestamptz
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("pending_registrations")
 }
 
 model RevokedRefreshToken {

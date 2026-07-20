@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { register as registerUser, checkAvailability } from "@/features/auth/api";
 import { Input } from "@/components/ui/Input";
-import { DashboardPath, Role } from "@/lib/roles";
+import { Role } from "@/lib/roles";
 
 const schema = z.object({
   fullName: z.string().min(2, "Required"),
@@ -115,8 +115,8 @@ export function RegisterForm() {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const user = await registerUser(values);
-      window.location.href = DashboardPath[user.role as Role] ?? "/";
+      const result = await registerUser(values);
+      router.push(`/verify-otp?email=${encodeURIComponent(result.email)}`);
     } catch {
       notifyError("Could not create account");
     }
