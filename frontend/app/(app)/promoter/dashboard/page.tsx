@@ -20,6 +20,9 @@ import { useUserRating } from "@/features/reviews/api";
 import { useUpload } from "@/features/upload/api";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { useQueryClient } from "@tanstack/react-query";
+import { useProfileCompletion } from "@/features/profile-completion/api";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import {
   Handshake,
   Star,
@@ -44,11 +47,20 @@ function relativeTime(iso: string) {
 
 function DashboardInner() {
   const { user } = useAuth();
+  const router = useRouter();
   const qc = useQueryClient();
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadAvatar = useUpload("avatar");
   const updateProfile = useUpdatePromoterProfile();
+
+  const { data: profileCompletion, isLoading: completionLoading } = useProfileCompletion();
+
+  useEffect(() => {
+    if (!completionLoading && profileCompletion && profileCompletion.completion < 100) {
+      router.replace("/promoter/profile");
+    }
+  }, [completionLoading, profileCompletion, router]);
 
   // Fetch PENDING invitations with a larger page size so the count is accurate
   const { data: invitations, isLoading: invsLoading } = usePromoterInvitations({ status: "PENDING", limit: 20 });

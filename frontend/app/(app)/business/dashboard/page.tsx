@@ -15,6 +15,8 @@ import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { Spinner } from "@/components/ui/Spinner";
 import { useProfileCompletion } from "@/features/profile-completion/api";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import {
   AreaChart,
@@ -44,10 +46,17 @@ function timeAgo(iso: string) {
 
 function DashboardInner() {
   const { user } = useAuth();
+  const router = useRouter();
   const { data: analytics, isLoading: statsLoading } = useBusinessAnalytics();
   const { data: applicationsData, isLoading: recentApplicationsLoading } = useBusinessApplications({ limit: 5 });
   const { data: activityData, isLoading: activityLoading } = useBusinessActivities({ size: 5 });
   const { data: profileCompletion, isLoading: completionLoading } = useProfileCompletion();
+
+  useEffect(() => {
+    if (!completionLoading && profileCompletion && profileCompletion.completion < 100) {
+      router.replace("/business/profile");
+    }
+  }, [completionLoading, profileCompletion, router]);
 
   const recentApplications = applicationsData?.items ?? [];
 

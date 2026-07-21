@@ -9,7 +9,6 @@ import { verifyRegistrationOtp, resendRegistrationOtp } from "@/features/auth/ap
 import { OtpInput } from "@/components/ui/OtpInput";
 import { Button } from "@/components/ui/Button";
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { DashboardPath, Role } from "@/lib/roles";
 
 function VerifyOtpInner() {
   const params = useSearchParams();
@@ -49,7 +48,7 @@ function VerifyOtpInner() {
     try {
       const user = await verifyRegistrationOtp({ email, code });
       notifySuccess("Email verified. Welcome!");
-      window.location.href = DashboardPath[user.role as Role] ?? "/";
+      window.location.href = `/${user.role.toLowerCase()}/profile`;
     } catch {
       notifyError("Invalid or expired code.");
     } finally {
