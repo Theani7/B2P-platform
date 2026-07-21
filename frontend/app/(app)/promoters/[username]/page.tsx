@@ -205,7 +205,19 @@ function PromoterProfileInner({ username }: { username: string }) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {profile.portfolioItems.map((item) => (
               <div key={item.id} className="rounded-cards border border-steel/10 p-4">
-                {item.coverImage && (
+                {(item.media ?? []).length > 0 && (
+                  <div className="mb-3 grid grid-cols-2 gap-1">
+                    {(item.media ?? []).slice(0, 4).map((m) => (
+                      <img key={m.id} src={m.filePath} alt={item.title} className="h-24 w-full rounded-images object-cover" />
+                    ))}
+                    {(item.media ?? []).length > 4 && (
+                      <div className="flex h-24 items-center justify-center rounded-images bg-steel/10 text-caption text-steel">
+                        +{(item.media ?? []).length - 4}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {!item.media?.length && item.coverImage && (
                   <img src={item.coverImage} alt={item.title} className="mb-3 h-32 w-full rounded-images object-cover" />
                 )}
                 <div className="flex items-center justify-between">
@@ -213,7 +225,7 @@ function PromoterProfileInner({ username }: { username: string }) {
                   {item.featured && <Badge tone="amber">Featured</Badge>}
                 </div>
                 {item.campaignType && <p className="text-caption text-steel">{item.campaignType}</p>}
-                {item.description && <p className="mt-1 text-body text-slate-custom">{item.description}</p>}
+                {item.description && <p className="mt-1 text-body text-slate-custom line-clamp-3">{item.description}</p>}
                 {item.platforms && item.platforms.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {item.platforms.map((p) => (

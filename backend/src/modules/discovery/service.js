@@ -63,7 +63,10 @@ export async function searchPromoters(params = {}) {
 export async function getPublicProfile(username) {
   const profile = await prisma.promoterProfile.findUnique({
     where: { username },
-    include: { portfolioItems: true, user: { include: { socialLinks: true } } },
+    include: {
+      portfolioItems: { include: { media: { orderBy: { displayOrder: "asc" } } } },
+      user: { include: { socialLinks: true } },
+    },
   });
   if (!profile) throw new AppError("Promoter not found", 404);
   return profile;

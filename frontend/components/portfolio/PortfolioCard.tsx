@@ -2,8 +2,8 @@ import React from "react";
 import { Star, Image as ImageIcon, Video, Eye, Heart, Pencil, Trash2 } from "lucide-react";
 
 export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: any) {
-  const hasVideo = item.media?.some((m: any) => m.media_type === "video");
-  const coverImageUrl = item.cover_image || item.media?.[0]?.file_path;
+  const hasVideo = item.media?.some((m: any) => m.mediaType === "video");
+  const coverImageUrl = item.coverImage || item.media?.[0]?.filePath;
 
   const getMediaUrl = (url: string) => {
     if (!url) return "";
@@ -48,9 +48,9 @@ export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: any)
             <h3 className="text-base font-bold text-gray-900 cursor-pointer hover:text-signal-blue transition-colors" onClick={() => onClick?.(item)}>
               {item.title}
             </h3>
-            {item.client_name && (
-              <p className="text-sm text-gray-500 mt-0.5">for {item.client_name}</p>
-            )}
+            {item.clientName && (
+               <p className="text-sm text-gray-500 mt-0.5">for {item.clientName}</p>
+             )}
           </div>
         </div>
 

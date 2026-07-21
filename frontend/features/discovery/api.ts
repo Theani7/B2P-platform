@@ -34,6 +34,12 @@ export interface PortfolioItemRead {
   featured: boolean;
   platforms?: string[];
   tags?: string[];
+  media?: Array<{
+    id: string;
+    filePath: string;
+    mediaType: string;
+    displayOrder: number;
+  }>;
 }
 
 export interface SocialLinkRead {
