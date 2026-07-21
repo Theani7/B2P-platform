@@ -53,7 +53,7 @@ function DashboardInner() {
   const { data: profileCompletion, isLoading: completionLoading } = useProfileCompletion();
 
   useEffect(() => {
-    if (!completionLoading && profileCompletion && profileCompletion.completion < 100) {
+    if (!completionLoading && profileCompletion && profileCompletion.completion < 50) {
       router.replace("/business/profile");
     }
   }, [completionLoading, profileCompletion, router]);

@@ -57,7 +57,7 @@ function DashboardInner() {
   const { data: profileCompletion, isLoading: completionLoading } = useProfileCompletion();
 
   useEffect(() => {
-    if (!completionLoading && profileCompletion && profileCompletion.completion < 100) {
+    if (!completionLoading && profileCompletion && profileCompletion.completion < 50) {
       router.replace("/promoter/profile");
     }
   }, [completionLoading, profileCompletion, router]);
