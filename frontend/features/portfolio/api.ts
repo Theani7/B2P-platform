@@ -1,6 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/apiClient";
 
+export interface PortfolioMedia {
+  id: string;
+  portfolioItemId: string;
+  filePath: string;
+  mediaType: string;
+  displayOrder: number;
+}
+
 export interface PortfolioItem {
   id: string;
   promoterProfileId: string;
@@ -12,6 +20,7 @@ export interface PortfolioItem {
   featured: boolean;
   platforms?: string[];
   tags?: string[];
+  media?: PortfolioMedia[];
   createdAt: string;
   updatedAt: string;
 }
@@ -69,3 +78,43 @@ export const useDeletePortfolioItem = () => {
     },
   });
 };
+
+export interface PortfolioMediaInput {
+  filePath: string;
+  mediaType?: string;
+}
+
+export const getPortfolioMedia = async (itemId: string): Promise<PortfolioMedia[]> =>
+  api.get<PortfolioMedia[]>(`/portfolio/${itemId}/media`).then((r) => r.data);
+
+export const usePortfolioMedia = (itemId: string) =>
+  useQuery<PortfolioMedia[]>({
+    queryKey: ["portfolio-media", itemId],
+    queryFn: () => getPortfolioMedia(itemId),
+    enabled: !!itemId,
+  });
+
+export const useAddPortfolioMedia = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, filePath, mediaType }: { itemId: string; filePath: string; mediaType?: string }) =>
+      api.post<PortfolioMedia>(`/portfolio/${itemId}/media`, { filePath, mediaType }).then((r) => r.data),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["my-portfolio"] });
+      qc.invalidateQueries({ queryKey: ["portfolio-media", vars.itemId] });
+    },
+  });
+};
+
+export const useDeletePortfolioMedia = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, mediaId }: { itemId: string; mediaId: string }) =>
+      api.delete(`/portfolio/${itemId}/media/${mediaId}`).then((r) => r.data),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["my-portfolio"] });
+      qc.invalidateQueries({ queryKey: ["portfolio-media", vars.itemId] });
+    },
+  });
+};
+

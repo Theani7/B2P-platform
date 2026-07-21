@@ -10,6 +10,7 @@ import businessRouter from "./modules/business/routes.js";
 import promoterRouter from "./modules/promoter/routes.js";
 import promotersRouter from "./modules/promoters/routes.js";
 import portfolioRouter from "./modules/portfolio/routes.js";
+import portfolioMediaRouter from "./modules/portfolio-media/routes.js";
 import socialRouter from "./modules/social/routes.js";
 import profileCompletionRouter from "./modules/profileCompletion/routes.js";
 import businessVerificationRouter from "./modules/verification/businessRoutes.js";
@@ -104,6 +105,7 @@ export function createApp() {
   app.use(`${config.apiV1}/promoter`, promoterRouter);
   app.use(`${config.apiV1}/promoters`, promotersRouter);
   app.use(`${config.apiV1}/portfolio`, portfolioRouter);
+  app.use(`${config.apiV1}/portfolio`, portfolioMediaRouter);
   app.use(`${config.apiV1}/social`, socialRouter);
   app.use(`${config.apiV1}/profile-completion`, profileCompletionRouter);
   app.use(`${config.apiV1}/activity`, activityRouter);

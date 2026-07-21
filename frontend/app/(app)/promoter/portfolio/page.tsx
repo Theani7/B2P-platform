@@ -49,7 +49,19 @@ function PortfolioPageInner() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.map((item) => (
             <Card key={item.id}>
-              {item.coverImage && (
+              {(item.media ?? []).length > 0 && (
+                <div className="mb-3 grid grid-cols-2 gap-1">
+                  {(item.media ?? []).slice(0, 4).map((m) => (
+                    <img key={m.id} src={m.filePath} alt={item.title} className="h-24 w-full rounded-images object-cover" />
+                  ))}
+                  {(item.media ?? []).length > 4 && (
+                    <div className="flex h-24 items-center justify-center rounded-images bg-steel/10 text-caption text-steel">
+                      +{(item.media ?? []).length - 4}
+                    </div>
+                  )}
+                </div>
+              )}
+              {!item.media?.length && item.coverImage && (
                 <img src={item.coverImage} alt={item.title} className="mb-3 h-32 w-full rounded-images object-cover" />
               )}
               <div className="flex items-center justify-between">

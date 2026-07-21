@@ -4,8 +4,11 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { notifySuccess, notifyError } from "@/lib/notify";
-import { useCreatePortfolioItem, useUpdatePortfolioItem, type PortfolioItem, type PortfolioItemInput } from "@/features/portfolio/api";
-import { X } from "lucide-react";
+import { useCreatePortfolioItem, useUpdatePortfolioItem, type PortfolioItem, type PortfolioItemInput, useAddPortfolioMedia, useDeletePortfolioMedia, usePortfolioMedia } from "@/features/portfolio/api";
+import { uploadFile } from "@/features/upload/api";
+import { X, Upload } from "lucide-react";
+
+const MAX_IMAGES = 5;
 
 export function PortfolioEditor({
   item,
@@ -16,6 +19,10 @@ export function PortfolioEditor({
 }) {
   const create = useCreatePortfolioItem();
   const update = useUpdatePortfolioItem();
+  const addMedia = useAddPortfolioMedia();
+  const deleteMedia = useDeletePortfolioMedia();
+  const { data: existingMedia = [] } = usePortfolioMedia(item?.id ?? "");
+
   const [form, setForm] = useState<PortfolioItemInput>({
     title: "",
     clientName: "",
@@ -26,6 +33,8 @@ export function PortfolioEditor({
     platforms: [],
     tags: [],
   });
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [platformText, setPlatformText] = useState("");
   const [tagText, setTagText] = useState("");
 
@@ -41,6 +50,7 @@ export function PortfolioEditor({
         platforms: item.platforms ?? [],
         tags: item.tags ?? [],
       });
+      setImages((item.media ?? []).map((m) => m.filePath));
     }
   }, [item]);
 
@@ -56,21 +66,60 @@ export function PortfolioEditor({
   const removeArray = (key: "platforms" | "tags", idx: number) =>
     setForm((f) => ({ ...f, [key]: (f[key] ?? []).filter((_, i) => i !== idx) }));
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = { ...form, title: form.title.trim() };
-    if (item) {
-      update.mutate(
-        { id: item.id, data: payload },
-        { onSuccess: () => { notifySuccess("Portfolio item updated"); onDone(); }, onError: (e: any) => notifyError(e?.response?.data?.message ?? "Update failed") },
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    const remaining = MAX_IMAGES - images.length;
+    if (remaining <= 0) {
+      notifyError(`Maximum ${MAX_IMAGES} images allowed`);
+      return;
+    }
+    const toUpload = files.slice(0, remaining);
+    setUploading(true);
+    try {
+      const uploaded = await Promise.all(
+        toUpload.map((file) =>
+          uploadFile("portfolio-image", file).then((r) => r.url)
+        )
       );
-    } else {
-      create.mutate(payload, {
-        onSuccess: () => { notifySuccess("Portfolio item added"); onDone(); },
-        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Create failed"),
-      });
+      setImages((prev) => [...prev, ...uploaded]);
+    } catch (err: any) {
+      notifyError(err?.response?.data?.message ?? "Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
     }
   };
+
+  const removeImage = (url: string) => {
+    setImages((prev) => prev.filter((u) => u !== url));
+  };
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = { ...form, title: form.title.trim() };
+    try {
+      let itemId: string;
+      if (item) {
+        await update.mutateAsync({ id: item.id, data: payload });
+        itemId = item.id;
+      } else {
+        const created = await create.mutateAsync(payload);
+        itemId = created.id;
+      }
+      const currentMedia = item ? existingMedia : [];
+      const toAdd = images.filter((url) => !currentMedia.some((m) => m.filePath === url));
+      await Promise.all(toAdd.map((url) => addMedia.mutateAsync({ itemId, filePath: url })));
+      const toRemove = currentMedia.filter((m) => !images.includes(m.filePath));
+      await Promise.all(toRemove.map((m) => deleteMedia.mutateAsync({ itemId, mediaId: m.id })));
+      notifySuccess(item ? "Portfolio item updated" : "Portfolio item added");
+      onDone();
+    } catch (err: any) {
+      notifyError(err?.response?.data?.message ?? "Save failed");
+    }
+  };
+
+  const currentCount = images.length;
 
   return (
     <form className="grid gap-4" onSubmit={onSubmit}>
@@ -88,7 +137,37 @@ export function PortfolioEditor({
           className="w-full rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
       </label>
-      <Input label="Cover image URL" value={form.coverImage ?? ""} onChange={set("coverImage")} />
+
+      <div>
+        <span className="mb-1 block text-caption font-medium uppercase tracking-wide text-steel">
+          Images ({currentCount}/{MAX_IMAGES})
+        </span>
+        <div className="flex flex-wrap gap-3">
+          {images.map((url) => (
+            <div key={url} className="relative h-24 w-32">
+              <img src={url} alt="" className="h-full w-full rounded-images object-cover" />
+              <button
+                type="button"
+                onClick={() => removeImage(url)}
+                className="absolute -top-2 -right-2 rounded-full bg-coral-alert p-1 text-white"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          ))}
+          {currentCount < MAX_IMAGES && (
+            <label className="flex h-24 w-32 cursor-pointer items-center justify-center rounded-images border-2 border-dashed border-steel/40 hover:border-primary">
+              <div className="text-center">
+                <Upload size={20} className="mx-auto text-steel" />
+                <span className="text-caption text-steel">Add</span>
+              </div>
+              <input type="file" accept="image/*" multiple className="hidden" onChange={handleUpload} disabled={uploading} />
+            </label>
+          )}
+        </div>
+        {uploading && <p className="mt-1 text-caption text-steel">Uploading…</p>}
+      </div>
+
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -138,7 +217,7 @@ export function PortfolioEditor({
       </div>
 
       <div className="flex gap-2">
-        <Button type="submit" disabled={create.isPending || update.isPending}>
+        <Button type="submit" disabled={create.isPending || update.isPending || uploading}>
           {item ? "Save changes" : "Add item"}
         </Button>
         <Button type="button" variant="ghost" onClick={onDone}>

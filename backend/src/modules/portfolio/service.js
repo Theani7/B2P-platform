@@ -16,6 +16,7 @@ export async function list(user) {
   return prisma.portfolioItem.findMany({
     where: { promoterId: profile.id },
     orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    include: { media: { orderBy: { displayOrder: "asc" } } },
   });
 }
 
@@ -23,6 +24,7 @@ export async function get(user, id) {
   const profile = await resolvePromoter(user);
   const item = await prisma.portfolioItem.findFirst({
     where: { id, promoterId: profile.id },
+    include: { media: { orderBy: { displayOrder: "asc" } } },
   });
   if (!item) throw new AppError("Portfolio item not found", 404);
   return item;
