@@ -46,6 +46,7 @@ export const useCreateBusinessProfile = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["business-profile"] });
       qc.invalidateQueries({ queryKey: ["currentUser"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
     },
   });
 };
@@ -57,6 +58,7 @@ export const useUpdateBusinessProfile = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["business-profile"] });
       qc.invalidateQueries({ queryKey: ["currentUser"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
     },
   });
 };
@@ -74,6 +76,7 @@ export const useCreatePromoterProfile = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["promoter-profile"] });
       qc.invalidateQueries({ queryKey: ["currentUser"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
     },
   });
 };
@@ -85,6 +88,7 @@ export const useUpdatePromoterProfile = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["promoter-profile"] });
       qc.invalidateQueries({ queryKey: ["currentUser"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
     },
   });
 };

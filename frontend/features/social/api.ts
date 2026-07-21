@@ -30,7 +30,10 @@ export const useCreateSocialLink = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: SocialLinkInput) => api.post<SocialLink>("/social/", data).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-social"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-social"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
+    },
   });
 };
 
@@ -39,7 +42,10 @@ export const useUpdateSocialLink = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<SocialLinkInput> }) =>
       api.put<SocialLink>(`/social/${id}`, data).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-social"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-social"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
+    },
   });
 };
 
@@ -47,6 +53,9 @@ export const useDeleteSocialLink = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/social/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-social"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-social"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
+    },
   });
 };

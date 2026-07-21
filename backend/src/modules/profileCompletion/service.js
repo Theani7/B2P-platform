@@ -25,7 +25,6 @@ async function promoterCompletion(user) {
     { label: "avatar", pass: !!profile.avatarUrl },
     { label: "portfolio", pass: profile.portfolioItems.length > 0 },
     { label: "social_links", pass: profile.user.socialLinks.length > 0 },
-    { label: "verification", pass: !!profile.verified },
   ];
   return { type: "PROMOTER", ...score(checks) };
 }
@@ -41,7 +40,6 @@ async function businessCompletion(user) {
     { label: "location", pass: !!profile.location },
     { label: "website", pass: !!profile.website },
     { label: "logo", pass: !!profile.logoUrl },
-    { label: "verification", pass: !!profile.verified },
   ];
   return { type: "BUSINESS", ...score(checks) };
 }

@@ -40,7 +40,10 @@ export const useCreatePortfolioItem = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: PortfolioItemInput) => api.post<PortfolioItem>("/portfolio/", data).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-portfolio"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-portfolio"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
+    },
   });
 };
 
@@ -49,7 +52,10 @@ export const useUpdatePortfolioItem = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<PortfolioItemInput> }) =>
       api.patch<PortfolioItem>(`/portfolio/${id}`, data).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-portfolio"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-portfolio"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
+    },
   });
 };
 
@@ -57,6 +63,9 @@ export const useDeletePortfolioItem = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/portfolio/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-portfolio"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-portfolio"] });
+      qc.invalidateQueries({ queryKey: ["profile-completion"] });
+    },
   });
 };

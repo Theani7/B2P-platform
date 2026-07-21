@@ -21,8 +21,8 @@ export const config = {
   rateLimitAuth: Number(process.env.RATE_LIMIT_AUTH || 30),
   maxFailedLoginAttempts: Number(process.env.MAX_FAILED_LOGIN_ATTEMPTS || 5),
   lockMinutes: Number(process.env.LOCK_MINUTES || 15),
-  frontendUrl: (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/+$/, ""),
-  allowedOrigins: (process.env.ALLOWED_ORIGINS || "http://localhost:5173")
+  frontendUrl: (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/+$/, ""),
+  allowedOrigins: (process.env.ALLOWED_ORIGINS || "http://localhost:3000,http://localhost:3001")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean),
