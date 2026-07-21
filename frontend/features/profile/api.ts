@@ -10,6 +10,7 @@ export interface BusinessProfileRead {
   website?: string;
   logoUrl?: string;
   companySize?: string;
+  verified?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -143,7 +143,7 @@ export default function BusinessProfilePage() {
   if (isLoading) return <Spinner />;
 
   const isComplete = completion?.completion === 100;
-  const verified = user?.isVerified;
+  const verified = profile?.verified;
 
   return (
     <RequireAuth role={Role.BUSINESS}>
