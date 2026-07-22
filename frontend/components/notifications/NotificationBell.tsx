@@ -140,13 +140,6 @@ export function NotificationBell() {
                           <Check size={12} />
                         </button>
                       )}
-                      <button
-                        className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-ash shadow-sm hover:bg-coral-alert hover:text-white transition-colors border border-slate-custom/10"
-                        onClick={(e) => { e.preventDefault(); del.mutate(n.id); }}
-                        title="Remove"
-                      >
-                        <Trash2 size={12} />
-                      </button>
                     </div>
                   </motion.li>
                 ))}

@@ -175,13 +175,6 @@ function NotificationsInner() {
                           <Check size={14} />
                         </button>
                       )}
-                      <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); del.mutate(n.id); }}
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-ash shadow-sm hover:bg-coral-alert hover:text-white transition-colors border border-slate-custom/10"
-                        title="Delete"
-                      >
-                        <Trash2 size={14} />
-                      </button>
                     </div>
                   </Link>
                 </motion.div>
