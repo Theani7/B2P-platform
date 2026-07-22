@@ -467,7 +467,6 @@ function ChatPanel({
                 <Send size={15} className="ml-0.5" />
               </button>
             </div>
-          )}
         </div>
       ) : (
         <div className="border-t border-slate-custom/10 bg-linen-canvas px-5 py-4 flex items-center justify-center gap-2 text-sm font-medium text-ash">
