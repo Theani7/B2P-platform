@@ -308,7 +308,7 @@ function ChatPanel({
       const formData = new FormData();
       formData.append("file", file);
       
-      const res = await api.post<{ url: string }>("/uploads/chat-attachment", formData, {
+      const res = await api.post<{ url: string }>("/upload/chat-attachment", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       
