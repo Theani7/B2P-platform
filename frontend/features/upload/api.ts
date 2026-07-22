@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/apiClient";
 
+import imageCompression from "browser-image-compression";
+
 export type UploadKind = "avatar" | "logo" | "portfolio-image" | "chat-attachment";
 
 export interface UploadResult {
@@ -20,9 +22,20 @@ function endpointFor(kind: UploadKind): string {
   }
 }
 
-export const uploadFile = (kind: UploadKind, file: File): Promise<UploadResult> => {
+export const uploadFile = async (kind: UploadKind, file: File): Promise<UploadResult> => {
+  let fileToUpload: File | Blob = file;
+  
+  if (file.type.startsWith("image/")) {
+    const options = {
+      maxSizeMB: 1, // Compress to under 1MB
+      maxWidthOrHeight: 1280, // Max dimension
+      useWebWorker: true,
+    };
+    fileToUpload = await imageCompression(file, options);
+  }
+
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", fileToUpload, file.name);
   return api.post<UploadResult>(endpointFor(kind), form, {
     headers: { "Content-Type": "multipart/form-data" },
   }).then((r) => r.data);
