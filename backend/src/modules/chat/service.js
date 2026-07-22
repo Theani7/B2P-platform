@@ -301,7 +301,7 @@ export async function sendChatMessage(userId, user, conversationId, text, messag
     return { error: "You can only send messages for active collaborations." };
   }
 
-  const msgType = messageType === "IMAGE" ? "IMAGE" : "TEXT";
+  const msgType = ["IMAGE", "FILE"].includes(messageType) ? messageType : "TEXT";
   const message = await prisma.message.create({
     data: { conversationId, senderId: userId, message: text, messageType: msgType },
   });
