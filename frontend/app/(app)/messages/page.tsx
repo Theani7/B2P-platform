@@ -21,6 +21,7 @@ import {
 import { getSocket, useSocketEvent } from "@/lib/socket";
 import { notifyError } from "@/lib/notify";
 import api from "@/lib/apiClient";
+import imageCompression from "browser-image-compression";
 
 function timeAgo(s: string) {
   const diff = Date.now() - new Date(s).getTime();
@@ -294,19 +295,31 @@ function ChatPanel({
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const originalFile = e.target.files?.[0];
+    if (!originalFile) return;
     
-    // Check file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
+    // Check file size (5MB max) for non-images (images will be compressed)
+    if (!originalFile.type.startsWith("image/") && originalFile.size > 5 * 1024 * 1024) {
       notifyError("File must be less than 5MB");
       return;
     }
 
     setUploading(true);
     try {
+      let fileToUpload: File | Blob = originalFile;
+      const isImage = originalFile.type.startsWith("image/");
+      
+      if (isImage) {
+        const options = {
+          maxSizeMB: 1, // Compress to under 1MB
+          maxWidthOrHeight: 1280, // Max dimension
+          useWebWorker: true,
+        };
+        fileToUpload = await imageCompression(originalFile, options);
+      }
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", fileToUpload, originalFile.name);
       
       const res = await api.post<{ url: string }>("/upload/chat-attachment", formData, {
         headers: { "Content-Type": "multipart/form-data" },

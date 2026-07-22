@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^3",
     "@tanstack/react-query": "^5",
     "axios": "^1",
+    "browser-image-compression": "^2.0.2",
     "framer-motion": "^11.18.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
