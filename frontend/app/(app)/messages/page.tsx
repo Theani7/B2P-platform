@@ -7,7 +7,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Spinner } from "@/components/ui/Spinner";
 import {
   MessageSquare, Target, Wallet, ChevronLeft, Send, Search, Info, AlertCircle,
-  Edit2, Trash2, Check, X, MoreVertical,
+  Edit2, Trash2, Check, X, MoreVertical, Paperclip, FileText, File, Image as ImageIcon
 } from "lucide-react";
 import {
   useConversations,
@@ -69,6 +69,15 @@ function MessageBubble({
         >
           {msg.isDeleted ? (
             <span className="italic opacity-60 text-xs">Message deleted</span>
+          ) : msg.messageType === "IMAGE" ? (
+            <a href={msg.message} target="_blank" rel="noreferrer">
+              <img src={msg.message} alt="Attachment" className="max-w-[200px] rounded-lg object-contain cursor-zoom-in" />
+            </a>
+          ) : msg.messageType === "FILE" ? (
+            <a href={msg.message} target="_blank" rel="noreferrer" className={`flex items-center gap-2 underline underline-offset-2 ${mine ? "text-white hover:text-white/80" : "text-signal-blue hover:text-signal-blue/80"}`}>
+              <FileText size={16} /> 
+              <span className="truncate max-w-[150px]">{msg.message.split('/').pop() || "Document"}</span>
+            </a>
           ) : (
             <span>{msg.message}</span>
           )}
@@ -220,8 +229,10 @@ function ChatPanel({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [typingTimeout, setTypingTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [uploading, setUploading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const markRead = useMarkConversationRead();
   const editMsg = useEditMessage();
@@ -276,9 +287,44 @@ function ChatPanel({
   const send = () => {
     if (!draft.trim()) return;
     const socket = getSocket();
-    socket.emit("message", { conversationId: active.id, text: draft.trim() });
+    socket.emit("message", { conversationId: active.id, text: draft.trim(), messageType: "TEXT" });
     setDraft("");
     if (typingTimeout) { clearTimeout(typingTimeout); socket.emit("typing_stop", { conversationId: active.id }); }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Check file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      notifyError("File must be less than 5MB");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      
+      const res = await api.post<{ url: string }>("/uploads/chat-attachment", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      
+      const url = res.data.url;
+      const isImage = file.type.startsWith("image/");
+      const socket = getSocket();
+      socket.emit("message", { 
+        conversationId: active.id, 
+        text: url, 
+        messageType: isImage ? "IMAGE" : "FILE" 
+      });
+    } catch (error: any) {
+      notifyError(error.response?.data?.message || "Failed to upload file");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const startEdit = (id: string, current: string) => {
@@ -441,16 +487,33 @@ function ChatPanel({
           ) : (
             <div className="flex items-center gap-2 rounded-2xl bg-linen-canvas border border-slate-custom/10 px-4 py-1.5 focus-within:border-signal-blue/40 focus-within:bg-white transition-all">
               <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                className="hidden"
+                accept="image/*,.pdf,.doc,.docx,.txt"
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-fog hover:text-signal-blue transition disabled:opacity-50"
+                aria-label="Attach file"
+              >
+                {uploading ? <Spinner className="w-4 h-4" /> : <Paperclip size={18} />}
+              </button>
+              
+              <input
                 ref={inputRef}
                 value={draft}
                 onChange={(e) => { setDraft(e.target.value); sendTyping(); }}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
                 placeholder="Type a message…"
                 className="flex-1 bg-transparent border-none py-2 text-sm text-midnight-ink outline-none placeholder:text-ash"
+                disabled={uploading}
               />
               <button
                 onClick={send}
-                disabled={!draft.trim()}
+                disabled={!draft.trim() || uploading}
                 className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-signal-blue text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-steel/30"
                 aria-label="Send message"
               >
