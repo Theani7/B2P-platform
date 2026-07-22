@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PortfolioCard } from "./PortfolioCard";
+import { PortfolioDetailModal } from "./PortfolioDetailModal";
 
 export function PortfolioGrid({ items, isOwner, onEdit, onDelete, onAdd }: any) {
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
@@ -51,6 +52,12 @@ export function PortfolioGrid({ items, isOwner, onEdit, onDelete, onAdd }: any) 
           ))}
         </AnimatePresence>
       </div>
+
+      <PortfolioDetailModal
+        item={selectedItem}
+        isOpen={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+      />
     </>
   );
 }

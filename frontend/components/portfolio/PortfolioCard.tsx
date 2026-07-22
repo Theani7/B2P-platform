@@ -1,16 +1,16 @@
 import React from "react";
 import { Star, Image as ImageIcon, Video, Eye, Heart, Pencil, Trash2 } from "lucide-react";
 
+export const getMediaUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads/")) return url;
+  return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}${url}`;
+};
+
 export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: any) {
   const hasVideo = item.media?.some((m: any) => m.mediaType === "video");
   const coverImageUrl = item.coverImage || item.media?.[0]?.filePath;
-
-  const getMediaUrl = (url: string) => {
-    if (!url) return "";
-    if (url.startsWith("http")) return url;
-    if (url.startsWith("/uploads/")) return url;
-    return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}${url}`;
-  };
 
   return (
     <div className="group bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 overflow-hidden hover:shadow-md transition-shadow">
