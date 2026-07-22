@@ -7,7 +7,7 @@ import { AppError } from "../../shared/errors.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_BASE = path.resolve(__dirname, "../../../uploads");
 
-const ALLOWED = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+const ALLOWED = new Set([".jpg", ".jpeg", ".png", ".webp", ".pdf", ".doc", ".docx", ".txt"]);
 
 function urlFor(subfolder, filename) {
   switch (subfolder) {
