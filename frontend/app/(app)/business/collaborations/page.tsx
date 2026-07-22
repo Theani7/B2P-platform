@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import {
   CheckCircle2, XCircle, Clock, Star, TrendingUp, Wallet, MessageCircle,
   Building2, Briefcase, UserCheck, MoreVertical, Search as SearchIcon,
+  Link2, FileText, MessageSquare, ExternalLink, CalendarDays, Check, RotateCcw
 } from "lucide-react";
 import { formatNepaliCurrency } from "@/utils/currency";
 
@@ -45,52 +46,126 @@ function DeliverablesPanel({ collaborationId }: { collaborationId: string }) {
     );
 
   return (
-    <div className="mt-4 border-t border-slate-custom/10 pt-2">
-      <h4 className="mb-2 text-caption font-medium uppercase tracking-wide text-steel">Deliverables</h4>
-      {isLoading && <Spinner />}
-      {data && data.length === 0 && <p className="text-body text-steel">No deliverables submitted yet.</p>}
+    <div className="mt-6 border-t border-slate-custom/10 pt-5">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-[11px] font-bold text-fog uppercase tracking-widest flex items-center gap-2">
+          <FileText size={14} className="text-steel" />
+          Project Deliverables
+        </h4>
+        {data && data.length > 0 && (
+          <span className="text-xs font-bold text-graphite bg-linen-canvas px-2 py-0.5 rounded-md border border-slate-custom/10">
+            {data.length} items
+          </span>
+        )}
+      </div>
+
+      {isLoading && (
+        <div className="py-4 flex justify-center">
+          <Spinner />
+        </div>
+      )}
+      
+      {data && data.length === 0 && (
+        <div className="bg-linen-canvas rounded-xl p-6 text-center border border-dashed border-steel/20">
+          <div className="w-10 h-10 mx-auto bg-white rounded-full flex items-center justify-center text-steel mb-3 shadow-sm ring-1 ring-gray-100">
+            <FileText size={18} />
+          </div>
+          <p className="text-sm font-medium text-graphite mb-1">No deliverables yet</p>
+          <p className="text-xs text-ash">The promoter hasn't submitted any work for review.</p>
+        </div>
+      )}
+
       {data && data.length > 0 && (
-        <ul className="grid gap-2">
+        <div className="grid gap-3">
           {data.map((d) => (
-            <li key={d.id} className="rounded-inputs border border-steel/10 p-3">
-              <div className="flex items-center justify-between">
-                <a href={d.contentUrl} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">{d.title}</a>
-                <Badge tone={deliverableTone[d.status]}>{d.status}</Badge>
+            <div key={d.id} className="bg-white rounded-xl border border-slate-custom/10 shadow-sm overflow-hidden flex flex-col">
+              <div className="p-4 flex-1">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <h5 className="text-sm font-bold text-graphite truncate pr-2">{d.title}</h5>
+                    <div className="flex items-center gap-2 mt-1.5 text-xs text-ash">
+                      <CalendarDays size={12} />
+                      {new Date(d.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </div>
+                  </div>
+                  <div className="shrink-0">
+                    <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                      d.status === 'APPROVED' || d.status === 'PUBLISHED' ? 'bg-emerald-status/10 text-emerald-status' :
+                      d.status === 'REVISION_REQUESTED' ? 'bg-coral-alert/10 text-coral-alert' :
+                      d.status === 'IN_REVIEW' ? 'bg-amber-50 text-amber-tag' :
+                      'bg-slate-100 text-slate-500'
+                    }`}>
+                      {d.status.replace("_", " ")}
+                    </span>
+                  </div>
+                </div>
+
+                <a 
+                  href={d.contentUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex items-center gap-2 bg-linen-canvas hover:bg-sky-wash transition-colors p-2.5 rounded-lg border border-slate-custom/10 mb-3 group"
+                >
+                  <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center text-signal-blue shrink-0 shadow-sm">
+                    <Link2 size={12} />
+                  </div>
+                  <span className="text-xs font-medium text-graphite truncate flex-1 group-hover:text-signal-blue transition-colors">
+                    {d.contentUrl}
+                  </span>
+                  <ExternalLink size={14} className="text-steel group-hover:text-signal-blue shrink-0 mr-1" />
+                </a>
+
+                {d.description && (
+                  <div className="mb-3">
+                    <p className="text-[10px] font-bold text-fog uppercase tracking-widest mb-1.5">Description</p>
+                    <p className="text-xs text-ash leading-relaxed bg-linen-canvas/50 p-2.5 rounded-lg border border-slate-custom/5">{d.description}</p>
+                  </div>
+                )}
+                
+                {d.feedback && (
+                  <div className="mt-2 bg-coral-alert/5 p-2.5 rounded-lg border border-coral-alert/20 flex gap-2">
+                    <MessageSquare size={14} className="text-coral-alert shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-bold text-coral-alert uppercase tracking-widest mb-0.5">Your Feedback</p>
+                      <p className="text-xs text-coral-alert/90 font-medium">{d.feedback}</p>
+                    </div>
+                  </div>
+                )}
               </div>
-              {d.description && <p className="mt-1 text-body text-slate-custom">{d.description}</p>}
-              {d.feedback && <p className="mt-1 text-caption text-steel">Feedback: {d.feedback}</p>}
-              <div className="mt-2 flex flex-wrap gap-2">
-                {/* PUBLISHED: no actions */}
-                {/* APPROVED: only Mark published */}
-                {d.status === "APPROVED" && (
-                  <Button variant="subtle" onClick={() => act(d.id, "PUBLISHED")}>Mark published</Button>
-                )}
-                {/* IN_REVIEW: Approve + Request revision */}
-                {d.status === "IN_REVIEW" && (
-                  <>
-                    <Button onClick={() => act(d.id, "APPROVED")}>Approve</Button>
-                    <Button variant="danger" onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}>Request revision</Button>
-                  </>
-                )}
-                {/* DRAFT: Approve + Request revision */}
-                {d.status === "DRAFT" && (
-                  <>
-                    <Button onClick={() => act(d.id, "APPROVED")}>Approve</Button>
-                    <Button variant="danger" onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}>Request revision</Button>
-                  </>
-                )}
-                {/* REVISION_REQUESTED: Approve + Mark published + Request revision again */}
-                {d.status === "REVISION_REQUESTED" && (
-                  <>
-                    <Button onClick={() => act(d.id, "APPROVED")}>Approve</Button>
-                    <Button variant="subtle" onClick={() => act(d.id, "PUBLISHED")}>Mark published</Button>
-                    <Button variant="danger" onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}>Request revision</Button>
-                  </>
-                )}
-              </div>
-            </li>
+
+              {/* Action Buttons */}
+              {(d.status === "IN_REVIEW" || d.status === "DRAFT" || d.status === "REVISION_REQUESTED" || d.status === "APPROVED") && (
+                <div className="bg-linen-canvas border-t border-slate-custom/10 p-2.5 flex gap-2">
+                  {(d.status === "APPROVED" || d.status === "REVISION_REQUESTED") && (
+                    <button 
+                      onClick={() => act(d.id, "PUBLISHED")}
+                      className="flex-1 h-8 rounded-lg bg-white border border-slate-custom/10 text-graphite text-xs font-bold hover:bg-linen-canvas transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      Mark Published
+                    </button>
+                  )}
+                  
+                  {(d.status === "IN_REVIEW" || d.status === "DRAFT" || d.status === "REVISION_REQUESTED") && (
+                    <>
+                      <button 
+                        onClick={() => act(d.id, "APPROVED")}
+                        className="flex-1 h-8 rounded-lg bg-gray-900 text-white text-xs font-bold hover:opacity-90 transition-colors flex items-center justify-center gap-1.5"
+                      >
+                        <Check size={14} /> Approve
+                      </button>
+                      <button 
+                        onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}
+                        className="flex-1 h-8 rounded-lg bg-coral-alert/10 text-coral-alert hover:bg-coral-alert/20 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                      >
+                        <RotateCcw size={14} /> Request Revision
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

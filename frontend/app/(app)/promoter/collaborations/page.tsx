@@ -30,6 +30,10 @@ import {
   Briefcase,
   Building2,
   Search as SearchIcon,
+  Link2,
+  FileText,
+  ExternalLink,
+  CalendarDays,
 } from "lucide-react";
 
 const fmtNpr = (n?: number | null) =>
@@ -63,55 +67,127 @@ function DeliverablesPanel({ collaborationId }: { collaborationId: string }) {
   };
 
   return (
-    <div className="mt-4 border-t border-slate-custom/10 pt-4">
-      <h4 className="mb-2 text-caption font-medium uppercase tracking-wide text-steel">Deliverables</h4>
-      {isLoading && <Spinner />}
-      {data && data.length === 0 && <p className="text-body text-steel">No deliverables submitted yet.</p>}
-      {data && data.length > 0 && (
-        <ul className="mb-4 grid gap-2">
-          {data.map((d) => (
-            <li key={d.id} className="rounded-inputs border border-slate-custom/10 p-3">
-              <div className="flex items-center justify-between">
-                <a href={d.contentUrl} target="_blank" rel="noreferrer" className="font-medium text-signal-blue hover:underline">
-                  {d.title}
-                </a>
-                <ToneBadge tone={deliverableTone[d.status]}>{d.status}</ToneBadge>
-              </div>
-              {d.description && <p className="mt-1 text-body text-slate-custom">{d.description}</p>}
-              {d.feedback && <p className="mt-1 text-caption text-coral-alert">Feedback: {d.feedback}</p>}
-            </li>
-          ))}
-        </ul>
-      )}
-      <form className="grid gap-2" onSubmit={onSubmit}>
-        <input
-          className="w-full rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-          placeholder="Title"
-          value={form.title}
-          onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-          minLength={3}
-          maxLength={100}
-          required
-        />
-        <input
-          className="w-full rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-          placeholder="Content URL"
-          type="url"
-          value={form.contentUrl}
-          onChange={(e) => setForm((f) => ({ ...f, contentUrl: e.target.value }))}
-          required
-        />
-        <input
-          className="w-full rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-          placeholder="Description (optional)"
-          value={form.description}
-          onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-          maxLength={1000}
-        />
-        <div>
-          <Button type="submit" disabled={submit.isPending}>Submit deliverable</Button>
+    <div className="mt-6 border-t border-slate-custom/10 pt-5">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-[11px] font-bold text-fog uppercase tracking-widest flex items-center gap-2">
+          <FileText size={14} className="text-steel" />
+          Project Deliverables
+        </h4>
+        {data && data.length > 0 && (
+          <span className="text-xs font-bold text-graphite bg-linen-canvas px-2 py-0.5 rounded-md border border-slate-custom/10">
+            {data.length} items
+          </span>
+        )}
+      </div>
+      
+      {isLoading && (
+        <div className="py-4 flex justify-center">
+          <Spinner />
         </div>
-      </form>
+      )}
+      
+      {data && data.length === 0 && (
+        <div className="bg-linen-canvas rounded-xl p-6 text-center border border-dashed border-steel/20 mb-4">
+          <div className="w-10 h-10 mx-auto bg-white rounded-full flex items-center justify-center text-steel mb-3 shadow-sm ring-1 ring-gray-100">
+            <FileText size={18} />
+          </div>
+          <p className="text-sm font-medium text-graphite mb-1">No deliverables yet</p>
+          <p className="text-xs text-ash">Submit your work below for review.</p>
+        </div>
+      )}
+
+      {data && data.length > 0 && (
+        <div className="mb-4 grid gap-3">
+          {data.map((d) => (
+            <div key={d.id} className="bg-white rounded-xl border border-slate-custom/10 shadow-sm overflow-hidden flex flex-col p-4">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="min-w-0 flex-1">
+                  <h5 className="text-sm font-bold text-graphite truncate pr-2">{d.title}</h5>
+                  <div className="flex items-center gap-2 mt-1.5 text-xs text-ash">
+                    <CalendarDays size={12} />
+                    {new Date(d.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  </div>
+                </div>
+                <div className="shrink-0">
+                  <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                    d.status === 'APPROVED' || d.status === 'PUBLISHED' ? 'bg-emerald-status/10 text-emerald-status' :
+                    d.status === 'REVISION_REQUESTED' ? 'bg-coral-alert/10 text-coral-alert' :
+                    d.status === 'IN_REVIEW' ? 'bg-amber-50 text-amber-tag' :
+                    'bg-slate-100 text-slate-500'
+                  }`}>
+                    {d.status.replace("_", " ")}
+                  </span>
+                </div>
+              </div>
+
+              <a 
+                href={d.contentUrl} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="flex items-center gap-2 bg-linen-canvas hover:bg-sky-wash transition-colors p-2.5 rounded-lg border border-slate-custom/10 mb-3 group"
+              >
+                <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center text-signal-blue shrink-0 shadow-sm">
+                  <Link2 size={12} />
+                </div>
+                <span className="text-xs font-medium text-graphite truncate flex-1 group-hover:text-signal-blue transition-colors">
+                  {d.contentUrl}
+                </span>
+                <ExternalLink size={14} className="text-steel group-hover:text-signal-blue shrink-0 mr-1" />
+              </a>
+
+              {d.description && (
+                <div className="mb-2">
+                  <p className="text-[10px] font-bold text-fog uppercase tracking-widest mb-1.5">Description</p>
+                  <p className="text-xs text-ash leading-relaxed bg-linen-canvas/50 p-2.5 rounded-lg border border-slate-custom/5">{d.description}</p>
+                </div>
+              )}
+              
+              {d.feedback && (
+                <div className="mt-2 bg-coral-alert/5 p-2.5 rounded-lg border border-coral-alert/20 flex gap-2">
+                  <MessageCircle size={14} className="text-coral-alert shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[10px] font-bold text-coral-alert uppercase tracking-widest mb-0.5">Business Feedback</p>
+                    <p className="text-xs text-coral-alert/90 font-medium">{d.feedback}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      
+      <div className="bg-linen-canvas rounded-xl p-4 border border-slate-custom/10">
+        <h5 className="text-[11px] font-bold text-fog uppercase tracking-widest mb-3">Submit New Deliverable</h5>
+        <form className="grid gap-3" onSubmit={onSubmit}>
+          <input
+            className="w-full h-10 rounded-inputs border border-slate-custom/10 bg-white px-3 text-sm text-graphite placeholder-fog outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue/20 transition-all shadow-sm"
+            placeholder="Title (e.g., Draft Instagram Reel)"
+            value={form.title}
+            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+            minLength={3}
+            maxLength={100}
+            required
+          />
+          <input
+            className="w-full h-10 rounded-inputs border border-slate-custom/10 bg-white px-3 text-sm text-graphite placeholder-fog outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue/20 transition-all shadow-sm"
+            placeholder="Content URL (Google Drive, Dropbox, etc)"
+            type="url"
+            value={form.contentUrl}
+            onChange={(e) => setForm((f) => ({ ...f, contentUrl: e.target.value }))}
+            required
+          />
+          <textarea
+            className="w-full min-h-[80px] rounded-inputs border border-slate-custom/10 bg-white px-3 py-2 text-sm text-graphite placeholder-fog outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue/20 transition-all shadow-sm resize-y"
+            placeholder="Description or notes (optional)"
+            value={form.description}
+            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+            maxLength={1000}
+          />
+          <Button type="submit" disabled={submit.isPending} className="w-full h-10 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-inputs shadow-sm">
+            {submit.isPending ? "Submitting..." : "Submit Deliverable"}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

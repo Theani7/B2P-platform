@@ -93,8 +93,8 @@ export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailM
                     <button onClick={nextMedia} className="absolute right-4 p-2 rounded-full bg-white/70 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
                       <ChevronRight size={24} className="text-midnight-ink" />
                     </button>
-                    <div className="absolute bottom-4 flex gap-1.5">
-                      {mediaItems.map((_, idx) => (
+                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+                      {mediaItems.map((_: any, idx: number) => (
                         <div key={idx} className={`w-2 h-2 rounded-full transition-all ${idx === currentMediaIdx ? 'bg-signal-blue w-6' : 'bg-steel/40'}`} />
                       ))}
                     </div>
