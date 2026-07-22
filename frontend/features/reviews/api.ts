@@ -11,6 +11,7 @@ export interface ReviewRead {
   createdAt: string;
   updatedAt: string;
   businessName: string;
+  promoterName: string;
   campaignTitle: string;
 }
 

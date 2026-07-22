@@ -44,8 +44,6 @@ function formatBudget(n?: number | null) {
 function MessageBubble({
   msg,
   mine,
-  onEdit,
-  onDelete,
 }: {
   msg: ChatMessage;
   mine: boolean;
@@ -446,7 +444,7 @@ function ChatPanel({
                 className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-fog hover:text-signal-blue transition disabled:opacity-50"
                 aria-label="Attach file"
               >
-                {uploading ? <Spinner className="w-4 h-4" /> : <Paperclip size={18} />}
+                {uploading ? <div className="scale-50"><Spinner /></div> : <Paperclip size={18} />}
               </button>
               
               <input

@@ -14,6 +14,7 @@ function reviewerInfo(user) {
 
 function toReviewRead(r) {
   const business = r.collaboration?.businessProfile || null;
+  const promoter = r.collaboration?.promoterProfile || null;
   const campaign = r.collaboration?.campaign || null;
   return {
     id: r.id,
@@ -25,13 +26,14 @@ function toReviewRead(r) {
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
     businessName: business?.companyName ?? "",
+    promoterName: promoter?.username ?? "",
     campaignTitle: campaign?.title ?? "",
   };
 }
 
 const reviewerInclude = {
   reviewer: { include: { promoterProfile: true, businessProfile: true } },
-  collaboration: { include: { campaign: true, businessProfile: true } },
+  collaboration: { include: { campaign: true, businessProfile: true, promoterProfile: true } },
 };
 
 export async function completeCollaboration(user, collaborationId) {
@@ -44,10 +46,10 @@ export async function completeCollaboration(user, collaborationId) {
     throw new AppError("Only active collaborations can be completed", 400);
   }
 
-  const profileIds = new Set(
-    [user.businessProfile?.id, user.promoterProfile?.id].filter(Boolean)
-  );
-  if (!profileIds.has(collab.businessProfileId) && !profileIds.has(collab.promoterProfileId)) {
+  const isBusiness = user.businessProfile?.id === collab.businessProfileId;
+  const isPromoter = user.promoterProfile?.id === collab.promoterProfileId;
+
+  if (!isBusiness && !isPromoter) {
     throw new AppError("You are not a participant in this collaboration", 403);
   }
 
@@ -56,7 +58,7 @@ export async function completeCollaboration(user, collaborationId) {
     data: { status: "COMPLETED", completedAt: new Date() },
   });
 
-  const otherPartyId = user.businessProfile
+  const otherPartyId = isBusiness
     ? collab.promoterProfile.userId
     : collab.businessProfile.userId;
   await createNotification({

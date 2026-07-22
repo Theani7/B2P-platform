@@ -8,7 +8,14 @@ import { useSocketEvent } from "@/lib/socket";
 import { Bell, Check, X, MessageSquare, Briefcase, Star, CheckCircle, XCircle, Info, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Spinner } from "@/components/ui/Spinner";
-import { timeAgo } from "@/lib/utils";
+function timeAgo(s: string) {
+  const diff = Date.now() - new Date(s).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 60) return `${Math.max(1, m)}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -83,7 +90,7 @@ export function NotificationBell() {
                   onClick={() => markAll.mutate()}
                   disabled={markAll.isPending}
                 >
-                  {markAll.isPending ? <Spinner className="w-3 h-3" /> : <Check size={14} />}
+                  {markAll.isPending ? <div className="scale-50"><Spinner /></div> : <Check size={14} />}
                   Mark all read
                 </button>
               )}
@@ -91,8 +98,8 @@ export function NotificationBell() {
             
             <div className="max-h-[400px] overflow-y-auto overscroll-contain">
               {isLoading && (
-                <div className="flex justify-center p-8">
-                  <Spinner className="w-6 h-6 text-signal-blue" />
+                <div className="flex justify-center p-8 scale-150">
+                  <Spinner />
                 </div>
               )}
               {data && data.items.length === 0 && (

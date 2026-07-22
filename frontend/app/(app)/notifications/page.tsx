@@ -113,7 +113,7 @@ function NotificationsInner() {
 
       <div className="overflow-hidden rounded-2xl border border-slate-custom/10 bg-white shadow-xl shadow-midnight-ink/5">
         {isLoading ? (
-          <div className="flex justify-center p-16"><Spinner className="w-8 h-8 text-signal-blue" /></div>
+          <div className="flex justify-center p-16"><div className="scale-150"><Spinner /></div></div>
         ) : notifications.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}

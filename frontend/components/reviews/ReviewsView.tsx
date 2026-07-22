@@ -15,7 +15,12 @@ import {
 } from "@/features/reviews/api";
 import { useAuth } from "@/providers/AuthProvider";
 
-function ReviewCard({ review, onDelete }: { review: ReviewRead; onDelete?: () => void }) {
+function ReviewCard({ review, tab, onDelete }: { review: ReviewRead; tab: "received" | "written"; onDelete?: () => void }) {
+  const isWritten = tab === "written";
+  const partnerName = isWritten
+    ? (review.businessName || review.promoterName)
+    : (review.reviewer ? review.reviewer.fullName || review.reviewer.username : "Unknown User");
+
   return (
     <Card>
       <div className="flex items-start justify-between gap-4">
@@ -24,7 +29,7 @@ function ReviewCard({ review, onDelete }: { review: ReviewRead; onDelete?: () =>
           {review.comment && <p className="mt-1 text-body text-slate-custom">{review.comment}</p>}
           <p className="mt-1 text-caption text-steel">
             {review.campaignTitle && `${review.campaignTitle} · `}
-            {review.reviewer ? `by ${review.reviewer.fullName || review.reviewer.username}` : ""}
+            {isWritten ? `for ${partnerName}` : `by ${partnerName}`}
           </p>
         </div>
         {onDelete && (
@@ -86,6 +91,7 @@ export function ReviewsView() {
             <ReviewCard
               key={r.id}
               review={r}
+              tab={tab}
               onDelete={
                 tab === "written"
                   ? () =>
