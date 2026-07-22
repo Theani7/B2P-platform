@@ -19,6 +19,7 @@ import {
 } from "@/features/collaborations/api";
 import { useCompleteCollaboration } from "@/features/reviews/api";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
+import { Portal } from "@/components/ui/Portal";
 import { useRouter } from "next/navigation";
 import {
   CheckCircle2, XCircle, Clock, Star, TrendingUp, Wallet, MessageCircle,
@@ -38,12 +39,22 @@ const deliverableTone: Record<DeliverableStatus, "slate" | "signal" | "emerald" 
 function DeliverablesPanel({ collaborationId }: { collaborationId: string }) {
   const { data, isLoading } = useBusinessDeliverables(collaborationId);
   const review = useReviewDeliverable();
+  const [revisionModalFor, setRevisionModalFor] = useState<string | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
 
   const act = (deliverableId: string, status: DeliverableStatus, feedback?: string) =>
     review.mutate(
       { collaborationId, deliverableId, status, feedback },
       { onSuccess: () => notifySuccess("Deliverable updated"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Update failed") },
     );
+
+  const submitRevision = () => {
+    if (revisionModalFor) {
+      act(revisionModalFor, "REVISION_REQUESTED", feedbackText.trim() || undefined);
+      setRevisionModalFor(null);
+      setFeedbackText("");
+    }
+  };
 
   return (
     <div className="mt-6 border-t border-slate-custom/10 pt-5">
@@ -146,26 +157,60 @@ function DeliverablesPanel({ collaborationId }: { collaborationId: string }) {
                   )}
                   
                   {(d.status === "IN_REVIEW" || d.status === "DRAFT" || d.status === "REVISION_REQUESTED") && (
-                    <>
-                      <button 
-                        onClick={() => act(d.id, "APPROVED")}
-                        className="flex-1 h-8 rounded-lg bg-gray-900 text-white text-xs font-bold hover:opacity-90 transition-colors flex items-center justify-center gap-1.5"
-                      >
-                        <Check size={14} /> Approve
-                      </button>
-                      <button 
-                        onClick={() => { const fb = prompt("Revision feedback (optional):") ?? undefined; act(d.id, "REVISION_REQUESTED", fb); }}
-                        className="flex-1 h-8 rounded-lg bg-coral-alert/10 text-coral-alert hover:bg-coral-alert/20 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
-                      >
-                        <RotateCcw size={14} /> Request Revision
-                      </button>
-                    </>
+                    <button 
+                      onClick={() => act(d.id, "APPROVED")}
+                      className="flex-1 h-8 rounded-lg bg-gray-900 text-white text-xs font-bold hover:opacity-90 transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <Check size={14} /> Approve
+                    </button>
+                  )}
+
+                  {(d.status === "IN_REVIEW" || d.status === "DRAFT") && (
+                    <button 
+                      onClick={() => { setRevisionModalFor(d.id); setFeedbackText(""); }}
+                      className="flex-1 h-8 rounded-lg bg-coral-alert/10 text-coral-alert hover:bg-coral-alert/20 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <RotateCcw size={14} /> Request Revision
+                    </button>
                   )}
                 </div>
               )}
             </div>
           ))}
         </div>
+      )}
+
+      {revisionModalFor && (
+        <Portal>
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/60 backdrop-blur-md p-4">
+            <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-6 shadow-xl max-w-sm w-full">
+              <h3 className="text-lg font-bold text-graphite mb-2">Request Revision</h3>
+              <p className="text-xs text-ash mb-4">Provide constructive feedback so the promoter knows exactly what to change.</p>
+              
+              <textarea
+                className="w-full min-h-[100px] rounded-inputs border border-slate-custom/10 bg-white px-3 py-2 text-sm text-graphite placeholder-fog outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue/20 transition-all shadow-sm resize-y mb-6"
+                placeholder="What needs to be improved? (Optional)"
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+              />
+              
+              <div className="flex gap-3 justify-end">
+                <button 
+                  onClick={() => { setRevisionModalFor(null); setFeedbackText(""); }}
+                  className="px-4 py-2 text-xs font-bold text-graphite bg-white border border-slate-custom/10 rounded-inputs hover:bg-sky-wash"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={submitRevision}
+                  className="px-5 py-2 text-xs font-bold text-white rounded-inputs bg-coral-alert hover:opacity-90 shadow-sm"
+                >
+                  Send Request
+                </button>
+              </div>
+            </div>
+          </div>
+        </Portal>
       )}
     </div>
   );
