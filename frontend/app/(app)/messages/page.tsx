@@ -326,7 +326,6 @@ function ChatPanel({
       });
       
       const url = res.data.url;
-      const isImage = file.type.startsWith("image/");
       const socket = getSocket();
       socket.emit("message", { 
         conversationId: active.id, 
