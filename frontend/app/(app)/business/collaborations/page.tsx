@@ -87,7 +87,7 @@ function DeliverablesPanel({ collaborationId }: { collaborationId: string }) {
       )}
 
       {data && data.length > 0 && (
-        <div className="grid gap-3">
+        <div className="grid gap-3 max-h-[320px] overflow-y-auto pr-1.5 scrollbar-thin scrollbar-thumb-slate-200">
           {data.map((d) => (
             <div key={d.id} className="bg-white rounded-xl border border-slate-custom/10 shadow-sm overflow-hidden flex flex-col">
               <div className="p-4 flex-1">
