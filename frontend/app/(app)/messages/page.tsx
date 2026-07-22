@@ -320,6 +320,8 @@ function ChatPanel({
         text: url, 
         messageType: isImage ? "IMAGE" : "FILE" 
       });
+      // Force a refetch to guarantee the UI updates immediately, regardless of socket connection state
+      setTimeout(() => history.refetch(), 500);
     } catch (error: any) {
       notifyError(error.response?.data?.message || "Failed to upload file");
     } finally {
