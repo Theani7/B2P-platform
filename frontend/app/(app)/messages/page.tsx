@@ -20,6 +20,7 @@ import {
 } from "@/features/chat/api";
 import { getSocket, useSocketEvent } from "@/lib/socket";
 import { notifyError } from "@/lib/notify";
+import api from "@/lib/apiClient";
 
 function timeAgo(s: string) {
   const diff = Date.now() - new Date(s).getTime();
