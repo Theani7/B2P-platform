@@ -34,10 +34,11 @@ export interface InvitationListRead {
   pages: number;
 }
 
-export const useBusinessInvitations = (params?: { status?: string; page?: number; limit?: number }) =>
+export const useBusinessInvitations = (params?: { status?: string; page?: number; limit?: number }, options?: { enabled?: boolean }) =>
   useQuery<InvitationListRead>({
     queryKey: ["business-invitations", params],
     queryFn: () => api.get<InvitationListRead>("/business/invitations", { params }).then((r) => r.data),
+    ...options,
   });
 
 export const usePromoterInvitations = (params?: { status?: string; page?: number; limit?: number }) =>

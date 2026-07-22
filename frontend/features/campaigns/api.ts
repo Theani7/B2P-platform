@@ -17,10 +17,11 @@ export interface CampaignListParams {
   sort?: string;
 }
 
-export const useCampaigns = (params?: CampaignListParams) =>
+export const useCampaigns = (params?: CampaignListParams, options?: { enabled?: boolean }) =>
   useQuery<CampaignListRead>({
     queryKey: ["campaigns", params],
     queryFn: () => api.get<CampaignListRead>("/campaigns", { params }).then((r) => r.data),
+    ...options,
   });
 
 export const useCampaign = (id: string) =>

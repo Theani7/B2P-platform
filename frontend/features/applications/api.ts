@@ -47,10 +47,11 @@ export const useCampaignApplications = (campaignId: string, params?: { page?: nu
     enabled: !!campaignId,
   });
 
-export const useBusinessApplications = (params?: { status?: string; page?: number; limit?: number }) =>
+export const useBusinessApplications = (params?: { status?: string; page?: number; limit?: number }, options?: { enabled?: boolean }) =>
   useQuery<ApplicationListRead>({
     queryKey: ["business-applications", params],
     queryFn: () => api.get<ApplicationListRead>("/business/applications", { params }).then((r) => r.data),
+    ...options,
   });
 
 export const useApplyToCampaign = () => {

@@ -6,6 +6,7 @@ import { useInvitePromoter } from "@/features/invitations/api";
 import { useBusinessInvitations } from "@/features/invitations/api";
 import { useBusinessApplications } from "@/features/applications/api";
 import { notifySuccess, notifyError } from "@/lib/notify";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface InvitePromoterModalProps {
   isOpen: boolean;
@@ -17,9 +18,13 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
   const [selectedCampaignId, setSelectedCampaignId] = useState("");
   const [message, setMessage] = useState("");
 
-  const { data: campaignsData, isLoading: campaignsLoading, error: campaignsError } = useCampaigns({ limit: 50 });
-  const { data: invitationsData } = useBusinessInvitations({ limit: 100 });
-  const { data: applicationsData } = useBusinessApplications({ limit: 100 });
+  const { user } = useAuth();
+  const role = user?.role;
+  const isEnabled = isOpen && role === "BUSINESS";
+
+  const { data: campaignsData, isLoading: campaignsLoading, error: campaignsError } = useCampaigns({ limit: 50 }, { enabled: isEnabled });
+  const { data: invitationsData } = useBusinessInvitations({ limit: 100 }, { enabled: isEnabled });
+  const { data: applicationsData } = useBusinessApplications({ limit: 100 }, { enabled: isEnabled });
   const invitePromoter = useInvitePromoter();
 
   if (!isOpen || !promoter) return null;

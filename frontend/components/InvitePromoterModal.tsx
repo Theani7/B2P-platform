@@ -19,7 +19,10 @@ export function InvitePromoterModal({ isOpen, onClose, promoter }: InvitePromote
   const [selectedCampaignId, setSelectedCampaignId] = useState("");
   const [message, setMessage] = useState("");
 
-  const { data: campaignsData, isLoading: campaignsLoading } = useCampaigns({ limit: 50 });
+  const { data: campaignsData, isLoading: campaignsLoading } = useCampaigns(
+    { limit: 50 },
+    { enabled: isOpen && user?.role === Role.BUSINESS }
+  );
   const invitePromoter = useInvitePromoter();
 
   if (!isOpen || !promoter) return null;
