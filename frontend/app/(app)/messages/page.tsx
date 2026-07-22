@@ -12,9 +12,8 @@ import {
 import {
   useConversations,
   useChatHistory,
+  useChatHistory,
   useMarkConversationRead,
-  useEditMessage,
-  useDeleteMessage,
   type ChatMessage,
   type Conversation,
 } from "@/features/chat/api";
@@ -50,17 +49,11 @@ function MessageBubble({
 }: {
   msg: ChatMessage;
   mine: boolean;
-  onEdit: (id: string, current: string) => void;
-  onDelete: (id: string) => void;
 }) {
   const [showActions, setShowActions] = useState(false);
 
   return (
-    <div
-      className={`group flex ${mine ? "justify-end" : "justify-start"}`}
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
-    >
+    <div className={`group flex ${mine ? "justify-end" : "justify-start"}`}>
       <div className={`relative flex items-end gap-2 max-w-[75%] ${mine ? "flex-row-reverse" : "flex-row"}`}>
         <div
           className={`rounded-2xl px-4 py-2.5 text-sm shadow-sm ${
@@ -88,26 +81,6 @@ function MessageBubble({
             {msg.editedAt && <span className="ml-1">(edited)</span>}
           </div>
         </div>
-
-        {/* Actions (only for own messages, not deleted) */}
-        {mine && !msg.isDeleted && showActions && (
-          <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={() => onEdit(msg.id, msg.message)}
-              className="p-1.5 rounded-lg bg-white border border-slate-custom/10 text-ash hover:text-graphite hover:bg-sky-wash transition-colors shadow-sm"
-              title="Edit message"
-            >
-              <Edit2 size={12} />
-            </button>
-            <button
-              onClick={() => onDelete(msg.id)}
-              className="p-1.5 rounded-lg bg-white border border-slate-custom/10 text-ash hover:text-coral-alert hover:bg-coral-alert/5 transition-colors shadow-sm"
-              title="Delete message"
-            >
-              <Trash2 size={12} />
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -228,8 +201,6 @@ function ChatPanel({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [typing, setTyping] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editText, setEditText] = useState("");
   const [typingTimeout, setTypingTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [uploading, setUploading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -237,8 +208,6 @@ function ChatPanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const markRead = useMarkConversationRead();
-  const editMsg = useEditMessage();
-  const deleteMsg = useDeleteMessage();
   const history = useChatHistory(active.collaborationId);
 
   useEffect(() => {
@@ -249,7 +218,6 @@ function ChatPanel({
     });
     if (active.unreadCount > 0) markRead.mutate(active.id);
     setDraft("");
-    setEditingId(null);
     inputRef.current?.focus();
   }, [active.id]);
 
@@ -342,39 +310,6 @@ function ChatPanel({
     }
   };
 
-  const startEdit = (id: string, current: string) => {
-    setEditingId(id);
-    setEditText(current);
-  };
-
-  const saveEdit = () => {
-    if (!editingId || !editText.trim()) return;
-    editMsg.mutate(
-      { messageId: editingId, content: editText.trim() },
-      {
-        onSuccess: () => {
-          // Refetch history to get updated messages
-          history.refetch().then(() => {
-            if (history.data) setMessages(history.data.items.slice().reverse());
-          });
-          setEditingId(null);
-          setEditText("");
-        },
-        onError: () => notifyError("Failed to edit message"),
-      }
-    );
-  };
-
-  const handleDelete = (id: string) => {
-    deleteMsg.mutate(id, {
-      onSuccess: () => {
-        // Mark as deleted optimistically
-        setMessages((m) => m.map((msg) => msg.id === id ? { ...msg, isDeleted: true } : msg));
-      },
-      onError: () => notifyError("Failed to delete message"),
-    });
-  };
-
   const other = active.participants.find((p) => p.id !== userId) ?? active.participants[0];
   const isActive = active.collaborationStatus === "ACTIVE";
 
@@ -439,8 +374,6 @@ function ChatPanel({
             key={m.id}
             msg={m}
             mine={m.senderId === userId}
-            onEdit={startEdit}
-            onDelete={handleDelete}
           />
         ))}
 
@@ -458,49 +391,10 @@ function ChatPanel({
         <div ref={bottomRef} />
       </div>
 
-      {/* Edit mode banner */}
-      {editingId && (
-        <div className="border-t border-amber-tag/20 bg-amber-tag/10 px-4 py-2 flex items-center justify-between">
-          <span className="text-xs font-semibold text-amber-tag flex items-center gap-2">
-            <Edit2 size={12} /> Editing message
-          </span>
-          <button onClick={() => { setEditingId(null); setEditText(""); }} className="text-xs text-ash hover:text-graphite">
-            <X size={14} />
-          </button>
-        </div>
-      )}
-
       {/* Input area */}
       {isActive ? (
         <div className="border-t border-slate-custom/10 bg-white p-4">
-          {editingId ? (
-            <div className="flex items-center gap-2">
-              <input
-                autoFocus
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") saveEdit();
-                  if (e.key === "Escape") { setEditingId(null); setEditText(""); }
-                }}
-                className="flex-1 border border-signal-blue/30 rounded-xl px-4 py-2.5 text-sm text-graphite outline-none focus:ring-2 focus:ring-signal-blue/20"
-              />
-              <button
-                onClick={saveEdit}
-                disabled={!editText.trim() || editMsg.isPending}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-signal-blue text-white hover:opacity-90 disabled:bg-steel/30 transition"
-              >
-                <Check size={16} />
-              </button>
-              <button
-                onClick={() => { setEditingId(null); setEditText(""); }}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-linen-canvas border border-slate-custom/10 text-ash hover:bg-sky-wash transition"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 rounded-2xl bg-linen-canvas border border-slate-custom/10 px-4 py-1.5 focus-within:border-signal-blue/40 focus-within:bg-white transition-all">
+          <div className="flex items-center gap-2 rounded-2xl bg-linen-canvas border border-slate-custom/10 px-4 py-1.5 focus-within:border-signal-blue/40 focus-within:bg-white transition-all">
               <input
                 type="file"
                 ref={fileInputRef}
