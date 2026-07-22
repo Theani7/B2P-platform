@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Eye, Heart, Briefcase, Calendar, Tag, ChevronLeft, ChevronRight } from "lucide-react";
 import { getMediaUrl } from "./PortfolioCard";
+import { useViewPortfolio, useLikePortfolio } from "@/features/portfolio/api";
 
 interface PortfolioDetailModalProps {
   item: any;
@@ -12,16 +13,19 @@ interface PortfolioDetailModalProps {
 
 export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailModalProps) {
   const [currentMediaIdx, setCurrentMediaIdx] = useState(0);
+  const viewPortfolio = useViewPortfolio();
+  const likePortfolio = useLikePortfolio();
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && item) {
       document.body.style.overflow = "hidden";
       setCurrentMediaIdx(0);
+      viewPortfolio.mutate(item.id);
     } else {
       document.body.style.overflow = "";
     }
     return () => { document.body.style.overflow = ""; };
-  }, [isOpen]);
+  }, [isOpen, item?.id]);
 
   if (!isOpen || !item) return null;
 
@@ -123,12 +127,19 @@ export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailM
                   <Eye size={10} /> VIEWS
                 </span>
               </div>
-              <div className="flex flex-col border-l border-steel/10 pl-6">
-                <span className="text-2xl font-bold text-midnight-ink">{item.likes > 1000 ? `${(item.likes / 1000).toFixed(1)}k` : item.likes || 0}</span>
-                <span className="text-[10px] font-bold text-steel uppercase tracking-widest flex items-center gap-1">
-                  <Heart size={10} /> LIKES
+              <button 
+                onClick={() => likePortfolio.mutate(item.id)}
+                disabled={likePortfolio.isPending}
+                className="flex flex-col border-l border-steel/10 pl-6 group text-left transition-colors"
+              >
+                <span className="text-2xl font-bold text-midnight-ink group-hover:text-signal-blue transition-colors">
+                  {item.likes > 1000 ? `${(item.likes / 1000).toFixed(1)}k` : item.likes || 0}
                 </span>
-              </div>
+                <span className="text-[10px] font-bold text-steel uppercase tracking-widest flex items-center gap-1 group-hover:text-signal-blue transition-colors">
+                  <Heart size={10} className={likePortfolio.isPending ? "fill-signal-blue text-signal-blue" : ""} /> 
+                  {likePortfolio.isPending ? "LIKING..." : "LIKE"}
+                </span>
+              </button>
             </div>
 
             {/* Description */}
@@ -155,13 +166,13 @@ export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailM
                 <h3 className="text-xs font-bold text-midnight-ink uppercase tracking-widest mb-3">Categories & Tags</h3>
               )}
               <div className="flex flex-wrap gap-2">
-                {item.platforms?.map((p: string) => (
-                  <span key={p} className="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-wider rounded-lg border border-indigo-100">
+                {item.platforms?.map((p: string, i: number) => (
+                  <span key={`${p}-${i}`} className="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-wider rounded-lg border border-indigo-100">
                     {p}
                   </span>
                 ))}
-                {item.tags?.map((t: string) => (
-                  <span key={t} className="px-3 py-1.5 bg-steel/5 text-slate text-xs font-medium rounded-lg border border-steel/10 flex items-center gap-1">
+                {item.tags?.map((t: string, i: number) => (
+                  <span key={`${t}-${i}`} className="px-3 py-1.5 bg-steel/5 text-slate text-xs font-medium rounded-lg border border-steel/10 flex items-center gap-1">
                     <Tag size={10} className="text-steel" />
                     {t}
                   </span>

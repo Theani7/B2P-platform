@@ -57,13 +57,13 @@ export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: any)
 
         {(item.platforms?.length > 0 || item.tags?.length > 0) && (
           <div className="flex flex-wrap gap-1.5 mt-3">
-            {item.platforms?.map((p: string) => (
-              <span key={p} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold uppercase tracking-wider rounded-md">
+            {item.platforms?.map((p: string, i: number) => (
+              <span key={`${p}-${i}`} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold uppercase tracking-wider rounded-md">
                 {p}
               </span>
             ))}
-            {item.tags?.slice(0, 2).map((t: string) => (
-              <span key={t} className="px-2 py-0.5 bg-gray-50 text-gray-600 text-[10px] font-medium rounded-md border border-gray-100">
+            {item.tags?.slice(0, 2).map((t: string, i: number) => (
+              <span key={`${t}-${i}`} className="px-2 py-0.5 bg-gray-50 text-gray-600 text-[10px] font-medium rounded-md border border-gray-100">
                 #{t}
               </span>
             ))}
