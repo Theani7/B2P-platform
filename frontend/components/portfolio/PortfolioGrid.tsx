@@ -4,7 +4,8 @@ import { PortfolioCard } from "./PortfolioCard";
 import { PortfolioDetailModal } from "./PortfolioDetailModal";
 
 export function PortfolioGrid({ items, isOwner, onEdit, onDelete, onAdd }: any) {
-  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const selectedItem = items?.find((i: any) => i.id === selectedItemId);
 
   if (!items || items.length === 0) {
     return (
@@ -44,7 +45,7 @@ export function PortfolioGrid({ items, isOwner, onEdit, onDelete, onAdd }: any) 
               <PortfolioCard
                 item={item}
                 isOwner={isOwner}
-                onClick={setSelectedItem}
+                onClick={(item: any) => setSelectedItemId(item.id)}
                 onEdit={onEdit}
                 onDelete={onDelete}
               />
@@ -56,7 +57,7 @@ export function PortfolioGrid({ items, isOwner, onEdit, onDelete, onAdd }: any) 
       <PortfolioDetailModal
         item={selectedItem}
         isOpen={!!selectedItem}
-        onClose={() => setSelectedItem(null)}
+        onClose={() => setSelectedItemId(null)}
       />
     </>
   );

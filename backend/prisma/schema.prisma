@@ -150,6 +150,7 @@ model User {
   receivedReviews         Review[]                 @relation("ReviewTarget")
   verificationReviews     VerificationRequest[]    @relation("VerificationReviewer")
   Message                 Message[]
+  portfolioLikes          PortfolioLike[]
 
   @@index([role])
   @@map("users")
@@ -255,6 +256,7 @@ model PortfolioItem {
 
   promoterProfile PromoterProfile  @relation(fields: [promoterId], references: [id], onDelete: Cascade)
   media           PortfolioMedia[]
+  portfolioLikes  PortfolioLike[]
 
   @@index([promoterId])
   @@map("portfolio_items")
@@ -272,6 +274,19 @@ model PortfolioMedia {
 
   @@index([portfolioItemId])
   @@map("portfolio_media")
+}
+
+model PortfolioLike {
+  id              String   @id @default(uuid()) @db.Uuid
+  portfolioItemId String   @map("portfolio_item_id") @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  portfolioItem   PortfolioItem @relation(fields: [portfolioItemId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioItemId, userId])
+  @@map("portfolio_likes")
 }
 
 model SocialLink {

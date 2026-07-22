@@ -47,3 +47,40 @@ export async function remove(user, id) {
   await prisma.portfolioItem.delete({ where: { id: item.id } });
   return { success: true, message: "Portfolio item deleted" };
 }
+
+export async function incrementViews(id) {
+  try {
+    return await prisma.portfolioItem.update({
+      where: { id },
+      data: { views: { increment: 1 } },
+    });
+  } catch (err) {
+    throw new AppError("Portfolio item not found", 404);
+  }
+}
+
+export async function toggleLike(user, id) {
+  try {
+    const existing = await prisma.portfolioLike.findUnique({
+      where: { portfolioItemId_userId: { portfolioItemId: id, userId: user.id } },
+    });
+
+    if (existing) {
+      await prisma.portfolioLike.delete({ where: { id: existing.id } });
+      return await prisma.portfolioItem.update({
+        where: { id },
+        data: { likes: { decrement: 1 } },
+      });
+    } else {
+      await prisma.portfolioLike.create({
+        data: { portfolioItemId: id, userId: user.id },
+      });
+      return await prisma.portfolioItem.update({
+        where: { id },
+        data: { likes: { increment: 1 } },
+      });
+    }
+  } catch (err) {
+    throw new AppError("Portfolio item not found", 404);
+  }
+}
