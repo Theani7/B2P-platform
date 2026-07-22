@@ -7,11 +7,11 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Spinner } from "@/components/ui/Spinner";
 import {
   MessageSquare, Target, Wallet, ChevronLeft, Send, Search, Info, AlertCircle,
-  Edit2, Trash2, Check, X, MoreVertical, Paperclip, FileText, File, Image as ImageIcon
+  Edit2, Trash2, Check, X, MoreVertical, Paperclip, FileText, File, Image as ImageIcon,
+  Download
 } from "lucide-react";
 import {
   useConversations,
-  useChatHistory,
   useChatHistory,
   useMarkConversationRead,
   type ChatMessage,
@@ -52,8 +52,33 @@ function MessageBubble({
 }) {
   const [showActions, setShowActions] = useState(false);
 
+  const handleDownload = async (e: React.MouseEvent, url: string, filename: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Failed to download file:', err);
+    }
+  };
+
+  const getFilename = (url: string) => url.split('/').pop() || "download";
+
   return (
-    <div className={`group flex ${mine ? "justify-end" : "justify-start"}`}>
+    <div 
+      className={`group flex ${mine ? "justify-end" : "justify-start"}`}
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
       <div className={`relative flex items-end gap-2 max-w-[75%] ${mine ? "flex-row-reverse" : "flex-row"}`}>
         <div
           className={`rounded-2xl px-4 py-2.5 text-sm shadow-sm ${
@@ -81,6 +106,19 @@ function MessageBubble({
             {msg.editedAt && <span className="ml-1">(edited)</span>}
           </div>
         </div>
+
+        {/* Actions (Download for files/images) */}
+        {showActions && (msg.messageType === "IMAGE" || msg.messageType === "FILE") && (
+          <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => handleDownload(e, msg.message, getFilename(msg.message))}
+              className="p-1.5 rounded-lg bg-white border border-slate-custom/10 text-ash hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-sm"
+              title="Download file"
+            >
+              <Download size={14} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
