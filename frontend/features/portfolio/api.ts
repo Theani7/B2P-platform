@@ -118,3 +118,35 @@ export const useDeletePortfolioMedia = () => {
   });
 };
 
+export const useViewPortfolio = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/portfolio/${id}/view`).then((r) => r.data),
+    onSuccess: () => {
+      // Don't aggressively invalidate to prevent UI jumps while viewing
+    }
+  });
+};
+
+export const useLikePortfolio = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/portfolio/${id}/like`).then((r) => r.data),
+    onSuccess: (data, id) => {
+      // Optimistically update the like status for this item
+      qc.setQueryData(["portfolio-like-status", id], { hasLiked: data.hasLiked });
+      
+      qc.invalidateQueries({ queryKey: ["promoter"] });
+      qc.invalidateQueries({ queryKey: ["my-portfolio"] });
+    }
+  });
+};
+
+export const usePortfolioLikeStatus = (itemId: string | undefined, enabled = true) =>
+  useQuery<{ hasLiked: boolean }>({
+    queryKey: ["portfolio-like-status", itemId],
+    queryFn: () => api.get(`/portfolio/${itemId}/like`).then(r => r.data),
+    enabled: !!itemId && enabled,
+    retry: false, // Don't retry on 401
+  });
+

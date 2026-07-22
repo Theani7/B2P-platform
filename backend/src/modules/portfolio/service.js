@@ -67,18 +67,20 @@ export async function toggleLike(user, id) {
 
     if (existing) {
       await prisma.portfolioLike.delete({ where: { id: existing.id } });
-      return await prisma.portfolioItem.update({
+      const item = await prisma.portfolioItem.update({
         where: { id },
         data: { likes: { decrement: 1 } },
       });
+      return { ...item, hasLiked: false };
     } else {
       await prisma.portfolioLike.create({
         data: { portfolioItemId: id, userId: user.id },
       });
-      return await prisma.portfolioItem.update({
+      const item = await prisma.portfolioItem.update({
         where: { id },
         data: { likes: { increment: 1 } },
       });
+      return { ...item, hasLiked: true };
     }
   } catch (err) {
     throw new AppError("Portfolio item not found", 404);

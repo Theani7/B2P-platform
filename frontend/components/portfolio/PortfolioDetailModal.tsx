@@ -3,7 +3,8 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Eye, Heart, Briefcase, Calendar, Tag, ChevronLeft, ChevronRight } from "lucide-react";
 import { getMediaUrl } from "./PortfolioCard";
-import { useViewPortfolio, useLikePortfolio } from "@/features/portfolio/api";
+import { useViewPortfolio, useLikePortfolio, usePortfolioLikeStatus } from "@/features/portfolio/api";
+import { useCurrentUser } from "@/features/auth/api";
 
 interface PortfolioDetailModalProps {
   item: any;
@@ -13,8 +14,12 @@ interface PortfolioDetailModalProps {
 
 export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailModalProps) {
   const [currentMediaIdx, setCurrentMediaIdx] = useState(0);
+  const { data: user } = useCurrentUser();
   const viewPortfolio = useViewPortfolio();
   const likePortfolio = useLikePortfolio();
+  const { data: likeStatus } = usePortfolioLikeStatus(item?.id, !!user);
+
+  const isLiked = likeStatus?.hasLiked;
 
   useEffect(() => {
     if (isOpen && item) {
@@ -129,15 +134,16 @@ export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailM
               </div>
               <button 
                 onClick={() => likePortfolio.mutate(item.id)}
-                disabled={likePortfolio.isPending}
+                disabled={likePortfolio.isPending || !user}
                 className="flex flex-col border-l border-steel/10 pl-6 group text-left transition-colors"
+                title={!user ? "Login to like" : ""}
               >
-                <span className="text-2xl font-bold text-midnight-ink group-hover:text-signal-blue transition-colors">
+                <span className={`text-2xl font-bold transition-colors ${isLiked ? 'text-signal-blue' : 'text-midnight-ink group-hover:text-signal-blue'}`}>
                   {item.likes > 1000 ? `${(item.likes / 1000).toFixed(1)}k` : item.likes || 0}
                 </span>
-                <span className="text-[10px] font-bold text-steel uppercase tracking-widest flex items-center gap-1 group-hover:text-signal-blue transition-colors">
-                  <Heart size={10} className={likePortfolio.isPending ? "fill-signal-blue text-signal-blue" : ""} /> 
-                  {likePortfolio.isPending ? "LIKING..." : "LIKE"}
+                <span className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 transition-colors ${isLiked ? 'text-signal-blue' : 'text-steel group-hover:text-signal-blue'}`}>
+                  <Heart size={10} className={isLiked || likePortfolio.isPending ? "fill-signal-blue text-signal-blue" : ""} /> 
+                  {likePortfolio.isPending ? "UPDATING..." : (isLiked ? "LIKED" : "LIKE")}
                 </span>
               </button>
             </div>
