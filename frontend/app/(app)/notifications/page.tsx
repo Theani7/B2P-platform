@@ -17,7 +17,8 @@ import {
   useNotificationPreferences,
   useUpdateNotificationPreferences,
 } from "@/features/notifications/api";
-import { Bell, Check, ChevronLeft, ChevronRight, MessageSquare, Briefcase, Star, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { Bell, Check, ChevronLeft, ChevronRight, MessageSquare, Briefcase, Star, CheckCircle, XCircle, Info, Trash2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 function timeAgo(s: string) {
   const diff = Date.now() - new Date(s).getTime();
@@ -40,7 +41,7 @@ const getIcon = (type: string) => {
     case "APPLICATION_REJECTED":
     case "INVITATION_DECLINED": return <XCircle size={18} className="text-coral-alert" />;
     case "REVIEW_RECEIVED": return <Star size={18} className="text-amber-tag" />;
-    default: return <Bell size={18} className="text-steel" />;
+    default: return <Info size={18} className="text-steel" />;
   }
 };
 
@@ -110,73 +111,102 @@ function NotificationsInner() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-custom/10 bg-white shadow-product-card-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-custom/10 bg-white shadow-xl shadow-midnight-ink/5">
         {isLoading ? (
-          <div className="flex justify-center p-12"><Spinner /></div>
+          <div className="flex justify-center p-16"><Spinner className="w-8 h-8 text-signal-blue" /></div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linen-canvas text-gray-300">
-              <Bell size={32} />
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center p-16 text-center"
+          >
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-sky-wash">
+              <Bell size={36} className="text-fog" />
             </div>
-            <h2 className="text-lg font-bold text-graphite">No notifications</h2>
-            <p className="mt-1 max-w-sm text-ash">
+            <h2 className="text-xl font-bold text-graphite">No notifications</h2>
+            <p className="mt-2 max-w-sm text-ash text-sm">
               {filter === "unread"
-                ? "You&apos;re all caught up! There are no unread notifications right now."
+                ? "You're all caught up! There are no unread notifications right now."
                 : "You don't have any notifications yet. We'll let you know when something happens."}
             </p>
-          </div>
+          </motion.div>
         ) : (
           <div className="flex flex-col">
-            {notifications.map((n) => (
-              <Link
-                key={n.id}
-                href={getLink(n.type, user?.role)}
-                onClick={() => { if (!n.isRead) markRead.mutate(n.id); }}
-                className={`flex cursor-pointer items-start gap-4 border-b border-slate-custom/10 p-4 transition-colors hover:bg-linen-canvas/50 last:border-0 ${n.isRead ? "" : "bg-sky-wash/40"}`}
-              >
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-custom/10 bg-white shadow-sm">
-                  {getIcon(n.type)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className={`text-sm ${n.isRead ? "font-semibold text-graphite" : "font-bold text-midnight-ink"}`}>
-                    {n.title}
-                  </h4>
-                  <p className="mt-0.5 whitespace-pre-wrap text-sm text-slate-custom">{n.message}</p>
-                  <span className="mt-1 block text-xs text-steel">{timeAgo(n.createdAt)}</span>
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  {!n.isRead && <span className="mt-2 h-2.5 w-2.5 rounded-full bg-signal-blue" />}
-                  <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); del.mutate(n.id); }}
-                    className="text-steel transition-colors hover:text-coral-alert"
-                    aria-label="Delete notification"
+            <AnimatePresence mode="popLayout">
+              {notifications.map((n) => (
+                <motion.div
+                  key={n.id}
+                  layout
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Link
+                    href={getLink(n.type, user?.role)}
+                    onClick={() => { if (!n.isRead) markRead.mutate(n.id); }}
+                    className={`group relative flex cursor-pointer items-start gap-4 border-b border-slate-custom/5 px-6 py-5 transition-all hover:bg-sky-wash/50 ${!n.isRead ? "bg-signal-blue/[0.02]" : ""}`}
                   >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </Link>
-            ))}
+                    {!n.isRead && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-14 w-1 rounded-r-full bg-signal-blue"></div>
+                    )}
+                    <div className={`mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors ${!n.isRead ? 'bg-signal-blue/10' : 'bg-linen-canvas border border-slate-custom/10'}`}>
+                      {getIcon(n.type)}
+                    </div>
+                    <div className="min-w-0 flex-1 pr-12">
+                      <h4 className={`text-base ${n.isRead ? "font-semibold text-graphite" : "font-bold text-midnight-ink"}`}>
+                        {n.title}
+                      </h4>
+                      <p className="mt-1 whitespace-pre-wrap text-sm text-ash leading-relaxed">
+                        {n.message}
+                      </p>
+                      <span className="mt-2 block text-[11px] font-medium uppercase tracking-wider text-steel">
+                        {timeAgo(n.createdAt)}
+                      </span>
+                    </div>
+                    
+                    <div className="absolute right-6 top-6 flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                      {!n.isRead && (
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); markRead.mutate(n.id); }}
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-signal-blue shadow-sm hover:bg-signal-blue hover:text-white transition-colors border border-slate-custom/10"
+                          title="Mark as read"
+                        >
+                          <Check size={14} />
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); del.mutate(n.id); }}
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-ash shadow-sm hover:bg-coral-alert hover:text-white transition-colors border border-slate-custom/10"
+                        title="Delete"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {data && data.pages > 1 && (
-              <div className="flex items-center justify-between border-t border-slate-custom/10 bg-linen-canvas/50 p-4">
-                <p className="text-sm text-ash">
-                  Page <span className="font-semibold text-graphite">{page}</span> of{" "}
-                  <span className="font-semibold text-graphite">{data.pages}</span>
+              <div className="flex items-center justify-between border-t border-slate-custom/10 bg-linen-canvas/50 px-6 py-4">
+                <p className="text-sm font-medium text-ash">
+                  Page <span className="text-graphite">{page}</span> of <span className="text-graphite">{data.pages}</span>
                 </p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page <= 1}
-                    className="rounded-lg border border-slate-custom/10 bg-white p-2 text-ash transition-colors hover:bg-linen-canvas disabled:opacity-50"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-custom/10 bg-white text-graphite shadow-sm transition-colors hover:bg-linen-canvas hover:text-midnight-ink disabled:opacity-40"
                   >
-                    <ChevronLeft size={16} />
+                    <ChevronLeft size={18} />
                   </button>
                   <button
                     onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
                     disabled={page >= data.pages}
-                    className="rounded-lg border border-slate-custom/10 bg-white p-2 text-ash transition-colors hover:bg-linen-canvas disabled:opacity-50"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-custom/10 bg-white text-graphite shadow-sm transition-colors hover:bg-linen-canvas hover:text-midnight-ink disabled:opacity-40"
                   >
-                    <ChevronRight size={16} />
+                    <ChevronRight size={18} />
                   </button>
                 </div>
               </div>
