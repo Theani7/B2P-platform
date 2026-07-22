@@ -16,18 +16,20 @@ import {
   usePromoterProfile,
   useCreatePromoterProfile,
   useUpdatePromoterProfile,
+  useMyVerificationRequests,
   type PromoterProfileInput,
 } from "@/features/profile/api";
 import { useUpload } from "@/features/upload/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProfileCompletion } from "@/features/profile-completion/api";
+import api from "@/lib/apiClient";
 import { ProfileCompletionWidget } from "@/components/profile/ProfileCompletionWidget";
 import { Spinner } from "@/components/ui/Spinner";
 import { ShareDialog } from "@/components/sharing/ShareDialog";
 import { Avatar } from "@/components/ui/Avatar";
 import AIGenerateButton from "@/components/ui/AIGenerateButton";
 import {
-  BadgeCheck, Save, Trophy, AlertTriangle, MapPin, Briefcase, Upload, RefreshCw, Share
+  BadgeCheck, Save, Trophy, AlertTriangle, MapPin, Briefcase, Upload, RefreshCw, Share, Clock
 } from "lucide-react";
 import { usePublicSettings } from "@/features/settings/api";
 
@@ -59,8 +61,17 @@ function PromoterProfileInner() {
   const uploadAvatarMutation = useUpload("avatar");
   
   const { data: completionData, isLoading: completionLoading } = useProfileCompletion();
+  const { data: myVerificationRequests } = useMyVerificationRequests();
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [pendingVerification, setPendingVerification] = useState(false);
+
+  useEffect(() => {
+    if (myVerificationRequests?.some((r) => r.status === "PENDING")) {
+      setPendingVerification(true);
+    }
+  }, [myVerificationRequests]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
 
@@ -171,6 +182,19 @@ function PromoterProfileInner() {
     if (file) handleAvatarUpload(file);
   };
 
+  const requestVerification = async () => {
+    setVerifying(true);
+    try {
+      await api.post("/promoter/verification-request");
+      notifySuccess("Verification request submitted!");
+      setPendingVerification(true);
+    } catch (err: any) {
+      notifyError(err?.response?.data?.message ?? "Failed to submit request");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   const isComplete = completionData?.completion === 100;
 
   if (isLoading) {
@@ -193,6 +217,23 @@ function PromoterProfileInner() {
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-button text-signal-blue font-semibold text-sm">
             <span>{completionData?.completion || 0}% Complete</span>
           </div>
+          {pendingVerification || profile?.verified ? (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-sm font-medium">
+              <BadgeCheck size={16} /> {profile?.verified ? "Verified Creator" : "Verification Pending"}
+            </div>
+          ) : isComplete ? (
+            <button
+              onClick={requestVerification}
+              disabled={verifying}
+              className="flex items-center gap-2 px-4 py-2 rounded-button bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
+            >
+              <BadgeCheck size={16} /> Request Verification
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-amber-tag/10 text-amber-tag border border-amber-tag/20 text-sm font-medium">
+              <Clock size={16} /> Complete profile to verify
+            </div>
+          )}
           <button
             onClick={() => setShareOpen(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-button bg-white border border-slate-custom/10 text-graphite text-sm font-medium hover:bg-sky-wash transition-colors shadow-sm"

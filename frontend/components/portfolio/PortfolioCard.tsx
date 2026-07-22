@@ -8,6 +8,7 @@ export function PortfolioCard({ item, isOwner, onClick, onEdit, onDelete }: any)
   const getMediaUrl = (url: string) => {
     if (!url) return "";
     if (url.startsWith("http")) return url;
+    if (url.startsWith("/uploads/")) return url;
     return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}${url}`;
   };
 

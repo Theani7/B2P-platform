@@ -69,7 +69,14 @@ export async function getPublicProfile(username) {
     },
   });
   if (!profile) throw new AppError("Promoter not found", 404);
-  return profile;
+  
+  const result = {
+    ...profile,
+    socialLinks: profile.user?.socialLinks || [],
+  };
+  delete result.user;
+  
+  return result;
 }
 
 async function ensureBusinessProfile(user) {

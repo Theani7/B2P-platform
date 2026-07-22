@@ -93,3 +93,15 @@ export const useUpdatePromoterProfile = () => {
     },
   });
 };
+
+export interface VerificationRequestRead {
+  id: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  submittedAt: string;
+}
+
+export const useMyVerificationRequests = () =>
+  useQuery<VerificationRequestRead[]>({
+    queryKey: ["my-verification-requests"],
+    queryFn: () => api.get<VerificationRequestRead[]>("/promoter/verification-request").then((r) => r.data),
+  });
