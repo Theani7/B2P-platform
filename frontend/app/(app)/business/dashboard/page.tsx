@@ -171,7 +171,7 @@ function DashboardInner() {
                       </div>
                     </div>
                     <Link
-                      href={`/business/campaigns/${app.campaign?.id}/applications`}
+                      href={`/business/campaigns/${app.campaign?.id}`}
                       className="text-xs font-medium text-signal-blue hover:underline"
                     >
                       Review

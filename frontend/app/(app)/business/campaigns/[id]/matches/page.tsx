@@ -112,7 +112,7 @@ function MatchesInner({ id }: { id: string }) {
               {data.items.map((m) => (
                 <Card key={m.id}>
                   <div className="flex items-start justify-between gap-2">
-                    <a href={`/promoters/${m.promoter.username}`} className="font-medium text-midnight-ink hover:text-primary">
+                    <a href={`/u/${m.promoter.username}`} className="font-medium text-midnight-ink hover:text-primary">
                       @{m.promoter.username}
                     </a>
                     <span className="font-mono text-heading-sm font-semibold text-primary">{Math.round(m.score)}</span>

@@ -29,7 +29,7 @@ export function PromoterCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <a
-              href={`/promoters/${promoter.username}`}
+              href={`/u/${promoter.username}`}
               className="truncate font-medium text-midnight-ink hover:text-primary"
             >
               @{promoter.username}

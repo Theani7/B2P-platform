@@ -30,7 +30,7 @@ function ApplicantRow({ app }: { app: any }) {
   return (
     <div className="flex items-center justify-between gap-3 border-t border-steel/10 py-3">
       <div>
-        <a href={`/promoters/${app.promoterProfile?.username}`} className="font-medium text-midnight-ink hover:text-primary">
+        <a href={`/u/${app.promoterProfile?.username}`} className="font-medium text-midnight-ink hover:text-primary">
           @{app.promoterProfile?.username}
         </a>
         <p className="text-caption text-steel">
@@ -297,7 +297,7 @@ function CampaignDetailInner({ id }: { id: string }) {
             {campaignInvites.map((i) => (
               <div key={i.id} className="flex items-center justify-between border-t border-steel/10 py-3">
                 <div>
-                  <a href={`/promoters/${i.promoterProfile?.username}`} className="font-medium text-midnight-ink hover:text-primary">@{i.promoterProfile?.username}</a>
+                  <a href={`/u/${i.promoterProfile?.username}`} className="font-medium text-midnight-ink hover:text-primary">@{i.promoterProfile?.username}</a>
                   <Badge tone={i.status === "ACCEPTED" ? "emerald" : i.status === "REJECTED" ? "coral" : "slate"}>{i.status}</Badge>
                 </div>
                 {i.status === "PENDING" && (

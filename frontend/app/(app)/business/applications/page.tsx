@@ -94,7 +94,7 @@ function ApplicationsPageInner() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <a href={`/promoters/${app.promoterProfile?.username}`} className="text-sm font-medium text-graphite hover:text-signal-blue">
+                      <a href={`/u/${app.promoterProfile?.username}`} className="text-sm font-medium text-graphite hover:text-signal-blue">
                         {app.promoterProfile?.username}
                       </a>
                     </div>
