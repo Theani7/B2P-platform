@@ -15,9 +15,6 @@ project_doc.txt
 # Build artifacts
 *.tsbuildinfo
 
-# Test files
-backend/tests/
-
 # Documentation (generated/agent docs)
 docs/*.md
 docs/superpowers/

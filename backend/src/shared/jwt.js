@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { config } from "../config/env.js";
 
 export function signAccessToken(userId, role) {
@@ -12,7 +13,7 @@ export function signAccessToken(userId, role) {
 }
 
 export function signRefreshToken(userId) {
-  const payload = { sub: String(userId), type: "refresh" };
+  const payload = { sub: String(userId), type: "refresh", jti: crypto.randomUUID() };
   const options = {
     expiresIn: `${config.refreshTokenExpireDays}d`,
     audience: config.jwtAudience,
