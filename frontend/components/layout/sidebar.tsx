@@ -24,6 +24,26 @@ import {
   Plus,
 } from "lucide-react";
 import { notifyError } from "@/lib/notify";
+import { useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/apiClient";
+
+interface PrefetchEntry {
+  queryKey: string[];
+  path: string;
+}
+
+const PREFETCH_KEYS: Record<string, PrefetchEntry[]> = {
+  BUSINESS: [
+    { queryKey: ["business-profile"], path: "/business/profile" },
+    { queryKey: ["campaign-dashboard-stats"], path: "/campaigns/dashboard/stats" },
+  ],
+  PROMOTER: [
+    { queryKey: ["promoter-profile"], path: "/promoter/profile" },
+    { queryKey: ["profile-completion"], path: "/profile-completion" },
+  ],
+  ADMIN: [{ queryKey: ["admin-dashboard"], path: "/admin/dashboard" }],
+};
 
 interface SidebarProps {
   role: string;
@@ -124,9 +144,23 @@ function getSections(role: string) {
 
 export function Sidebar({ role }: SidebarProps) {
   const { user, hasProfile } = useAuth();
-  const { data: conversationsData } = useConversations();
   const sections = getSections(role);
   const pathname = usePathname();
+  const prefetchedRef = useRef(false);
+
+  const isMessagesPage = pathname === "/messages";
+  const { data: conversationsData } = useConversations({ enabled: isMessagesPage });
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (prefetchedRef.current || !user) return;
+    prefetchedRef.current = true;
+    const keys = PREFETCH_KEYS[user.role] || [];
+    keys.forEach(({ queryKey, path }) => {
+      queryClient.prefetchQuery({ queryKey, queryFn: () => api.get(path).then((r) => r.data) });
+    });
+  }, [user, queryClient]);
 
   const unreadMessagesCount =
     conversationsData?.reduce((acc, conv) => acc + (conv.unreadCount || 0), 0) || 0;

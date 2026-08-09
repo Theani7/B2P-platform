@@ -1,7 +1,5 @@
 "use client";
 
-"use use client";
-
 import { useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";

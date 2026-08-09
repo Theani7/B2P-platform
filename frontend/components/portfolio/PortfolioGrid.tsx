@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { PortfolioCard } from "./PortfolioCard";
 import { PortfolioDetailModal } from "./PortfolioDetailModal";
 
@@ -32,26 +31,21 @@ export function PortfolioGrid({ items, isOwner, onEdit, onDelete, onAdd }: any) 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <AnimatePresence>
-          {items.map((item: any) => (
-            <motion.div
-              key={item.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
-              <PortfolioCard
-                item={item}
-                isOwner={isOwner}
-                onClick={(item: any) => setSelectedItemId(item.id)}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {items.map((item: any, index: number) => (
+          <div
+            key={item.id}
+            className="animate-fade-slide-up"
+            style={{ animationDelay: `${Math.min(index * 60, 360)}ms` }}
+          >
+            <PortfolioCard
+              item={item}
+              isOwner={isOwner}
+              onClick={(item: any) => setSelectedItemId(item.id)}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          </div>
+        ))}
       </div>
 
       <PortfolioDetailModal

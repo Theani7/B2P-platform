@@ -1,5 +1,6 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, AlertCircle } from "lucide-react";
 import { useCampaigns } from "@/features/campaigns/api";
 import { useInvitePromoter } from "@/features/invitations/api";
@@ -7,11 +8,12 @@ import { useBusinessInvitations } from "@/features/invitations/api";
 import { useBusinessApplications } from "@/features/applications/api";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { useAuth } from "@/providers/AuthProvider";
+import { Role } from "@/lib/roles";
 
 interface InvitePromoterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  promoter: any;
+  promoter: { id: string; username: string };
 }
 
 export default function InvitePromoterModal({ isOpen, onClose, promoter }: InvitePromoterModalProps) {
@@ -20,7 +22,7 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
 
   const { user } = useAuth();
   const role = user?.role;
-  const isEnabled = isOpen && role === "BUSINESS";
+  const isEnabled = isOpen && role === Role.BUSINESS;
 
   const { data: campaignsData, isLoading: campaignsLoading, error: campaignsError } = useCampaigns({ limit: 50 }, { enabled: isEnabled });
   const { data: invitationsData } = useBusinessInvitations({ limit: 100 }, { enabled: isEnabled });
@@ -28,6 +30,7 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
   const invitePromoter = useInvitePromoter();
 
   if (!isOpen || !promoter) return null;
+  if (user?.role !== Role.BUSINESS) return null;
 
   const campaigns = campaignsData?.items || [];
   const invitations = invitationsData?.items || [];
@@ -81,24 +84,14 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-gray-900/60 backdrop-blur-md"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl flex flex-col z-[2001] overflow-hidden"
-          >
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+      <div
+        className="animate-fade-in absolute inset-0 bg-gray-900/60 backdrop-blur-md"
+        onClick={onClose}
+      />
+      <div
+        className="animate-pop-in relative w-full max-w-md bg-white rounded-2xl shadow-2xl flex flex-col z-[2001] overflow-hidden"
+      >
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-900">Invite {promoter.username}</h3>
               <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
@@ -165,9 +158,7 @@ export default function InvitePromoterModal({ isOpen, onClose, promoter }: Invit
                 )}
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
-      )}
-    </AnimatePresence>
   );
 }

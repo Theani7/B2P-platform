@@ -16,9 +16,8 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Card, PageHeader } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
-import { notifySuccess, notifyError } from "@/lib/notify";
+import { notifySuccess, notifyError, notifyApiError } from "@/lib/notify";
 import { Building2, Globe, MapPin, Briefcase, Upload, Save, AlertTriangle, RefreshCw, BadgeCheck, Clock, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -98,7 +97,7 @@ export default function BusinessProfilePage() {
       notifySuccess("Profile updated successfully");
       reset(data);
     } catch (err: any) {
-      notifyError(err?.response?.data?.message ?? "Failed to update profile");
+      notifyApiError(err, "Failed to update profile");
     }
   };
 
@@ -119,7 +118,7 @@ export default function BusinessProfilePage() {
       }
       notifySuccess("Logo updated");
     } catch (err: any) {
-      notifyError(err?.response?.data?.message ?? "Failed to upload logo");
+      notifyApiError(err, "Failed to upload logo");
     } finally {
       if (fileRef.current) {
         fileRef.current.value = "";
@@ -134,7 +133,7 @@ export default function BusinessProfilePage() {
       notifySuccess("Verification request submitted!");
       setPendingVerification(true);
     } catch (err: any) {
-      notifyError(err?.response?.data?.message ?? "Failed to submit request");
+      notifyApiError(err, "Failed to submit request");
     } finally {
       setVerifying(false);
     }
@@ -376,45 +375,38 @@ export default function BusinessProfilePage() {
         </div>
       </div>
       
-      <AnimatePresence>
-        {isDirty && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4"
-          >
-            <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-4 shadow-feature-section flex items-center justify-between ring-1 ring-slate-custom/5">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-tag/10 flex items-center justify-center text-amber-tag">
-                  <AlertTriangle size={16} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-graphite">Unsaved changes</p>
-                  <p className="text-xs text-ash">Please save your profile to apply changes.</p>
-                </div>
+      {isDirty && (
+        <div className="animate-fade-slide-up fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
+          <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-4 shadow-feature-section flex items-center justify-between ring-1 ring-slate-custom/5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-amber-tag/10 flex items-center justify-center text-amber-tag">
+                <AlertTriangle size={16} />
               </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => reset()}
-                  disabled={isSubmitting}
-                  className="px-4 py-2 text-sm font-medium text-ash hover:text-graphite transition-colors disabled:opacity-50"
-                >
-                  Discard
-                </button>
-                <button
-                  onClick={handleSubmit(onSubmit)}
-                  disabled={isSubmitting}
-                  className="px-6 h-10 hero-blue-fade text-white rounded-button text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
-                >
-                  {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
-                  {isSubmitting ? "Saving..." : "Save Changes"}
-                </button>
+              <div>
+                <p className="text-sm font-medium text-graphite">Unsaved changes</p>
+                <p className="text-xs text-ash">Please save your profile to apply changes.</p>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => reset()}
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-medium text-ash hover:text-graphite transition-colors disabled:opacity-50"
+              >
+                Discard
+              </button>
+              <button
+                onClick={handleSubmit(onSubmit)}
+                disabled={isSubmitting}
+                className="px-6 h-10 hero-blue-fade text-white rounded-button text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
     </RequireAuth>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, type ReactNode, useState } from "react";
+import { createContext, useContext, type ReactNode, useState, useCallback } from "react";
 import { useCurrentUser, useLogout } from "@/features/auth/api";
 import type { User } from "@/features/auth/types";
 import { Role } from "@/lib/roles";
@@ -13,6 +13,7 @@ type AuthContextType = {
   isLoading: boolean;
   logout: () => void;
   openLogoutDialog: () => void;
+  refreshUser: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,7 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() =>
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null,
   );
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user, isLoading, refetch } = useCurrentUser();
   const logoutMutation = useLogout();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
@@ -30,10 +31,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
   };
   const openLogoutDialog = () => setIsLogoutDialogOpen(true);
+  const refreshUser = useCallback(() => { refetch(); }, [refetch]);
   const hasProfile = !!user && !!(user.promoterProfile || user.businessProfile);
 
   return (
-    <AuthContext.Provider value={{ user, hasProfile, token, isLoading, logout, openLogoutDialog }}>
+    <AuthContext.Provider value={{ user, hasProfile, token, isLoading, logout, openLogoutDialog, refreshUser }}>
       {children}
       <LogoutConfirmDialog
         isOpen={isLogoutDialogOpen}

@@ -27,6 +27,8 @@ export const usePublicSettings = () =>
   useQuery<PlatformSetting[]>({
     queryKey: ["settings-public"],
     queryFn: () => api.get<PlatformSetting[]>("/settings").then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 
 export const useAccountSettings = () =>

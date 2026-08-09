@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useUpload, type UploadKind } from "@/features/upload/api";
 import { Button } from "@/components/ui/Button";
-import { notifySuccess, notifyError } from "@/lib/notify";
+import { notifySuccess, notifyError, notifyApiError } from "@/lib/notify";
 
 export function UploadField({
   kind,
@@ -43,7 +43,7 @@ export function UploadField({
               onUploaded?.(res.url);
             },
             onError: (err: any) =>
-              notifyError(err?.response?.data?.message ?? "Upload failed"),
+              notifyApiError(err, "Upload failed"),
           });
           e.target.value = "";
         }}

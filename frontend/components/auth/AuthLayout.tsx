@@ -2,7 +2,6 @@
 
 import { type ReactNode } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 const features = [
   "Discover verified creators",
@@ -34,29 +33,14 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           </div>
 
           <div className="max-w-xl mx-auto w-full mb-20">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[44px] leading-[1.1] font-bold text-white mb-6 tracking-tight"
-            >
+            <h2 className="animate-fade-slide-up text-[44px] leading-[1.1] font-bold text-white mb-6 tracking-tight">
               Connect with top-tier brands and local creators.
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-lg text-white/70 font-medium leading-relaxed mb-12"
-            >
+            </h2>
+            <p className="animate-fade-slide-up animate-delay-100 text-lg text-white/70 font-medium leading-relaxed mb-12">
               The most powerful marketplace for influencer marketing. Build your portfolio, discover opportunities, and manage campaigns effortlessly.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="grid grid-cols-2 gap-4"
-            >
+            <div className="animate-fade-slide-up animate-delay-200 grid grid-cols-2 gap-4">
               {features.map((feature, idx) => (
                 <div key={feature} className="flex items-center gap-3">
                   <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
@@ -67,7 +51,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
                   <span className="text-sm font-medium text-white/90">{feature}</span>
                 </div>
               ))}
-            </motion.div>
+            </div>
           </div>
 
           <div className="flex items-center justify-between text-xs font-medium text-white/50 border-t border-white/10 pt-6">
@@ -92,13 +76,9 @@ export function AuthLayout({ children }: { children: ReactNode }) {
             Byparsathy
           </Link>
           
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          >
+          <div className="animate-fade-slide-up">
             {children}
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { notifySuccess, notifyError } from "@/lib/notify";
+import { notifySuccess, notifyError, notifyApiError } from "@/lib/notify";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Card, PageHeader } from "@/components/ui/Card";
@@ -46,7 +46,7 @@ export function BusinessProfileForm() {
     const mutation = hasProfile ? updateMutation : createMutation;
     mutation.mutate(form, {
       onSuccess: () => notifySuccess(hasProfile ? "Profile updated" : "Profile created"),
-      onError: (err: any) => notifyError(err?.response?.data?.message ?? "Something went wrong"),
+      onError: (err: any) => notifyApiError(err, "Something went wrong"),
     });
   };
 

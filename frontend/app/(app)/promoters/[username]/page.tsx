@@ -9,7 +9,7 @@ import { usePublicPromoterProfile, useSavePromoter } from "@/features/discovery/
 import { useUserRating } from "@/features/reviews/api";
 import { useUserAchievements } from "@/features/achievements/api";
 import { RatingStars } from "@/components/reviews/RatingStars";
-import { InvitePromoterModal } from "@/components/InvitePromoterModal";
+import InvitePromoterModal from "@/components/discovery/InvitePromoterModal";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";

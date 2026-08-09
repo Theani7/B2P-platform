@@ -59,7 +59,9 @@ export function RegisterForm() {
           if (errors.username?.type === "manual") clearErrors("username");
           setUsernameAvailable(true);
         }
-      } catch (e) {}
+      } catch {
+        setUsernameAvailable(undefined);
+      }
     }, 500);
     return () => clearTimeout(timeout);
   }, [username, setError, clearErrors, errors.username]);
@@ -77,7 +79,9 @@ export function RegisterForm() {
           if (errors.email?.type === "manual") clearErrors("email");
           setEmailAvailable(true);
         }
-      } catch (e) {}
+      } catch {
+        setEmailAvailable(undefined);
+      }
     }, 500);
     return () => clearTimeout(timeout);
   }, [email, setError, clearErrors, errors.email]);

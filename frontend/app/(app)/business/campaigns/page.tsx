@@ -11,7 +11,7 @@ import { StatCard } from "@/components/ui/Stats";
 import { Avatar } from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StatusBadge, formatBudget } from "@/components/campaigns/StatusBadge";
-import { ExportButton } from "@/components/export/ExportButton";
+import { CampaignStatus } from "@/features/campaigns/types";
 import {
   useCampaigns,
   useDeleteCampaign,
@@ -26,6 +26,12 @@ import {
   MoreVertical, Eye, FolderDot, FolderOpen, Rocket,
   MapPin, Calendar, Users,
 } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const ExportButton = dynamic(
+  () => import("@/components/export/ExportButton").then((m) => m.ExportButton),
+  { ssr: false }
+);
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
   useEffect(() => {
@@ -150,7 +156,7 @@ function CampaignsPageInner() {
   const handleReopen = (id: string) =>
     reopenCampaign.mutate(id, { onSuccess: () => notifySuccess("Campaign reopened"), onError: () => notifyError("Failed to reopen campaign") });
   const handleCancel = (id: string) =>
-    updateCampaign.mutate({ id, data: { status: "CANCELLED" as any } }, { onSuccess: () => notifySuccess("Campaign cancelled"), onError: () => notifyError("Failed to cancel campaign") });
+    updateCampaign.mutate({ id, data: { status: CampaignStatus.CANCELLED } }, { onSuccess: () => notifySuccess("Campaign cancelled"), onError: () => notifyError("Failed to cancel campaign") });
   const handlePublish = (id: string) =>
     publishCampaign.mutate(id, {
       onSuccess: () => notifySuccess("Campaign published! It's now visible in the marketplace."),

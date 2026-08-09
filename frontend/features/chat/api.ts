@@ -51,10 +51,11 @@ export interface HistoryRead {
   pages: number;
 }
 
-export const useConversations = () =>
+export const useConversations = (options?: { enabled?: boolean }) =>
   useQuery<Conversation[]>({
     queryKey: ["conversations"],
     queryFn: () => api.get<{ items: Conversation[] }>("/chat/conversations").then((r) => r.data.items),
+    enabled: options?.enabled ?? true,
     refetchInterval: 15000,
   });
 

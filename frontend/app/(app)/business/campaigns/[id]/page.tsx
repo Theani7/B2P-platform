@@ -1,7 +1,5 @@
 "use client";
 
-"use use client";
-
 import { useState } from "react";
 import { use } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
@@ -174,7 +172,7 @@ function CampaignDetailInner({ id }: { id: string }) {
                   <button onClick={() => run(archive, "Archived")} className="bg-amber-tag/10 text-amber-tag border border-amber-tag/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-amber-tag/20 transition-colors">
                     Archive
                   </button>
-                  <button onClick={() => update.mutate({ id, data: { status: "CANCELLED" as any } }, { onSuccess: () => notifySuccess("Cancelled"), onError: (e: any) => notifyError(e?.response?.data?.message) })} className="bg-coral-alert/10 text-coral-alert border border-coral-alert/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors">
+                  <button onClick={() => run({ mutate: (id, o) => update.mutate({ id, data: { status: CampaignStatus.CANCELLED } }, o) }, "Cancelled")} className="bg-coral-alert/10 text-coral-alert border border-coral-alert/20 rounded-inputs px-3 py-1.5 text-xs font-medium hover:bg-coral-alert/20 transition-colors">
                     Cancel
                   </button>
                 </>

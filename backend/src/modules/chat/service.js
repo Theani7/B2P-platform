@@ -92,19 +92,42 @@ export async function getConversations(user, params = {}) {
   }
 
   const convIds = conversations.map((c) => c.id);
-  const messages =
-    convIds.length > 0
-      ? await prisma.message.findMany({
-          where: { conversationId: { in: convIds } },
-          orderBy: { createdAt: "desc" },
-        })
-      : [];
 
-  const byConv = new Map();
-  for (const m of messages) {
-    if (!byConv.has(m.conversationId)) byConv.set(m.conversationId, []);
-    byConv.get(m.conversationId).push(m);
+  // Fetch only what the list needs: exact unread counts (single grouped query)
+  // and the latest message per conversation (bounded, small selects) instead of
+  // pulling every message body across all conversations.
+  let lastMessages = [];
+  let unreadCounts = new Map();
+  if (convIds.length > 0) {
+    const [unreadGroup, latest] = await Promise.all([
+      prisma.message.groupBy({
+        by: ["conversationId"],
+        where: { conversationId: { in: convIds }, senderId: { not: user.id }, readAt: null },
+        _count: { _all: true },
+      }),
+      Promise.all(
+        conversations.map((c) =>
+          prisma.message.findFirst({
+            where: { conversationId: c.id },
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              conversationId: true,
+              senderId: true,
+              message: true,
+              messageType: true,
+              isDeleted: true,
+              createdAt: true,
+            },
+          })
+        )
+      ),
+    ]);
+    unreadCounts = new Map(unreadGroup.map((g) => [g.conversationId, g._count._all]));
+    lastMessages = latest.filter(Boolean);
   }
+
+  const lastByConv = new Map(lastMessages.map((m) => [m.conversationId, m]));
 
   const items = conversations.map((conv) => {
     const collab = conv.collaboration;
@@ -128,11 +151,8 @@ export async function getConversations(user, params = {}) {
       });
     }
 
-    const convMessages = byConv.get(conv.id) || [];
-    const lastMessage = convMessages[0] || null;
-    const unreadCount = convMessages.filter(
-      (m) => m.senderId !== user.id && m.readAt === null
-    ).length;
+    const lastMessage = lastByConv.get(conv.id) || null;
+    const unreadCount = unreadCounts.get(conv.id) || 0;
 
     return {
       id: conv.id,

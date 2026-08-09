@@ -2,7 +2,11 @@ import axios from "axios";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
 
-const api = axios.create({ baseURL, withCredentials: true });
+const api = axios.create({
+  baseURL,
+  withCredentials: true,
+  timeout: 30000,
+});
 
 api.interceptors.request.use((config) => {
   const access = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;

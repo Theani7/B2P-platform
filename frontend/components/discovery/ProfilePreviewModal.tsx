@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, BadgeCheck, MapPin, Briefcase, Star, Users, TrendingUp, 
   Bookmark, Share2, Play, Image as ImageIcon, ExternalLink, Mail, Send
@@ -51,24 +50,15 @@ export function ProfilePreviewModal({ isOpen, onClose, promoter, onSave, isSaved
   };
 
   return createPortal(
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-md"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative w-full max-w-[1000px] max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col z-[101] overflow-hidden"
-          >
+    <>
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6">
+      <div
+        className="animate-fade-in absolute inset-0 bg-gray-900/40 backdrop-blur-md"
+        onClick={onClose}
+      />
+      <div
+        className="animate-pop-in relative w-full max-w-[1000px] max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col z-[101] overflow-hidden"
+      >
             <div className="relative p-6 sm:p-8 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 bg-white">
               <div className="flex items-center gap-5">
                 <div className="relative shrink-0">
@@ -201,9 +191,8 @@ export function ProfilePreviewModal({ isOpen, onClose, promoter, onSave, isSaved
                 </div>
               </div>
             </div>
-          </motion.div>
         </div>
-      )}
+      </div>
       {isInviteModalOpen && (
         <InvitePromoterModal
           isOpen={isInviteModalOpen}
@@ -211,7 +200,7 @@ export function ProfilePreviewModal({ isOpen, onClose, promoter, onSave, isSaved
           promoter={promoter}
         />
       )}
-    </AnimatePresence>,
+    </>,
     document.body
   );
 }

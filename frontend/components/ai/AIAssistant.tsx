@@ -48,7 +48,7 @@ export function AIAssistant() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const chat = useAssistantChat();
-  const { data: campaignsData } = useCampaigns({ limit: 50 }, { enabled: role === "BUSINESS" });
+  const { data: campaignsData } = useCampaigns({ limit: 50 }, { enabled: role === "BUSINESS" && open });
   const campaigns = campaignsData?.items ?? [];
 
   useEffect(() => {

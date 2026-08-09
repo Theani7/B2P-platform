@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, lazy, Suspense, type ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { Role, DashboardPath } from "@/lib/roles";
 import { Spinner } from "@/components/ui/Spinner";
 import { PageShell } from "./PageShell";
-import { AIAssistant } from "@/components/ai/AIAssistant";
-import { FirstLoginWelcome } from "@/components/ai/FirstLoginWelcome";
+
+const AIAssistant = lazy(() => import("@/components/ai/AIAssistant").then(m => ({ default: m.AIAssistant })));
+const FirstLoginWelcome = lazy(() => import("@/components/ai/FirstLoginWelcome").then(m => ({ default: m.FirstLoginWelcome })));
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { user, token, isLoading, hasProfile } = useAuth();
@@ -34,8 +35,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <PageShell role={role}>
       {children}
-      <AIAssistant />
-      <FirstLoginWelcome />
+      <Suspense fallback={null}>
+        <AIAssistant />
+        <FirstLoginWelcome />
+      </Suspense>
     </PageShell>
   );
 }

@@ -1,7 +1,7 @@
+"use client";
+
 import React, { useState } from 'react';
 import { Download, FileSpreadsheet, FileText, FileDown, CheckCircle2 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 interface ExportButtonProps {
   module: string;
@@ -27,11 +27,16 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ module, className = 
     setTimeout(() => {
       if (format === 'csv') {
         exportCSV();
+        setIsExporting(false);
+        setIsOpen(false);
       } else {
-        exportPDF();
+        exportPDF()
+          .catch(() => alert("Failed to generate PDF."))
+          .finally(() => {
+            setIsExporting(false);
+            setIsOpen(false);
+          });
       }
-      setIsExporting(false);
-      setIsOpen(false);
     }, 500);
   };
 
@@ -57,7 +62,11 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ module, className = 
     document.body.removeChild(link);
   };
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable'),
+    ]);
     const doc = new jsPDF();
     
     // Add beautiful header

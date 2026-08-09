@@ -23,7 +23,6 @@ export function TopHeader() {
     user?.fullName?.split(" ").map((n) => n[0]).join("").toUpperCase() ||
     user?.email?.[0]?.toUpperCase() ||
     "?";
-  const colorIndex = user?.id ? Math.floor(parseInt(user.id) % 5) : 0;
 
   return (
     <header className="h-16 px-6 border-b border-slate-custom/10 bg-white/70 backdrop-blur-lg flex items-center justify-between sticky top-0 z-[200]">

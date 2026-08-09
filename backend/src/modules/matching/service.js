@@ -88,7 +88,17 @@ export async function generateMatches(user, campaignId) {
   const profile = await businessProfileOf(user);
   const campaign = await campaignForBusiness(campaignId, profile.id);
 
-  const promoters = await prisma.promoterProfile.findMany();
+  // Only fetch the fields needed for scoring — avoids pulling large text columns.
+  const promoters = await prisma.promoterProfile.findMany({
+    select: {
+      id: true,
+      niche: true,
+      location: true,
+      followersCount: true,
+      yearsExperience: true,
+      engagementRate: true,
+    },
+  });
 
   const ops = [];
   for (const promoter of promoters) {
@@ -117,8 +127,12 @@ export async function generateMatches(user, campaignId) {
     );
   }
 
-  // Persist all match results atomically in a single transaction.
-  await prisma.$transaction(ops);
+  // Persist in bounded batches — avoids one giant transaction that can exceed
+  // the max transaction item limit on Postgres.
+  const BATCH_SIZE = 100;
+  for (let i = 0; i < ops.length; i += BATCH_SIZE) {
+    await prisma.$transaction(ops.slice(i, i + BATCH_SIZE));
+  }
   const count = ops.length;
 
   await createNotification({

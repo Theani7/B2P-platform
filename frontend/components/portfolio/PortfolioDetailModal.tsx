@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { X, Eye, Heart, Briefcase, Calendar, Tag, ChevronLeft, ChevronRight } from "lucide-react";
 import { getMediaUrl } from "./PortfolioCard";
 import { useViewPortfolio, useLikePortfolio, usePortfolioLikeStatus } from "@/features/portfolio/api";
@@ -42,24 +41,15 @@ export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailM
   const prevMedia = () => setCurrentMediaIdx((i) => (i - 1 + mediaItems.length) % mediaItems.length);
 
   return createPortal(
-    <AnimatePresence>
-      <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 sm:p-6 lg:p-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="absolute inset-0 bg-[#020520]/40 backdrop-blur-sm"
-          onClick={onClose}
-        />
-        
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.98, y: 10 }}
-          transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-          className="relative w-full max-w-[1200px] max-h-[90vh] bg-linen-canvas rounded-[32px] shadow-2xl flex flex-col md:flex-row z-[1101] overflow-hidden border border-steel/10"
-        >
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 sm:p-6 lg:p-10">
+      <div
+        className="animate-fade-in absolute inset-0 bg-[#020520]/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div
+        className="animate-pop-in relative w-full max-w-[1200px] max-h-[90vh] bg-linen-canvas rounded-[32px] shadow-2xl flex flex-col md:flex-row z-[1101] overflow-hidden border border-steel/10"
+      >
           {/* Close Button */}
           <button 
             onClick={onClose} 
@@ -72,18 +62,12 @@ export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailM
           <div className="w-full md:w-3/5 lg:w-2/3 bg-gray-50 flex items-center justify-center relative overflow-hidden group border-b md:border-b-0 md:border-r border-steel/10 min-h-[40vh] md:min-h-0">
             {hasMedia ? (
               <>
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={currentMediaIdx}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    src={getMediaUrl(mediaItems[currentMediaIdx].filePath)}
-                    alt={`${item.title} preview`}
-                    className="w-full h-full object-contain absolute inset-0"
-                  />
-                </AnimatePresence>
+                <img
+                  key={currentMediaIdx}
+                  src={getMediaUrl(mediaItems[currentMediaIdx].filePath)}
+                  alt={`${item.title} preview`}
+                  className="animate-fade-in w-full h-full object-contain absolute inset-0"
+                />
 
                 {mediaItems.length > 1 && (
                   <>
@@ -187,9 +171,8 @@ export function PortfolioDetailModal({ item, isOpen, onClose }: PortfolioDetailM
             </div>
 
           </div>
-        </motion.div>
-      </div>
-    </AnimatePresence>,
+        </div>
+      </div>,
     document.body
   );
 }

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -9,6 +9,15 @@ const mono = Roboto_Mono({ subsets: ["latin"], variable: "--font-mono", display:
 export const metadata: Metadata = {
   title: "Byparsathy — Creator & Brand Collaborations",
   description: "Connect brands with promoters. Manage campaigns, collaborations, and growth.",
+  other: {
+    "dns-prefetch-control": "on",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#145aff",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

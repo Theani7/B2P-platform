@@ -7,8 +7,7 @@ import Link from "next/link";
 import { useAuth } from "@/providers/AuthProvider";
 import { Role } from "@/lib/roles";
 import { RequireAuth } from "@/components/common/RequireAuth";
-import { motion, AnimatePresence } from "framer-motion";
-import { notifySuccess, notifyError } from "@/lib/notify";
+import { notifySuccess, notifyError, notifyApiError } from "@/lib/notify";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -189,7 +188,7 @@ function PromoterProfileInner() {
       notifySuccess("Verification request submitted!");
       setPendingVerification(true);
     } catch (err: any) {
-      notifyError(err?.response?.data?.message ?? "Failed to submit request");
+      notifyApiError(err, "Failed to submit request");
     } finally {
       setVerifying(false);
     }
@@ -470,44 +469,37 @@ function PromoterProfileInner() {
       </div>
 
       {/* Floating Save Bar */}
-      <AnimatePresence>
-        {isDirty && (
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4"
-          >
-            <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-4 shadow-feature-section flex items-center justify-between ring-1 ring-slate-custom/5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-amber-tag/10 flex items-center justify-center text-amber-tag">
-                  <AlertTriangle size={18} />
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-graphite">Unsaved changes</h4>
-                  <p className="text-xs text-ash mt-0.5">Please save your profile changes.</p>
-                </div>
+      {isDirty && (
+        <div className="animate-fade-slide-up fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
+          <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-4 shadow-feature-section flex items-center justify-between ring-1 ring-slate-custom/5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-tag/10 flex items-center justify-center text-amber-tag">
+                <AlertTriangle size={18} />
               </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => profile && reset(profile as any)}
-                  className="h-10 px-4 rounded-button text-sm font-medium text-ash hover:text-graphite hover:bg-sky-wash transition-colors"
-                >
-                  Discard
-                </button>
-                <button
-                  onClick={handleSubmit(onSubmit)}
-                  disabled={isSubmitting}
-                  className="h-10 px-6 rounded-button hero-blue-fade text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
-                >
-                  {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
-                  {isSubmitting ? "Saving..." : "Save Changes"}
-                </button>
+              <div>
+                <h4 className="text-sm font-medium text-graphite">Unsaved changes</h4>
+                <p className="text-xs text-ash mt-0.5">Please save your profile changes.</p>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => profile && reset(profile as any)}
+                className="h-10 px-4 rounded-button text-sm font-medium text-ash hover:text-graphite hover:bg-sky-wash transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                onClick={handleSubmit(onSubmit)}
+                disabled={isSubmitting}
+                className="h-10 px-6 rounded-button hero-blue-fade text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ShareDialog open={shareOpen} onClose={() => setShareOpen(false)} />
     </div>

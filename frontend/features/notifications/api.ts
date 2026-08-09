@@ -35,10 +35,11 @@ export interface NotificationParams {
   unread_only?: boolean;
 }
 
-export const useNotifications = (params?: NotificationParams) =>
+export const useNotifications = (params?: NotificationParams, options?: { enabled?: boolean }) =>
   useQuery<NotificationListRead>({
     queryKey: ["notifications", params],
     queryFn: () => api.get<NotificationListRead>("/notifications", { params }).then((r) => r.data),
+    enabled: options?.enabled,
   });
 
 export const useUnreadCount = () =>

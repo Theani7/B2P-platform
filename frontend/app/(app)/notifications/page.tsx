@@ -18,18 +18,7 @@ import {
   useUpdateNotificationPreferences,
 } from "@/features/notifications/api";
 import { Bell, Check, ChevronLeft, ChevronRight, MessageSquare, Briefcase, Star, CheckCircle, XCircle, Info, Trash2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-
-function timeAgo(s: string) {
-  const diff = Date.now() - new Date(s).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return `${d}d ago`;
-}
+import { timeAgo } from "@/lib/time";
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -115,10 +104,8 @@ function NotificationsInner() {
         {isLoading ? (
           <div className="flex justify-center p-16"><div className="scale-150"><Spinner /></div></div>
         ) : notifications.length === 0 ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center p-16 text-center"
+          <div 
+            className="animate-fade-slide-up flex flex-col items-center justify-center p-16 text-center"
           >
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-sky-wash">
               <Bell size={36} className="text-fog" />
@@ -129,20 +116,14 @@ function NotificationsInner() {
                 ? "You're all caught up! There are no unread notifications right now."
                 : "You don't have any notifications yet. We'll let you know when something happens."}
             </p>
-          </motion.div>
+          </div>
         ) : (
           <div className="flex flex-col">
-            <AnimatePresence mode="popLayout">
-              {notifications.map((n) => (
-                <motion.div
-                  key={n.id}
-                  layout
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Link
+            {notifications.map((n) => (
+              <div
+                key={n.id}
+              >
+                <Link
                     href={getLink(n.type, user?.role)}
                     onClick={() => { if (!n.isRead) markRead.mutate(n.id); }}
                     className={`group relative flex cursor-pointer items-start gap-4 border-b border-slate-custom/5 px-6 py-5 transition-all hover:bg-sky-wash/50 ${!n.isRead ? "bg-signal-blue/[0.02]" : ""}`}
@@ -177,9 +158,8 @@ function NotificationsInner() {
                       )}
                     </div>
                   </Link>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+              </div>
+            ))}
 
             {data && data.pages > 1 && (
               <div className="flex items-center justify-between border-t border-slate-custom/10 bg-linen-canvas/50 px-6 py-4">

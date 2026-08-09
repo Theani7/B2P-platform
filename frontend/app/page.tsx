@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/Button";
 import { DashboardPath, Role } from "@/lib/roles";
-import { motion } from "framer-motion";
 import {
   Menu,
   X,
@@ -23,23 +22,6 @@ import {
   Shield,
   DollarSign,
 } from "lucide-react";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fade = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
-};
-
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-} as const;
-
-const item = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
-} as const;
 
 const navLinks = [
   { href: "#features", label: "Features" },
@@ -61,10 +43,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
 
   return (
-    <motion.nav
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: EASE }}
+    <nav
       className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
         scrolled ? "border-b border-steel/10 bg-linen-canvas/80 backdrop-blur-md" : "bg-transparent"
       }`}
@@ -160,7 +139,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
           </div>
         </>
       )}
-    </motion.nav>
+    </nav>
   );
 }
 
@@ -247,13 +226,7 @@ function LandingHero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
       />
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: EASE }}
-          >
-
-
+          <div>
             <h1 className="mb-6 text-display text-midnight-ink">
               Connect with the <span className="text-signal-blue">right promoters</span> for every campaign
             </h1>
@@ -286,16 +259,11 @@ function LandingHero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
                 </>
               )}
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.9, delay: 0.15, ease: EASE }}
-            className="hidden lg:block"
-          >
+          <div className="hidden lg:block">
             <DashboardMockup />
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
@@ -312,20 +280,14 @@ const trustStats = [
 function Trust() {
   return (
     <section className="bg-white py-16">
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: "-80px" }}
-        className="mx-auto grid max-w-[1200px] grid-cols-2 gap-8 px-6 md:grid-cols-4 md:gap-12"
-      >
+      <div className="mx-auto grid max-w-[1200px] grid-cols-2 gap-8 px-6 md:grid-cols-4 md:gap-12">
         {trustStats.map((stat) => (
-          <motion.div key={stat.label} variants={item} className="text-center">
+          <div key={stat.label} className="text-center">
             <p className="mb-2 text-heading-lg text-midnight-ink">{stat.value}</p>
             <p className="text-body text-ash">{stat.label}</p>
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }
@@ -346,23 +308,17 @@ function ProblemSolution() {
   return (
     <section className="bg-sky-wash/40 py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="mb-14 text-center"
-        >
+        <div className="mb-14 text-center">
           <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">Why Byparsathy</p>
           <h2 className="text-heading-lg text-midnight-ink">Stop running campaigns in the dark</h2>
-        </motion.div>
+        </div>
 
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
+          <div>
             <p className="mb-6 text-caption font-medium uppercase tracking-wide text-ash">The old way</p>
             <div className="flex flex-col gap-4">
               {problems.map((p) => (
-                <motion.div key={p.title} variants={item} className="flex gap-4 rounded-cards border border-steel/10 bg-white p-5 shadow-product-card">
+                <div key={p.title} className="flex gap-4 rounded-cards border border-steel/10 bg-white p-5 shadow-product-card">
                   <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-buttons border border-coral-alert/20 bg-coral-alert/10">
                     <p.icon size={16} className="text-coral-alert" />
                   </span>
@@ -370,16 +326,16 @@ function ProblemSolution() {
                     <p className="mb-1 text-sm font-medium text-graphite">{p.title}</p>
                     <p className="text-sm leading-relaxed text-ash">{p.desc}</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}>
+          <div>
             <p className="mb-6 text-caption font-medium uppercase tracking-wide text-emerald-status">With Byparsathy</p>
             <div className="flex flex-col gap-4">
               {solutions.map((s) => (
-                <motion.div key={s.title} variants={item} className="flex gap-4 rounded-cards border border-steel/10 bg-white p-5 shadow-product-card">
+                <div key={s.title} className="flex gap-4 rounded-cards border border-steel/10 bg-white p-5 shadow-product-card">
                   <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-buttons border border-emerald-status/20 bg-emerald-status/10">
                     <s.icon size={16} className="text-emerald-status" />
                   </span>
@@ -387,10 +343,10 @@ function ProblemSolution() {
                     <p className="mb-1 text-sm font-medium text-graphite">{s.title}</p>
                     <p className="text-sm leading-relaxed text-ash">{s.desc}</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
@@ -422,30 +378,17 @@ function Features() {
   return (
     <section id="features" className="bg-linen-canvas py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="mb-14 text-center"
-        >
+        <div className="mb-14 text-center">
           <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">Features</p>
           <h2 className="mx-auto max-w-2xl text-heading-lg text-midnight-ink">
             Everything you need to run successful creator campaigns
           </h2>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-40px" }}
-          className="grid gap-6 md:grid-cols-3"
-        >
+        <div className="grid gap-6 md:grid-cols-3">
           {features.map((feature) => (
-            <motion.div
+            <div
               key={feature.title}
-              variants={item}
               className="rounded-cards border border-steel/10 bg-white p-6 shadow-product-card"
             >
               <span className="mb-4 flex h-8 w-8 items-center justify-center rounded-buttons bg-sky-wash">
@@ -453,9 +396,9 @@ function Features() {
               </span>
               <h3 className="mb-2 text-heading-sm text-graphite">{feature.title}</h3>
               <p className="text-sm leading-relaxed text-ash">{feature.description}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -472,13 +415,7 @@ function ForBusinesses() {
   return (
     <section id="businesses" className="bg-white py-20 lg:py-28">
       <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
-        <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease: EASE }}
-        >
+        <div>
           <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">For businesses</p>
           <h2 className="mb-6 text-heading-lg text-midnight-ink">Run campaigns that actually convert</h2>
           <p className="mb-8 max-w-lg text-body text-steel">
@@ -493,25 +430,19 @@ function ForBusinesses() {
               <Button variant="ghost">See how it works</Button>
             </Link>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-40px" }}
-          className="grid gap-4 sm:grid-cols-2"
-        >
+        <div className="grid gap-4 sm:grid-cols-2">
           {businessFeatures.map((feature) => (
-            <motion.div key={feature.title} variants={item} className="rounded-cards border border-steel/10 bg-linen-canvas p-5 shadow-product-card">
+            <div key={feature.title} className="rounded-cards border border-steel/10 bg-linen-canvas p-5 shadow-product-card">
               <span className="mb-3 flex h-8 w-8 items-center justify-center rounded-buttons bg-sky-wash">
                 <feature.icon size={16} className="text-signal-blue" />
               </span>
               <h3 className="mb-1 text-sm font-medium text-graphite">{feature.title}</h3>
               <p className="text-xs leading-relaxed text-steel">{feature.description}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -528,18 +459,11 @@ function ForPromoters() {
   return (
     <section id="promoters" className="bg-sky-wash/40 py-20 lg:py-28">
       <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-40px" }}
-          className="order-2 lg:order-1"
-        >
+        <div className="order-2 lg:order-1">
           <div className="grid gap-4 sm:grid-cols-2">
             {promoterFeatures.map((feature) => (
-              <motion.div
+              <div
                 key={feature.title}
-                variants={item}
                 className="rounded-cards border border-steel/10 bg-white p-5 shadow-product-card"
               >
                 <span className="mb-3 flex h-8 w-8 items-center justify-center rounded-buttons bg-emerald-status/10">
@@ -547,18 +471,12 @@ function ForPromoters() {
                 </span>
                 <h3 className="mb-1 text-sm font-medium text-graphite">{feature.title}</h3>
                 <p className="text-xs leading-relaxed text-steel">{feature.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="order-1 lg:order-2"
-        >
+        <div className="order-1 lg:order-2">
           <p className="mb-3 text-caption font-medium uppercase tracking-wide text-emerald-status">For promoters</p>
           <h2 className="mb-6 text-heading-lg text-midnight-ink">Turn your audience into income</h2>
           <p className="mb-8 max-w-lg text-body text-steel">
@@ -573,7 +491,7 @@ function ForPromoters() {
               <Button variant="ghost">Browse campaigns</Button>
             </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -590,30 +508,17 @@ function HowItWorks() {
   return (
     <section id="how-it-works" className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="mb-14 text-center"
-        >
+        <div className="mb-14 text-center">
           <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">How it works</p>
           <h2 className="mx-auto max-w-2xl text-heading-lg text-midnight-ink">
             Four steps to your next great campaign
           </h2>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-40px" }}
-          className="grid gap-6 md:grid-cols-4"
-        >
+        <div className="grid gap-6 md:grid-cols-4">
           {steps.map((step) => (
-            <motion.div
+            <div
               key={step.step}
-              variants={item}
               className="relative rounded-cards border border-steel/10 bg-linen-canvas p-6 shadow-product-card"
             >
               <span className="absolute right-4 top-4 font-semibold text-display text-primary/20">{step.step}</span>
@@ -622,9 +527,9 @@ function HowItWorks() {
               </span>
               <h3 className="mb-2 text-heading-sm text-graphite">{step.title}</h3>
               <p className="text-sm leading-relaxed text-ash">{step.description}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -641,35 +546,23 @@ function Showcase() {
   return (
     <section className="bg-sky-wash/40 py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="mb-14 text-center"
-        >
+        <div className="mb-14 text-center">
           <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">
             Trusted by creators and brands
           </p>
           <h2 className="mx-auto max-w-2xl text-heading-lg text-midnight-ink">
             Join a growing community of Nepal&apos;s best marketing partnerships
           </h2>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="grid grid-cols-2 gap-8 px-6 md:grid-cols-4 md:gap-12"
-        >
+        <div className="grid grid-cols-2 gap-8 px-6 md:grid-cols-4 md:gap-12">
           {showcaseStats.map((stat) => (
-            <motion.div key={stat.label} variants={item} className="text-center">
+            <div key={stat.label} className="text-center">
               <p className="mb-2 text-heading-lg text-midnight-ink">{stat.value}</p>
               <p className="text-body text-ash">{stat.label}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -679,13 +572,7 @@ function CTA() {
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-12 text-center shadow-feature-section lg:p-16"
-        >
+        <div className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-12 text-center shadow-feature-section lg:p-16">
           <h2 className="mx-auto mb-4 max-w-2xl text-heading-lg text-midnight-ink">
             Ready to transform your marketing?
           </h2>
@@ -707,7 +594,7 @@ function CTA() {
               </Button>
             </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

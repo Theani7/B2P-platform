@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { KeyRound, ArrowLeft, Check, ShieldCheck } from "lucide-react";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { verifyRegistrationOtp, resendRegistrationOtp } from "@/features/auth/api";
@@ -68,7 +67,7 @@ function VerifyOtpInner() {
         </p>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
+      <div className="animate-fade-slide-up flex flex-col gap-4">
         <OtpInput length={6} value={code} onChange={setCode} autoFocus />
         <Button type="button" onClick={submit} disabled={submitting}>
           {submitting ? "Verifying…" : "Verify email"}
@@ -94,7 +93,7 @@ function VerifyOtpInner() {
           </p>
         </div>
         <LinkBack />
-      </motion.div>
+      </div>
     </AuthLayout>
   );
 }

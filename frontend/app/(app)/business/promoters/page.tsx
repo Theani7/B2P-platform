@@ -1,7 +1,5 @@
 "use client";
 
-"use use client";
-
 import { useState } from "react";
 import { usePromoterDirectory, useSavePromoter, useRemoveSavedPromoter, useSavedPromoters, type DirectorySearchParams } from "@/features/discovery/api";
 import { Input } from "@/components/ui/Input";

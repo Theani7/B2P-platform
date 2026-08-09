@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { notifySuccess, notifyError } from "@/lib/notify";
+import { notifySuccess, notifyError, notifyApiError } from "@/lib/notify";
 import { useCreatePortfolioItem, useUpdatePortfolioItem, type PortfolioItem, type PortfolioItemInput, useAddPortfolioMedia, useDeletePortfolioMedia, usePortfolioMedia } from "@/features/portfolio/api";
 import { uploadFile } from "@/features/upload/api";
 import { X, Upload } from "lucide-react";
@@ -84,7 +84,7 @@ export function PortfolioEditor({
       );
       setImages((prev) => [...prev, ...uploaded]);
     } catch (err: any) {
-      notifyError(err?.response?.data?.message ?? "Upload failed");
+      notifyApiError(err, "Upload failed");
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -115,7 +115,7 @@ export function PortfolioEditor({
       notifySuccess(item ? "Portfolio item updated" : "Portfolio item added");
       onDone();
     } catch (err: any) {
-      notifyError(err?.response?.data?.message ?? "Save failed");
+      notifyApiError(err, "Save failed");
     }
   };
 

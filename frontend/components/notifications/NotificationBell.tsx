@@ -6,16 +6,8 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useNotifications, useUnreadCount, useMarkRead, useMarkAllRead, useDeleteNotification } from "@/features/notifications/api";
 import { useSocketEvent } from "@/lib/socket";
 import { Bell, Check, X, MessageSquare, Briefcase, Star, CheckCircle, XCircle, Info, Trash2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Spinner } from "@/components/ui/Spinner";
-function timeAgo(s: string) {
-  const diff = Date.now() - new Date(s).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 60) return `${Math.max(1, m)}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
+import { timeAgo } from "@/lib/time";
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -35,7 +27,7 @@ export function NotificationBell() {
   const { token, user } = useAuth();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { data, isLoading } = useNotifications({ limit: 10 });
+  const { data, isLoading } = useNotifications({ limit: 10 }, { enabled: open });
   const unread = useUnreadCount();
   const markRead = useMarkRead();
   const markAll = useMarkAllRead();
@@ -73,15 +65,8 @@ export function NotificationBell() {
         )}
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute right-0 z-50 mt-2 w-96 rounded-2xl border border-white/40 bg-white/95 backdrop-blur-xl p-0 shadow-2xl shadow-midnight-ink/5 overflow-hidden"
-          >
+      {open && (
+        <div className="animate-pop-in absolute right-0 z-50 mt-2 w-96 rounded-2xl border border-white/40 bg-white/95 backdrop-blur-xl p-0 shadow-2xl shadow-midnight-ink/5 overflow-hidden">
             <div className="flex items-center justify-between border-b border-slate-custom/10 bg-linen-canvas/50 px-5 py-4">
               <h3 className="text-sm font-semibold text-graphite">Notifications</h3>
               {unread.data && unread.data.count > 0 && (
@@ -114,8 +99,7 @@ export function NotificationBell() {
               
               <ul className="flex flex-col">
                 {data?.items.map((n) => (
-                  <motion.li
-                    layout
+                  <li
                     key={n.id}
                     className={`group relative flex items-start gap-4 border-b border-slate-custom/5 px-5 py-4 transition-colors hover:bg-sky-wash/50 ${!n.isRead ? 'bg-signal-blue/[0.02]' : ''}`}
                   >
@@ -148,7 +132,7 @@ export function NotificationBell() {
                         </button>
                       )}
                     </div>
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -164,9 +148,8 @@ export function NotificationBell() {
                 </Link>
               </div>
             )}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 }
