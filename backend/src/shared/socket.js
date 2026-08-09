@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { verifyToken } from "./jwt.js";
+import { config } from "../config/env.js";
 
 /**
  * Socket.io infra for realtime notifications + chat.
@@ -31,7 +32,7 @@ function userIdFromSocket(socket) {
 
 export function initSocket(server) {
   io = new Server(server, {
-    cors: { origin: "*", credentials: true },
+    cors: { origin: config.allowedOrigins, credentials: true },
   });
 
   io.on("connection", (socket) => {

@@ -55,6 +55,13 @@ async function seedAchievements() {
   }
 }
 
+process.on("unhandledRejection", (reason) => {
+  console.error("[unhandledRejection]", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[uncaughtException]", err);
+});
+
 const app = createApp();
 const port = config.port;
 
@@ -69,5 +76,16 @@ server.listen(port, () => {
 seedAdmin().catch((e) => console.error("Admin seed failed", e));
 seedAchievements().catch((e) => console.error("Achievement seed failed", e));
 seedSettings().catch((e) => console.error("Settings seed failed", e));
+
+function shutdown(signal) {
+  console.log(`\n${signal} received, shutting down...`);
+  server.close(() => {
+    io.close();
+    prisma.$disconnect().finally(() => process.exit(0));
+  });
+  setTimeout(() => process.exit(1), 10000).unref();
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
 
 export { app, server, prisma, io };

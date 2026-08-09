@@ -31,7 +31,7 @@ export function errorHandler(err, req, res, next) {
   return res.status(500).json({
     success: false,
     message: "Internal server error",
-    errors: [{ detail: String((err && err.message) || err) }],
+    errors: [{ detail: process.env.NODE_ENV === "production" ? "An unexpected error occurred" : String((err && err.message) || err) }],
   });
 }
 

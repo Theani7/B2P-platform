@@ -27,4 +27,8 @@ export const config = {
     .map((s) => s.trim())
     .filter(Boolean),
   port: Number(process.env.PORT || 8000),
+  nodeEnv: process.env.NODE_ENV || "development",
+  rateLimitGlobal: Number(process.env.RATE_LIMIT_GLOBAL || 100),
+  rateLimitAi: Number(process.env.RATE_LIMIT_AI || 10),
+  rateLimitExport: Number(process.env.RATE_LIMIT_EXPORT || 5),
 };

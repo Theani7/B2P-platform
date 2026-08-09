@@ -1,12 +1,23 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import { authenticate } from "../../shared/auth.js";
 import { validate } from "../../shared/validate.js";
+import { config } from "../../config/env.js";
 import * as controller from "./controller.js";
 import * as schema from "./validation.js";
 
 const router = Router();
 
 router.use(authenticate);
+router.use(
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: config.rateLimitAi,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, message: "Too many AI requests, please wait" },
+  })
+);
 
 router.post("/generate/campaign", validate(schema.generateCampaignSchema), controller.generateCampaign);
 router.post("/generate/proposal", validate(schema.generateProposalSchema), controller.generateProposal);

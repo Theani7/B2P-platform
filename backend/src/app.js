@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import path from "path";
 import { config } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./shared/errors.js";
+import { prisma } from "./config/db.js";
 import authRouter from "./modules/auth/routes.js";
 import businessRouter from "./modules/business/routes.js";
 import promoterRouter from "./modules/promoter/routes.js";
@@ -40,34 +41,69 @@ import { uploadBaseDir } from "./modules/upload/service.js";
 export function createApp() {
   const app = express();
 
+  app.set("trust proxy", 1);
+
   app.use(
     cors({
       origin: config.allowedOrigins,
       credentials: true,
     })
   );
-  app.use(helmet());
-  app.use(express.json());
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }));
+  app.use(express.json({ limit: "1mb" }));
   app.use("/uploads", express.static(uploadBaseDir()));
 
-  // Rate limit auth endpoints (mirrors RateLimitMiddleware on /auth).
+  app.use(
+    rateLimit({
+      windowMs: 60 * 1000,
+      max: config.rateLimitGlobal,
+      standardHeaders: true,
+      legacyHeaders: false,
+    })
+  );
+
   app.use(
     `${config.apiV1}/auth`,
     rateLimit({ windowMs: 60 * 1000, max: config.rateLimitAuth })
   );
 
-  app.get("/health", (req, res) => {
-    res.json({
-      status: "healthy",
-      version: "1.0.0",
-      database: "healthy",
-      timestamp: new Date().toISOString(),
-    });
+  app.get("/health", async (req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      res.json({
+        status: "healthy",
+        version: process.env.npm_package_version || "1.0.0",
+        database: "healthy",
+        environment: config.nodeEnv,
+        timestamp: new Date().toISOString(),
+      });
+    } catch {
+      res.status(503).json({
+        status: "unhealthy",
+        database: "unreachable",
+        timestamp: new Date().toISOString(),
+      });
+    }
   });
 
-  app.get("/ready", (req, res) => res.json({ status: "ready", database: "connected" }));
+  app.get("/ready", async (req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      res.json({ status: "ready", database: "connected" });
+    } catch {
+      res.status(503).json({ status: "not ready", database: "unreachable" });
+    }
+  });
+
   app.get("/version", (req, res) =>
-    res.json({ name: "Byparsathy", version: "1.0.0", api_version: "v1", environment: "production" })
+    res.json({
+      name: "Byparsathy",
+      version: process.env.npm_package_version || "1.0.0",
+      api_version: "v1",
+      environment: config.nodeEnv,
+    })
   );
 
   // Routers
