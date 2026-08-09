@@ -94,12 +94,14 @@ export const useAdminDashboard = () =>
   useQuery<AdminDashboardStats>({
     queryKey: ["admin-dashboard"],
     queryFn: () => api.get<AdminDashboardStats>("/admin/dashboard").then((r) => r.data),
+    staleTime: 2 * 60 * 1000,
   });
 
 export const useAdminAnalytics = () =>
   useQuery<AdminAnalytics>({
     queryKey: ["admin-analytics"],
     queryFn: () => api.get<AdminAnalytics>("/admin/analytics").then((r) => r.data),
+    staleTime: 2 * 60 * 1000,
   });
 
 // --- Users ---
@@ -232,13 +234,14 @@ export interface VerificationRequest {
   submitted_at: string;
   requester_headline?: string | null;
   admin_notes?: string | null;
+  reviewed_at?: string | null;
   profile_data?: {
-    niche?: string;
-    followers_count?: number;
-    engagement_rate?: number;
-    website?: string;
-    company_size?: number;
-    location?: string;
+    niche?: string | null;
+    followers_count?: number | null;
+    engagement_rate?: number | null;
+    website?: string | null;
+    company_size?: string | null;
+    location?: string | null;
   } | null;
 }
 

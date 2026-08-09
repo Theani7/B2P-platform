@@ -28,9 +28,35 @@ export const listPromoterRequests = wrap(async (req, res) => {
 export const listRequests = wrap(async (req, res) => {
   const { status, page = 1, limit = 20 } = req.query;
   const [items, total] = await verificationService.listRequests({ status, page: Number(page), limit: Number(limit) });
+  const mapped = items.map((vr) => {
+    const isPromoter = !!vr.promoterProfileId;
+    const profile = isPromoter ? vr.promoterProfile : vr.businessProfile;
+    return {
+      id: vr.id,
+      status: vr.status,
+      requester_name: isPromoter ? profile?.username : profile?.companyName ?? "",
+      requester_type: isPromoter ? "PROMOTER" : "BUSINESS",
+      submitted_at: vr.submittedAt,
+      requester_headline: isPromoter ? vr.promoterProfile?.headline ?? null : null,
+      admin_notes: vr.adminNotes ?? null,
+      reviewed_at: vr.reviewedAt ?? null,
+      profile_data: isPromoter
+        ? {
+            niche: vr.promoterProfile?.niche ?? null,
+            followers_count: vr.promoterProfile?.followersCount ?? null,
+            engagement_rate: vr.promoterProfile?.engagementRate ?? null,
+            location: vr.promoterProfile?.location ?? null,
+          }
+        : {
+            website: vr.businessProfile?.website ?? null,
+            company_size: vr.businessProfile?.companySize ?? null,
+            location: vr.businessProfile?.location ?? null,
+          },
+    };
+  });
   return ok(
     res,
-    { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(total / Number(limit))) },
+    { items: mapped, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(total / Number(limit))) },
     "Verification requests"
   );
 });

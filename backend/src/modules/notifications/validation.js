@@ -1,9 +1,11 @@
 import { z } from "zod";
 
+const stringToBoolean = z.union([z.boolean(), z.enum(["true", "false"])]).transform((val) => val === true || val === "true");
+
 export const notificationListQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
-  unread_only: z.coerce.boolean().optional(),
+  unread_only: stringToBoolean.optional().default(false),
 });
 
 export const preferenceUpdateSchema = z.object({

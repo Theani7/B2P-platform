@@ -37,7 +37,17 @@ export async function listNotifications(user, params = {}) {
   const [rows, total] = await Promise.all([
     prisma.notification.findMany({
       where,
-      include: { actor: { include: { promoterProfile: true, businessProfile: true } } },
+      include: {
+        actor: {
+          select: {
+            id: true,
+            username: true,
+            fullName: true,
+            promoterProfile: { select: { avatarUrl: true } },
+            businessProfile: { select: { logoUrl: true } },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),
@@ -60,7 +70,7 @@ export async function markRead(user, notificationId) {
   if (!notification || notification.recipientId !== user.id) return null;
 
   if (!notification.isRead) {
-    await prisma.notification.update({
+    return prisma.notification.update({
       where: { id: notificationId },
       data: { isRead: true, readAt: new Date() },
     });
@@ -95,13 +105,15 @@ export async function getPreferences(user) {
 }
 
 export async function updatePreferences(user, items) {
+  const existing = await prisma.notificationPreference.findMany({
+    where: { userId: user.id, type: { in: items.map((i) => i.type) } },
+  });
+  const existingMap = new Map(existing.map((e) => [e.type, e]));
   for (const item of items) {
-    const existing = await prisma.notificationPreference.findFirst({
-      where: { userId: user.id, type: item.type },
-    });
-    if (existing) {
+    const found = existingMap.get(item.type);
+    if (found) {
       await prisma.notificationPreference.update({
-        where: { id: existing.id },
+        where: { id: found.id },
         data: { enabled: item.enabled },
       });
     } else {

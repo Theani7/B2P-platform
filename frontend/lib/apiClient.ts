@@ -14,6 +14,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+let refreshPromise: Promise<{ access_token: string; refresh_token: string }> | null = null;
+
+async function doRefresh(refresh: string): Promise<{ access_token: string; refresh_token: string }> {
+  const resp = await axios.post(`${baseURL}/auth/refresh`, { refresh_token: refresh });
+  return resp.data.data;
+}
+
 api.interceptors.response.use(
   (r) => r.data,
   async (error) => {
@@ -23,10 +30,14 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry && !isAuthCall) {
       const refresh = typeof window !== "undefined" ? localStorage.getItem("refresh_token") : null;
       if (refresh) {
+        if (!refreshPromise) {
+          refreshPromise = doRefresh(refresh).finally(() => {
+            refreshPromise = null;
+          });
+        }
         try {
+          const { access_token, refresh_token } = await refreshPromise;
           original._retry = true;
-          const resp = await axios.post(`${baseURL}/auth/refresh`, { refresh_token: refresh });
-          const { access_token, refresh_token } = resp.data.data;
           localStorage.setItem("access_token", access_token);
           if (refresh_token) localStorage.setItem("refresh_token", refresh_token);
           original.headers.Authorization = `Bearer ${access_token}`;

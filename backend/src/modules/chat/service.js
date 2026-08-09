@@ -76,55 +76,42 @@ export async function getConversations(user, params = {}) {
   });
   const collabIds = collabs.map((c) => c.id);
 
-  let conversations = await prisma.conversation.findMany({
+  const conversations = await prisma.conversation.findMany({
     where: { campaignId: { in: collabIds } },
     include: conversationInclude,
   });
-  const existingCollabIds = new Set(conversations.map((c) => c.campaignId));
-  const missing = collabIds.filter((id) => !existingCollabIds.has(id));
-  if (missing.length) {
-    await prisma.conversation.createMany({ data: missing.map((id) => ({ campaignId: id })) });
-    const created = await prisma.conversation.findMany({
-      where: { campaignId: { in: missing } },
-      include: conversationInclude,
-    });
-    conversations = conversations.concat(created);
-  }
 
   const convIds = conversations.map((c) => c.id);
 
-  // Fetch only what the list needs: exact unread counts (single grouped query)
-  // and the latest message per conversation (bounded, small selects) instead of
-  // pulling every message body across all conversations.
   let lastMessages = [];
   let unreadCounts = new Map();
   if (convIds.length > 0) {
-    const [unreadGroup, latest] = await Promise.all([
+    const [unreadGroup, allMessages] = await Promise.all([
       prisma.message.groupBy({
         by: ["conversationId"],
         where: { conversationId: { in: convIds }, senderId: { not: user.id }, readAt: null },
         _count: { _all: true },
       }),
-      Promise.all(
-        conversations.map((c) =>
-          prisma.message.findFirst({
-            where: { conversationId: c.id },
-            orderBy: { createdAt: "desc" },
-            select: {
-              id: true,
-              conversationId: true,
-              senderId: true,
-              message: true,
-              messageType: true,
-              isDeleted: true,
-              createdAt: true,
-            },
-          })
-        )
-      ),
+      prisma.message.findMany({
+        where: { conversationId: { in: convIds } },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          conversationId: true,
+          senderId: true,
+          message: true,
+          messageType: true,
+          isDeleted: true,
+          createdAt: true,
+        },
+      }),
     ]);
     unreadCounts = new Map(unreadGroup.map((g) => [g.conversationId, g._count._all]));
-    lastMessages = latest.filter(Boolean);
+    const lastByConv = new Map();
+    for (const m of allMessages) {
+      if (!lastByConv.has(m.conversationId)) lastByConv.set(m.conversationId, m);
+    }
+    lastMessages = [...lastByConv.values()];
   }
 
   const lastByConv = new Map(lastMessages.map((m) => [m.conversationId, m]));
@@ -326,13 +313,14 @@ export async function sendChatMessage(userId, user, conversationId, text, messag
     data: { conversationId, senderId: userId, message: text, messageType: msgType },
   });
 
-  const otherUserId = participantProfiles(user).includes(collab.businessProfileId)
-    ? collab.promoterProfile.userId
-    : collab.businessProfile.userId;
+  const isBusiness = participantProfiles(user).includes(collab.businessProfileId);
+  const otherUserId = isBusiness
+    ? collab.promoterProfile?.userId
+    : collab.businessProfile?.userId;
 
   return {
     messageRead: toMessageRead(message, user),
-    otherUserId,
+    otherUserId: otherUserId ?? null,
     senderName: user.username,
     messageId: message.id,
   };

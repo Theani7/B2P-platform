@@ -28,8 +28,8 @@ export async function login(payload: LoginPayload): Promise<User> {
   return (await api.get<User>("/auth/me")).data;
 }
 
-export async function register(payload: RegisterPayload): Promise<{ email: string; role: string }> {
-  const res = await api.post<{ email: string; role: string }>("/auth/register", payload);
+export async function register(payload: RegisterPayload): Promise<{ email: string; role: string; emailSent: boolean }> {
+  const res = await api.post<{ email: string; role: string; emailSent: boolean }>("/auth/register", payload);
   return res.data;
 }
 
@@ -53,7 +53,11 @@ export function useCurrentUser() {
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
   return useQuery<User>({
     queryKey: ["currentUser"],
-    queryFn: async () => (await api.get<User>("/auth/me")).data,
+    queryFn: async () => {
+      const res = await api.get<User>("/auth/me");
+      if (!res.data) throw new Error("Failed to load current user");
+      return res.data;
+    },
     enabled: !!token,
     retry: false,
   });

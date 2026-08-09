@@ -45,6 +45,8 @@ function toRead(collab, user) {
   const campaign = collab.campaign || {};
   const partner = collab.promoterProfile || {};
   const business = collab.businessProfile || {};
+  const partnerUser = collab.promoterProfile?.user || {};
+  const businessUser = collab.businessProfile?.user || {};
   const isBusiness = user.role === ROLE.BUSINESS;
   return {
     id: collab.id,
@@ -64,7 +66,7 @@ function toRead(collab, user) {
     campaignStartDate: campaign.startDate ?? null,
     campaignEndDate: campaign.endDate ?? null,
     partnerName: isBusiness ? partner.username ?? "" : business.companyName ?? "",
-    partnerUsername: isBusiness ? partner.username ?? "" : business.companyName ?? "",
+    partnerUsername: isBusiness ? partnerUser.username ?? "" : businessUser.username ?? "",
     partnerAvatarUrl: isBusiness ? partner.avatarUrl ?? null : business.logoUrl ?? null,
     hasReview: collab._hasReview ?? false,
   };
@@ -79,7 +81,7 @@ export async function listBusinessCollaborations(user, params = {}) {
   const [items, total] = await Promise.all([
     prisma.collaboration.findMany({
       where,
-      include: { campaign: true, promoterProfile: true },
+      include: { campaign: true, promoterProfile: { include: { user: true } } },
       orderBy: { createdAt: "desc" },
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),
@@ -100,7 +102,7 @@ export async function listPromoterCollaborations(user, params = {}) {
   const [items, total] = await Promise.all([
     prisma.collaboration.findMany({
       where,
-      include: { campaign: true, businessProfile: true },
+      include: { campaign: true, businessProfile: { include: { user: true } } },
       orderBy: { createdAt: "desc" },
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),

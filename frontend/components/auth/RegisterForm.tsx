@@ -120,6 +120,9 @@ export function RegisterForm() {
   const onSubmit = handleSubmit(async (values) => {
     try {
       const result = await registerUser(values);
+      if (!result.emailSent) {
+        notifyError("Account created but we couldn't send the verification email. Please use the resend option on the next screen.");
+      }
       router.push(`/verify-otp?email=${encodeURIComponent(result.email)}`);
     } catch {
       notifyError("Could not create account");

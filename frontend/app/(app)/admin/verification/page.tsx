@@ -176,19 +176,19 @@ function VerificationRequests() {
                     <div className="mt-3 space-y-2">
                       {req.requester_type === "PROMOTER" && (
                         <>
-                          {req.profile_data.niche && (
+                          {req.profile_data.niche != null && (
                             <div className="flex items-center justify-between text-xs">
                               <span className="text-ash">Niche</span>
                               <span className="font-medium text-graphite">{req.profile_data.niche}</span>
                             </div>
                           )}
-                          {req.profile_data.followers_count !== undefined && (
+                          {req.profile_data.followers_count != null && (
                             <div className="flex items-center justify-between text-xs">
                               <span className="text-ash">Followers</span>
                               <span className="font-medium text-graphite">{req.profile_data.followers_count}</span>
                             </div>
                           )}
-                          {req.profile_data.engagement_rate !== undefined && (
+                          {req.profile_data.engagement_rate != null && (
                             <div className="flex items-center justify-between text-xs">
                               <span className="text-ash">Engagement</span>
                               <span className="font-medium text-graphite">{req.profile_data.engagement_rate}%</span>
@@ -199,22 +199,22 @@ function VerificationRequests() {
 
                       {req.requester_type === "BUSINESS" && (
                         <>
-                          {req.profile_data.website && (
+                          {req.profile_data.website != null && (
                             <div className="flex items-center justify-between text-xs">
                               <span className="text-ash">Website</span>
                               <span className="font-medium text-signal-blue truncate max-w-[120px]">{req.profile_data.website}</span>
                             </div>
                           )}
-                          {req.profile_data.company_size !== undefined && (
+                          {req.profile_data.company_size != null && (
                             <div className="flex items-center justify-between text-xs">
                               <span className="text-ash">Company Size</span>
-                              <span className="font-medium text-graphite">{req.profile_data.company_size} employees</span>
+                              <span className="font-medium text-graphite">{req.profile_data.company_size}</span>
                             </div>
                           )}
                         </>
                       )}
 
-                      {req.profile_data.location && (
+                      {req.profile_data.location != null && (
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-ash">Location</span>
                           <span className="font-medium text-graphite">{req.profile_data.location}</span>

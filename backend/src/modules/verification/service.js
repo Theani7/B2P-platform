@@ -89,17 +89,19 @@ export async function listRequests(params = {}) {
   const where = {};
   if (status) where.status = status;
 
-  const total = await prisma.verificationRequest.count({ where });
-  const items = await prisma.verificationRequest.findMany({
-    where,
-    include: {
-      promoterProfile: { select: { id: true, username: true } },
-      businessProfile: { select: { id: true, companyName: true } },
-    },
-    orderBy: { submittedAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const [items, total] = await Promise.all([
+    prisma.verificationRequest.findMany({
+      where,
+      include: {
+        promoterProfile: { select: { id: true, username: true, niche: true, followersCount: true, engagementRate: true, location: true, headline: true } },
+        businessProfile: { select: { id: true, companyName: true, website: true, companySize: true, location: true } },
+      },
+      orderBy: { submittedAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.verificationRequest.count({ where }),
+  ]);
   return [items, total];
 }
 
