@@ -78,20 +78,41 @@ export async function searchPromoters(params = {}) {
 export async function getPublicProfile(username) {
   const profile = await prisma.promoterProfile.findUnique({
     where: { username },
-    include: {
-      portfolioItems: { include: { media: { orderBy: { displayOrder: "asc" } } } },
-      user: { include: { socialLinks: true } },
+    select: {
+      id: true,
+      userId: true,
+      username: true,
+      headline: true,
+      bio: true,
+      niche: true,
+      location: true,
+      avatarUrl: true,
+      followersCount: true,
+      engagementRate: true,
+      yearsExperience: true,
+      verified: true,
+      portfolioItems: {
+        select: {
+          id: true,
+          title: true,
+          clientName: true,
+          description: true,
+          coverImage: true,
+          featured: true,
+          platforms: true,
+          tags: true,
+          media: { select: { id: true, filePath: true, mediaType: true, displayOrder: true }, orderBy: { displayOrder: "asc" } },
+        },
+      },
+      user: { select: { socialLinks: { select: { id: true, platform: true, username: true, url: true } } } },
     },
   });
   if (!profile) throw new AppError("Promoter not found", 404);
-  
-  const result = {
+
+  return {
     ...profile,
     socialLinks: profile.user?.socialLinks || [],
   };
-  delete result.user;
-  
-  return result;
 }
 
 async function ensureBusinessProfile(user) {

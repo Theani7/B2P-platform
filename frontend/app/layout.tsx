@@ -7,10 +7,18 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 const mono = Roboto_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Byparsathy — Creator & Brand Collaborations",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  title: "B2P Connect — Creator & Brand Collaborations",
   description: "Connect brands with promoters. Manage campaigns, collaborations, and growth.",
-  other: {
-    "dns-prefetch-control": "on",
+  openGraph: {
+    title: "B2P Connect — Creator & Brand Collaborations",
+    description: "Connect brands with promoters. Manage campaigns, collaborations, and growth.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "B2P Connect — Creator & Brand Collaborations",
+    description: "Connect brands with promoters. Manage campaigns, collaborations, and growth.",
   },
 };
 
