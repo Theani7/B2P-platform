@@ -24,7 +24,7 @@ describe("auth.service", () => {
 
   afterEach(async () => {
     await prisma.revokedRefreshToken.deleteMany();
-    await prisma.user.deleteMany({ where: { id: user.id } });
+    if (user?.id) await prisma.user.deleteMany({ where: { id: user.id } });
   });
 
   test("login succeeds with valid credentials", async () => {

@@ -12,15 +12,19 @@ describe("authenticate middleware", () => {
   beforeEach(async () => {
     user = await prisma.user.create({
       data: {
-        username: `mw_${Date.now()}`,
+        username: `mw_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         fullName: "MW Test",
-        email: `mw_${Date.now()}@test.com`,
+        email: `mw_${Date.now()}_${Math.random().toString(36).slice(2, 6)}@test.com`,
         passwordHash: await bcrypt.hash("pass", 10),
         role: ROLE.PROMOTER,
         isActive: true,
         isVerified: true,
       },
     });
+  });
+
+  afterEach(async () => {
+    if (user?.id) await prisma.user.deleteMany({ where: { id: user.id } });
   });
 
   function makeReq(headers = {}) {

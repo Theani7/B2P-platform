@@ -39,8 +39,8 @@ jobs:
         run: bunx prisma generate
         working-directory: backend
 
-      - name: Run migrations
-        run: bunx prisma migrate deploy
+      - name: Sync database schema
+        run: bunx prisma db push --skip-generate --accept-data-loss
         working-directory: backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/b2p_test
