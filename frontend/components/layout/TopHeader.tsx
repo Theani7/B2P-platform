@@ -97,7 +97,7 @@ export function TopHeader() {
                 <p className="text-sm text-steel truncate">{user?.email}</p>
               </div>
               <Link
-                href={user?.role === Role.BUSINESS ? "/business/profile" : "/promoter/profile"}
+                href="/settings"
                 className="flex items-center gap-3 px-4 py-2 text-sm text-graphite hover:bg-sky-wash transition-colors"
               >
                 <Settings size={16} className="text-graphite" />

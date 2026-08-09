@@ -121,7 +121,7 @@ export default function PromoterReviewsPage() {
             <p className="text-sm text-ash mt-2 max-w-xl">Manage your creator reputation and review history.</p>
           </div>
           <Link
-            href={`/u/${user?.username}`}
+            href={`/u/${user?.promoterProfile?.username}`}
             className="bg-white border border-slate-custom/10 text-graphite rounded-inputs px-5 h-11 text-sm font-semibold hover:bg-sky-wash transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             <Eye size={16} /> View Public Profile

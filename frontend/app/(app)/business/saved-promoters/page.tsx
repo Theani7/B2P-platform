@@ -171,7 +171,7 @@ function SavedPromotersPageInner() {
               {filteredPromoters.map((p: any) => (
                 <div
                   key={p.id}
-                  onClick={() => router.push(`/promoters/${p.username}`)}
+                  onClick={() => router.push(`/u/${p.username}`)}
                   className="bg-white rounded-cards-lg p-6 shadow-product-card border border-slate-custom/10 hover:border-signal-blue/20 transition-all cursor-pointer flex flex-col group"
                 >
                   <div className="flex items-start gap-4">

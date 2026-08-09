@@ -53,7 +53,7 @@ export async function getCampaignShare(user, campaignId) {
 
   const base = config.frontendUrl;
   return {
-    publicUrl: `${base}/campaign-marketplace/${campaignId}`,
+    publicUrl: `${base}/promoter/marketplace?campaignId=${campaignId}`,
     qrCodeUrl: null,
     campaignId,
     title: campaign.title,

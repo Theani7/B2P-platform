@@ -221,7 +221,7 @@ function InvitationsPageInner() {
 
                     <div
                       className="flex items-center gap-3 cursor-pointer group/promoter hover:bg-linen-canvas p-2 -ml-2 rounded-lg transition-colors min-w-0"
-                      onClick={() => inv.promoterProfile?.username && router.push(`/promoters/${inv.promoterProfile.username}`)}
+                      onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)}
                     >
                       {inv.promoterProfile?.avatarUrl ? (
                         <img src={inv.promoterProfile.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-50 flex-shrink-0" />
@@ -269,13 +269,13 @@ function InvitationsPageInner() {
                             Cancel
                           </button>
                         ) : (
-                          <button onClick={() => inv.promoterProfile?.username && router.push(`/promoters/${inv.promoterProfile.username}`)} className="w-full bg-white border border-slate-custom/10 text-graphite h-10 px-3 rounded-lg text-sm font-semibold hover:bg-linen-canvas transition-colors shadow-product-card-sm whitespace-nowrap">
+                          <button onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)} className="w-full bg-white border border-slate-custom/10 text-graphite h-10 px-3 rounded-lg text-sm font-semibold hover:bg-linen-canvas transition-colors shadow-product-card-sm whitespace-nowrap">
                             Profile
                           </button>
                         )}
                       </div>
                       <button
-                        onClick={() => inv.promoterProfile?.username && router.push(`/promoters/${inv.promoterProfile.username}`)}
+                        onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)}
                         className="w-10 h-10 rounded-lg border border-slate-custom/10 text-ash hover:bg-linen-canvas hover:text-graphite transition-colors bg-white shadow-product-card-sm flex items-center justify-center"
                         title="View promoter profile"
                       >

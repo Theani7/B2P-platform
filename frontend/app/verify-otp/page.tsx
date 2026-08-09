@@ -47,7 +47,8 @@ function VerifyOtpInner() {
     try {
       const user = await verifyRegistrationOtp({ email, code });
       notifySuccess("Email verified. Welcome!");
-      window.location.href = `/${user.role.toLowerCase()}/profile`;
+      const dashboard = user.role === "ADMIN" ? "/admin/dashboard" : `/${user.role.toLowerCase()}/profile`;
+      window.location.href = dashboard;
     } catch {
       notifyError("Invalid or expired code.");
     } finally {

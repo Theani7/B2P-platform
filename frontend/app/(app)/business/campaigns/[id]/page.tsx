@@ -267,7 +267,7 @@ function CampaignDetailInner({ id }: { id: string }) {
               <a href={`/business/campaigns/${campaign.id}/matches`} className="bg-signal-blue text-white rounded-button px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
                 Recommended Promoters
               </a>
-              <a href={`/business/campaigns/${campaign.id}`} className="bg-white border border-slate-custom/10 text-graphite rounded-inputs px-4 py-2 text-sm font-medium hover:bg-sky-wash transition-colors">
+              <a href="#applications" className="bg-white border border-slate-custom/10 text-graphite rounded-inputs px-4 py-2 text-sm font-medium hover:bg-sky-wash transition-colors">
                 View Applications
               </a>
             </div>
@@ -275,6 +275,7 @@ function CampaignDetailInner({ id }: { id: string }) {
         </>
       )}
 
+      <div id="applications">
       <Card>
         <h2 className="mb-3 text-heading text-graphite pb-2 border-b border-slate-custom/10">Applications</h2>
         {!apps || apps.items.length === 0 ? (
@@ -308,6 +309,7 @@ function CampaignDetailInner({ id }: { id: string }) {
           </div>
         )}
       </Card>
+      </div>
 
       <InvitePanel campaignId={id} />
       <ShareDialog campaignId={id} open={share} onClose={() => setShare(false)} />

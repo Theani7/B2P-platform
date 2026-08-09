@@ -70,7 +70,7 @@ export async function performSearch(user, { q, type, limit = 10 }) {
           url:
             user.role === ROLE.BUSINESS
               ? `/business/campaigns/${c.id}`
-              : `/promoter/campaigns/${c.id}`,
+              : `/promoter/marketplace?campaignId=${c.id}`,
           score: 0,
         });
       }
@@ -95,7 +95,7 @@ export async function performSearch(user, { q, type, limit = 10 }) {
         subtitle: p.niche,
         imageUrl: p.avatarUrl,
         type: "promoter",
-        url: user.role === ROLE.BUSINESS ? `/business/promoters/${p.username}` : `/promoter/profile`,
+        url: `/u/${p.username}`,
         score: 0,
       });
     }
