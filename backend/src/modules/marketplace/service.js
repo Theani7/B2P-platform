@@ -16,14 +16,16 @@ export async function listMarketplaceCampaigns(user, params = {}) {
     ];
   }
 
-  const total = await prisma.campaign.count({ where });
-  const campaigns = await prisma.campaign.findMany({
-    where,
-    include: { businessProfile: true },
-    orderBy: { [sort]: "desc" },
-    skip: (Number(page) - 1) * Number(limit),
-    take: Number(limit),
-  });
+  const [campaigns, total] = await Promise.all([
+    prisma.campaign.findMany({
+      where,
+      include: { businessProfile: { select: { companyName: true } } },
+      orderBy: { [sort]: "desc" },
+      skip: (Number(page) - 1) * Number(limit),
+      take: Number(limit),
+    }),
+    prisma.campaign.count({ where }),
+  ]);
 
   const campaignIds = campaigns.map((c) => c.id);
 

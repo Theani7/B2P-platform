@@ -26,14 +26,11 @@ export async function createOrUpdate(user, payload) {
     if (existing) throw new AppError("Username already taken", 409);
   }
 
-  let profile = await prisma.promoterProfile.findUnique({ where: { userId: user.id } });
-  if (profile) {
-    await prisma.promoterProfile.update({ where: { id: profile.id }, data: payload });
-  } else {
-    profile = await prisma.promoterProfile.create({ data: { userId: user.id, ...payload } });
-  }
-  const reloaded = await prisma.promoterProfile.findUnique({ where: { id: profile.id } });
-  return withPendingVerification(reloaded);
+  const profile = await prisma.promoterProfile.findUnique({ where: { userId: user.id } });
+  const saved = profile
+    ? await prisma.promoterProfile.update({ where: { id: profile.id }, data: payload })
+    : await prisma.promoterProfile.create({ data: { userId: user.id, ...payload } });
+  return withPendingVerification(saved);
 }
 
 export async function getMyProfile(user) {

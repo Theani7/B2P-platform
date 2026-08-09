@@ -86,14 +86,16 @@ export async function withdraw(user, applicationId) {
 export async function getPromoterApplications(user, { page = 1, limit = 20 }) {
   const promoter = await promoterProfileOf(user);
   const where = { promoterProfileId: promoter.id };
-  const total = await prisma.campaignApplication.count({ where });
-  const items = await prisma.campaignApplication.findMany({
-    where,
-    include: { campaign: { include: { businessProfile: true } } },
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const [items, total] = await Promise.all([
+    prisma.campaignApplication.findMany({
+      where,
+      include: { campaign: { include: { businessProfile: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.campaignApplication.count({ where }),
+  ]);
   return [items, total];
 }
 
@@ -103,28 +105,32 @@ export async function getCampaignApplications(user, campaignId, { page = 1, limi
   const business = await businessProfileOf(user);
   const campaign = await campaignForBusiness(campaignId, business.id);
   const where = { campaignId: campaign.id };
-  const total = await prisma.campaignApplication.count({ where });
-  const items = await prisma.campaignApplication.findMany({
-    where,
-    include: { promoterProfile: true },
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const [items, total] = await Promise.all([
+    prisma.campaignApplication.findMany({
+      where,
+      include: { promoterProfile: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.campaignApplication.count({ where }),
+  ]);
   return [items, total];
 }
 
 export async function getBusinessApplications(user, { page = 1, limit = 20 }) {
   const business = await businessProfileOf(user);
   const where = { campaign: { businessProfileId: business.id } };
-  const total = await prisma.campaignApplication.count({ where });
-  const items = await prisma.campaignApplication.findMany({
-    where,
-    include: { promoterProfile: true, campaign: true },
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const [items, total] = await Promise.all([
+    prisma.campaignApplication.findMany({
+      where,
+      include: { promoterProfile: true, campaign: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.campaignApplication.count({ where }),
+  ]);
   return [items, total];
 }
 
@@ -141,7 +147,7 @@ export async function accept(user, applicationId) {
 
   const collab = await prisma.$transaction(async (tx) => {
     await tx.campaignApplication.update({ where: { id: application.id }, data: { status: "ACCEPTED" } });
-    return tx.collaboration.create({
+    const created = await tx.collaboration.create({
       data: {
         campaignId: campaign.id,
         businessProfileId: business.id,
@@ -151,6 +157,8 @@ export async function accept(user, applicationId) {
         startedAt: new Date(),
       },
     });
+    await tx.conversation.create({ data: { campaignId: created.id } });
+    return created;
   });
 
   await createNotification({

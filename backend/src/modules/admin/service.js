@@ -68,7 +68,19 @@ export async function getAdminUsers({ page = 1, limit = 20, search, role, isActi
   const [rows, total] = await Promise.all([
     prisma.user.findMany({
       where,
-      include: { businessProfile: true, promoterProfile: true },
+      select: {
+        id: true,
+        username: true,
+        fullName: true,
+        email: true,
+        role: true,
+        isActive: true,
+        isVerified: true,
+        createdAt: true,
+        lastLoginAt: true,
+        businessProfile: { select: { id: true } },
+        promoterProfile: { select: { id: true } },
+      },
       orderBy: { createdAt: "desc" },
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),
@@ -192,7 +204,10 @@ export async function getAdminReviews({ page = 1, limit = 20, search }) {
   const [rows, total] = await Promise.all([
     prisma.review.findMany({
       where,
-      include: { reviewer: true, reviewee: true },
+      include: {
+        reviewer: { select: { username: true } },
+        reviewee: { select: { username: true } },
+      },
       orderBy: { createdAt: "desc" },
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),

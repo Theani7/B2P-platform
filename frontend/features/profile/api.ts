@@ -38,6 +38,7 @@ export const useBusinessProfile = () =>
   useQuery<BusinessProfileRead>({
     queryKey: ["business-profile"],
     queryFn: () => api.get("/business/profile").then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
   });
 
 export const useCreateBusinessProfile = () => {
@@ -68,6 +69,7 @@ export const usePromoterProfile = () =>
   useQuery<PromoterProfileRead>({
     queryKey: ["promoter-profile"],
     queryFn: () => api.get("/promoter/profile").then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
   });
 
 export const useCreatePromoterProfile = () => {

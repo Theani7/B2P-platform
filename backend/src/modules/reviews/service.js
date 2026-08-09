@@ -32,8 +32,22 @@ function toReviewRead(r) {
 }
 
 const reviewerInclude = {
-  reviewer: { include: { promoterProfile: true, businessProfile: true } },
-  collaboration: { include: { campaign: true, businessProfile: true, promoterProfile: true } },
+  reviewer: {
+    select: {
+      id: true,
+      username: true,
+      fullName: true,
+      promoterProfile: { select: { avatarUrl: true } },
+      businessProfile: { select: { logoUrl: true } },
+    },
+  },
+  collaboration: {
+    select: {
+      businessProfile: { select: { companyName: true } },
+      promoterProfile: { select: { username: true } },
+      campaign: { select: { title: true } },
+    },
+  },
 };
 
 export async function completeCollaboration(user, collaborationId) {
@@ -178,7 +192,17 @@ export async function getUserReviews(userId, params = {}) {
   const [rows, total] = await Promise.all([
     prisma.review.findMany({
       where,
-      include: { reviewer: { include: { promoterProfile: true, businessProfile: true } } },
+      include: {
+        reviewer: {
+          select: {
+            id: true,
+            username: true,
+            fullName: true,
+            promoterProfile: { select: { avatarUrl: true } },
+            businessProfile: { select: { logoUrl: true } },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),

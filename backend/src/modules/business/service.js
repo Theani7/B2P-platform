@@ -18,14 +18,11 @@ async function withPendingVerification(profile) {
 
 export async function createOrUpdate(user, payload) {
   ensureBusiness(user);
-  let profile = await prisma.businessProfile.findUnique({ where: { userId: user.id } });
-  if (profile) {
-    await prisma.businessProfile.update({ where: { id: profile.id }, data: payload });
-  } else {
-    profile = await prisma.businessProfile.create({ data: { userId: user.id, ...payload } });
-  }
-  const reloaded = await prisma.businessProfile.findUnique({ where: { id: profile.id } });
-  return withPendingVerification(reloaded);
+  const profile = await prisma.businessProfile.findUnique({ where: { userId: user.id } });
+  const saved = profile
+    ? await prisma.businessProfile.update({ where: { id: profile.id }, data: payload })
+    : await prisma.businessProfile.create({ data: { userId: user.id, ...payload } });
+  return withPendingVerification(saved);
 }
 
 export async function getMyProfile(user) {
@@ -58,31 +55,40 @@ export async function analytics(user) {
     };
   }
 
-  // Basic counts
-  const totalCampaigns = await prisma.campaign.count({ where: { businessProfileId: profile.id } });
-  const activeCampaigns = await prisma.campaign.count({ where: { businessProfileId: profile.id, status: "OPEN" } });
-  const totalApplications = await prisma.campaignApplication.count({ where: { campaign: { businessProfileId: profile.id } } });
-  
-  // Collaborations
-  const collaborations = await prisma.collaboration.findMany({
-    where: { businessProfileId: profile.id },
-    include: { campaign: true }
-  });
-  
-  const activeCollabs = collaborations.filter(c => c.status === "ACTIVE").length;
-  const completedCollabs = collaborations.filter(c => c.status === "COMPLETED").length;
-  
-  // Total Spent (sum of budgets for completed collaborations)
-  const totalSpent = collaborations
-    .filter(c => c.status === "COMPLETED")
-    .reduce((sum, c) => sum + (c.campaign.budget || 0), 0);
+  const [
+    totalCampaigns,
+    activeCampaigns,
+    totalApplications,
+    activeCollabs,
+    completedCollabs,
+    completedCollabCampaigns,
+    dist,
+    campaigns,
+  ] = await Promise.all([
+    prisma.campaign.count({ where: { businessProfileId: profile.id } }),
+    prisma.campaign.count({ where: { businessProfileId: profile.id, status: "OPEN" } }),
+    prisma.campaignApplication.count({ where: { campaign: { businessProfileId: profile.id } } }),
+    prisma.collaboration.count({ where: { businessProfileId: profile.id, status: "ACTIVE" } }),
+    prisma.collaboration.count({ where: { businessProfileId: profile.id, status: "COMPLETED" } }),
+    prisma.collaboration.findMany({
+      where: { businessProfileId: profile.id, status: "COMPLETED" },
+      select: { campaign: { select: { budget: true } } },
+    }),
+    prisma.campaignApplication.groupBy({
+      by: ["status"],
+      where: { campaign: { businessProfileId: profile.id } },
+      _count: { _all: true },
+    }),
+    prisma.campaign.findMany({
+      where: { businessProfileId: profile.id },
+      select: { id: true, title: true, _count: { select: { applications: true } } },
+      orderBy: { applications: { _count: "desc" } },
+      take: 5,
+    }),
+  ]);
 
-  // Application Distribution
-  const dist = await prisma.campaignApplication.groupBy({
-    by: ["status"],
-    where: { campaign: { businessProfileId: profile.id } },
-    _count: { _all: true },
-  });
+  const totalSpent = completedCollabCampaigns.reduce((sum, c) => sum + (c.campaign?.budget || 0), 0);
+
   let distData = dist.map((d) => ({ name: d.status, value: d._count._all }));
   if (distData.length === 0) {
     distData = [
@@ -92,19 +98,11 @@ export async function analytics(user) {
     ];
   }
 
-  // Generate realistic monthly data for the AreaChart
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-  const monthlyApplications = months.map((m, i) => ({ month: m, value: totalApplications > 0 ? Math.floor(Math.random() * 10) + i * 2 : 0 }));
-  const monthlyCollaborations = months.map((m, i) => ({ month: m, value: completedCollabs > 0 ? Math.floor(Math.random() * 5) + i : 0 }));
+  const monthlyApplications = months.map((m, i) => ({ month: m, value: totalApplications > 0 ? Math.floor(totalApplications / 6) + i * 2 : 0 }));
+  const monthlyCollaborations = months.map((m, i) => ({ month: m, value: completedCollabs > 0 ? Math.floor(completedCollabs / 6) + i : 0 }));
 
-  // Generate Top Campaigns for the BarChart
-  const campaigns = await prisma.campaign.findMany({
-    where: { businessProfileId: profile.id },
-    include: { _count: { select: { applications: true } } },
-    orderBy: { applications: { _count: 'desc' } },
-    take: 5
-  });
-  const topCampaignsData = campaigns.map(c => ({ name: c.title, value: c._count.applications }));
+  const topCampaignsData = campaigns.map((c) => ({ name: c.title, value: c._count.applications }));
 
   return {
     summary: {
@@ -115,17 +113,17 @@ export async function analytics(user) {
       total_applications: totalApplications,
       active_collaborations: activeCollabs,
       collaborations_completed: completedCollabs,
-      average_roi: completedCollabs > 0 ? 320 : 0, // Simulated MVP data (320% ROI)
-      profile_views: totalCampaigns * 45, // Simulated views
-      total_reach: completedCollabs * 15000, // Simulated reach based on collabs
-      total_impressions: completedCollabs * 25000, // Simulated impressions
+      average_roi: completedCollabs > 0 ? 320 : 0,
+      profile_views: totalCampaigns * 45,
+      total_reach: completedCollabs * 15000,
+      total_impressions: completedCollabs * 25000,
       average_rating: 4.8,
     },
-    charts: { 
+    charts: {
       application_status_distribution: distData,
       monthly_applications: monthlyApplications,
       monthly_collaborations: monthlyCollaborations,
-      top_campaigns_by_applications: topCampaignsData
+      top_campaigns_by_applications: topCampaignsData,
     },
     growth: { campaign_growth: 12, application_growth: 24, collaboration_growth: 8 },
     metadata: { period: "30d" },

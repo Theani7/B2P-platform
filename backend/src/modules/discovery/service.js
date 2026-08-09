@@ -45,17 +45,32 @@ export async function searchPromoters(params = {}) {
   if (experienceMin !== undefined && experienceMin !== null) where.yearsExperience = { gte: experienceMin };
   if (experienceMax !== undefined && experienceMax !== null) where.yearsExperience = { ...(where.yearsExperience || {}), lte: experienceMax };
 
-  const total = await prisma.promoterProfile.count({ where });
-
   const col = SORT_COLS[sortBy] || "createdAt";
   const order = sortOrder === "asc" ? "asc" : "desc";
 
-  const items = await prisma.promoterProfile.findMany({
-    where,
-    orderBy: { [col]: order },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const [items, total] = await Promise.all([
+    prisma.promoterProfile.findMany({
+      where,
+      select: {
+        id: true,
+        userId: true,
+        username: true,
+        headline: true,
+        bio: true,
+        niche: true,
+        location: true,
+        avatarUrl: true,
+        followersCount: true,
+        engagementRate: true,
+        yearsExperience: true,
+        verified: true,
+      },
+      orderBy: { [col]: order },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.promoterProfile.count({ where }),
+  ]);
 
   return [items, total];
 }
@@ -126,13 +141,15 @@ export async function getSavedPromoters(user, { search = "", page = 1, limit = 2
     ];
   }
 
-  const total = await prisma.savedPromoter.count({ where });
-  const items = await prisma.savedPromoter.findMany({
-    where,
-    include: { promoterProfile: true },
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const [items, total] = await Promise.all([
+    prisma.savedPromoter.findMany({
+      where,
+      include: { promoterProfile: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.savedPromoter.count({ where }),
+  ]);
   return [items, total];
 }

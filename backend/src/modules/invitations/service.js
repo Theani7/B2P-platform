@@ -72,14 +72,16 @@ export async function getBusinessInvitations(user, { status, page = 1, limit = 2
   const business = await businessProfileOf(user);
   const where = { campaign: { businessProfileId: business.id } };
   if (status) where.status = status;
-  const total = await prisma.campaignInvitation.count({ where });
-  const items = await prisma.campaignInvitation.findMany({
-    where,
-    include: { campaign: true, promoterProfile: true },
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const [items, total] = await Promise.all([
+    prisma.campaignInvitation.findMany({
+      where,
+      include: { campaign: true, promoterProfile: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.campaignInvitation.count({ where }),
+  ]);
   return [items, total];
 }
 
@@ -89,14 +91,16 @@ export async function getPromoterInvitations(user, { status, page = 1, limit = 2
   const promoter = await promoterProfileOf(user);
   const where = { promoterProfileId: promoter.id };
   if (status) where.status = status;
-  const total = await prisma.campaignInvitation.count({ where });
-  const items = await prisma.campaignInvitation.findMany({
-    where,
-    include: { campaign: { include: { businessProfile: true } } },
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const [items, total] = await Promise.all([
+    prisma.campaignInvitation.findMany({
+      where,
+      include: { campaign: { include: { businessProfile: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.campaignInvitation.count({ where }),
+  ]);
   return [items, total];
 }
 
@@ -114,7 +118,7 @@ export async function accept(user, invitationId) {
 
   const collab = await prisma.$transaction(async (tx) => {
     await tx.campaignInvitation.update({ where: { id: invitation.id }, data: { status: "ACCEPTED" } });
-    return tx.collaboration.create({
+    const created = await tx.collaboration.create({
       data: {
         campaignId: campaign.id,
         businessProfileId: business.id,
@@ -124,6 +128,8 @@ export async function accept(user, invitationId) {
         startedAt: new Date(),
       },
     });
+    await tx.conversation.create({ data: { campaignId: created.id } });
+    return created;
   });
 
   await createNotification({

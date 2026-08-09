@@ -46,7 +46,7 @@ export const useUnreadCount = () =>
   useQuery<{ count: number }>({
     queryKey: ["notifications-unread"],
     queryFn: () => api.get<{ count: number }>("/notifications/unread-count").then((r) => r.data),
-    refetchInterval: 30000,
+    refetchInterval: 5 * 60 * 1000,
   });
 
 export const useMarkRead = () => {

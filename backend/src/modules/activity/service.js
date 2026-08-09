@@ -54,7 +54,19 @@ async function paginate(where, page, size) {
   const [rows, total] = await Promise.all([
     prisma.activityLog.findMany({
       where,
-      include: { actor: true },
+      select: {
+        id: true,
+        actorId: true,
+        actorRole: true,
+        entityType: true,
+        entityId: true,
+        action: true,
+        title: true,
+        description: true,
+        metadataInfo: true,
+        createdAt: true,
+        actor: { select: { fullName: true } },
+      },
       orderBy: { createdAt: "desc" },
       skip: (Number(page) - 1) * Number(size),
       take: Number(size),

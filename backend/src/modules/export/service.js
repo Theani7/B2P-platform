@@ -27,7 +27,16 @@ async function gather(user, module) {
         : {};
     const camps = await prisma.campaign.findMany({
       where,
-      include: { businessProfile: true },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        budget: true,
+        location: true,
+        category: true,
+        businessProfile: { select: { companyName: true } },
+      },
+      take: 10000,
     });
     return camps.map((c) => ({
       id: c.id,
@@ -41,7 +50,17 @@ async function gather(user, module) {
   }
 
   if (module === "promoters") {
-    const proms = await prisma.promoterProfile.findMany({});
+    const proms = await prisma.promoterProfile.findMany({
+      select: {
+        id: true,
+        username: true,
+        niche: true,
+        followersCount: true,
+        location: true,
+        verified: true,
+      },
+      take: 10000,
+    });
     return proms.map((p) => ({
       id: p.id,
       username: p.username,

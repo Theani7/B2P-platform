@@ -42,6 +42,7 @@ export const useAchievementsCatalog = () =>
   useQuery<AchievementListResponse>({
     queryKey: ["achievements-catalog"],
     queryFn: () => api.get<AchievementListResponse>("/achievements").then((r) => r.data),
+    staleTime: Infinity,
   });
 
 export const useMyAchievements = () =>

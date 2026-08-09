@@ -94,6 +94,7 @@ export const usePromoterDirectory = (params: DirectorySearchParams) =>
   useQuery<PromoterDirectoryResponse>({
     queryKey: ["promoter-directory", params],
     queryFn: () => api.get("/promoters", { params }).then((r) => r.data),
+    staleTime: 2 * 60 * 1000,
   });
 
 export const usePublicPromoterProfile = (username: string) =>
@@ -101,6 +102,7 @@ export const usePublicPromoterProfile = (username: string) =>
     queryKey: ["promoter", username],
     queryFn: () => api.get(`/promoters/${username}`).then((r) => r.data),
     enabled: !!username,
+    staleTime: 5 * 60 * 1000,
   });
 
 export const useSavePromoter = () => {

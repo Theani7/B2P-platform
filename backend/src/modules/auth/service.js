@@ -42,13 +42,15 @@ export async function register(payload) {
     },
   });
 
+  let emailSent = true;
   try {
     await sendOtpEmail(payload.email, otpCode);
   } catch (e) {
     console.error("registration otp email failed", e);
+    emailSent = false;
   }
 
-  return { email: payload.email, role: payload.role };
+  return { email: payload.email, role: payload.role, emailSent };
 }
 
 export async function resendRegistrationOtp(email) {
@@ -89,7 +91,7 @@ export async function login(payload) {
 
   const valid = await bcrypt.compare(payload.password, user.passwordHash);
   if (!valid) {
-    await incrementFailed(user.id);
+    await incrementFailed(user);
     throw new AppError("Invalid credentials", 401);
   }
 
@@ -100,14 +102,13 @@ export async function login(payload) {
   return tokens(user);
 }
 
-async function incrementFailed(userId) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+async function incrementFailed(user) {
   const attempts = (user.failedLoginAttempts || 0) + 1;
   const data = { failedLoginAttempts: attempts };
   if (attempts >= config.maxFailedLoginAttempts) {
     data.lockedUntil = new Date(Date.now() + config.lockMinutes * 60 * 1000);
   }
-  await prisma.user.update({ where: { id: userId }, data });
+  await prisma.user.update({ where: { id: user.id }, data });
 }
 
 async function resetFailed(userId) {
@@ -280,7 +281,21 @@ export async function verifyRegistrationOtp(email, code) {
 export async function updateMe(user, payload) {
   const data = {};
   if (payload.fullName !== undefined) data.fullName = payload.fullName;
-  if (payload.email !== undefined) data.email = payload.email;
+  if (payload.email !== undefined) {
+    if (payload.email !== user.email) {
+      data.email = payload.email;
+      data.isVerified = false;
+      data.verificationToken = crypto.randomBytes(32).toString("hex");
+      data.verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    }
+  }
   const updated = await prisma.user.update({ where: { id: user.id }, data });
+  if (data.verificationToken) {
+    try {
+      await sendVerificationEmail(updated.email, data.verificationToken);
+    } catch (e) {
+      console.error("verification email failed", e);
+    }
+  }
   return updated;
 }

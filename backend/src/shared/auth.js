@@ -4,11 +4,21 @@ import { AppError } from "./errors.js";
 
 export async function authenticate(req, res, next) {
   try {
+    if (req._authenticatedUser) {
+      req.user = req._authenticatedUser;
+      return next();
+    }
     const header = req.headers.authorization || "";
     const [scheme, token] = header.split(" ");
     if (scheme !== "Bearer" || !token) throw new AppError("Invalid token", 401);
 
-    const payload = verifyToken(token);
+    let payload;
+    try {
+      payload = verifyToken(token);
+    } catch (err) {
+      const expired = err?.name === "TokenExpiredError";
+      throw new AppError(expired ? "Token expired" : "Invalid token", 401);
+    }
     if (payload.type !== "access") throw new AppError("Invalid token", 401);
     const userId = payload.sub;
     if (!userId) throw new AppError("Invalid token", 401);
@@ -24,6 +34,7 @@ export async function authenticate(req, res, next) {
       throw new AppError("Account locked", 403);
     }
 
+    req._authenticatedUser = user;
     req.user = user;
     next();
   } catch (e) {

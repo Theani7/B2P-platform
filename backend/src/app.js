@@ -121,11 +121,6 @@ export function createApp() {
   app.use(`${config.apiV1}/admin`, adminRouter);
   app.use(`${config.apiV1}/ai`, aiRouter);
 
-  // TODO: mount additional routers as ported:
-  // app.use(`${config.apiV1}/campaigns`, campaignRouter);
-  // app.use(`${config.apiV1}/marketplace`, marketplaceRouter);
-  // ... etc
-
   app.use(notFoundHandler);
   app.use(errorHandler);
 

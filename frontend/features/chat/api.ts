@@ -56,7 +56,7 @@ export const useConversations = (options?: { enabled?: boolean }) =>
     queryKey: ["conversations"],
     queryFn: () => api.get<{ items: Conversation[] }>("/chat/conversations").then((r) => r.data.items),
     enabled: options?.enabled ?? true,
-    refetchInterval: 15000,
+    refetchInterval: 2 * 60 * 1000,
   });
 
 export const useChatHistory = (collaborationId: string) =>

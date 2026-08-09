@@ -17,20 +17,23 @@ function scoreResults(items, q) {
   return items;
 }
 
-async function recordHistory(userId, q) {
-  const count = await prisma.searchHistory.count({ where: { userId } });
-  if (count >= 10) {
-    const oldest = await prisma.searchHistory.findFirst({
-      where: { userId },
-      orderBy: { createdAt: "asc" },
-    });
-    if (oldest) await prisma.searchHistory.delete({ where: { id: oldest.id } });
-  }
-  await prisma.searchHistory.create({ data: { userId, query: q } });
+function recordHistory(userId, q) {
+  prisma.searchHistory.count({ where: { userId } }).then((count) => {
+    if (count >= 10) {
+      return prisma.searchHistory.findFirst({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      }).then((oldest) => {
+        if (oldest) return prisma.searchHistory.delete({ where: { id: oldest.id } });
+      });
+    }
+  }).then(() => {
+    return prisma.searchHistory.create({ data: { userId, query: q } });
+  }).catch(() => {});
 }
 
 export async function performSearch(user, { q, type, limit = 10 }) {
-  await recordHistory(user.id, q);
+  recordHistory(user.id, q);
 
   const results = {
     campaigns: [],

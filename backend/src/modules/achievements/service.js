@@ -84,12 +84,12 @@ export async function getUserAchievementsWithLevel(userId) {
   };
 }
 
-export async function recalculateUserAchievements(user) {
+export async function recalculateUserAchievements(user, achievementMap) {
   const evaluations = await evaluateAll(user);
   const results = [];
 
   for (const { key, progress } of evaluations) {
-    const achievement = await prisma.achievement.findUnique({ where: { key } });
+    const achievement = achievementMap.get(key);
     if (!achievement) continue;
 
     let userAch = await prisma.userAchievement.findFirst({
@@ -138,13 +138,17 @@ export async function recalculateUserAchievements(user) {
 }
 
 export async function recalculateAll() {
-  const users = await prisma.user.findMany({
-    where: { isActive: true },
-    include: { promoterProfile: true, businessProfile: true },
-  });
+  const [users, achievements] = await Promise.all([
+    prisma.user.findMany({
+      where: { isActive: true },
+      include: { promoterProfile: true, businessProfile: true },
+    }),
+    prisma.achievement.findMany({ where: { isActive: true } }),
+  ]);
+  const achievementMap = new Map(achievements.map((a) => [a.key, a]));
   let count = 0;
   for (const u of users) {
-    await recalculateUserAchievements(u);
+    await recalculateUserAchievements(u, achievementMap);
     count += 1;
   }
   return count;

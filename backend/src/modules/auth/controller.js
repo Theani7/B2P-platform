@@ -72,7 +72,21 @@ export const resendRegistrationOtp = wrap(async (req, res) => {
 });
 
 export const me = wrap(async (req, res) => {
-  return ok(res, req.user, "Current user");
+  const u = req.user;
+  const safe = {
+    id: u.id,
+    username: u.username,
+    fullName: u.fullName,
+    email: u.email,
+    role: u.role,
+    isActive: u.isActive,
+    isVerified: u.isVerified,
+    createdAt: u.createdAt,
+    lastLoginAt: u.lastLoginAt,
+    promoterProfile: u.promoterProfile ?? null,
+    businessProfile: u.businessProfile ?? null,
+  };
+  return ok(res, safe, "Current user");
 });
 
 export const updateMe = wrap(async (req, res) => {

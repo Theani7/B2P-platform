@@ -13,4 +13,5 @@ export const useProfileCompletion = () =>
   useQuery<ProfileCompletionResponse>({
     queryKey: ["profile-completion"],
     queryFn: () => api.get<ProfileCompletionResponse>("/profile-completion").then((r) => r.data),
+    staleTime: 2 * 60 * 1000,
   });

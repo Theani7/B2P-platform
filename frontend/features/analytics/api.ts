@@ -44,4 +44,5 @@ export const useBusinessAnalytics = () =>
   useQuery<BusinessAnalyticsRead>({
     queryKey: ["business-analytics"],
     queryFn: () => api.get<BusinessAnalyticsRead>("/business/analytics").then((r) => r.data),
+    staleTime: 2 * 60 * 1000,
   });
