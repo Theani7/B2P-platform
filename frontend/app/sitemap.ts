@@ -3,6 +3,12 @@ import { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
+      url: "https://b2p.com/u",
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
       url: "https://b2p.com",
       lastModified: new Date(),
       changeFrequency: "weekly",

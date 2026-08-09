@@ -13,7 +13,7 @@ export function getProfileShare(user) {
   if (user.role === "PROMOTER" && user.promoterProfile) {
     const username = user.promoterProfile.username;
     return {
-      publicUrl: `${base}/promoters/${username}`,
+      publicUrl: `${base}/u/${username}`,
       qrCodeUrl: null,
       username,
       slug: username,
