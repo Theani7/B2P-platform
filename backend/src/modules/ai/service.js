@@ -163,6 +163,10 @@ const contextBlock = (ctx) =>
     ? `\n\nLIVE ACCOUNT DATA (use this to answer account-specific questions; never invent numbers not shown here):\n${JSON.stringify(ctx, null, 2)}`
     : "";
 
+// Qwen reasoning models wrap their chain-of-thought in <think> tags —
+// strip it so users only see the final answer.
+const stripThinking = (text) => (text || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+
 export const chatWithAssistant = async ({ message, role, history = [], user, campaignId }) => {
   const ctx = user ? await buildAssistantContext(user, campaignId) : null;
   const groq = getGroqClient();
@@ -176,22 +180,22 @@ export const chatWithAssistant = async ({ message, role, history = [], user, cam
   ];
   const response = await groq.chat.completions.create({
     messages,
-    model: "llama-3.3-70b-versatile",
+    model: "qwen/qwen3.6-27b",
     temperature: 0.6,
     max_tokens: 700,
   });
-  return { text: response.choices[0]?.message?.content || "", role: role || null };
+  return { text: stripThinking(response.choices[0]?.message?.content), role: role || null };
 };
 
 const generateText = async (system, user) => {
   const groq = getGroqClient();
   const response = await groq.chat.completions.create({
     messages: [{ role: "system", content: system }, { role: "user", content: user }],
-    model: "llama-3.3-70b-versatile",
+    model: "qwen/qwen3.6-27b",
     temperature: 0.7,
     max_tokens: 800,
   });
-  return { text: response.choices[0]?.message?.content || "" };
+  return { text: stripThinking(response.choices[0]?.message?.content) };
 };
 
 export const generateCampaignDescription = (prompt) =>
