@@ -164,18 +164,25 @@ const contextBlock = (ctx) =>
     : "";
 
 // Qwen reasoning models wrap their chain-of-thought in <think> tags —
-// strip it so users only see the final answer.
-const stripThinking = (text) => (text || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+// strip it (including unclosed tags from truncated output) so users
+// only ever see the final answer.
+const stripThinking = (text) => (text || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/g, "").trim();
 
 // Primary model first, then GPT-OSS fallbacks if it errors (rate limit,
 // outage, deprecation). First success wins; if all fail the last error throws.
-const AI_MODELS = ["qwen/qwen3.6-27b", "openai/gpt-oss-120b", "openai/gpt-oss-20b"];
+// Reasoning params are per-model: qwen uses reasoning_format, gpt-oss uses
+// include_reasoning/reasoning_effort (it rejects reasoning_format).
+const AI_MODELS = [
+  { model: "qwen/qwen3.6-27b", params: { reasoning_format: "hidden" } },
+  { model: "openai/gpt-oss-120b", params: { reasoning_effort: "low", include_reasoning: false } },
+  { model: "openai/gpt-oss-20b", params: { reasoning_effort: "low", include_reasoning: false } },
+];
 
 const createChatCompletion = async (groq, params) => {
   let lastError;
-  for (const model of AI_MODELS) {
+  for (const { model, params: modelParams } of AI_MODELS) {
     try {
-      return await groq.chat.completions.create({ ...params, model });
+      return await groq.chat.completions.create({ ...params, ...modelParams, model });
     } catch (e) {
       lastError = e;
       console.error(`AI model ${model} failed, trying fallback:`, e?.message || e);
@@ -198,7 +205,7 @@ export const chatWithAssistant = async ({ message, role, history = [], user, cam
   const response = await createChatCompletion(groq, {
     messages,
     temperature: 0.6,
-    max_tokens: 700,
+    max_tokens: 1000,
   });
   return { text: stripThinking(response.choices[0]?.message?.content), role: role || null };
 };
@@ -208,7 +215,7 @@ const generateText = async (system, user) => {
   const response = await createChatCompletion(groq, {
     messages: [{ role: "system", content: system }, { role: "user", content: user }],
     temperature: 0.7,
-    max_tokens: 800,
+    max_tokens: 1000,
   });
   return { text: stripThinking(response.choices[0]?.message?.content) };
 };
