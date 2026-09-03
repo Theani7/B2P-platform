@@ -167,6 +167,23 @@ const contextBlock = (ctx) =>
 // strip it so users only see the final answer.
 const stripThinking = (text) => (text || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
 
+// Primary model first, then GPT-OSS fallbacks if it errors (rate limit,
+// outage, deprecation). First success wins; if all fail the last error throws.
+const AI_MODELS = ["qwen/qwen3.6-27b", "openai/gpt-oss-120b", "openai/gpt-oss-20b"];
+
+const createChatCompletion = async (groq, params) => {
+  let lastError;
+  for (const model of AI_MODELS) {
+    try {
+      return await groq.chat.completions.create({ ...params, model });
+    } catch (e) {
+      lastError = e;
+      console.error(`AI model ${model} failed, trying fallback:`, e?.message || e);
+    }
+  }
+  throw lastError;
+};
+
 export const chatWithAssistant = async ({ message, role, history = [], user, campaignId }) => {
   const ctx = user ? await buildAssistantContext(user, campaignId) : null;
   const groq = getGroqClient();
@@ -178,9 +195,8 @@ export const chatWithAssistant = async ({ message, role, history = [], user, cam
     ...history.slice(-10).map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.content })),
     { role: "user", content: message },
   ];
-  const response = await groq.chat.completions.create({
+  const response = await createChatCompletion(groq, {
     messages,
-    model: "qwen/qwen3.6-27b",
     temperature: 0.6,
     max_tokens: 700,
   });
@@ -189,9 +205,8 @@ export const chatWithAssistant = async ({ message, role, history = [], user, cam
 
 const generateText = async (system, user) => {
   const groq = getGroqClient();
-  const response = await groq.chat.completions.create({
+  const response = await createChatCompletion(groq, {
     messages: [{ role: "system", content: system }, { role: "user", content: user }],
-    model: "qwen/qwen3.6-27b",
     temperature: 0.7,
     max_tokens: 800,
   });
