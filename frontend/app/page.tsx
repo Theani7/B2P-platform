@@ -10,6 +10,7 @@ import {
   X,
   ArrowRight,
   Check,
+  Star,
   MapPin,
   Heart,
   Smile,
