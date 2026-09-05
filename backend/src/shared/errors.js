@@ -27,6 +27,16 @@ export function errorHandler(err, req, res, next) {
     });
   }
 
+  // Multer upload errors -> 413 for oversize, 400 otherwise.
+  if (err && err.name === "MulterError") {
+    const status = err.code === "LIMIT_FILE_SIZE" ? 413 : 400;
+    return res.status(status).json({
+      success: false,
+      message: err.code === "LIMIT_FILE_SIZE" ? "File too large (max 5MB)" : "File upload failed",
+      errors: [{ detail: err.message }],
+    });
+  }
+
   console.error("[unhandled]", err);
   return res.status(500).json({
     success: false,
