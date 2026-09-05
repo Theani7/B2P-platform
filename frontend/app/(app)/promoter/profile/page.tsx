@@ -231,18 +231,6 @@ function PromoterProfileInner() {
           >
             <Share size={16} /> Share Profile
           </button>
-          <button
-            onClick={handleSubmit(onSubmit)}
-            disabled={!isDirty || isSubmitting}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-button text-sm font-medium transition-all shadow-feature-section ${
-              isDirty && !isSubmitting
-                ? "hero-blue-fade text-white hover:opacity-90 hover:scale-[1.02]"
-                : "bg-slate-custom/5 text-steel cursor-not-allowed border border-slate-custom/10"
-            }`}
-          >
-            {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </button>
         </div>
       </div>
 
