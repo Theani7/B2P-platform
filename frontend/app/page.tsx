@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/Button";
+import { AuthModal, type AuthView } from "@/components/auth/AuthModal";
 import { DashboardPath, Role } from "@/lib/roles";
 import {
   Menu,
@@ -71,7 +72,7 @@ const NAV_LINKS = [
   { href: "#faq", label: "FAQ" },
 ];
 
-function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
+function LandingNav({ isAuthed, role, onAuth }: { isAuthed: boolean; role?: string; onAuth: (view: AuthView, role?: Role.BUSINESS | Role.PROMOTER) => void }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
@@ -113,12 +114,10 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             </Link>
           ) : (
             <>
-              <Link href="/login" className="px-3 py-2 text-sm font-medium text-slate-custom transition-colors hover:text-midnight-ink">
+              <button onClick={() => onAuth("login")} className="px-3 py-2 text-sm font-medium text-slate-custom transition-colors hover:text-midnight-ink">
                 Sign in
-              </Link>
-              <Link href="/register">
-                <Button className="rounded-full shadow-product-card">Get started free</Button>
-              </Link>
+              </button>
+              <Button className="rounded-full shadow-product-card" onClick={() => onAuth("register")}>Get started free</Button>
             </>
           )}
         </div>
@@ -168,12 +167,12 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
                 </Link>
               ) : (
                 <>
-                  <Link href="/login" onClick={() => setMobileOpen(false)}>
-                    <Button variant="ghost" className="w-full rounded-full">Sign in</Button>
-                  </Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)}>
-                    <Button variant="primary" className="w-full rounded-full">Get started free</Button>
-                  </Link>
+                  <Button variant="ghost" className="w-full rounded-full" onClick={() => { setMobileOpen(false); onAuth("login"); }}>
+                    Sign in
+                  </Button>
+                  <Button variant="primary" className="w-full rounded-full" onClick={() => { setMobileOpen(false); onAuth("register"); }}>
+                    Get started free
+                  </Button>
                 </>
               )}
             </div>
@@ -195,7 +194,7 @@ const HERO_AVATARS = [
   "https://randomuser.me/api/portraits/men/41.jpg",
 ];
 
-function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
+function Hero({ isAuthed, role, onAuth }: { isAuthed: boolean; role?: string; onAuth: (view: AuthView, role?: Role.BUSINESS | Role.PROMOTER) => void }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
   return (
     <section className="relative overflow-hidden pb-20 pt-36 lg:pb-28 lg:pt-44">
@@ -233,12 +232,12 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             </div>
           ) : (
             <div className="mx-auto mb-12 flex max-w-lg flex-col gap-3 sm:flex-row">
-              <Link href="/register?role=BUSINESS" className="flex-1 rounded-full bg-signal-blue px-6 py-4 text-center text-sm font-semibold text-white shadow-product-card transition-transform hover:-translate-y-0.5">
+              <button onClick={() => onAuth("register", Role.BUSINESS)} className="flex-1 rounded-full bg-signal-blue px-6 py-4 text-center text-sm font-semibold text-white shadow-product-card transition-transform hover:-translate-y-0.5">
                 I am a brand
-              </Link>
-              <Link href="/register?role=PROMOTER" className="flex-1 rounded-full bg-white px-6 py-4 text-center text-sm font-semibold text-graphite shadow-product-card transition-transform hover:-translate-y-0.5">
+              </button>
+              <button onClick={() => onAuth("register", Role.PROMOTER)} className="flex-1 rounded-full bg-white px-6 py-4 text-center text-sm font-semibold text-graphite shadow-product-card transition-transform hover:-translate-y-0.5">
                 I am a creator
-              </Link>
+              </button>
             </div>
           )}
         </Reveal>
@@ -329,7 +328,7 @@ function HowItWorks() {
 
 /* --------------------------------- audiences ------------------------------- */
 
-function Audiences() {
+function Audiences({ onAuth }: { onAuth: (view: AuthView, role?: Role.BUSINESS | Role.PROMOTER) => void }) {
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto grid max-w-[1100px] gap-5 px-6 md:grid-cols-2">
@@ -349,9 +348,9 @@ function Audiences() {
               </li>
             ))}
           </ul>
-          <Link href="/register?role=BUSINESS" className="inline-block rounded-full bg-white px-6 py-3 text-sm font-semibold text-midnight-ink transition-transform hover:-translate-y-0.5">
+          <button onClick={() => onAuth("register", Role.BUSINESS)} className="inline-block rounded-full bg-white px-6 py-3 text-sm font-semibold text-midnight-ink transition-transform hover:-translate-y-0.5">
             Explore for brands
-          </Link>
+          </button>
         </Reveal>
         <Reveal delay={120} className="rounded-[2.5rem] bg-amber-tag/20 p-9 lg:p-12">
           <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-graphite/5">
@@ -369,9 +368,9 @@ function Audiences() {
               </li>
             ))}
           </ul>
-          <Link href="/register?role=PROMOTER" className="inline-block rounded-full bg-graphite px-6 py-3 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">
+          <button onClick={() => onAuth("register", Role.PROMOTER)} className="inline-block rounded-full bg-graphite px-6 py-3 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">
             Create creator profile
-          </Link>
+          </button>
         </Reveal>
       </div>
     </section>
@@ -414,7 +413,7 @@ function WhyDirect() {
 
 /* --------------------------------- live briefs ------------------------------ */
 
-function LiveBriefs() {
+function LiveBriefs({ onAuth }: { onAuth: (view: AuthView, role?: Role.BUSINESS | Role.PROMOTER) => void }) {
   return (
     <section className="bg-sky-wash/50 py-20 lg:py-24">
       <div className="mx-auto max-w-[1100px] px-6">
@@ -430,12 +429,12 @@ function LiveBriefs() {
             Browse open campaigns the moment you join. Filter by niche, apply in one click, and start the conversation today.
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href="/register?role=PROMOTER" className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-midnight-ink transition-transform hover:-translate-y-0.5">
+            <button onClick={() => onAuth("register", Role.PROMOTER)} className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-midnight-ink transition-transform hover:-translate-y-0.5">
               Find open briefs
-            </Link>
-            <Link href="/register?role=BUSINESS" className="rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+            </button>
+            <button onClick={() => onAuth("register", Role.BUSINESS)} className="rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">
               Post a brief
-            </Link>
+            </button>
           </div>
         </Reveal>
       </div>
@@ -496,7 +495,7 @@ function Faq() {
 
 /* ----------------------------------- CTA ----------------------------------- */
 
-function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
+function CTA({ isAuthed, role, onAuth }: { isAuthed: boolean; role?: string; onAuth: (view: AuthView, role?: Role.BUSINESS | Role.PROMOTER) => void }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
   return (
     <section className="bg-linen-canvas px-6 pb-20 lg:pb-28">
@@ -518,12 +517,12 @@ function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             </Link>
           ) : (
             <div className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row">
-              <Link href="/register?role=BUSINESS" className="flex-1 rounded-full bg-white px-6 py-4 text-sm font-semibold text-signal-blue transition-transform hover:-translate-y-0.5">
+              <button onClick={() => onAuth("register", Role.BUSINESS)} className="flex-1 rounded-full bg-white px-6 py-4 text-sm font-semibold text-signal-blue transition-transform hover:-translate-y-0.5">
                 I am a brand
-              </Link>
-              <Link href="/register?role=PROMOTER" className="flex-1 rounded-full bg-midnight-ink px-6 py-4 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">
+              </button>
+              <button onClick={() => onAuth("register", Role.PROMOTER)} className="flex-1 rounded-full bg-midnight-ink px-6 py-4 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">
                 I am a creator
-              </Link>
+              </button>
             </div>
           )}
         </div>
@@ -597,23 +596,42 @@ function Footer() {
 export default function LandingPage() {
   const { token, user } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authView, setAuthView] = useState<AuthView>("login");
+  const [authRole, setAuthRole] = useState<Role.BUSINESS | Role.PROMOTER>(Role.BUSINESS);
   useEffect(() => setMounted(true), []);
   const isAuthed = mounted && !!token && !!user;
 
+  const openAuth = (view: AuthView, role?: Role.BUSINESS | Role.PROMOTER) => {
+    if (role) setAuthRole(role);
+    setAuthView(view);
+    setAuthOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-linen-canvas">
-      <LandingNav isAuthed={isAuthed} role={user?.role} />
+      <LandingNav isAuthed={isAuthed} role={user?.role} onAuth={openAuth} />
       <main>
-        <Hero isAuthed={isAuthed} role={user?.role} />
+        <Hero isAuthed={isAuthed} role={user?.role} onAuth={openAuth} />
         <LoveNotes />
         <HowItWorks />
-        <Audiences />
+        <Audiences onAuth={openAuth} />
         <WhyDirect />
-        <LiveBriefs />
+        <LiveBriefs onAuth={openAuth} />
         <Faq />
-        <CTA isAuthed={isAuthed} role={user?.role} />
+        <CTA isAuthed={isAuthed} role={user?.role} onAuth={openAuth} />
       </main>
       <Footer />
+      <AuthModal
+        open={authOpen}
+        view={authView}
+        role={authRole}
+        onClose={() => setAuthOpen(false)}
+        onSwitch={(view, role) => {
+          if (role) setAuthRole(role);
+          setAuthView(view);
+        }}
+      />
     </div>
   );
 }

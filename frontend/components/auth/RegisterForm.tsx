@@ -24,7 +24,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-export function RegisterForm() {
+export function RegisterForm({ initialRole }: { initialRole?: Role.BUSINESS | Role.PROMOTER } = {}) {
   const router = useRouter();
   const {
     register,
@@ -37,10 +37,11 @@ export function RegisterForm() {
     resolver: zodResolver(schema),
     defaultValues: {
       role:
-        typeof window !== "undefined" &&
+        initialRole ??
+        (typeof window !== "undefined" &&
         new URLSearchParams(window.location.search).get("role") === Role.PROMOTER
           ? Role.PROMOTER
-          : Role.BUSINESS,
+          : Role.BUSINESS),
     },
   });
 
