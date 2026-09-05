@@ -14,6 +14,7 @@ import portfolioRouter from "./modules/portfolio/routes.js";
 import publicPortfolioRouter from "./modules/portfolio/publicRoutes.js";
 import portfolioMediaRouter from "./modules/portfolio-media/routes.js";
 import socialRouter from "./modules/social/routes.js";
+import followsRouter from "./modules/follows/routes.js";
 import profileCompletionRouter from "./modules/profileCompletion/routes.js";
 import businessVerificationRouter from "./modules/verification/businessRoutes.js";
 import promoterVerificationRouter from "./modules/verification/promoterRoutes.js";
@@ -142,6 +143,7 @@ export function createApp() {
   app.use(`${config.apiV1}/portfolio`, portfolioRouter);
   app.use(`${config.apiV1}/portfolio`, portfolioMediaRouter);
   app.use(`${config.apiV1}/social`, socialRouter);
+  app.use(`${config.apiV1}/follows`, followsRouter);
   app.use(`${config.apiV1}/profile-completion`, profileCompletionRouter);
   app.use(`${config.apiV1}/notifications`, notificationsRouter);
   app.use(`${config.apiV1}/chat`, chatRouter);

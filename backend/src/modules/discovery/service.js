@@ -72,7 +72,18 @@ export async function searchPromoters(params = {}) {
     prisma.promoterProfile.count({ where }),
   ]);
 
-  return [items, total];
+  const counts = await prisma.follow.groupBy({
+    by: ["followingId"],
+    where: { followingId: { in: items.map((i) => i.userId) } },
+    _count: { followingId: true },
+  });
+  const countByUser = new Map(counts.map((c) => [c.followingId, c._count.followingId]));
+  const withFollows = items.map((i) => ({
+    ...i,
+    inAppFollowers: countByUser.get(i.userId) ?? 0,
+  }));
+
+  return [withFollows, total];
 }
 
 export async function getPublicProfile(username) {
@@ -109,8 +120,11 @@ export async function getPublicProfile(username) {
   });
   if (!profile) throw new AppError("Promoter not found", 404);
 
+  const inAppFollowers = await prisma.follow.count({ where: { followingId: profile.userId } });
+
   return {
     ...profile,
+    inAppFollowers,
     socialLinks: profile.user?.socialLinks || [],
   };
 }
