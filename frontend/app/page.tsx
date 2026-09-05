@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/Button";
 import { DashboardPath, Role } from "@/lib/roles";
-import { Menu, X, ArrowRight, Plus } from "lucide-react";
+import { Menu, X, ArrowRight, ArrowUpRight } from "lucide-react";
 
 /* ---------------------------------- nav ---------------------------------- */
 
 const NAV_LINKS = [
-  { href: "#platform", label: "Platform" },
-  { href: "#how", label: "How it works" },
+  { href: "#live", label: "Live" },
+  { href: "#score", label: "Scoring" },
+  { href: "#chapters", label: "Platform" },
   { href: "#faq", label: "FAQ" },
 ];
 
@@ -33,8 +34,8 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-        <Link href="/" className="text-lg font-medium text-signal-blue">
-          Byparsathy
+        <Link href="/" className="text-lg font-medium tracking-tight text-midnight-ink">
+          Byparsathy<span className="text-signal-blue">.</span>
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
@@ -42,25 +43,25 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-slate-custom transition-colors hover:text-signal-blue"
+              className="text-sm text-slate-custom transition-colors hover:text-midnight-ink"
             >
               {link.label}
             </a>
           ))}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
           {isAuthed ? (
             <Link href={dash}>
-              <Button variant="ghost">Open dashboard</Button>
+              <Button variant="ghost">Dashboard</Button>
             </Link>
           ) : (
             <>
-              <Link href="/login" className="px-3 py-2 text-sm text-slate-custom transition-colors hover:text-signal-blue">
+              <Link href="/login" className="px-3 py-2 text-sm text-slate-custom transition-colors hover:text-midnight-ink">
                 Sign in
               </Link>
               <Link href="/register">
-                <Button>Get started</Button>
+                <Button className="rounded-pill">Get started <ArrowUpRight size={15} /></Button>
               </Link>
             </>
           )}
@@ -83,7 +84,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
           />
           <div className="fixed bottom-0 right-0 top-0 z-50 flex w-72 flex-col bg-linen-canvas md:hidden">
             <div className="flex h-16 items-center justify-between border-b border-steel/10 px-6">
-              <span className="text-lg font-medium text-signal-blue">Byparsathy</span>
+              <span className="text-lg font-medium text-midnight-ink">Byparsathy.</span>
               <button
                 onClick={() => setMobileOpen(false)}
                 className="rounded-buttons p-2 text-slate-custom hover:bg-sky-wash"
@@ -107,7 +108,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             <div className="flex flex-col gap-3 border-t border-steel/10 p-6">
               {isAuthed ? (
                 <Link href={dash} onClick={() => setMobileOpen(false)}>
-                  <Button variant="primary" className="w-full">Open dashboard</Button>
+                  <Button variant="primary" className="w-full">Dashboard</Button>
                 </Link>
               ) : (
                 <>
@@ -127,33 +128,63 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   );
 }
 
-/* ------------------------------- match preview ------------------------------ */
+/* -------------------------------- live feed -------------------------------- */
 
-const MATCH_ROWS = [
-  { niche: "Food and lifestyle", reach: "42K followers", score: 96 },
-  { niche: "Travel vlogs", reach: "28K followers", score: 91 },
-  { niche: "Wellness", reach: "15K followers", score: 88 },
+const FEED = [
+  { brief: "Festival snack launch", detail: "Food · Kathmandu · Rs 45K", score: 96 },
+  { brief: "Trek gear field test", detail: "Travel · Pokhara · Rs 30K", score: 91 },
+  { brief: "Gadget unboxing wave", detail: "Tech · Lalitpur · Rs 60K", score: 89 },
+  { brief: "Winter lookbook", detail: "Fashion · Kathmandu · Rs 38K", score: 93 },
 ];
 
-function MatchPreview() {
+function LiveFeed() {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setIndex((i) => (i + 1) % FEED.length), 3200);
+    return () => clearInterval(id);
+  }, [paused]);
+
+  const item = FEED[index];
+
   return (
-    <div className="relative mx-auto w-full max-w-[520px]">
-      <div className="absolute -inset-4 rounded-cards-lg bg-signal-blue/5 blur-2xl" />
-      <div className="relative rounded-cards-lg border border-steel/10 bg-white p-6 shadow-feature-section sm:p-7">
-        <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">Summer Launch 2026</p>
-        <p className="mb-5 text-heading-sm text-graphite">Top matches</p>
-        <div className="divide-y divide-steel/10 border-y border-steel/10">
-          {MATCH_ROWS.map((r) => (
-            <div key={r.niche} className="flex items-center justify-between py-3.5">
-              <div>
-                <p className="text-sm font-medium text-graphite">{r.niche}</p>
-                <p className="mt-0.5 text-xs text-ash">{r.reach}</p>
-              </div>
-              <span className="font-roboto-mono text-sm text-signal-blue">{r.score}%</span>
-            </div>
-          ))}
+    <div
+      id="live"
+      className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-7 shadow-feature-section sm:p-8"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="mb-6 flex items-center justify-between">
+        <p className="text-caption font-medium uppercase tracking-wide text-ash">Happening now</p>
+        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-status">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-status" />
+          Live
+        </span>
+      </div>
+
+      <div key={index} className="animate-fade-slide-up">
+        <p className="mb-1 text-heading text-graphite">{item.brief}</p>
+        <p className="mb-5 text-sm text-ash">{item.detail}</p>
+        <div className="flex items-end justify-between">
+          <p className="text-caption uppercase tracking-wide text-fog">Top match</p>
+          <p className="font-roboto-mono text-display leading-none text-signal-blue">{item.score}<span className="text-lg text-ash">%</span></p>
         </div>
-        <p className="mt-4 text-xs text-fog">Scores combine niche fit, location, audience, and track record.</p>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-sky-wash">
+          <div className="h-full rounded-full bg-signal-blue transition-all duration-700" style={{ width: `${item.score}%` }} />
+        </div>
+      </div>
+
+      <div className="mt-6 flex gap-1.5">
+        {FEED.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`Show brief ${i + 1}`}
+            onClick={() => setIndex(i)}
+            className={`h-1 flex-1 rounded-full transition-colors ${i === index ? "bg-signal-blue" : "bg-steel/15 hover:bg-steel/30"}`}
+          />
+        ))}
       </div>
     </div>
   );
@@ -164,127 +195,167 @@ function MatchPreview() {
 function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
   return (
-    <section className="relative overflow-hidden pb-20 pt-32 lg:pb-28 lg:pt-40">
+    <section className="relative overflow-hidden pb-16 pt-32 lg:pb-24 lg:pt-40">
       <div
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(90% 60% at 50% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0.55) 45%, rgba(252,252,252,0) 75%)",
+            "radial-gradient(60% 50% at 85% 20%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0.5) 50%, rgba(252,252,252,0) 75%)",
         }}
       />
-      <div className="mx-auto max-w-[1200px] px-6 text-center">
-        <h1 className="mx-auto mb-5 max-w-2xl text-display text-midnight-ink">
-          Every campaign finds <span className="text-signal-blue">its creator</span>
-        </h1>
-        <p className="mx-auto mb-8 max-w-xl text-body leading-relaxed text-graphite/80">
-          Post a brief, meet scored matches, and run the collaboration in one quiet workspace.
-        </p>
-        <div className="mb-16 flex flex-wrap items-center justify-center gap-4">
-          {isAuthed ? (
-            <Link href={dash}>
-              <Button className="h-12 px-6 text-base">Open dashboard</Button>
-            </Link>
-          ) : (
-            <>
-              <Link href="/register">
-                <Button className="h-12 px-6 text-base">Get started</Button>
+      <div className="mx-auto grid max-w-[1200px] items-center gap-14 px-6 lg:grid-cols-[1.15fr_1fr] lg:gap-10">
+        <div>
+          <p className="font-roboto-mono mb-6 text-xs text-signal-blue">brand × creator marketplace — nepal</p>
+          <h1 className="text-display text-midnight-ink">
+            Put your brand<br />in trusted hands<span className="text-signal-blue">.</span>
+          </h1>
+          <p className="mb-9 mt-6 max-w-md text-body leading-relaxed text-graphite/80">
+            Post a brief. Meet creators scored on fit, not fame. Launch work you can measure.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            {isAuthed ? (
+              <Link href={dash}>
+                <Button className="h-12 rounded-pill px-7 text-base">Open dashboard</Button>
               </Link>
-              <Link href="/login">
-                <Button variant="ghost" className="h-12 px-6 text-base">Sign in</Button>
-              </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link href="/register">
+                  <Button className="h-12 rounded-pill px-7 text-base">
+                    <span className="flex items-center gap-2">Start free <ArrowRight size={16} /></span>
+                  </Button>
+                </Link>
+                <Link href="/login" className="px-2 py-2 text-sm font-medium text-slate-custom transition-colors hover:text-midnight-ink">
+                  Sign in
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-        <MatchPreview />
+        <LiveFeed />
       </div>
     </section>
   );
 }
 
-/* --------------------------------- niches ---------------------------------- */
+/* ------------------------------- score band -------------------------------- */
 
-const NICHES = ["Fashion", "Tech", "Food", "Travel", "Fitness", "Gaming", "Beauty", "Education"];
-
-function Niches() {
-  return (
-    <section className="border-y border-steel/10 bg-white py-10">
-      <div className="mx-auto max-w-[1200px] px-6 text-center">
-        <p className="mb-5 text-caption font-medium uppercase tracking-wide text-fog">Creators across every niche</p>
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-          {NICHES.map((n) => (
-            <span key={n} className="text-heading-sm text-ash transition-colors hover:text-graphite">{n}</span>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------------------- platform --------------------------------- */
-
-const FEATURES = [
-  { title: "Scored matching", body: "Niche, location, audience, and track record compress into one number you can inspect." },
-  { title: "Structured briefs", body: "Goals, budget, and requirements live in one place both sides can see." },
-  { title: "Calm delivery", body: "Drafts, approvals, and reviews move forward without chasing threads." },
-  { title: "Shared context", body: "Every message belongs to its collaboration. Nothing gets lost." },
-  { title: "Verified profiles", body: "Identity and audience checks run before anyone can apply." },
-  { title: "Honest reputation", body: "Two sided reviews compound into trust worth hiring on." },
+const SEGMENTS = [
+  { label: "Niche", pts: 40 },
+  { label: "Place", pts: 20 },
+  { label: "Crowd", pts: 15 },
+  { label: "Proof", pts: 25 },
 ];
 
-function Platform() {
+function ScoreBand() {
   return (
-    <section id="platform" className="bg-linen-canvas py-20 lg:py-28">
-      <div className="mx-auto max-w-[900px] px-6">
-        <h2 className="mx-auto mb-4 max-w-xl text-center text-heading-lg text-midnight-ink">
-          Less noise around hiring creators
-        </h2>
-        <p className="mx-auto mb-14 max-w-md text-center text-body text-ash">
-          Six quiet tools replace the spreadsheet, the inbox, and the follow up.
-        </p>
-        <div className="divide-y divide-steel/10 border-y border-steel/10">
-          {FEATURES.map((f, i) => (
-            <div key={f.title} className="grid gap-1 py-6 sm:grid-cols-[64px_1fr] sm:gap-6">
-              <span className="font-roboto-mono text-sm text-fog">0{i + 1}</span>
-              <div>
-                <h3 className="mb-1 text-heading-sm text-graphite">{f.title}</h3>
-                <p className="max-w-xl text-sm leading-relaxed text-ash">{f.body}</p>
+    <section id="score" className="border-y border-steel/10 bg-white py-16 lg:py-20">
+      <div className="mx-auto max-w-[1200px] px-6">
+        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+          <div>
+            <h2 className="mb-3 text-heading-lg text-midnight-ink">One number, fully open</h2>
+            <p className="max-w-sm text-body leading-relaxed text-ash">
+              Every match is scored out of 100. Nothing hidden, nothing averaged away.
+            </p>
+          </div>
+          <div>
+            <div className="flex h-14 w-full overflow-hidden rounded-buttons">
+              {SEGMENTS.map((s) => (
+                <div
+                  key={s.label}
+                  className="flex h-full flex-col justify-center border-r border-white/60 bg-sky-wash px-4 last:border-0"
+                  style={{ width: `${s.pts}%` }}
+                >
+                  <span className="font-roboto-mono text-sm text-midnight-ink">{s.pts}</span>
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-ash">{s.label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex justify-between">
+              <span className="text-xs text-fog">Fit · Place · Crowd · Proof</span>
+              <span className="font-roboto-mono text-xs text-signal-blue">100 pts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------- chapters --------------------------------- */
+
+const CHAPTERS = [
+  {
+    n: "01",
+    title: "Brief it",
+    body: "Describe the work, the crowd, and the budget. A structured brief takes minutes and answers every question a creator would ask.",
+    tags: ["Goals", "Budget", "Requirements"],
+  },
+  {
+    n: "02",
+    title: "Meet the shortlist",
+    body: "Applications arrive ranked by the open score. Open a profile, check the record, and invite your favorites.",
+    tags: ["Ranked applicants", "Verified profiles", "Direct invites"],
+  },
+  {
+    n: "03",
+    title: "Ship it together",
+    body: "Drafts, feedback, and approvals move through one thread. Chat stays attached to the work it is about.",
+    tags: ["Deliverables", "Approvals", "In-context chat"],
+  },
+];
+
+function Chapters() {
+  return (
+    <section id="chapters" className="bg-linen-canvas py-20 lg:py-28">
+      <div className="mx-auto max-w-[1200px] px-6">
+        {CHAPTERS.map((c, i) => (
+          <div
+            key={c.n}
+            className={`grid gap-6 border-t border-steel/10 py-12 lg:py-16 ${i === CHAPTERS.length - 1 ? "border-b" : ""} lg:grid-cols-[120px_1fr_1fr] lg:gap-10`}
+          >
+            <p className="font-roboto-mono text-display leading-none text-steel/25">{c.n}</p>
+            <h3 className="text-heading-lg text-midnight-ink">{c.title}</h3>
+            <div>
+              <p className="mb-5 max-w-md text-body leading-relaxed text-ash">{c.body}</p>
+              <div className="flex flex-wrap gap-2">
+                {c.tags.map((t) => (
+                  <span key={t} className="rounded-badges bg-sky-wash px-2.5 py-1 text-xs font-medium text-signal-blue">
+                    {t}
+                  </span>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </section>
   );
 }
 
-/* ---------------------------------- steps ---------------------------------- */
+/* ----------------------------------- roles ---------------------------------- */
 
-const STEPS = [
-  { title: "Create your profile", desc: "Business or creator, finished in minutes." },
-  { title: "Match and apply", desc: "Scores point both sides toward the fit." },
-  { title: "Deliver together", desc: "Briefs, drafts, and approvals in one thread." },
-  { title: "Review and repeat", desc: "Each collaboration builds your record." },
-];
-
-function HowItWorks() {
+function Roles() {
   return (
-    <section id="how" className="bg-white py-20 lg:py-28">
-      <div className="mx-auto max-w-[900px] px-6">
-        <h2 className="mb-12 text-center text-heading-lg text-midnight-ink">Four steps, no detours</h2>
-        <ol className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          {STEPS.map((s, i) => (
-            <li key={s.title}>
-              <p className="font-roboto-mono mb-3 border-b border-steel/10 pb-3 text-sm text-signal-blue">0{i + 1}</p>
-              <h3 className="mb-1.5 text-heading-sm text-graphite">{s.title}</h3>
-              <p className="text-sm leading-relaxed text-ash">{s.desc}</p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-14 text-center">
-          <Link href="/register">
-            <Button className="h-12 px-6 text-base">
-              <span className="flex items-center gap-2">Get started <ArrowRight size={16} /></span>
-            </Button>
+    <section className="bg-white py-20 lg:py-28">
+      <div className="mx-auto grid max-w-[1200px] gap-px overflow-hidden rounded-cards-lg border border-steel/10 bg-steel/10 sm:grid-cols-2">
+        <div className="bg-white p-10 lg:p-14">
+          <p className="font-roboto-mono mb-4 text-xs text-signal-blue">for brands</p>
+          <h3 className="mb-3 text-heading-lg text-midnight-ink">Hire on evidence</h3>
+          <p className="mb-8 max-w-sm text-body leading-relaxed text-ash">
+            Compare audiences, read real reviews, and approve work without leaving the thread.
+          </p>
+          <Link href="/register?role=BUSINESS" className="inline-flex items-center gap-1.5 text-sm font-medium text-signal-blue hover:opacity-75">
+            Start hiring <ArrowRight size={15} />
+          </Link>
+        </div>
+        <div className="bg-midnight-ink p-10 lg:p-14">
+          <p className="font-roboto-mono mb-4 text-xs text-white/50">for creators</p>
+          <h3 className="mb-3 text-heading-lg text-white">Get found for your thing</h3>
+          <p className="mb-8 max-w-sm text-body leading-relaxed text-white/70">
+            One profile, matched briefs, reviews that raise your rate. No follower gatekeeping.
+          </p>
+          <Link href="/register?role=PROMOTER" className="inline-flex items-center gap-1.5 text-sm font-medium text-white hover:opacity-75">
+            Join as a creator <ArrowRight size={15} />
           </Link>
         </div>
       </div>
@@ -296,20 +367,16 @@ function HowItWorks() {
 
 const FAQS = [
   {
-    q: "How does the matching score work?",
-    a: "Each promoter is scored out of 100 across niche fit, location, audience, and track record, with the breakdown always visible.",
-  },
-  {
-    q: "Is Byparsathy free?",
+    q: "What does it cost?",
     a: "Joining and building a profile is free. Businesses pay only for the campaigns they run.",
   },
   {
-    q: "Who can apply to my campaign?",
-    a: "Any verified promoter. Every application arrives pre-scored so you review fit first.",
+    q: "How is the score calculated?",
+    a: "Niche fit (40), location (20), audience (15), and track record (25). The full split shows on every match.",
   },
   {
-    q: "How do creators get paid?",
-    a: "Terms are agreed inside the collaboration before work starts, and completed work earns public reviews.",
+    q: "Who owns the content?",
+    a: "Creators do. Posting it here only lets the platform display it for marketplace purposes.",
   },
 ];
 
@@ -318,18 +385,20 @@ function Faq() {
   return (
     <section id="faq" className="bg-linen-canvas py-20 lg:py-28">
       <div className="mx-auto max-w-[720px] px-6">
-        <h2 className="mb-10 text-center text-heading-lg text-midnight-ink">Questions</h2>
-        <div className="divide-y divide-steel/10 border-y border-steel/10">
+        <h2 className="mb-10 text-heading-lg text-midnight-ink">Asked often</h2>
+        <div className="border-t border-steel/10">
           {FAQS.map((f, i) => {
             const isOpen = open === i;
             return (
-              <div key={f.q}>
+              <div key={f.q} className="border-b border-steel/10">
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
                   className="flex w-full items-center justify-between gap-4 py-5 text-left"
                 >
                   <span className="text-heading-sm text-graphite">{f.q}</span>
-                  <Plus size={16} className={`flex-shrink-0 text-signal-blue transition-transform ${isOpen ? "rotate-45" : ""}`} />
+                  <span className={`font-roboto-mono text-sm ${isOpen ? "text-signal-blue" : "text-fog"}`}>
+                    {isOpen ? "—" : "+"}
+                  </span>
                 </button>
                 {isOpen && (
                   <p className="animate-fade-slide-up max-w-2xl pb-6 text-sm leading-relaxed text-ash">{f.a}</p>
@@ -343,31 +412,83 @@ function Faq() {
   );
 }
 
+/* ----------------------------------- CTA ----------------------------------- */
+
+function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
+  const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
+  return (
+    <section className="bg-linen-canvas px-6 pb-20 lg:pb-28">
+      <div className="mx-auto max-w-[1200px] rounded-cards-lg bg-midnight-ink px-6 py-16 text-center lg:py-20">
+        <h2 className="mx-auto mb-4 max-w-xl text-heading-lg text-white">
+          Your next collab is one brief away
+        </h2>
+        <p className="mx-auto mb-9 max-w-md text-body text-white/65">
+          Free to start. Pick a side and meet your match.
+        </p>
+        {isAuthed ? (
+          <Link href={dash}>
+            <Button className="h-12 rounded-pill bg-white px-7 text-base font-medium text-midnight-ink hover:opacity-90">
+              Open dashboard
+            </Button>
+          </Link>
+        ) : (
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link href="/register?role=BUSINESS" className="rounded-pill bg-white px-7 py-3 text-sm font-medium text-midnight-ink transition-opacity hover:opacity-90">
+              I am a brand
+            </Link>
+            <Link href="/register?role=PROMOTER" className="rounded-pill border border-white/25 px-7 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10">
+              I am a creator
+            </Link>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 /* ---------------------------------- footer ---------------------------------- */
 
 function Footer() {
   return (
-    <footer className="border-t border-steel/10 bg-white">
-      <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-6 px-6 py-10 sm:flex-row">
+    <footer className="border-t border-steel/10 bg-linen-canvas">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 py-12 md:flex-row md:items-start md:justify-between">
         <div>
-          <p className="text-lg font-medium text-signal-blue">Byparsathy</p>
-          <p className="mt-1 text-sm text-ash">Brand to creator collaborations, made in Nepal.</p>
+          <p className="text-lg font-medium tracking-tight text-midnight-ink">Byparsathy<span className="text-signal-blue">.</span></p>
+          <p className="mt-2 max-w-xs text-sm leading-relaxed text-ash">
+            The brand to creator marketplace. Direct briefs, open scoring, honest reviews.
+          </p>
         </div>
-        <div className="flex items-center gap-6">
-          <a href="#platform" className="text-sm text-ash transition-colors hover:text-signal-blue">Platform</a>
-          <Link href="/about" className="text-sm text-ash transition-colors hover:text-signal-blue">About</Link>
-          <Link href="/login" className="text-sm text-ash transition-colors hover:text-signal-blue">Sign in</Link>
-          <Link href="/register" className="text-sm font-medium text-signal-blue hover:opacity-80">Get started</Link>
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
+          {[
+            { title: "Platform", links: [{ label: "Live", href: "#live" }, { label: "Scoring", href: "#score" }, { label: "FAQ", href: "#faq" }] },
+            { title: "Company", links: [{ label: "About", href: "/about" }] },
+            { title: "Legal", links: [{ label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }] },
+          ].map((col) => (
+            <div key={col.title}>
+              <p className="mb-3 text-caption font-medium uppercase tracking-wide text-fog">{col.title}</p>
+              <ul className="space-y-2">
+                {col.links.map((l) => (
+                  <li key={l.label}>
+                    {l.href.startsWith("/") ? (
+                      <Link href={l.href} className="text-sm text-slate-custom transition-colors hover:text-midnight-ink">
+                        {l.label}
+                      </Link>
+                    ) : (
+                      <a href={l.href} className="text-sm text-slate-custom transition-colors hover:text-midnight-ink">
+                        {l.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
       <div className="border-t border-steel/10">
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-2 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-ash">© {new Date().getFullYear()} Byparsathy. All rights reserved.</p>
-          <p className="flex gap-4 text-xs text-ash">
-            <Link href="/privacy" className="transition-colors hover:text-signal-blue">Privacy</Link>
-            <Link href="/terms" className="transition-colors hover:text-signal-blue">Terms</Link>
-          </p>
-        </div>
+        <p className="mx-auto max-w-[1200px] px-6 py-5 text-xs text-fog">
+          © {new Date().getFullYear()} Byparsathy · Made in Nepal
+        </p>
       </div>
     </footer>
   );
@@ -382,14 +503,15 @@ export default function LandingPage() {
   const isAuthed = mounted && !!token && !!user;
 
   return (
-    <div className="min-h-screen bg-linen-canvas">
+    <div className="min-h-screen bg-linen-canvas text-graphite antialiased">
       <LandingNav isAuthed={isAuthed} role={user?.role} />
       <main>
         <Hero isAuthed={isAuthed} role={user?.role} />
-        <Niches />
-        <Platform />
-        <HowItWorks />
+        <ScoreBand />
+        <Chapters />
+        <Roles />
         <Faq />
+        <CTA isAuthed={isAuthed} role={user?.role} />
       </main>
       <Footer />
     </div>
