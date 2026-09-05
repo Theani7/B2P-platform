@@ -92,6 +92,11 @@ export async function verifyOtp(payload: { email: string; code: string }): Promi
   return res.data;
 }
 
+export async function loginWithOtp(payload: { email: string; code: string }): Promise<User> {
+  await verifyOtp(payload);
+  return (await api.get<User>("/auth/me")).data;
+}
+
 export async function verifyRegistrationOtp(payload: { email: string; code: string }): Promise<User> {
   const res = await api.post<AuthTokens>("/auth/verify-registration-otp", payload);
   setTokens(res.data.access_token, res.data.refresh_token);
