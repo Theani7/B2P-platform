@@ -35,7 +35,13 @@ export function RegisterForm() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { role: Role.BUSINESS },
+    defaultValues: {
+      role:
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("role") === Role.PROMOTER
+          ? Role.PROMOTER
+          : Role.BUSINESS,
+    },
   });
 
   const selectedRole = useWatch({ control, name: "role" });

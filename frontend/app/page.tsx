@@ -11,22 +11,18 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  ShieldCheck,
-  Sparkles,
-  ChevronDown,
-  Zap,
-  Target,
-  MessagesSquare,
-  ClipboardList,
   Star,
+  Zap,
+  ChevronDown,
+  MapPin,
 } from "lucide-react";
 
 /* ---------------------------------- nav ---------------------------------- */
 
 const NAV_LINKS = [
-  { href: "#match", label: "Matching" },
-  { href: "#platform", label: "Platform" },
-  { href: "#who", label: "Who it is for" },
+  { href: "#creators", label: "Creators" },
+  { href: "#brands", label: "For Brands" },
+  { href: "#how", label: "How it works" },
   { href: "#faq", label: "FAQ" },
 ];
 
@@ -147,7 +143,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
 
 const LAB_DATA: Record<string, { name: string; meta: string; score: number; bars: { label: string; value: number; max: number }[] }> = {
   Food: {
-    name: "Sushma Pandey",
+    name: "Supriya Thapa",
     meta: "Food and lifestyle · 42K followers",
     score: 96,
     bars: [
@@ -158,7 +154,7 @@ const LAB_DATA: Record<string, { name: string; meta: string; score: number; bars
     ],
   },
   Travel: {
-    name: "Roshan Poudel",
+    name: "Niraj Tamang",
     meta: "Travel vlogs · 28K followers",
     score: 91,
     bars: [
@@ -169,7 +165,7 @@ const LAB_DATA: Record<string, { name: string; meta: string; score: number; bars
     ],
   },
   Tech: {
-    name: "Bibek Shrestha",
+    name: "Aashish Karki",
     meta: "Gadgets and reviews · 31K followers",
     score: 89,
     bars: [
@@ -180,7 +176,7 @@ const LAB_DATA: Record<string, { name: string; meta: string; score: number; bars
     ],
   },
   Fashion: {
-    name: "Priya KC",
+    name: "Divya Shrestha",
     meta: "Style and lookbooks · 56K followers",
     score: 93,
     bars: [
@@ -251,11 +247,11 @@ function MatchLab() {
             </div>
           </div>
           <div className="min-w-0">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-sky-wash text-sm font-medium text-signal-blue">
-              {d.name.split(" ").map((w) => w[0]).join("")}
-            </div>
-            <p className="mt-2 truncate text-sm font-medium text-graphite">{d.name}</p>
+            <p className="truncate text-sm font-medium text-graphite">{d.name}</p>
             <p className="truncate text-xs text-ash">{d.meta}</p>
+            <p className="mt-2 inline-flex items-center gap-1 rounded-badges bg-sky-wash px-2 py-0.5 text-[11px] font-medium text-signal-blue">
+              <Check size={11} /> Verified creator
+            </p>
           </div>
         </div>
 
@@ -295,47 +291,41 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
       />
       <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-10">
         <div className="text-left">
-          <Link
-            href={isAuthed ? dash : "/register"}
-            className="mb-6 inline-flex items-center gap-2 rounded-pill border border-steel/15 bg-white/70 px-4 py-1.5 text-xs font-medium text-slate-custom backdrop-blur-sm transition-colors hover:border-signal-blue/40 hover:text-signal-blue"
-          >
-            <Zap size={12} className="text-signal-blue" />
-            Brand to creator marketplace
-            <ArrowUpRight size={12} />
-          </Link>
-
           <h1 className="mb-5 text-display text-midnight-ink">
-            Creators your customers <span className="text-signal-blue">already trust</span>
+            Find creators.<br />Post briefs.<br /><span className="text-signal-blue">Connect directly.</span>
           </h1>
 
           <p className="mb-8 max-w-md text-body leading-relaxed text-graphite/80">
-            Score every promoter on fit, audience, and track record before you spend a rupee.
+            Byparsathy is where brands and creators meet. Browse by niche, get smart-matched on fit, and run the deal with no middlemen.
           </p>
 
-          <div className="mb-10 flex flex-wrap items-center gap-4">
-            {isAuthed ? (
+          {isAuthed ? (
+            <div className="mb-10 flex flex-wrap items-center gap-4">
               <Link href={dash}>
                 <Button className="h-12 px-6 text-base">Open dashboard</Button>
               </Link>
-            ) : (
-              <>
-                <Link href="/register">
-                  <Button className="h-12 px-6 text-base">
-                    <span className="flex items-center gap-2">
-                      <span>Get started</span>
-                      <ArrowRight size={16} />
-                    </span>
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button variant="ghost" className="h-12 px-6 text-base">Sign in</Button>
-                </Link>
-              </>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="mb-10 grid max-w-md grid-cols-2 gap-3">
+              <Link
+                href="/register?role=BUSINESS"
+                className="group rounded-cards border border-steel/10 bg-white p-4 shadow-product-card transition-all hover:-translate-y-0.5 hover:border-signal-blue/40"
+              >
+                <p className="font-medium text-graphite">I am a brand</p>
+                <p className="mt-0.5 text-xs text-ash">Find creators <ArrowUpRight size={11} className="inline text-signal-blue" /></p>
+              </Link>
+              <Link
+                href="/register?role=PROMOTER"
+                className="group rounded-cards bg-midnight-ink p-4 shadow-product-card transition-all hover:-translate-y-0.5"
+              >
+                <p className="font-medium text-white">I am a creator</p>
+                <p className="mt-0.5 text-xs text-white/60">Get discovered <ArrowUpRight size={11} className="inline" /></p>
+              </Link>
+            </div>
+          )}
 
           <div className="flex flex-col gap-2.5">
-            {["No spreadsheets, no scattered DMs", "Verified profiles only", "Free to join for creators"].map((t) => (
+            {["Free to join for everyone", "Verified profiles only", "Your deal, your terms"].map((t) => (
               <span key={t} className="inline-flex items-center gap-2 text-sm text-ash">
                 <Check size={15} className="flex-shrink-0 text-emerald-status" />
                 {t}
@@ -352,98 +342,48 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   );
 }
 
-/* --------------------------------- ticker --------------------------------- */
+/* -------------------------------- spotlight -------------------------------- */
 
-const TICKS = [
-  { text: "Sushma applied to Summer Launch", score: 96 },
-  { text: "Roshan accepted a festival brief", score: 91 },
-  { text: "Anita published a wellness reel", score: 88 },
-  { text: "Priya got verified", score: 93 },
-  { text: "Bibek bid on a gadget drop", score: 89 },
+const SPOTLIGHT = [
+  { name: "Supriya Thapa", niche: "Food", location: "Kathmandu", followers: "42K", rating: "4.9", img: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { name: "Aashish Karki", niche: "Tech", location: "Lalitpur", followers: "31K", rating: "4.8", img: "https://randomuser.me/api/portraits/men/32.jpg" },
+  { name: "Niraj Tamang", niche: "Travel", location: "Pokhara", followers: "28K", rating: "4.9", img: "https://randomuser.me/api/portraits/men/75.jpg" },
+  { name: "Divya Shrestha", niche: "Fashion", location: "Kathmandu", followers: "56K", rating: "5.0", img: "https://randomuser.me/api/portraits/women/68.jpg" },
+  { name: "Kabita Rai", niche: "Wellness", location: "Bhaktapur", followers: "15K", rating: "4.8", img: "https://randomuser.me/api/portraits/women/17.jpg" },
 ];
 
-function Ticker() {
-  const row = [...TICKS, ...TICKS];
+function Spotlight() {
   return (
-    <section aria-label="Marketplace activity" className="overflow-hidden border-y border-steel/10 bg-white py-4">
-      <div className="animate-marquee-x flex w-max items-center gap-8 pr-8">
-        {row.map((t, i) => (
-          <span key={i} className="flex items-center gap-2.5 whitespace-nowrap text-sm text-ash">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-status" />
-            {t.text}
-            <span className="font-roboto-mono text-xs text-signal-blue">{t.score}%</span>
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* --------------------------------- platform -------------------------------- */
-
-const PLATFORM_CARDS = [
-  {
-    icon: Target,
-    tint: "bg-sky-wash text-signal-blue",
-    title: "Post a brief",
-    body: "Goals, budget, audience, and requirements in one structured brief.",
-  },
-  {
-    icon: Sparkles,
-    tint: "bg-sky-wash text-signal-blue",
-    title: "Get scored applicants",
-    body: "Every application arrives with its match score and reasoning.",
-  },
-  {
-    icon: ClipboardList,
-    tint: "bg-sky-wash text-signal-blue",
-    title: "Approve deliverables",
-    body: "Review drafts, request changes, and publish without leaving the app.",
-  },
-  {
-    icon: MessagesSquare,
-    tint: "bg-sky-wash text-signal-blue",
-    title: "Chat in context",
-    body: "Each collaboration carries its own conversation thread.",
-  },
-  {
-    icon: Star,
-    tint: "bg-amber-tag/15 text-amber-tag",
-    title: "Build reputation",
-    body: "Two sided reviews compound into trust you can hire on.",
-  },
-  {
-    icon: ShieldCheck,
-    tint: "bg-emerald-status/10 text-emerald-status",
-    title: "Stay verified",
-    body: "Identity and audience checks keep bots and fakes out.",
-  },
-];
-
-function Platform() {
-  return (
-    <section id="platform" className="bg-linen-canvas py-20 lg:py-28">
+    <section id="creators" className="overflow-hidden border-y border-steel/10 bg-white py-20 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-6">
-        <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <h2 className="max-w-md text-heading-lg text-midnight-ink">
-            Everything after hello, handled
-          </h2>
-          <p className="max-w-sm text-body leading-relaxed text-ash">
-            Six tools that replace the spreadsheet, the inbox threads, and the follow up anxiety.
-          </p>
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="mb-2 text-heading-lg text-midnight-ink">Creators ready to collaborate</h2>
+            <p className="max-w-md text-body text-ash">Verified profiles across every major niche, with audiences and track records you can see.</p>
+          </div>
+          <Link href="/register?role=BUSINESS" className="inline-flex items-center gap-1.5 text-sm font-medium text-signal-blue hover:opacity-80">
+            Browse as a brand <ArrowRight size={15} />
+          </Link>
         </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {PLATFORM_CARDS.map((c) => (
-            <div
-              key={c.title}
-              className="group rounded-cards border border-steel/10 bg-white p-6 shadow-product-card transition-all hover:-translate-y-1 hover:shadow-xl"
-            >
-              <span className={`mb-4 flex h-10 w-10 items-center justify-center rounded-buttons ${c.tint}`}>
-                <c.icon size={18} />
-              </span>
-              <h3 className="mb-1.5 text-heading-sm text-graphite">{c.title}</h3>
-              <p className="text-sm leading-relaxed text-ash">{c.body}</p>
+      </div>
+      <div className="overflow-x-auto pb-2">
+        <div className="flex w-max gap-4 px-6 lg:mx-auto lg:w-full lg:max-w-[1200px] lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-6">
+          {SPOTLIGHT.map((c) => (
+            <div key={c.name} className="w-52 flex-shrink-0 overflow-hidden rounded-cards border border-steel/10 bg-linen-canvas lg:w-auto">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={c.img} alt={`${c.name}, ${c.niche} creator`} loading="lazy" className="h-44 w-full object-cover" />
+              <div className="p-4">
+                <p className="truncate text-sm font-medium text-graphite">{c.name}</p>
+                <p className="mt-0.5 flex items-center gap-1 text-xs text-ash">
+                  {c.niche} · <MapPin size={10} /> {c.location}
+                </p>
+                <div className="mt-3 flex items-center justify-between border-t border-steel/10 pt-3">
+                  <span className="font-roboto-mono text-xs text-graphite">{c.followers}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-tag">
+                    <Star size={12} className="fill-amber-tag" /> {c.rating}
+                  </span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -452,33 +392,141 @@ function Platform() {
   );
 }
 
-/* ----------------------------------- who ----------------------------------- */
+/* ------------------------------- trust band -------------------------------- */
 
-function Who() {
+const TRUST = [
+  { value: "Rs 0", label: "to join, for brands and creators" },
+  { value: "100", label: "point scoring on every match" },
+  { value: "1", label: "workspace from brief to review" },
+];
+
+function TrustBand() {
   return (
-    <section id="who" className="bg-white py-20 lg:py-28">
-      <div className="mx-auto grid max-w-[1200px] gap-4 px-6 md:grid-cols-2">
-        <div className="rounded-cards-lg bg-sky-wash/60 p-8 lg:p-10">
-          <p className="mb-2 text-caption font-medium uppercase tracking-wide text-signal-blue">For business</p>
-          <h3 className="mb-3 text-heading-lg text-midnight-ink">Launch in an afternoon</h3>
-          <p className="mb-6 max-w-sm text-body leading-relaxed text-steel">
-            Write one brief and wake up to a ranked shortlist. Approve the work, pay for results, repeat.
+    <section className="bg-linen-canvas py-16 lg:py-20">
+      <div className="mx-auto grid max-w-[1200px] gap-10 px-6 text-center sm:grid-cols-3">
+        {TRUST.map((t) => (
+          <div key={t.label}>
+            <p className="font-roboto-mono mb-2 text-heading-lg text-midnight-ink">{t.value}</p>
+            <p className="mx-auto max-w-[220px] text-sm text-ash">{t.label}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------- brands ---------------------------------- */
+
+const BRAND_POINTS = [
+  "Search creators by niche, audience, and location",
+  "Every application arrives with a match score",
+  "Direct chat, clear deliverables, honest reviews",
+];
+
+function Brands() {
+  return (
+    <section id="brands" className="bg-white py-20 lg:py-28">
+      <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-6 lg:grid-cols-2 lg:gap-16">
+        <div>
+          <p className="mb-2 text-caption font-medium uppercase tracking-wide text-signal-blue">For brands</p>
+          <h2 className="mb-4 text-heading-lg text-midnight-ink">Authentic voices for your story</h2>
+          <p className="mb-6 max-w-md text-body leading-relaxed text-steel">
+            Read past reviews, compare audiences, and send a brief in minutes. The terms you agree are the terms you keep.
           </p>
-          <Link href="/register">
+          <ul className="mb-8 flex flex-col gap-3">
+            {BRAND_POINTS.map((p) => (
+              <li key={p} className="flex items-start gap-2.5 text-sm text-graphite">
+                <Check size={15} className="mt-0.5 flex-shrink-0 text-emerald-status" />
+                {p}
+              </li>
+            ))}
+          </ul>
+          <Link href="/register?role=BUSINESS">
             <Button>
-              <span className="flex items-center gap-2">Get started <ArrowRight size={16} /></span>
+              <span className="flex items-center gap-2">Explore for brands <ArrowRight size={16} /></span>
             </Button>
           </Link>
         </div>
-        <div className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-8 lg:p-10">
+        <div className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-6 shadow-product-card sm:p-7">
+          <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">Sample brief</p>
+          <p className="mb-4 text-heading-sm text-graphite">Festival snack launch</p>
+          <div className="flex flex-col gap-2">
+            {[
+              { name: "Supriya Thapa", score: 96 },
+              { name: "Kabita Rai", score: 90 },
+              { name: "Divya Shrestha", score: 84 },
+            ].map((m, i) => (
+              <div key={m.name} className="flex items-center justify-between rounded-cards border border-steel/10 bg-white px-4 py-3">
+                <span className="flex items-center gap-3 text-sm font-medium text-graphite">
+                  <span className="font-roboto-mono text-xs text-fog">0{i + 1}</span>
+                  {m.name}
+                </span>
+                <span className="font-roboto-mono text-sm text-signal-blue">{m.score}%</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-center text-xs text-ash">Ranked by fit to your brief</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------- creators --------------------------------- */
+
+const CREATOR_POINTS = [
+  "One profile puts you in front of hiring brands",
+  "Apply to matched campaigns in one click",
+  "Reviews compound into rates you set yourself",
+];
+
+function Creators() {
+  return (
+    <section className="bg-sky-wash/40 py-20 lg:py-28">
+      <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-6 lg:grid-cols-2 lg:gap-16">
+        <div className="order-2 rounded-cards-lg border border-steel/10 bg-white p-6 shadow-product-card sm:p-7 lg:order-1">
+          <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">Creator profile</p>
+          <div className="mb-4 flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Creator profile preview" loading="lazy" className="h-12 w-12 rounded-full object-cover" />
+            <div>
+              <p className="text-sm font-medium text-graphite">Supriya Thapa</p>
+              <p className="text-xs text-ash">Food · Kathmandu</p>
+            </div>
+            <span className="ml-auto inline-flex items-center gap-1 rounded-badges bg-emerald-status/10 px-2 py-0.5 text-xs font-medium text-emerald-status">
+              <Check size={11} /> Verified
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { k: "Followers", v: "42K" },
+              { k: "Rating", v: "4.9" },
+              { k: "Collabs", v: "18" },
+            ].map((s) => (
+              <div key={s.k} className="rounded-cards bg-linen-canvas p-3 text-center">
+                <p className="font-roboto-mono text-sm font-medium text-graphite">{s.v}</p>
+                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-ash">{s.k}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="order-1 lg:order-2">
           <p className="mb-2 text-caption font-medium uppercase tracking-wide text-emerald-status">For creators</p>
-          <h3 className="mb-3 text-heading-lg text-midnight-ink">Get paid for influence</h3>
-          <p className="mb-6 max-w-sm text-body leading-relaxed text-steel">
-            Build one profile, collect verified reviews, and let matched briefs come to you.
+          <h2 className="mb-4 text-heading-lg text-midnight-ink">Get discovered in your niche</h2>
+          <p className="mb-6 max-w-md text-body leading-relaxed text-steel">
+            Real brands browse by what you actually do. No follower-count gatekeeping, no agency cut.
           </p>
-          <Link href="/register">
-            <Button variant="ghost">
-              <span className="flex items-center gap-2">Get started <ArrowRight size={16} /></span>
+          <ul className="mb-8 flex flex-col gap-3">
+            {CREATOR_POINTS.map((p) => (
+              <li key={p} className="flex items-start gap-2.5 text-sm text-graphite">
+                <Check size={15} className="mt-0.5 flex-shrink-0 text-emerald-status" />
+                {p}
+              </li>
+            ))}
+          </ul>
+          <Link href="/register?role=PROMOTER">
+            <Button>
+              <span className="flex items-center gap-2">Create creator profile <ArrowRight size={16} /></span>
             </Button>
           </Link>
         </div>
@@ -487,7 +535,7 @@ function Who() {
   );
 }
 
-/* ----------------------------------- steps ---------------------------------- */
+/* ---------------------------------- steps ---------------------------------- */
 
 const STEPS = [
   { title: "Create your profile", desc: "Business or creator, done in minutes." },
@@ -496,21 +544,19 @@ const STEPS = [
   { title: "Review and repeat", desc: "Every collaboration builds your record." },
 ];
 
-function Steps() {
+function HowItWorks() {
   return (
-    <section className="bg-linen-canvas py-20 lg:py-28">
-      <div className="mx-auto max-w-[800px] px-6">
-        <h2 className="mb-12 text-center text-heading-lg text-midnight-ink">From signup to published</h2>
-        <ol className="relative space-y-0 border-l border-steel/20 pl-0">
+    <section id="how" className="bg-white py-20 lg:py-28">
+      <div className="mx-auto max-w-[1200px] px-6">
+        <h2 className="mx-auto mb-12 max-w-xl text-center text-heading-lg text-midnight-ink">
+          From signup to published
+        </h2>
+        <ol className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           {STEPS.map((s, i) => (
-            <li key={s.title} className="relative flex gap-5 pb-10 last:pb-0">
-              <span className="font-roboto-mono z-10 -ml-[21px] flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-steel/15 bg-white text-sm text-signal-blue shadow-product-card">
-                {i + 1}
-              </span>
-              <div className="pt-1">
-                <h3 className="mb-1 text-heading-sm text-graphite">{s.title}</h3>
-                <p className="text-sm leading-relaxed text-ash">{s.desc}</p>
-              </div>
+            <li key={s.title} className="rounded-cards border border-steel/10 bg-linen-canvas p-6">
+              <p className="font-roboto-mono mb-3 text-sm text-signal-blue">0{i + 1}</p>
+              <h3 className="mb-1.5 text-heading-sm text-graphite">{s.title}</h3>
+              <p className="text-sm leading-relaxed text-ash">{s.desc}</p>
             </li>
           ))}
         </ol>
@@ -540,14 +586,14 @@ const FAQS = [
   },
   {
     q: "What stops fake followers?",
-    a: "Promoters pass identity and audience verification before they can apply, and review history is public to hiring businesses.",
+    a: "Promoters pass identity and audience verification before they can apply, and review history is visible to hiring businesses.",
   },
 ];
 
 function Faq() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="bg-white py-20 lg:py-28">
+    <section id="faq" className="bg-linen-canvas py-20 lg:py-28">
       <div className="mx-auto max-w-[800px] px-6">
         <h2 className="mb-10 text-center text-heading-lg text-midnight-ink">Questions, answered</h2>
         <div className="flex flex-col gap-3">
@@ -582,35 +628,28 @@ function Faq() {
 function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
   return (
-    <section className="bg-linen-canvas py-20 lg:py-28">
+    <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <div className="relative overflow-hidden rounded-cards-lg bg-midnight-ink p-12 text-center lg:p-16">
-          <div
-            className="absolute inset-0"
-            style={{ background: "radial-gradient(60% 90% at 50% 110%, rgba(20,90,255,0.45) 0%, rgba(2,5,32,0) 70%)" }}
-          />
-          <div className="relative">
-            <h2 className="mx-auto mb-4 max-w-xl text-heading-lg text-white">
-              Stop guessing who to hire
-            </h2>
-            <p className="mx-auto mb-8 max-w-md text-body text-white/70">
-              See the score behind every creator before you commit a single rupee.
-            </p>
-            {isAuthed ? (
-              <Link href={dash}>
-                <Button className="h-12 px-6 text-base">Open dashboard</Button>
-              </Link>
-            ) : (
-              <Link href="/register">
-                <Button className="h-12 px-6 text-base">
-                  <span className="flex items-center gap-2">
-                    Get started
-                    <ArrowRight size={16} />
-                  </span>
-                </Button>
-              </Link>
-            )}
+        <div className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-12 text-center shadow-feature-section lg:p-16">
+          <div className="mx-auto mb-6 flex max-w-md items-center justify-center gap-3">
+            <Link href="/register?role=BUSINESS" className="flex-1 rounded-buttons border border-steel/15 bg-white px-4 py-3 text-sm font-medium text-graphite transition-colors hover:border-signal-blue/50">
+              I am a brand
+            </Link>
+            <Link href="/register?role=PROMOTER" className="flex-1 rounded-buttons bg-midnight-ink px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90">
+              I am a creator
+            </Link>
           </div>
+          <h2 className="mx-auto mb-4 max-w-xl text-heading-lg text-midnight-ink">
+            Your next collaboration starts here
+          </h2>
+          <p className="mx-auto mb-2 max-w-md text-body text-ash">
+            Free to join. No middlemen. Pick your side to begin.
+          </p>
+          {isAuthed && (
+            <Link href={dash} className="mt-6 inline-block">
+              <Button className="h-12 px-6 text-base">Open dashboard</Button>
+            </Link>
+          )}
         </div>
       </div>
     </section>
@@ -620,27 +659,60 @@ function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
 /* ---------------------------------- footer ---------------------------------- */
 
 function Footer() {
+  const cols = [
+    { title: "Platform", links: [
+      { label: "Matching", href: "#match" },
+      { label: "Creators", href: "#creators" },
+      { label: "For Brands", href: "#brands" },
+      { label: "How it works", href: "#how" },
+    ] },
+    { title: "Resources", links: [
+      { label: "About", href: "/about" },
+      { label: "FAQ", href: "#faq" },
+    ] },
+    { title: "Legal", links: [
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+    ] },
+  ];
   return (
     <footer className="border-t border-steel/10 bg-white">
-      <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-6 px-6 py-10 sm:flex-row">
-        <div>
-          <p className="flex items-center gap-2 text-lg font-medium text-signal-blue">
-            <span className="flex h-7 w-7 items-center justify-center rounded-buttons bg-signal-blue text-sm font-semibold text-white">B</span>
-            Byparsathy
-          </p>
-          <p className="mt-1 text-sm text-ash">Brand to promoter collaborations, made in Nepal.</p>
+      <div className="mx-auto max-w-[1200px] px-6 py-12">
+        <div className="grid gap-8 md:grid-cols-4">
+          <div>
+            <p className="flex items-center gap-2 text-lg font-medium text-signal-blue">
+              <span className="flex h-7 w-7 items-center justify-center rounded-buttons bg-signal-blue text-sm font-semibold text-white">B</span>
+              Byparsathy
+            </p>
+            <p className="mt-2 max-w-xs text-sm text-ash">
+              The creator and brand collaboration platform. Direct connections, smart matching.
+            </p>
+          </div>
+          {cols.map((col) => (
+            <div key={col.title}>
+              <h4 className="mb-4 text-caption font-medium uppercase tracking-wider text-graphite">{col.title}</h4>
+              <ul className="space-y-2">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    {link.href.startsWith("/") ? (
+                      <Link href={link.href} className="text-sm text-ash transition-colors hover:text-signal-blue">
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className="text-sm text-ash transition-colors hover:text-signal-blue">
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="flex items-center gap-6">
-          <a href="#match" className="text-sm text-ash transition-colors hover:text-signal-blue">Matching</a>
-          <a href="#faq" className="text-sm text-ash transition-colors hover:text-signal-blue">FAQ</a>
-          <Link href="/login" className="text-sm text-ash transition-colors hover:text-signal-blue">Sign in</Link>
-          <Link href="/register" className="text-sm font-medium text-signal-blue hover:opacity-80">Get started</Link>
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-steel/10 pt-8 sm:flex-row">
+          <p className="text-xs text-ash">© {new Date().getFullYear()} Byparsathy. All rights reserved.</p>
+          <p className="text-xs text-ash">Made in Nepal</p>
         </div>
-      </div>
-      <div className="border-t border-steel/10">
-        <p className="mx-auto max-w-[1200px] px-6 py-5 text-xs text-ash">
-          © {new Date().getFullYear()} Byparsathy. All rights reserved.
-        </p>
       </div>
     </footer>
   );
@@ -659,10 +731,11 @@ export default function LandingPage() {
       <LandingNav isAuthed={isAuthed} role={user?.role} />
       <main>
         <Hero isAuthed={isAuthed} role={user?.role} />
-        <Ticker />
-        <Platform />
-        <Who />
-        <Steps />
+        <Spotlight />
+        <TrustBand />
+        <Brands />
+        <Creators />
+        <HowItWorks />
         <Faq />
         <CTA isAuthed={isAuthed} role={user?.role} />
       </main>
