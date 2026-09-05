@@ -133,7 +133,7 @@ function DashboardInner() {
           </p>
         </div>
         <div className="px-6 pb-7 pt-0 sm:px-8 relative">
-          <div className="flex flex-col gap-5 -mt-12 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-5 -mt-16 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
               <div className="relative group w-fit shrink-0">
                 {avatarUploading ? (
@@ -164,7 +164,7 @@ function DashboardInner() {
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
               </div>
-              <div className="min-w-0 sm:pb-1">
+              <div className="min-w-0 sm:pb-1 sm:pt-16">
                 <p className="text-xs font-medium text-ash">Welcome back,</p>
                 <h1 className="mt-0.5 truncate font-display text-2xl font-semibold tracking-tight text-graphite sm:text-3xl">{user?.fullName ?? "Creator"}</h1>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-ash">
