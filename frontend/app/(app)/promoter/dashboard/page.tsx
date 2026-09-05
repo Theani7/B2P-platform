@@ -345,12 +345,12 @@ function DashboardInner() {
                       </div>
                     ))}
                     {invitations.total > 3 && (
-                      <Link href="/promoter/invitations" className="block w-full text-center text-xs font-bold text-signal-blue hover:underline pt-1">
+                      <Link href="/promoter/opportunities?tab=invitations" className="block w-full text-center text-xs font-bold text-signal-blue hover:underline pt-1">
                         +{invitations.total - 3} more invitations
                       </Link>
                     )}
                     {invitations.total <= 3 && (
-                      <Link href="/promoter/invitations" className="block w-full text-center text-xs font-bold text-signal-blue hover:underline pt-3">
+                      <Link href="/promoter/opportunities?tab=invitations" className="block w-full text-center text-xs font-bold text-signal-blue hover:underline pt-3">
                         View all invitations
                       </Link>
                     )}

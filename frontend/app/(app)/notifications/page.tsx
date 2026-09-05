@@ -40,11 +40,11 @@ const getLink = (type: string, role?: Role) => {
     case "REVIEW_RECEIVED": return role === Role.BUSINESS ? "/business/reviews" : "/promoter/reviews";
     case "APPLICATION_RECEIVED": return "/business/campaigns";
     case "COLLABORATION_STARTED": return role === Role.BUSINESS ? "/business/collaborations" : "/promoter/collaborations";
-    case "INVITATION_RECEIVED": return "/promoter/invitations";
+    case "INVITATION_RECEIVED": return "/promoter/opportunities?tab=invitations";
     case "INVITATION_ACCEPTED":
-    case "INVITATION_DECLINED": return role === Role.BUSINESS ? "/business/invitations" : "/promoter/invitations";
+    case "INVITATION_DECLINED": return role === Role.BUSINESS ? "/business/invitations" : "/promoter/opportunities?tab=invitations";
     case "APPLICATION_ACCEPTED":
-    case "APPLICATION_REJECTED": return role === Role.BUSINESS ? "/business/applications" : "/promoter/applications";
+    case "APPLICATION_REJECTED": return role === Role.BUSINESS ? "/business/applications" : "/promoter/opportunities?tab=applications";
     case "CAMPAIGN_MATCH_READY": return "/business/campaigns";
     case "COLLABORATION_COMPLETED": return role === Role.BUSINESS ? "/business/collaborations" : "/promoter/collaborations";
     default: return "#";

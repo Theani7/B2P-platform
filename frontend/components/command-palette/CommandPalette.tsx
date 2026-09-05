@@ -111,8 +111,7 @@ export function CommandPalette() {
       cmds.push({ id: "nav-notifications", title: "Notifications", type: "navigation", icon: "notifications", action: () => router.push("/notifications") });
     } else if (user.role === Role.PROMOTER) {
       cmds.push({ id: "nav-marketplace", title: "Marketplace", type: "navigation", icon: "globe", action: () => router.push("/promoter/marketplace") });
-      cmds.push({ id: "nav-applications", title: "Applications", type: "navigation", icon: "applications", action: () => router.push("/promoter/applications") });
-      cmds.push({ id: "nav-invitations", title: "Invitations", type: "navigation", icon: "applications", action: () => router.push("/promoter/invitations") });
+      cmds.push({ id: "nav-opportunities", title: "Opportunities", type: "navigation", icon: "applications", action: () => router.push("/promoter/opportunities") });
       cmds.push({ id: "nav-collaborations", title: "Collaborations", type: "navigation", icon: "collaborations", action: () => router.push("/promoter/collaborations") });
       cmds.push({ id: "nav-reviews", title: "My Reviews", type: "navigation", icon: "reviews", action: () => router.push("/promoter/reviews") });
       cmds.push({ id: "nav-messages", title: "Messages", type: "navigation", icon: "messages", action: () => router.push("/messages") });

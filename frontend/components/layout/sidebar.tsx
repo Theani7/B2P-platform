@@ -23,6 +23,7 @@ import {
   Settings,
   Plus,
   LogOut,
+  Inbox,
 } from "lucide-react";
 import { notifyError } from "@/lib/notify";
 import { useEffect, useRef } from "react";
@@ -96,8 +97,7 @@ const promoterSections = [
     title: "Work",
     links: [
       { to: "/promoter/marketplace", label: "Marketplace", icon: Store },
-      { to: "/promoter/applications", label: "Applications", icon: FileText },
-      { to: "/promoter/invitations", label: "Invitations", icon: Mail },
+      { to: "/promoter/opportunities", label: "Opportunities", icon: Inbox },
     ],
   },
   {
