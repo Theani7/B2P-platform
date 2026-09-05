@@ -9,6 +9,7 @@ type BadgeVariant =
   | "draft"
   | "business"
   | "promoter"
+  | "admin"
   | "open"
   | "archived";
 
@@ -27,6 +28,7 @@ const variantClasses: Record<BadgeVariant, string> = {
   draft: "bg-slate-custom/10 text-slate-custom",
   business: "bg-signal-blue/10 text-signal-blue",
   promoter: "bg-emerald-status/10 text-emerald-status",
+  admin: "bg-amber-tag/10 text-amber-tag",
   open: "bg-signal-blue/10 text-signal-blue",
   archived: "bg-amber-tag/10 text-amber-tag",
 };

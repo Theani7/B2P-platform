@@ -7,7 +7,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { ShareProfileDialog } from "@/components/sharing/ShareProfileDialog";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
-import { Role } from "@/lib/roles";
+import { Role, RoleLabels } from "@/lib/roles";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -79,8 +79,11 @@ export function TopHeader() {
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-xs font-medium text-graphite">{user?.fullName || "User"}</span>
               {user?.role && (
-                <Badge variant={user.role === Role.BUSINESS ? "business" : "promoter"} className="scale-[0.85] origin-right">
-                  {user.role === Role.BUSINESS ? "Business" : "Promoter"}
+                <Badge
+                  variant={user.role === Role.BUSINESS ? "business" : user.role === Role.ADMIN ? "admin" : "promoter"}
+                  className="scale-[0.85] origin-right"
+                >
+                  {RoleLabels[user.role as Role] ?? user.role}
                 </Badge>
               )}
             </div>
