@@ -26,12 +26,7 @@ import {
   MoreVertical, Eye, FolderDot, FolderOpen, Rocket,
   MapPin, Calendar, Users,
 } from "lucide-react";
-import dynamic from "next/dynamic";
 
-const ExportButton = dynamic(
-  () => import("@/components/export/ExportButton").then((m) => m.ExportButton),
-  { ssr: false }
-);
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
   useEffect(() => {
@@ -201,7 +196,6 @@ function CampaignsPageInner() {
             </div>
           </div>
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <ExportButton module="campaigns" data={campaigns} availableColumns={['title', 'status', 'budget', 'location']} />
             <button
               onClick={() => router.push("/business/campaigns/create")}
               className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 h-11 bg-signal-blue text-white rounded-pill text-sm font-bold shadow-product-card hover:bg-signal-blue/90 transition-colors"

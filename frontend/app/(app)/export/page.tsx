@@ -11,8 +11,8 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Role } from "@/lib/roles";
 
 const MODULES: { value: ExportModule; label: string; roles: Role[] }[] = [
-  { value: "profile", label: "My profile", roles: [Role.BUSINESS, Role.PROMOTER, Role.ADMIN] },
-  { value: "campaigns", label: "My campaigns", roles: [Role.BUSINESS, Role.ADMIN] },
+  { value: "profile", label: "My profile", roles: [Role.ADMIN] },
+  { value: "campaigns", label: "All campaigns", roles: [Role.ADMIN] },
   { value: "promoters", label: "All promoters", roles: [Role.ADMIN] },
 ];
 
@@ -27,9 +27,13 @@ function ExportInner() {
   const [format, setFormat] = useState<ExportFormat>("csv");
   const exp = useExport();
 
-  // Export is not offered to promoters — send them home.
+  // Export is only offered to admins — send others to their dashboards.
   if (user?.role === Role.PROMOTER) {
     if (typeof window !== "undefined") window.location.href = "/promoter/dashboard";
+    return null;
+  }
+  if (user?.role === Role.BUSINESS) {
+    if (typeof window !== "undefined") window.location.href = "/business/dashboard";
     return null;
   }
 

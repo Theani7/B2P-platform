@@ -108,6 +108,7 @@ export function CommandPalette() {
       cmds.push({ id: "nav-reviews", title: "Reviews", type: "navigation", icon: "reviews", action: () => router.push("/business/reviews") });
       cmds.push({ id: "nav-messages", title: "Messages", type: "navigation", icon: "messages", action: () => router.push("/messages") });
       cmds.push({ id: "nav-notifications", title: "Notifications", type: "navigation", icon: "notifications", action: () => router.push("/notifications") });
+      cmds.push({ id: "nav-settings", title: "Settings", type: "navigation", icon: "settings", action: () => router.push("/settings/account") });
     } else if (user.role === Role.PROMOTER) {
       cmds.push({ id: "nav-marketplace", title: "Marketplace", type: "navigation", icon: "globe", action: () => router.push("/promoter/marketplace") });
       cmds.push({ id: "nav-opportunities", title: "Opportunities", type: "navigation", icon: "applications", action: () => router.push("/promoter/opportunities") });
@@ -115,9 +116,10 @@ export function CommandPalette() {
       cmds.push({ id: "nav-reviews", title: "My Reviews", type: "navigation", icon: "reviews", action: () => router.push("/promoter/reviews") });
       cmds.push({ id: "nav-messages", title: "Messages", type: "navigation", icon: "messages", action: () => router.push("/messages") });
       cmds.push({ id: "nav-notifications", title: "Notifications", type: "navigation", icon: "notifications", action: () => router.push("/notifications") });
+      cmds.push({ id: "nav-settings", title: "Settings", type: "navigation", icon: "settings", action: () => router.push("/settings/account") });
     }
 
-    if (user.role !== Role.PROMOTER) {
+    if (user.role === Role.ADMIN) {
       cmds.push({ id: "nav-export", title: "Export", type: "navigation", icon: "campaigns", action: () => router.push("/export") });
     }
     cmds.push({ id: "action-logout", title: "Logout", type: "action", icon: "logout", action: () => logout() });

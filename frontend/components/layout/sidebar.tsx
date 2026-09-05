@@ -79,9 +79,9 @@ const businessSections = [
     ],
   },
   {
-    title: "Tools",
+    title: "Account",
     links: [
-      { to: "/export", label: "Export", icon: Download },
+      { to: "/settings/account", label: "Settings", icon: Settings },
     ],
   },
 ];

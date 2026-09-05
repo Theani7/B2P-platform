@@ -345,8 +345,8 @@ function SettingsInner() {
   const { user } = useAuth();
   const isAdmin = user?.role === Role.ADMIN;
 
-  // Promoters have no use for this page — send them to account settings.
-  if (user?.role === Role.PROMOTER) {
+  // Non-admins have no use for platform configuration — send them to account settings.
+  if (user?.role === Role.PROMOTER || user?.role === Role.BUSINESS) {
     if (typeof window !== "undefined") window.location.href = "/settings/account";
     return <Spinner />;
   }

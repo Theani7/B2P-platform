@@ -106,15 +106,13 @@ export function TopHeader() {
                 <p className="text-sm font-medium text-graphite truncate">{user?.fullName || "User"}</p>
                 <p className="text-sm text-steel truncate">{user?.email}</p>
               </div>
-              {user?.role !== Role.PROMOTER && (
-                <Link
-                  href="/settings"
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-graphite hover:bg-sky-wash transition-colors"
-                >
-                  <Settings size={16} className="text-graphite" />
-                  Settings
-                </Link>
-              )}
+              <Link
+                href={user?.role === Role.ADMIN ? "/admin/settings" : "/settings/account"}
+                className="flex items-center gap-3 px-4 py-2 text-sm text-graphite hover:bg-sky-wash transition-colors"
+              >
+                <Settings size={16} className="text-graphite" />
+                Settings
+              </Link>
               <button
                 onClick={() => openLogoutDialog()}
                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-coral-alert hover:bg-coral-alert/10 transition-colors text-left"
