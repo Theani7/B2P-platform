@@ -180,19 +180,18 @@ function MarketplaceInner() {
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-20">
       {/* HERO */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-custom/10 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <h1 className="text-heading-lg text-graphite tracking-tight">Marketplace</h1>
-          <p className="text-sm text-ash mt-1.5 max-w-md">Discover premium campaigns matched perfectly to your creator profile.</p>
-          <div className="flex items-center gap-4 mt-4">
-            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-status bg-emerald-status/10 px-2.5 py-1 rounded-badges">
-              <Sparkles size={12} /> {isLoading ? "…" : `${data?.total ?? 0} Available Campaigns`}
-            </span>
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-6 shadow-product-card sm:p-8">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(55% 130% at 100% 0%, rgba(22,202,46,0.12) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Marketplace</h1>
+            <p className="text-sm text-ash mt-2 max-w-md">Discover premium campaigns matched perfectly to your creator profile.</p>
           </div>
-        </div>
-        <div className="flex gap-3 w-full md:w-auto">
-          <span className="flex-1 md:flex-none h-11 px-6 rounded-inputs hidden items-center justify-center gap-2 text-sm font-semibold text-ash">
-            <Filter size={16} /> {data?.total ?? 0} campaigns
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-pill bg-emerald-status/10 px-4 py-2 text-xs font-bold text-emerald-status">
+            <Sparkles size={13} /> {isLoading ? "…" : `${data?.total ?? 0} Available Campaigns`}
           </span>
         </div>
       </div>

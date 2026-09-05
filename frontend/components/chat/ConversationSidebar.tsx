@@ -35,15 +35,15 @@ export function ConversationSidebar({
   return (
     <div className="flex h-full flex-col bg-white overflow-hidden">
       <div className="border-b border-slate-custom/10 p-4">
-        <h2 className="text-lg font-bold text-graphite mb-3">Messages</h2>
+        <h2 className="font-display mb-3 text-lg font-medium tracking-tight text-graphite">Messages</h2>
         <div className="relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-fog" />
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fog" />
           <input
             type="text"
             placeholder="Search conversations…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 h-9 bg-linen-canvas border border-slate-custom/10 rounded-lg text-sm text-graphite placeholder-gray-400 outline-none focus:ring-1 focus:ring-signal-blue"
+            className="w-full pl-10 pr-3 h-11 bg-linen-canvas border border-transparent rounded-2xl text-sm text-graphite placeholder-gray-400 outline-none transition-all focus:bg-white focus:border-signal-blue/40 focus:ring-4 focus:ring-signal-blue/10"
           />
         </div>
       </div>

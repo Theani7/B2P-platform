@@ -26,12 +26,12 @@ function OpportunitiesInner() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-5 rounded-cards-lg border border-steel/10 bg-white p-5 shadow-product-card sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Opportunities</h1>
-          <p className="text-sm text-ash mt-2">Brand invitations needing your answer, and applications awaiting theirs.</p>
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-midnight-ink">Opportunities</h1>
+          <p className="text-sm text-ash mt-1.5">Brand invitations needing your answer, and applications awaiting theirs.</p>
         </div>
-        <div className="inline-flex gap-1 rounded-pill bg-sky-wash/70 p-1 w-fit">
+        <div className="inline-flex w-fit gap-1 rounded-pill bg-sky-wash/70 p-1">
           <button
             onClick={() => setTab("invitations")}
             className={`flex items-center gap-2 rounded-pill px-5 py-2 text-sm font-semibold transition-all ${

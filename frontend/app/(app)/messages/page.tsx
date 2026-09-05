@@ -29,9 +29,9 @@ function MessagesInner() {
   const active: Conversation | null = conversations?.find((c) => c.id === activeId) ?? null;
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-64px-48px)] max-w-6xl overflow-hidden rounded-2xl border border-slate-custom/10 bg-white shadow-product-card ring-1 ring-gray-200">
+    <div className="mx-auto flex h-[calc(100vh-64px-48px)] max-w-6xl overflow-hidden rounded-cards-lg border border-slate-custom/10 bg-white shadow-feature-section">
       {/* Sidebar */}
-      <div className={`w-full flex-shrink-0 border-r border-slate-custom/10 md:w-80 ${active ? "hidden md:block" : "block"}`}>
+      <div className={`w-full flex-shrink-0 border-r border-slate-custom/10 bg-linen-canvas/50 md:w-80 ${active ? "hidden md:block" : "block"}`}>
         <ConversationSidebar
           conversations={conversations}
           isLoading={isLoading}
@@ -53,11 +53,11 @@ function MessagesInner() {
           />
         ) : (
           <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sky-wash text-fog">
+            <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-gradient-to-br from-sky-wash to-periwinkle-glow/40 text-signal-blue shadow-product-card">
               <MessageSquare size={32} />
             </div>
-            <h2 className="mb-2 text-xl font-bold text-graphite">Your Messages</h2>
-            <p className="max-w-sm text-ash text-sm">
+            <h2 className="mb-2 font-display text-2xl font-medium tracking-tight text-graphite">Your Messages</h2>
+            <p className="max-w-sm text-ash text-sm leading-relaxed">
               Select a conversation from the sidebar to start chatting with your collaboration partners.
             </p>
           </div>
