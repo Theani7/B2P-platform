@@ -9,6 +9,7 @@ import { Role } from "@/lib/roles";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { useMarketplace, useBookmarkCampaign, useRemoveBookmark } from "@/features/marketplace/api";
 import { useApplyToCampaign } from "@/features/applications/api";
+import { useDebounce } from "@/lib/useDebounce";
 import { useQueryClient } from "@tanstack/react-query";
 import { SkeletonCards } from "@/components/ui/Skeleton";
 import {
@@ -112,6 +113,7 @@ function getCategoryIcon(c: string, active: boolean) {
 function MarketplaceInner() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("createdAt");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -122,8 +124,8 @@ function MarketplaceInner() {
   const [applyMessage, setApplyMessage] = useState("");
   const [selectedCampaignDetails, setSelectedCampaignDetails] = useState<any | null>(null);
 
-  const { data, isLoading } = useMarketplace({
-    search: search || undefined,
+  const { data, isLoading, isFetching } = useMarketplace({
+    search: debouncedSearch || undefined,
     category: selectedCategory || undefined,
     page,
     limit: 12,
@@ -243,8 +245,11 @@ function MarketplaceInner() {
                 placeholder="Search campaigns, brands, or categories..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-fog text-graphite outline-none"
+                className="w-full h-12 pl-11 pr-10 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-fog text-graphite outline-none"
               />
+              {(isFetching && !isLoading) || search !== debouncedSearch ? (
+                <span className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin rounded-full border-2 border-steel/20 border-t-signal-blue" />
+              ) : null}
             </div>
             <div className="hidden md:flex items-center gap-2 pr-2">
               <div className="h-8 w-px bg-slate-custom/10 mx-2" />
