@@ -345,6 +345,12 @@ function SettingsInner() {
   const { user } = useAuth();
   const isAdmin = user?.role === Role.ADMIN;
 
+  // Promoters have no use for this page — send them home.
+  if (user?.role === Role.PROMOTER) {
+    if (typeof window !== "undefined") window.location.href = "/promoter/dashboard";
+    return <Spinner />;
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <AccountCard />
