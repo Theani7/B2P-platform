@@ -21,44 +21,53 @@ export function AuthModal({
   onClose: () => void;
   onSwitch: (view: AuthView, role?: Role.BUSINESS | Role.PROMOTER) => void;
 }) {
-  const [render, setRender] = useState(open);
+  const [render, setRender] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (open) {
       setRender(true);
       document.body.style.overflow = "hidden";
+      const id = requestAnimationFrame(() =>
+        requestAnimationFrame(() => setVisible(true))
+      );
+      return () => cancelAnimationFrame(id);
     }
+    setVisible(false);
+    document.body.style.overflow = "";
+  }, [open ]);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
+    if (open) window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  if (!render && !open) return null;
+  if (!render) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto px-4 py-8 transition-opacity duration-200 ${
-        open ? "opacity-100" : "pointer-events-none opacity-0"
-      }`}
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto px-4 py-8"
       role="dialog"
       aria-modal="true"
-      onAnimationEnd={() => {
+      onTransitionEnd={() => {
         if (!open) setRender(false);
       }}
     >
       <div
-        className="fixed inset-0 bg-midnight-ink/40 backdrop-blur-md"
         onClick={onClose}
+        className={`fixed inset-0 bg-midnight-ink/40 transition-all duration-300 ease-out ${
+          visible ? "opacity-100 backdrop-blur-md" : "opacity-0 backdrop-blur-none"
+        }`}
       />
 
       <div
-        className={`relative w-full max-w-md rounded-[2rem] border border-steel/10 bg-white p-8 shadow-feature-section transition-all duration-200 sm:p-10 ${
-          open ? "scale-100 opacity-100" : "scale-95 opacity-0"
+        className={`relative w-full max-w-md rounded-[2rem] border border-steel/10 bg-white p-8 shadow-feature-section transition-all duration-300 ease-out sm:p-10 ${
+          visible
+            ? "translate-y-0 scale-100 opacity-100"
+            : "translate-y-4 scale-[0.97] opacity-0"
         }`}
       >
         <button
