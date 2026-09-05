@@ -10,6 +10,7 @@ import InvitePromoterModal from "./InvitePromoterModal";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { usePublicPromoterProfile } from "@/features/discovery/api";
 import { PortfolioGrid } from "@/components/portfolio/PortfolioGrid";
+import { getNicheIcon } from "./NicheBadge";
 
 interface ProfilePreviewModalProps {
   isOpen: boolean;
@@ -86,8 +87,8 @@ export function ProfilePreviewModal({ isOpen, onClose, promoter, onSave, isSaved
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                       <MapPin size={12} className="text-gray-500" /> {promoter.location || "Remote"}
                     </span>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-wash text-signal-blue">
-                      <Briefcase size={12} className="text-signal-blue" /> {promoter.niche || "General"}
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sky-wash text-signal-blue">
+                      {getNicheIcon(promoter.niche, { size: 13, className: "text-signal-blue" })} {promoter.niche || "General"}
                     </span>
                   </div>
                 </div>

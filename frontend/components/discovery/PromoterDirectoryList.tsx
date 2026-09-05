@@ -15,6 +15,7 @@ import {
   Briefcase, Star, ChevronLeft, ChevronRight, X,
 } from "lucide-react";
 import { ProfilePreviewModal } from "@/components/discovery/ProfilePreviewModal";
+import { getNicheIcon, NicheBadge } from "@/components/discovery/NicheBadge";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest Profiles" },
@@ -23,7 +24,7 @@ const SORT_OPTIONS = [
   { value: "years_experience", label: "Most Experienced" },
 ];
 
-const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD"];
+const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS"];
 
 function SaveButton({ promoterId, saved, onToggle }: { promoterId: string; saved: boolean; onToggle: () => void }) {
   return (
@@ -149,15 +150,23 @@ export function PromoterDirectoryList() {
             >
               Verified Only
             </button>
-            {NICHE_OPTIONS.slice(0, 4).map((n) => (
-              <button
-                key={n}
-                onClick={() => { setNiche(niche === n ? "" : n); setPage(1); }}
-                className={`h-10 whitespace-nowrap rounded-pill px-4 text-xs font-semibold tracking-wide transition-all border ${niche === n ? "bg-midnight-ink text-white shadow-product-card border-midnight-ink" : "bg-white border-slate-custom/10 text-ash hover:bg-sky-wash hover:text-graphite"}`}
-              >
-                {n}
-              </button>
-            ))}
+            {NICHE_OPTIONS.map((n) => {
+              const active = niche === n;
+              return (
+                <button
+                  key={n}
+                  onClick={() => { setNiche(active ? "" : n); setPage(1); }}
+                  className={`flex items-center gap-1.5 h-10 whitespace-nowrap rounded-pill px-4 text-xs font-semibold tracking-wide transition-all border ${
+                    active
+                      ? "bg-midnight-ink text-white shadow-product-card border-midnight-ink"
+                      : "bg-white border-slate-custom/10 text-ash hover:bg-sky-wash hover:text-graphite"
+                  }`}
+                >
+                  {getNicheIcon(n, { size: 14, className: active ? "text-white" : "text-signal-blue" })}
+                  <span>{n}</span>
+                </button>
+              );
+            })}
           </div>
           <select
             value={sortBy}
@@ -212,11 +221,7 @@ export function PromoterDirectoryList() {
                       <p className="text-xs text-ash mt-0.5 truncate flex items-center gap-1.5">
                         <MapPin size={12} className="text-fog" /> {p.location || "Anywhere"}
                       </p>
-                      {p.niche && (
-                        <div className="mt-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-inputs text-[10px] font-bold tracking-wider uppercase bg-sky-wash text-graphite">
-                          {p.niche}
-                        </div>
-                      )}
+                      {p.niche && <NicheBadge niche={p.niche} className="mt-2.5" />}
                     </div>
                   </div>
 

@@ -10,6 +10,7 @@ import {
   Search, MapPin, BadgeCheck, BookmarkX,
   Star, ChevronLeft, ChevronRight, X, Filter,
 } from "lucide-react";
+import { NicheBadge, getNicheIcon } from "@/components/discovery/NicheBadge";
 
 const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS"];
 
@@ -187,11 +188,7 @@ export function SavedPromotersList() {
                       <p className="text-xs text-ash truncate flex items-center gap-1.5">
                         <MapPin size={12} className="text-fog" /> {p.location || "Anywhere"}
                       </p>
-                      {p.niche && (
-                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-inputs text-[10px] font-bold tracking-wider uppercase bg-sky-wash text-graphite">
-                          {p.niche}
-                        </div>
-                      )}
+                      {p.niche && <NicheBadge niche={p.niche} className="mt-2" />}
                     </div>
                   </div>
 

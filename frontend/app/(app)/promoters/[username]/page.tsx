@@ -11,6 +11,7 @@ import { RatingStars } from "@/components/reviews/RatingStars";
 import InvitePromoterModal from "@/components/discovery/InvitePromoterModal";
 import { FollowButton } from "@/components/social/FollowButton";
 import { InAppFollowersCount } from "@/components/social/InAppFollowersCount";
+import { NicheBadge } from "@/components/discovery/NicheBadge";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
@@ -157,7 +158,7 @@ function PromoterProfileInner({ username }: { username: string }) {
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-graphite">
               {(profile.niches?.length ? profile.niches : profile.niche ? [profile.niche] : []).slice(0, 3).map((n) => (
-                <span key={n} className="rounded bg-steel/10 px-2 py-1 text-xs font-medium">{n}</span>
+                <NicheBadge key={n} niche={n} />
               ))}
               {profile.location && (
                 <span className="flex items-center gap-1.5"><MapPin size={14} className="text-steel" /> {profile.location}</span>
