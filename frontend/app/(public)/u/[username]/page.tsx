@@ -72,7 +72,9 @@ function PromoterProfileContent({ username }: { username: string }) {
               <FollowButton userId={profile.userId} />
             </div>
             <div className="flex flex-wrap items-center gap-4 text-sm text-ash">
-              {profile.niche && <span className="rounded bg-sky-wash px-2 py-0.5 text-xs font-medium text-signal-blue">{profile.niche}</span>}
+              {(profile.niches?.length ? profile.niches : profile.niche ? [profile.niche] : []).slice(0, 3).map((n) => (
+                <span key={n} className="rounded bg-sky-wash px-2 py-0.5 text-xs font-medium text-signal-blue">{n}</span>
+              ))}
               {profile.location && (
                 <span className="flex items-center gap-1"><MapPin size={14} />{profile.location}</span>
               )}

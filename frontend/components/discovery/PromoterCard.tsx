@@ -41,7 +41,9 @@ export function PromoterCard({
             <p className="truncate text-body text-slate-custom">{promoter.headline}</p>
           )}
           <div className="mt-1 flex flex-wrap items-center gap-2 text-caption text-steel">
-            <Badge tone="signal">{promoter.niche}</Badge>
+            {(promoter.niches?.length ? promoter.niches : promoter.niche ? [promoter.niche] : []).slice(0, 3).map((n) => (
+              <Badge key={n} tone="signal">{n}</Badge>
+            ))}
             {promoter.location && <span>{promoter.location}</span>}
           </div>
         </div>

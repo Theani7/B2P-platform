@@ -11,6 +11,13 @@ import {
   useUpdatePromoterProfile,
   type PromoterProfileInput,
 } from "@/features/profile/api";
+import { usePublicSettings } from "@/features/settings/api";
+
+const FALLBACK_NICHES = ["TECH","FASHION","FOOD","TRAVEL","FITNESS","LIFESTYLE","GAMING","BUSINESS","HEALTH","EDUCATION","ENTERTAINMENT","OTHER"];
+
+function formatNicheLabel(n: string) {
+  return n.trim().replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+}
 
 export function PromoterProfileForm() {
   const { data: profile, isLoading } = usePromoterProfile();
@@ -18,6 +25,11 @@ export function PromoterProfileForm() {
   const updateMutation = useUpdatePromoterProfile();
   const [form, setForm] = useState<PromoterProfileInput>({});
   const [hasProfile, setHasProfile] = useState(false);
+  const { data: settingsData } = usePublicSettings();
+  const nicheSetting = settingsData?.find((s) => s.settingKey === "promoter_niches");
+  const NICHE_OPTIONS: string[] = nicheSetting
+    ? nicheSetting.settingValue.split(",").map((n: string) => n.trim()).filter(Boolean)
+    : FALLBACK_NICHES;
 
   useEffect(() => {
     if (profile) {
@@ -27,6 +39,7 @@ export function PromoterProfileForm() {
         headline: profile.headline,
         bio: profile.bio,
         niche: profile.niche,
+        niches: profile.niches?.length ? profile.niches : profile.niche ? [profile.niche] : [],
         location: profile.location,
         avatarUrl: profile.avatarUrl,
         yearsExperience: profile.yearsExperience,
@@ -43,8 +56,11 @@ export function PromoterProfileForm() {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const niches = form.niches ?? (form.niche ? [form.niche] : []);
     const payload: PromoterProfileInput = {
       ...form,
+      niches,
+      niche: niches[0],
       yearsExperience: form.yearsExperience ? Number(form.yearsExperience) : undefined,
     };
     const mutation = hasProfile ? updateMutation : createMutation;
@@ -72,7 +88,44 @@ export function PromoterProfileForm() {
           />
           <Input label="Headline" name="headline" value={form.headline ?? ""} onChange={set("headline")} />
         </div>
-        <Input label="Niche" name="niche" value={form.niche ?? ""} onChange={set("niche")} required />
+        <div>
+          <span className="mb-1 block text-caption font-medium uppercase tracking-wide text-steel">
+            Niches (pick up to 3) <span className="text-coral-alert">*</span>
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {NICHE_OPTIONS.map((opt) => {
+              const selected = form.niches ?? [];
+              const checked = selected.includes(opt);
+              const disabled = !checked && selected.length >= 3;
+              return (
+                <label
+                  key={opt}
+                  className={`inline-flex cursor-pointer items-center gap-2 rounded-button border px-3 py-1.5 text-sm font-medium transition-colors ${checked ? "border-primary bg-sky-wash text-primary" : "border-steel/30 bg-white text-midnight-ink"} ${disabled ? "cursor-not-allowed opacity-40" : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    checked={checked}
+                    disabled={disabled}
+                    onChange={() => {
+                      setForm((f) => {
+                        const current = f.niches ?? (f.niche ? [f.niche] : []);
+                        const next = checked
+                          ? current.filter((n) => n !== opt)
+                          : [...current, opt].slice(0, 3);
+                        return { ...f, niches: next, niche: next[0] };
+                      });
+                    }}
+                  />
+                  {formatNicheLabel(opt)}
+                </label>
+              );
+            })}
+          </div>
+          {(form.niches ?? []).length === 0 && (
+            <p className="mt-1 text-xs text-coral-alert">Pick at least one niche</p>
+          )}
+        </div>
         <label className="block">
           <span className="mb-1 block text-caption font-medium uppercase tracking-wide text-steel">Bio</span>
           <textarea

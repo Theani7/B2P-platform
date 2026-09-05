@@ -93,6 +93,7 @@ export async function generateMatches(user, campaignId) {
     select: {
       id: true,
       niche: true,
+      niches: true,
       location: true,
       followersCount: true,
       yearsExperience: true,
@@ -103,7 +104,7 @@ export async function generateMatches(user, campaignId) {
   const ops = [];
   for (const promoter of promoters) {
     const breakdown = {
-      niche: scoreNiche(campaign.category, promoter.niche),
+      niche: Math.max(scoreNiche(campaign.category, promoter.niche), ...(promoter.niches || []).map((n) => scoreNiche(campaign.category, n))),
       location: scoreLocation(campaign.location, promoter.location),
       followers: scoreFollowers(promoter.followersCount),
       experience: scoreExperience(promoter.yearsExperience),

@@ -21,6 +21,7 @@ export interface PromoterProfileRead {
   headline?: string;
   bio?: string;
   niche: string;
+  niches?: string[];
   location?: string;
   avatarUrl?: string;
   followersCount: number;

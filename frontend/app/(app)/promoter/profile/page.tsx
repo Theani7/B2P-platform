@@ -37,7 +37,7 @@ const schema = z.object({
   username: z.string().min(3, "Username too short"),
   headline: z.string().optional(),
   bio: z.string().optional(),
-  niche: z.string().min(1, "Niche required"),
+  niches: z.array(z.string()).min(1, "Pick at least one niche").max(3),
   location: z.string().optional(),
   yearsExperience: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").max(100, "Invalid years of experience").optional(),
 });
@@ -98,22 +98,22 @@ function PromoterProfileInner() {
       username: profile?.username || user?.fullName || "",
       headline: profile?.headline || "",
       bio: profile?.bio || "",
-      niche: profile?.niche || "OTHER",
+      niches: profile?.niches?.length ? profile.niches : profile?.niche ? [profile.niche] : [],
       location: profile?.location || "",
       yearsExperience: profile?.yearsExperience || 0,
     },
   });
 
   const headline = watch("headline");
-  const niche = watch("niche");
+  const niches = watch("niches") ?? [];
   const location = watch("location");
   const yearsExperience = watch("yearsExperience");
 
-  const hasEnoughDetails = !!(niche && niche !== "OTHER" && location);
-  const disableGenerateReason = "Please fill out your Primary Niche and Location in the Creator Details section before generating!";
+  const hasEnoughDetails = !!((niches?.length ?? 0) > 0 && location);
+  const disableGenerateReason = "Please fill out your Niches and Location in the Creator Details section before generating!";
 
   const aiContext = [
-    niche && niche !== "OTHER" && `Primary Niche: ${niche}`,
+    (niches?.length ?? 0) > 0 && `Niches: ${niches.join(", ")}`,
     location && `Location: ${location}`,
     (profile?.followersCount ?? 0) > 0 && `Followers: ${profile?.followersCount}`,
     (profile?.engagementRate ?? 0) > 0 && `Engagement Rate: ${profile?.engagementRate}%`,
@@ -126,7 +126,7 @@ function PromoterProfileInner() {
         username: profile.username || user?.fullName || "",
         headline: profile.headline || "",
         bio: profile.bio || "",
-        niche: profile.niche || "OTHER",
+        niches: profile.niches?.length ? profile.niches : profile.niche ? [profile.niche] : [],
         location: profile.location || "",
         yearsExperience: profile.yearsExperience || 0,
       });
@@ -136,6 +136,7 @@ function PromoterProfileInner() {
   const onSubmit = (data: FormValues) => {
     const payload: PromoterProfileInput = {
       ...data,
+      niche: data.niches[0],
       yearsExperience: data.yearsExperience ? Number(data.yearsExperience) : undefined,
     };
     
@@ -154,7 +155,8 @@ function PromoterProfileInner() {
     setAvatarUploading(true);
     try {
       const res = await uploadAvatarMutation.mutateAsync(file);
-      const payload: PromoterProfileInput = { ...getValues(), avatarUrl: res.url };
+      const values = getValues();
+      const payload: PromoterProfileInput = { ...values, niche: values.niches[0], avatarUrl: res.url };
       const mutation = hasProfile ? updateProfile : createProfile;
       await mutation.mutateAsync(payload);
       notifySuccess("Avatar updated successfully");
@@ -297,9 +299,10 @@ function PromoterProfileInner() {
               <h2 className="text-2xl sm:text-3xl font-bold text-graphite tracking-tight">{user?.fullName || 'Creator Name'}</h2>
               <p className="text-sm sm:text-base font-medium text-signal-blue mt-1">{headline || 'Your awesome headline'}</p>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3 text-xs sm:text-sm font-medium text-ash">
-                {niche && (
+                {(niches?.length ?? 0) > 0 && (
                   <span className="inline-flex items-center gap-1.5 bg-sky-wash text-signal-blue px-2.5 py-1 rounded-button">
-                    <Briefcase size={14} /> {NICHE_OPTIONS.find((o: any) => o.value === niche)?.label || niche}
+                    <Briefcase size={14} /> {NICHE_OPTIONS.find((o: any) => o.value === niches[0])?.label || niches[0]}
+                    {niches.length > 1 && <span className="font-semibold">+{niches.length - 1}</span>}
                   </span>
                 )}
                 {location && (
@@ -379,13 +382,36 @@ function PromoterProfileInner() {
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-graphite">Primary Niche <span className="text-coral-alert">*</span></label>
-                    <select {...register("niche")} className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm bg-white">
-                      {NICHE_OPTIONS.map((opt: any) => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
+                  <div className="space-y-2 sm:col-span-2">
+                    <label className="text-sm font-medium text-graphite">Niches <span className="text-coral-alert">*</span></label>
+                    <p className="text-xs text-ash">Pick up to 3</p>
+                    <div className="flex flex-wrap gap-2">
+                      {NICHE_OPTIONS.map((opt: any) => {
+                        const checked = niches.includes(opt.value);
+                        const disabled = !checked && niches.length >= 3;
+                        return (
+                          <label
+                            key={opt.value}
+                            className={`inline-flex cursor-pointer items-center gap-2 rounded-button border px-3 py-1.5 text-sm font-medium transition-colors ${checked ? "border-signal-blue bg-sky-wash text-signal-blue" : "border-slate-custom/20 bg-white text-graphite"} ${disabled ? "cursor-not-allowed opacity-40" : "hover:border-signal-blue"}`}
+                          >
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 accent-[#145aff]"
+                              checked={checked}
+                              disabled={disabled}
+                              onChange={() => {
+                                const next = checked
+                                  ? niches.filter((n: string) => n !== opt.value)
+                                  : [...niches, opt.value];
+                                setValue("niches", next, { shouldDirty: true, shouldValidate: true });
+                              }}
+                            />
+                            {opt.label}
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {errors.niches && <p className="text-xs text-coral-alert">{errors.niches.message}</p>}
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-graphite">Location</label>
@@ -462,7 +488,14 @@ function PromoterProfileInner() {
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => profile && reset(profile as any)}
+                onClick={() => profile && reset({
+                  username: profile.username || user?.fullName || "",
+                  headline: profile.headline || "",
+                  bio: profile.bio || "",
+                  niches: profile.niches?.length ? profile.niches : profile.niche ? [profile.niche] : [],
+                  location: profile.location || "",
+                  yearsExperience: profile.yearsExperience || 0,
+                })}
                 className="h-10 px-4 rounded-button text-sm font-medium text-ash hover:text-graphite hover:bg-sky-wash transition-colors"
               >
                 Discard

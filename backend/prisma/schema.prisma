@@ -218,6 +218,7 @@ model PromoterProfile {
   headline        String?  @db.VarChar(255)
   bio             String?  @db.Text
   niche           String   @db.VarChar(50)
+  niches          String[] @default([])
   location        String?  @db.VarChar(255)
   avatarUrl       String?  @map("avatar_url") @db.VarChar(500)
   followersCount  Int      @default(0) @map("followers_count")

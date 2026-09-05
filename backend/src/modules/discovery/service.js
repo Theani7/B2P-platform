@@ -37,7 +37,11 @@ export async function searchPromoters(params = {}) {
       { location: { contains: like, mode: "insensitive" } },
     ];
   }
-  if (niche) where.niche = niche.toUpperCase();
+  if (niche) {
+    const wanted = niche.toUpperCase();
+    const nicheOr = { OR: [{ niche: wanted }, { niches: { has: wanted } }] };
+    where.AND = [...(where.AND || []), nicheOr];
+  }
   if (location) where.location = { contains: location, mode: "insensitive" };
   if (verified !== undefined && verified !== null) where.verified = verified;
   if (followersMin !== undefined && followersMin !== null) where.followersCount = { gte: followersMin };
@@ -58,6 +62,7 @@ export async function searchPromoters(params = {}) {
         headline: true,
         bio: true,
         niche: true,
+        niches: true,
         location: true,
         avatarUrl: true,
         followersCount: true,
@@ -96,6 +101,7 @@ export async function getPublicProfile(username) {
       headline: true,
       bio: true,
       niche: true,
+      niches: true,
       location: true,
       avatarUrl: true,
       followersCount: true,

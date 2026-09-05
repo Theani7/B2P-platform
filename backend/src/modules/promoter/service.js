@@ -9,6 +9,19 @@ function ensurePromoter(user) {
   }
 }
 
+// Normalize a niche input (single string or array) to 1–3 unique uppercased values.
+function normalizeNiches(input) {
+  const arr = Array.isArray(input) ? input : [input];
+  const cleaned = [];
+  for (const n of arr) {
+    if (typeof n !== "string") continue;
+    const v = n.trim().toUpperCase();
+    if (!v || cleaned.includes(v)) continue;
+    cleaned.push(v);
+  }
+  return cleaned.slice(0, 3);
+}
+
 async function withPendingVerification(profile) {
   const pending = await prisma.verificationRequest.findFirst({
     where: { promoterProfileId: profile.id, status: "PENDING" },
@@ -19,17 +32,31 @@ async function withPendingVerification(profile) {
 export async function createOrUpdate(user, payload) {
   ensurePromoter(user);
 
-  if (payload.username) {
+  // Multi-niche support (max 3): keep legacy `niche` synced as niches[0].
+  const data = { ...payload };
+  if (data.niches !== undefined) {
+    const normalized = normalizeNiches(data.niches);
+    if (!normalized.length) throw new AppError("At least one valid niche is required", 400);
+    data.niches = normalized;
+    data.niche = normalized[0];
+  } else if (data.niche !== undefined) {
+    const normalized = normalizeNiches(data.niche);
+    if (!normalized.length) throw new AppError("At least one valid niche is required", 400);
+    data.niche = normalized[0];
+    data.niches = normalized;
+  }
+
+  if (data.username) {
     const existing = await prisma.promoterProfile.findFirst({
-      where: { username: payload.username, NOT: { userId: user.id } },
+      where: { username: data.username, NOT: { userId: user.id } },
     });
     if (existing) throw new AppError("Username already taken", 409);
   }
 
   const profile = await prisma.promoterProfile.findUnique({ where: { userId: user.id } });
   const saved = profile
-    ? await prisma.promoterProfile.update({ where: { id: profile.id }, data: payload })
-    : await prisma.promoterProfile.create({ data: { userId: user.id, ...payload } });
+    ? await prisma.promoterProfile.update({ where: { id: profile.id }, data })
+    : await prisma.promoterProfile.create({ data: { userId: user.id, ...data } });
   return withPendingVerification(saved);
 }
 

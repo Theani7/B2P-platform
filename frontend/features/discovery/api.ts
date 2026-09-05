@@ -7,6 +7,7 @@ export interface PromoterDirectoryItem {
   username: string;
   headline?: string | null;
   niche: string;
+  niches?: string[];
   location?: string | null;
   avatarUrl?: string | null;
   followersCount: number;
@@ -58,6 +59,7 @@ export interface PromoterPublicProfile {
   headline?: string | null;
   bio?: string | null;
   niche: string;
+  niches?: string[];
   location?: string | null;
   avatarUrl?: string | null;
   followersCount: number;

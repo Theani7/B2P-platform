@@ -123,9 +123,9 @@ function PromoterProfileInner({ username }: { username: string }) {
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-graphite">
-              {profile.niche && (
-                <span className="rounded bg-steel/10 px-2 py-1 text-xs font-medium">{profile.niche}</span>
-              )}
+              {(profile.niches?.length ? profile.niches : profile.niche ? [profile.niche] : []).slice(0, 3).map((n) => (
+                <span key={n} className="rounded bg-steel/10 px-2 py-1 text-xs font-medium">{n}</span>
+              ))}
               {profile.location && (
                 <span className="flex items-center gap-1.5"><MapPin size={14} className="text-steel" /> {profile.location}</span>
               )}
