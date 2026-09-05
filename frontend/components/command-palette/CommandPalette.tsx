@@ -45,6 +45,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -70,11 +71,16 @@ export function CommandPalette() {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      const id = requestAnimationFrame(() =>
+        requestAnimationFrame(() => setVisible(true))
+      );
       setTimeout(() => inputRef.current?.focus(), 50);
       setQuery("");
       setActiveIndex(0);
+      return () => cancelAnimationFrame(id);
     } else {
       document.body.style.overflow = "";
+      setVisible(false);
     }
   }, [isOpen]);
 
@@ -202,9 +208,16 @@ export function CommandPalette() {
 
       {isOpen && (
         <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4 pb-4">
-          <div className="fixed inset-0 bg-graphite/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+          <div
+            className={`fixed inset-0 bg-graphite/40 transition-all duration-300 ease-out ${
+              visible ? "opacity-100 backdrop-blur-md" : "opacity-0 backdrop-blur-none"
+            }`}
+            onClick={() => setIsOpen(false)}
+          />
 
-          <div className="relative w-full max-w-2xl bg-white rounded-cards-lg shadow-product-card border border-slate-custom/10 overflow-hidden flex flex-col max-h-[80vh]">
+          <div className={`relative w-full max-w-2xl bg-white rounded-cards-lg shadow-product-card border border-slate-custom/10 overflow-hidden flex flex-col max-h-[80vh] transition-all duration-300 ease-out ${
+            visible ? "translate-y-0 scale-100 opacity-100" : "-translate-y-3 scale-[0.98] opacity-0"
+          }`}>
             <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-custom/10">
               <Search size={20} className="text-ash" />
               <input
