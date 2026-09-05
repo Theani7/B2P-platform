@@ -150,6 +150,8 @@ model User {
   sentNotifications       Notification[]           @relation("NotificationActor")
   writtenReviews          Review[]                 @relation("ReviewAuthor")
   receivedReviews         Review[]                 @relation("ReviewTarget")
+  following               Follow[]                 @relation("FollowFollower")
+  followers               Follow[]                 @relation("FollowFollowing")
   verificationReviews     VerificationRequest[]    @relation("VerificationReviewer")
   Message                 Message[]
   portfolioLikes          PortfolioLike[]
@@ -341,8 +343,24 @@ model Campaign {
   @@map("campaigns")
 }
 
-model SavedPromoter {
-  id                String   @id @default(uuid()) @db.Uuid
+// ===================== Follows (in-app social graph) =====================
+
+model Follow {
+  id          String   @id @default(uuid()) @db.Uuid
+  followerId  String   @map("follower_id") @db.Uuid
+  followingId String   @map("following_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  follower  User @relation("FollowFollower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("FollowFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+model SavedPromoter {  id                String   @id @default(uuid()) @db.Uuid
   businessProfileId String   @map("business_profile_id") @db.Uuid
   promoterProfileId String   @map("promoter_profile_id") @db.Uuid
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
