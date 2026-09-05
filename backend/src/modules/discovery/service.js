@@ -167,7 +167,14 @@ export async function removeSavedPromoter(user, promoterId) {
     where: { businessProfileId: business.id, promoterProfileId: promoterId },
   });
   if (!saved) throw new AppError("Saved promoter not found", 404);
-  await prisma.savedPromoter.delete({ where: { id: saved.id } });
+  await prisma.savedPromoter.delete({
+    where: {
+      businessProfileId_promoterProfileId: {
+        businessProfileId: business.id,
+        promoterProfileId: promoterId,
+      },
+    },
+  });
 }
 
 export async function getSavedPromoters(user, { search = "", page = 1, limit = 20 }) {

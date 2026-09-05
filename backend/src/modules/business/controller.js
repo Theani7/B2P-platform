@@ -31,7 +31,7 @@ export const deleteProfile = wrap(async (req, res) => {
 
 export const addSavedPromoter = wrap(async (req, res) => {
   const saved = await businessService.savePromoter(req.user, req.params.promoterId);
-  return ok(res, { id: saved.id }, "Promoter saved", 201);
+  return ok(res, { promoterProfileId: saved.promoterProfileId }, "Promoter saved", 201);
 });
 
 export const deleteSavedPromoter = wrap(async (req, res) => {

@@ -2,18 +2,13 @@
 
 import { useState } from "react";
 import { useSavedPromoters, useRemoveSavedPromoter } from "@/features/discovery/api";
-import { Button } from "@/components/ui/Button";
-import { Card, PageHeader, Badge } from "@/components/ui/Card";
-import { StatCard } from "@/components/ui/Stats";
-import { Spinner } from "@/components/ui/Spinner";
 import { SkeletonCards } from "@/components/ui/Skeleton";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { Avatar } from "@/components/ui/Avatar";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { useRouter } from "next/navigation";
 import {
-  Search, MapPin, Users, TrendingUp, BadgeCheck, ArrowRight, BookmarkX,
-  Star, ChevronLeft, ChevronRight, Filter, X,
+  Search, MapPin, BadgeCheck, BookmarkX,
+  Star, ChevronLeft, ChevronRight, X, Filter,
 } from "lucide-react";
 
 const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS"];
@@ -71,57 +66,7 @@ export function SavedPromotersList() {
   const fmtCompact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K` : `${n}`);
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8 pb-32">
-      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
-        />
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div>
-            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Saved Promoters</h1>
-            <p className="text-sm text-ash mt-2 max-w-xl">Manage and compare your shortlisted creators.</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => router.push("/business/promoters")}
-              className="inline-flex items-center gap-2 rounded-pill border border-slate-custom/10 bg-white px-5 py-2.5 text-sm font-semibold text-graphite shadow-product-card-sm transition-all hover:bg-sky-wash"
-            >
-              <Search size={16} /> Browse Promoters
-            </button>
-            <button
-              onClick={() => router.push("/business/campaigns/create")}
-              className="inline-flex items-center gap-2 rounded-pill bg-signal-blue px-5 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90"
-            >
-              <ArrowRight size={16} /> Post Campaign
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
-          <StatCard label="Saved Promoters" value={data?.total ?? "—"} className="border-0 shadow-none bg-transparent" />
-        </div>
-        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
-          <StatCard label="Verified Promoters" value={filteredPromoters.length ? filteredPromoters.filter(p => p.verified).length : "—"} className="border-0 shadow-none bg-transparent" />
-        </div>
-        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
-          <StatCard 
-            label="Average Engagement" 
-            value={filteredPromoters.length ? `${(filteredPromoters.reduce((acc, p) => acc + (p.engagementRate || 0), 0) / filteredPromoters.length).toFixed(1)}%` : "—"} 
-            className="border-0 shadow-none bg-transparent"
-          />
-        </div>
-        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
-          <StatCard 
-            label="Combined Followers" 
-            value={filteredPromoters.length ? fmtCompact(filteredPromoters.reduce((acc, p) => acc + (p.followersCount || 0), 0)) : "—"} 
-            className="border-0 shadow-none bg-transparent"
-          />
-        </div>
-      </div>
-
+    <div className="max-w-[1400px] mx-auto space-y-6 pb-32">
       <div className="sticky top-0 z-30 bg-linen-canvas/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
         <div className="flex flex-col gap-2.5 rounded-[1.75rem] border border-slate-custom/10 bg-white p-2.5 shadow-feature-section transition-shadow focus-within:border-signal-blue/40 focus-within:shadow-blue-focus lg:flex-row lg:items-center">
           <div className="relative flex-1">
