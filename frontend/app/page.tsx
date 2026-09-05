@@ -220,7 +220,7 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
         </Reveal>
         <Reveal delay={160}>
           <p className="mx-auto mb-9 max-w-xl text-base leading-relaxed text-steel md:text-lg">
-            Meet creators who genuinely love what you sell. Chat, collaborate, and grow together, all in one happy place.
+            Byparsathy is where brands and creators meet. Browse by niche and platform, get smart-matched to the right fit, and run the whole collaboration directly. No middlemen. No hidden fees.
           </p>
         </Reveal>
 
@@ -295,10 +295,10 @@ function LoveNotes() {
 /* ------------------------------- how it works ------------------------------ */
 
 const STEPS = [
-  { icon: Sprout, tint: "bg-emerald-status/10 text-emerald-status", title: "Plant your profile", desc: "Tell us who you are and what you love. It takes minutes, not meetings." },
-  { icon: Search, tint: "bg-sky-wash text-signal-blue", title: "Find your people", desc: "Browse by vibe and niche, or let smart matches tap you on the shoulder." },
-  { icon: Mail, tint: "bg-amber-tag/20 text-amber-tag", title: "Say hello", desc: "Chat directly, agree on the fun stuff, and start creating together." },
-  { icon: Sparkles, tint: "bg-signal-blue/10 text-signal-blue", title: "Shine together", desc: "Publish, review each other, and watch the next invite roll in." },
+  { icon: Sprout, tint: "bg-emerald-status/10 text-emerald-status", title: "Plant your profile", desc: "Tell the marketplace who you are, what you love making, and who you want to work with. A complete profile takes minutes, and every field helps the matcher place you better." },
+  { icon: Search, tint: "bg-sky-wash text-signal-blue", title: "Find your people", desc: "Brands filter vetted creators by niche, platform, and location. Creators browse open briefs the same way. Shortlist, compare, and keep the ones that feel right." },
+  { icon: Mail, tint: "bg-amber-tag/20 text-amber-tag", title: "Say hello", desc: "Chat directly inside the collaboration, agree on deliverables and timelines, and start creating together. No agencies relaying messages, no games." },
+  { icon: Sparkles, tint: "bg-signal-blue/10 text-signal-blue", title: "Shine together", desc: "Publish the work, rate each other honestly, and let every finished collaboration raise your standing for the next one." },
 ];
 
 function HowItWorks() {
@@ -337,24 +337,40 @@ function Audiences() {
           <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
             <Store size={22} className="text-white" />
           </span>
-          <h3 className="mb-3 font-display text-3xl font-medium tracking-tight text-white">Brands, come hungry</h3>
-          <p className="mb-7 max-w-sm text-sm leading-relaxed text-white/70">
-            Post a brief at breakfast, wake up to creators who already love what you sell.
+          <h3 className="mb-3 font-display text-3xl font-medium tracking-tight text-white">Brands, find your voice</h3>
+          <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/70">
+            Search creators by niche, audience size, and platform. Read past reviews. Send a brief. That is it.
           </p>
+          <ul className="mb-7 flex flex-col gap-2.5">
+            {["Search verified creators by niche and audience", "Post briefs and get scored applications", "Direct chat with no middlemen", "Honest ratings from past partners"].map((p) => (
+              <li key={p} className="flex items-start gap-2.5 text-sm text-white/85">
+                <Check size={15} className="mt-0.5 flex-shrink-0 text-emerald-status" />
+                {p}
+              </li>
+            ))}
+          </ul>
           <Link href="/register?role=BUSINESS" className="inline-block rounded-full bg-white px-6 py-3 text-sm font-semibold text-midnight-ink transition-transform hover:-translate-y-0.5">
-            Start hiring
+            Explore for brands
           </Link>
         </Reveal>
         <Reveal delay={120} className="rounded-[2.5rem] bg-amber-tag/20 p-9 lg:p-12">
           <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-graphite/5">
             <Palette size={22} className="text-amber-tag" />
           </span>
-          <h3 className="mb-3 font-display text-3xl font-medium tracking-tight text-graphite">Creators, shine bright</h3>
-          <p className="mb-7 max-w-sm text-sm leading-relaxed text-steel">
-            One profile, endless dinner invitations from brands in your niche. Bring appetite.
+          <h3 className="mb-3 font-display text-3xl font-medium tracking-tight text-graphite">Creators, get discovered</h3>
+          <p className="mb-6 max-w-sm text-sm leading-relaxed text-steel">
+            Build a profile once. Real brands find you. Apply to campaigns that match your niche, your size, your style.
           </p>
+          <ul className="mb-7 flex flex-col gap-2.5">
+            {["Free forever, no subscription and no cut", "Apply to brand campaigns in one click", "Showcase a portfolio brands can browse", "Reviews that compound over time"].map((p) => (
+              <li key={p} className="flex items-start gap-2.5 text-sm text-graphite">
+                <Check size={15} className="mt-0.5 flex-shrink-0 text-emerald-status" />
+                {p}
+              </li>
+            ))}
+          </ul>
           <Link href="/register?role=PROMOTER" className="inline-block rounded-full bg-graphite px-6 py-3 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">
-            Join the party
+            Create creator profile
           </Link>
         </Reveal>
       </div>
@@ -362,9 +378,72 @@ function Audiences() {
   );
 }
 
-/* ----------------------------------- FAQ ----------------------------------- */
+/* ------------------------------- why direct -------------------------------- */
 
-const FAQS = [
+const DIRECT = [
+  { value: "Rs 0", title: "No commission", body: "No platform cut, no agency markup. The terms you agree on are the terms you keep." },
+  { value: "100%", title: "Direct connection", body: "Every conversation is brand to creator. Nobody stands between the deal." },
+  { value: "2-way", title: "Honest ratings", body: "Reputation is earned on both sides after real collaborations, not bought." },
+];
+
+function WhyDirect() {
+  return (
+    <section className="bg-white py-20 lg:py-28">
+      <div className="mx-auto max-w-[1100px] px-6">
+        <Reveal className="mx-auto mb-12 max-w-xl text-center">
+          <h2 className="mb-3 font-display text-4xl font-semibold tracking-tight text-midnight-ink md:text-5xl">
+            Your collaboration, your terms
+          </h2>
+          <p className="text-body text-ash">
+            No platform sitting in the middle of your deal, just the safeguards that keep it fair on both sides.
+          </p>
+        </Reveal>
+        <div className="grid gap-5 md:grid-cols-3">
+          {DIRECT.map((d, i) => (
+            <Reveal key={d.title} delay={i * 90} className="rounded-[2rem] bg-linen-canvas p-8 text-center">
+              <p className="font-roboto-mono mb-2 text-heading-lg text-signal-blue">{d.value}</p>
+              <h3 className="mb-2 font-display text-xl font-medium text-graphite">{d.title}</h3>
+              <p className="mx-auto max-w-[260px] text-sm leading-relaxed text-ash">{d.body}</p>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------- live briefs ------------------------------ */
+
+function LiveBriefs() {
+  return (
+    <section className="bg-sky-wash/50 py-20 lg:py-24">
+      <div className="mx-auto max-w-[1100px] px-6">
+        <Reveal className="rounded-[2.5rem] bg-midnight-ink p-9 text-center lg:p-14">
+          <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white/80">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-status" />
+            Open marketplace
+          </p>
+          <h2 className="mx-auto mb-3 max-w-xl font-display text-3xl font-medium tracking-tight text-white md:text-4xl">
+            Brands are posting briefs right now
+          </h2>
+          <p className="mx-auto mb-8 max-w-md text-sm leading-relaxed text-white/65">
+            Browse open campaigns the moment you join. Filter by niche, apply in one click, and start the conversation today.
+          </p>
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/register?role=PROMOTER" className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-midnight-ink transition-transform hover:-translate-y-0.5">
+              Find open briefs
+            </Link>
+            <Link href="/register?role=BUSINESS" className="rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+              Post a brief
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------------- FAQ ----------------------------------- */const FAQS = [
   {
     q: "Is it really free to join?",
     a: "Yes! Building a profile costs nothing. Businesses only pay for the campaigns they run.",
@@ -529,6 +608,8 @@ export default function LandingPage() {
         <LoveNotes />
         <HowItWorks />
         <Audiences />
+        <WhyDirect />
+        <LiveBriefs />
         <Faq />
         <CTA isAuthed={isAuthed} role={user?.role} />
       </main>
