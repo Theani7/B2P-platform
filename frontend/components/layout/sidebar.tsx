@@ -60,15 +60,13 @@ const businessSections = [
     title: "Campaigns",
     links: [
       { to: "/business/campaigns", label: "My Campaigns", icon: Megaphone },
-      { to: "/business/campaigns/create", label: "Create Campaign", icon: Plus },
       { to: "/business/applications", label: "Applications", icon: FileText },
     ],
   },
   {
     title: "Promoters",
     links: [
-      { to: "/business/promoters", label: "Find Promoters", icon: Users },
-      { to: "/business/saved-promoters", label: "Saved Promoters", icon: Bookmark },
+      { to: "/business/promoters", label: "Promoters", icon: Users },
     ],
   },
   {

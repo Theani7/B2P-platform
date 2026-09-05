@@ -100,10 +100,9 @@ export function CommandPalette() {
       cmds.push({ id: "nav-settings", title: "Platform Settings", type: "navigation", icon: "settings", action: () => router.push("/admin/settings") });
     } else if (user.role === Role.BUSINESS) {
       cmds.push({ id: "nav-campaigns", title: "Campaigns", type: "navigation", icon: "campaigns", action: () => router.push("/business/campaigns") });
-      cmds.push({ id: "action-create-campaign", title: "Create Campaign", type: "action", icon: "plus", action: () => router.push("/business/campaigns/create") });
       cmds.push({ id: "nav-applications", title: "Applications", type: "navigation", icon: "applications", action: () => router.push("/business/applications") });
-      cmds.push({ id: "action-marketplace", title: "Find Promoters", type: "navigation", icon: "globe", action: () => router.push("/business/promoters") });
-      cmds.push({ id: "nav-saved", title: "Saved Promoters", type: "navigation", icon: "portfolio", action: () => router.push("/business/saved-promoters") });
+      cmds.push({ id: "action-marketplace", title: "Promoters", type: "navigation", icon: "globe", action: () => router.push("/business/promoters") });
+      cmds.push({ id: "nav-saved", title: "Saved Promoters", type: "navigation", icon: "portfolio", action: () => router.push("/business/promoters?tab=saved") });
       cmds.push({ id: "nav-collaborations", title: "Collaborations", type: "navigation", icon: "collaborations", action: () => router.push("/business/collaborations") });
       cmds.push({ id: "nav-invitations", title: "Invitations", type: "navigation", icon: "applications", action: () => router.push("/business/invitations") });
       cmds.push({ id: "nav-reviews", title: "Reviews", type: "navigation", icon: "reviews", action: () => router.push("/business/reviews") });
