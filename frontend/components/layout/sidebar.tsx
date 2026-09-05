@@ -107,12 +107,6 @@ const promoterSections = [
       { to: "/messages", label: "Messages", icon: MessageSquare },
     ],
   },
-  {
-    title: "Tools",
-    links: [
-      { to: "/export", label: "Export", icon: Download },
-    ],
-  },
 ];
 
 const adminSections = [

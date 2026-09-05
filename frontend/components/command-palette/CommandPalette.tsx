@@ -113,7 +113,9 @@ export function CommandPalette() {
       cmds.push({ id: "nav-notifications", title: "Notifications", type: "navigation", icon: "notifications", action: () => router.push("/notifications") });
     }
 
-    cmds.push({ id: "nav-export", title: "Export", type: "navigation", icon: "campaigns", action: () => router.push("/export") });
+    if (user.role !== Role.PROMOTER) {
+      cmds.push({ id: "nav-export", title: "Export", type: "navigation", icon: "campaigns", action: () => router.push("/export") });
+    }
     cmds.push({ id: "action-logout", title: "Logout", type: "action", icon: "logout", action: () => logout() });
 
     return cmds;

@@ -27,6 +27,12 @@ function ExportInner() {
   const [format, setFormat] = useState<ExportFormat>("csv");
   const exp = useExport();
 
+  // Export is not offered to promoters — send them home.
+  if (user?.role === Role.PROMOTER) {
+    if (typeof window !== "undefined") window.location.href = "/promoter/dashboard";
+    return null;
+  }
+
   const available = MODULES.filter((m) => !user || m.roles.includes(user.role));
 
   const go = () => {
