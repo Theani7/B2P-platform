@@ -15,14 +15,45 @@ import {
   useUpdateSetting,
   useDeleteSetting,
 } from "@/features/admin/api";
+import {
+  useBusinessProfile,
+  useUpdateBusinessProfile,
+  usePromoterProfile,
+  useUpdatePromoterProfile,
+} from "@/features/profile/api";
 import { UploadField } from "@/components/common/UploadField";
 import { Plus, Trash2, Edit2, X, Settings2, Save } from "lucide-react";
 
 function AccountCard() {
   const { data: account, isLoading } = useAccountSettings();
   const { user } = useAuth();
+  const { data: promoterProfile } = usePromoterProfile();
+  const { data: businessProfile } = useBusinessProfile();
+  const updatePromoter = useUpdatePromoterProfile();
+  const updateBusiness = useUpdateBusinessProfile();
   if (isLoading) return <Spinner />;
   if (!account) return null;
+
+  const saveAvatar = (url: string) => {
+    if (promoterProfile) {
+      updatePromoter.mutate(
+        { avatarUrl: url },
+        { onSuccess: () => notifySuccess("Avatar updated"), onError: () => notifyError("Failed to save avatar") },
+      );
+    } else {
+      notifyError("Create your promoter profile first");
+    }
+  };
+  const saveLogo = (url: string) => {
+    if (businessProfile) {
+      updateBusiness.mutate(
+        { logoUrl: url },
+        { onSuccess: () => notifySuccess("Logo updated"), onError: () => notifyError("Failed to save logo") },
+      );
+    } else {
+      notifyError("Create your business profile first");
+    }
+  };
   return (
     <Card>
       <h2 className="mb-3 text-heading-sm font-semibold text-midnight-ink">Account</h2>
@@ -62,11 +93,11 @@ function AccountCard() {
       </div>
       <div className="mt-4 flex flex-col gap-3">
         <p className="text-caption uppercase tracking-wide text-steel">Profile picture</p>
-        <UploadField kind="avatar" label="Upload avatar" />
+        <UploadField kind="avatar" label="Upload avatar" onUploaded={saveAvatar} />
         {user?.role === Role.BUSINESS && (
           <>
             <p className="text-caption uppercase tracking-wide text-steel">Company logo</p>
-            <UploadField kind="logo" label="Upload logo" />
+            <UploadField kind="logo" label="Upload logo" onUploaded={saveLogo} />
           </>
         )}
       </div>

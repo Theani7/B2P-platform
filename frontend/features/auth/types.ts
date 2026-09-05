@@ -10,8 +10,8 @@ export interface User {
   isActive: boolean;
   createdAt?: string;
   lastLoginAt?: string | null;
-  promoterProfile?: { id: string; username: string; niche?: string } | null;
-  businessProfile?: { id: string; companyName?: string } | null;
+  promoterProfile?: { id: string; username: string; niche?: string; avatarUrl?: string | null } | null;
+  businessProfile?: { id: string; companyName?: string; logoUrl?: string | null } | null;
 }
 
 export interface AuthTokens {

@@ -24,6 +24,8 @@ export function TopHeader() {
     user?.email?.[0]?.toUpperCase() ||
     "?";
 
+  const avatarSrc = user?.promoterProfile?.avatarUrl || user?.businessProfile?.logoUrl || null;
+
   return (
     <header className="h-16 px-6 border-b border-slate-custom/10 bg-white/70 backdrop-blur-lg flex items-center justify-between sticky top-0 z-[200]">
       <div className="flex-1 max-w-lg flex items-center">
@@ -87,8 +89,13 @@ export function TopHeader() {
                 </Badge>
               )}
             </div>
-            <div className="w-8 h-8 rounded-full bg-sky-wash text-signal-blue flex items-center justify-center text-xs font-medium border border-slate-custom/10">
-              {initials}
+            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-sky-wash text-xs font-medium text-signal-blue border border-slate-custom/10">
+              {avatarSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={avatarSrc} alt="" className="h-full w-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <ChevronDown size={14} className="text-graphite" />
           </button>
