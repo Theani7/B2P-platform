@@ -9,38 +9,37 @@ import {
   Menu,
   X,
   ArrowRight,
-  CheckCircle2,
-  Search,
-  FolderOpen,
-  MessageSquare,
-  Building2,
-  Target,
-  Users,
-  LineChart,
-  Camera,
-  Trophy,
-  Shield,
-  DollarSign,
+  ArrowUpRight,
+  Check,
+  ShieldCheck,
+  MessagesSquare,
+  ClipboardList,
+  Sparkles,
+  Store,
+  Megaphone,
+  Inbox,
+  FileCheck2,
 } from "lucide-react";
 
-const navLinks = [
-  { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#businesses", label: "For businesses" },
-  { href: "#promoters", label: "For promoters" },
+/* ---------------------------------- nav ---------------------------------- */
+
+const NAV_LINKS = [
+  { href: "#platform", label: "Platform" },
+  { href: "#business", label: "For business" },
+  { href: "#creators", label: "For creators" },
+  { href: "#how", label: "How it works" },
 ];
 
 function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
 
   return (
     <nav
@@ -54,7 +53,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -68,7 +67,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
         <div className="hidden items-center gap-3 md:flex">
           {isAuthed ? (
             <Link href={dash}>
-              <Button variant="ghost">Go to dashboard</Button>
+              <Button variant="ghost">Open dashboard</Button>
             </Link>
           ) : (
             <>
@@ -76,7 +75,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
                 Sign in
               </Link>
               <Link href="/register">
-                <Button variant="ghost">Get started</Button>
+                <Button>Get started</Button>
               </Link>
             </>
           )}
@@ -109,7 +108,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
               </button>
             </div>
             <div className="flex-1 space-y-1 overflow-y-auto p-6">
-              {navLinks.map((link) => (
+              {NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -122,15 +121,15 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             </div>
             <div className="flex flex-col gap-3 border-t border-steel/10 p-6">
               {isAuthed ? (
-                <Link href={dash} onClick={() => setMobileOpen(false)} className="block text-center">
-                  <Button variant="primary" className="w-full">Go to dashboard</Button>
+                <Link href={dash} onClick={() => setMobileOpen(false)}>
+                  <Button variant="primary" className="w-full">Open dashboard</Button>
                 </Link>
               ) : (
                 <>
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="block text-center">
+                  <Link href="/login" onClick={() => setMobileOpen(false)}>
                     <Button variant="ghost" className="w-full">Sign in</Button>
                   </Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)} className="block text-center">
+                  <Link href="/register" onClick={() => setMobileOpen(false)}>
                     <Button variant="primary" className="w-full">Get started</Button>
                   </Link>
                 </>
@@ -143,353 +142,272 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   );
 }
 
+/* ------------------------------ product preview ------------------------------ */
+
+const MATCH_ROWS = [
+  { name: "Sushma Pandey", meta: "Food and lifestyle", reach: "42K", score: 96 },
+  { name: "Roshan Poudel", meta: "Travel vlogs", reach: "28K", score: 91 },
+  { name: "Anita Maharjan", meta: "Wellness", reach: "15K", score: 88 },
+];
+
 function ScoreBadge({ score }: { score: number }) {
   const color =
-    score >= 85
-      ? "border-steel/10 bg-emerald-status/10 text-emerald-status"
-      : score >= 70
-        ? "border-steel/10 bg-amber-tag/10 text-amber-tag"
-        : "border-steel/10 bg-steel/10 text-steel";
+    score >= 90
+      ? "bg-emerald-status/10 text-emerald-status"
+      : "bg-amber-tag/10 text-amber-tag";
   return (
-    <span className={`inline-flex items-center rounded-badges border px-2 py-0.5 text-[10px] font-medium ${color}`}>
+    <span className={`font-roboto-mono inline-flex items-center rounded-badges px-2 py-0.5 text-xs font-medium ${color}`}>
       {score}%
     </span>
   );
 }
 
-function DashboardMockup() {
-  const people = [
-    { name: "Sushma Pandey", meta: "Food & lifestyle · 42K", score: 96 },
-    { name: "Roshan Poudel", meta: "Travel · 28K", score: 91 },
-    { name: "Anita Maharjan", meta: "Wellness · 15K", score: 88 },
-  ];
+function MatchPreview() {
   return (
-    <div className="relative">
-      <div className="absolute -inset-4 rounded-cards-lg bg-primary/5 blur-2xl" />
-      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-5 shadow-feature-section">
-        <div className="mb-5 flex items-center justify-between">
+    <div className="relative mx-auto w-full max-w-[560px]">
+      <div className="absolute -inset-4 rounded-cards-lg bg-signal-blue/5 blur-2xl" />
+      <div className="animate-fade-slide-up relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-5 text-left shadow-feature-section">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">Active campaigns</p>
+            <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">Match results</p>
             <p className="text-sm font-medium text-graphite">Summer Launch 2026</p>
           </div>
           <span className="inline-flex items-center rounded-badges bg-emerald-status/10 px-2 py-0.5 text-xs font-medium text-emerald-status">
-            Active
+            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-emerald-status" />
+            Live
           </span>
         </div>
 
-        <div className="mb-4 rounded-cards border border-steel/5 bg-linen-canvas p-4">
-          <p className="mb-3 text-caption font-medium uppercase tracking-wide text-ash">Top matched promoters</p>
-          <div className="flex flex-col gap-3">
-            {people.map((p) => (
-              <div key={p.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-periwinkle-glow/20 text-[10px] font-medium text-primary-action">
-                    {p.name.split(" ").map((n) => n[0]).join("")}
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-graphite">{p.name}</p>
-                    <p className="text-[10px] text-ash">{p.meta}</p>
-                  </div>
+        <div className="flex flex-col gap-1">
+          {MATCH_ROWS.map((p) => (
+            <div key={p.name} className="flex items-center justify-between rounded-cards px-3 py-2.5 transition-colors hover:bg-sky-wash/60">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-wash text-[10px] font-medium text-signal-blue">
+                  {p.name.split(" ").map((n) => n[0]).join("")}
                 </div>
-                <ScoreBadge score={p.score} />
+                <div>
+                  <p className="text-xs font-medium text-graphite">{p.name}</p>
+                  <p className="text-[10px] text-ash">{p.meta} · {p.reach}</p>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { label: "Applications", value: "24" },
-            { label: "Avg. match score", value: "87%" },
-          ].map((s) => (
-            <div key={s.label} className="rounded-cards border border-steel/5 bg-linen-canvas p-3">
-              <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">{s.label}</p>
-              <p className="text-sm font-medium text-graphite">{s.value}</p>
+              <ScoreBadge score={p.score} />
             </div>
           ))}
         </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 border-t border-steel/10 pt-4">
+          {[
+            { label: "Applications", value: "24" },
+            { label: "Avg. match", value: "87%" },
+          ].map((s) => (
+            <div key={s.label} className="rounded-cards bg-linen-canvas p-3">
+              <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">{s.label}</p>
+              <p className="font-roboto-mono text-sm font-medium text-graphite">{s.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="animate-fade-slide-up animate-delay-100 absolute -left-3 top-10 hidden items-center gap-2 rounded-cards border border-steel/10 bg-white/90 px-3 py-2 shadow-product-card backdrop-blur-sm sm:flex">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-status/10">
+          <Inbox size={12} className="text-emerald-status" />
+        </span>
+        <p className="text-xs font-medium text-graphite">New application</p>
+      </div>
+      <div className="animate-fade-slide-up animate-delay-200 absolute -right-3 bottom-12 hidden items-center gap-2 rounded-cards border border-steel/10 bg-white/90 px-3 py-2 shadow-product-card backdrop-blur-sm sm:flex">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-wash">
+          <FileCheck2 size={12} className="text-signal-blue" />
+        </span>
+        <p className="text-xs font-medium text-graphite">Brief approved</p>
       </div>
     </div>
   );
 }
 
-function LandingHero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
+/* ---------------------------------- hero ---------------------------------- */
+
+function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
   return (
-    <section className="relative overflow-hidden pb-20 pt-32 lg:pb-28 lg:pt-40">
+    <section className="relative overflow-hidden pb-16 pt-28 lg:pb-20 lg:pt-36">
       <div
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(120% 80% at 50% 0%, rgba(20,90,255,0.12) 0%, rgba(252,252,252,0) 70%)",
+            "radial-gradient(90% 60% at 50% 0%, rgba(182,203,253,0.55) 0%, rgba(240,244,254,0.6) 45%, rgba(252,252,252,0) 75%)",
         }}
       />
-      <div className="mx-auto max-w-[1200px] px-6">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
-          <div>
-            <h1 className="mb-6 text-display text-midnight-ink">
-              Connect with the <span className="text-signal-blue">right promoters</span> for every campaign
-            </h1>
+      <div className="mx-auto max-w-[1200px] px-6 text-center">
+        <Link
+          href={isAuthed ? dash : "/register"}
+          className="mb-6 inline-flex items-center gap-2 rounded-pill border border-steel/15 bg-white/70 px-4 py-1.5 text-xs font-medium text-slate-custom backdrop-blur-sm transition-colors hover:border-signal-blue/40 hover:text-signal-blue"
+        >
+          <Sparkles size={12} className="text-signal-blue" />
+          The brand to creator marketplace
+          <ArrowUpRight size={12} />
+        </Link>
 
-            <p className="mb-8 max-w-lg text-body text-graphite/80">
-              Byparsathy matches your business with verified local promoters using smart scoring — by
-              niche, audience, location, and track record.
-            </p>
+        <h1 className="mx-auto mb-5 max-w-3xl text-display text-midnight-ink">
+          The right creator for <span className="text-signal-blue">every campaign</span>
+        </h1>
 
-            <div className="flex flex-wrap items-center gap-4">
-              {isAuthed ? (
-                <Link href={dash}>
-                  <Button className="h-12 px-6 text-base">Go to dashboard</Button>
-                </Link>
-              ) : (
-                <>
-                  <Link href="/register">
-                    <Button className="h-12 px-6 text-base">
-                      <span className="flex items-center gap-2">
-                        <span>Get started free</span>
-                        <ArrowRight size={16} />
-                      </span>
-                    </Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button variant="ghost" className="h-12 px-6 text-base">
-                      Get started
-                    </Button>
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
+        <p className="mx-auto mb-8 max-w-xl text-body text-graphite/80">
+          Post a brief, get scored matches, and run the whole collaboration in one workspace.
+        </p>
 
-          <div className="hidden lg:block">
-            <DashboardMockup />
-          </div>
+        <div className="mb-14 flex flex-wrap items-center justify-center gap-4">
+          {isAuthed ? (
+            <Link href={dash}>
+              <Button className="h-12 px-6 text-base">Open dashboard</Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/register">
+                <Button className="h-12 px-6 text-base">
+                  <span className="flex items-center gap-2">
+                    <span>Get started</span>
+                    <ArrowRight size={16} />
+                  </span>
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button variant="ghost" className="h-12 px-6 text-base">Sign in</Button>
+              </Link>
+            </>
+          )}
+        </div>
+
+        <MatchPreview />
+
+        <div className="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-x-8 gap-y-3">
+          {[
+            { icon: ShieldCheck, label: "Verified profiles" },
+            { icon: Sparkles, label: "Scored matching" },
+            { icon: MessagesSquare, label: "Chat in context" },
+          ].map((t) => (
+            <span key={t.label} className="inline-flex items-center gap-2 text-sm text-ash">
+              <t.icon size={15} className="text-signal-blue" />
+              {t.label}
+            </span>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-const trustStats = [
-  { value: "500+", label: "Verified creators" },
-  { value: "120+", label: "Businesses" },
-  { value: "900+", label: "Campaigns" },
-  { value: "98%", label: "Successful collabs" },
-];
+/* --------------------------------- marquee --------------------------------- */
 
-function Trust() {
+const NICHES = ["Fashion", "Tech", "Food", "Travel", "Fitness", "Gaming", "Beauty", "Education", "Finance"];
+
+function NicheMarquee() {
+  const row = [...NICHES, ...NICHES];
   return (
-    <section className="bg-white py-16">
-      <div className="mx-auto grid max-w-[1200px] grid-cols-2 gap-8 px-6 md:grid-cols-4 md:gap-12">
-        {trustStats.map((stat) => (
-          <div key={stat.label} className="text-center">
-            <p className="mb-2 text-heading-lg text-midnight-ink">{stat.value}</p>
-            <p className="text-body text-ash">{stat.label}</p>
-          </div>
+    <section aria-label="Creator niches" className="overflow-hidden border-y border-steel/10 bg-white py-5">
+      <div className="animate-marquee-x flex w-max items-center gap-10 pr-10">
+        {row.map((n, i) => (
+          <span key={`${n}-${i}`} className="flex items-center gap-10 whitespace-nowrap text-sm font-medium text-ash">
+            {n}
+            <span className="h-1 w-1 rounded-full bg-signal-blue/40" />
+          </span>
         ))}
       </div>
     </section>
   );
 }
 
-const problems = [
-  { icon: Search, title: "Finding creators", desc: "Hours scrolling through profiles with no reliable way to identify real fit." },
-  { icon: FolderOpen, title: "Managing outreach", desc: "Spreadsheet chaos, scattered DMs, and lost follow-ups across channels." },
-  { icon: MessageSquare, title: "Communication", desc: "No shared context — every message is a new thread and a new risk of misunderstanding." },
+/* ---------------------------------- bento ---------------------------------- */
+
+const SCORE_BARS = [
+  { label: "Niche fit", value: 40, note: "40 pts" },
+  { label: "Location", value: 20, note: "20 pts" },
+  { label: "Audience", value: 15, note: "15 pts" },
+  { label: "Track record", value: 12, note: "12 pts" },
 ];
 
-const solutions = [
-  { icon: CheckCircle2, title: "Smart matching", desc: "Promoters scored by niche, audience, location, and track record. See exactly why." },
-  { icon: CheckCircle2, title: "Structured workspace", desc: "Briefs, deliverables, and approvals in one place. No more WhatsApp campaigns." },
-  { icon: CheckCircle2, title: "Tied communication", desc: "Every message lives inside the collaboration. Full context, zero surprises." },
-];
-
-function ProblemSolution() {
+function Platform() {
   return (
-    <section className="bg-sky-wash/40 py-20 lg:py-28">
+    <section id="platform" className="bg-linen-canvas py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <div className="mb-14 text-center">
-          <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">Why Byparsathy</p>
-          <h2 className="text-heading-lg text-midnight-ink">Stop running campaigns in the dark</h2>
-        </div>
+        <h2 className="mx-auto mb-4 max-w-2xl text-center text-heading-lg text-midnight-ink">
+          One workspace, from brief to payout
+        </h2>
+        <p className="mx-auto mb-12 max-w-xl text-center text-body text-ash">
+          Everything a collaboration needs lives inside Byparsathy. No scattered DMs, no lost files.
+        </p>
 
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <p className="mb-6 text-caption font-medium uppercase tracking-wide text-ash">The old way</p>
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-cards-lg border border-steel/10 bg-white p-7 shadow-product-card md:col-span-2 md:row-span-2">
+            <h3 className="mb-1 text-heading-sm text-graphite">Matching you can inspect</h3>
+            <p className="mb-6 max-w-md text-sm leading-relaxed text-ash">
+              Every promoter gets a score out of 100 with the breakdown shown. You see exactly why someone fits.
+            </p>
             <div className="flex flex-col gap-4">
-              {problems.map((p) => (
-                <div key={p.title} className="flex gap-4 rounded-cards border border-steel/10 bg-white p-5 shadow-product-card">
-                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-buttons border border-coral-alert/20 bg-coral-alert/10">
-                    <p.icon size={16} className="text-coral-alert" />
-                  </span>
-                  <div>
-                    <p className="mb-1 text-sm font-medium text-graphite">{p.title}</p>
-                    <p className="text-sm leading-relaxed text-ash">{p.desc}</p>
+              {SCORE_BARS.map((b) => (
+                <div key={b.label}>
+                  <div className="mb-1.5 flex items-center justify-between text-xs">
+                    <span className="font-medium text-graphite">{b.label}</span>
+                    <span className="font-roboto-mono text-ash">{b.note}</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-sky-wash">
+                    <div className="h-full rounded-full bg-signal-blue" style={{ width: `${(b.value / 40) * 100}%` }} />
                   </div>
                 </div>
               ))}
             </div>
+            <div className="mt-6 inline-flex items-center gap-2 rounded-badges bg-sky-wash px-3 py-1.5">
+              <span className="text-xs text-ash">Total</span>
+              <span className="font-roboto-mono text-sm font-medium text-signal-blue">87 / 100 · Strong match</span>
+            </div>
           </div>
 
-          <div>
-            <p className="mb-6 text-caption font-medium uppercase tracking-wide text-emerald-status">With Byparsathy</p>
-            <div className="flex flex-col gap-4">
-              {solutions.map((s) => (
-                <div key={s.title} className="flex gap-4 rounded-cards border border-steel/10 bg-white p-5 shadow-product-card">
-                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-buttons border border-emerald-status/20 bg-emerald-status/10">
-                    <s.icon size={16} className="text-emerald-status" />
-                  </span>
-                  <div>
-                    <p className="mb-1 text-sm font-medium text-graphite">{s.title}</p>
-                    <p className="text-sm leading-relaxed text-ash">{s.desc}</p>
-                  </div>
-                </div>
+          <div className="rounded-cards-lg border border-steel/10 bg-sky-wash/60 p-7">
+            <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-buttons bg-white shadow-product-card">
+              <ShieldCheck size={18} className="text-emerald-status" />
+            </span>
+            <h3 className="mb-2 text-heading-sm text-graphite">Verified creators</h3>
+            <p className="text-sm leading-relaxed text-ash">
+              Identity and audience checks before anyone can apply to your campaign.
+            </p>
+          </div>
+
+          <div className="rounded-cards-lg border border-steel/10 bg-white p-7 shadow-product-card">
+            <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-buttons bg-sky-wash">
+              <ClipboardList size={18} className="text-signal-blue" />
+            </span>
+            <h3 className="mb-2 text-heading-sm text-graphite">Structured delivery</h3>
+            <ul className="flex flex-col gap-2 text-sm text-ash">
+              {["Briefs with clear requirements", "Deliverables with approvals", "Reviews that build reputation"].map((t) => (
+                <li key={t} className="flex items-start gap-2">
+                  <Check size={14} className="mt-0.5 flex-shrink-0 text-emerald-status" />
+                  {t}
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
-const features = [
-  {
-    title: "Smart matching engine",
-    description:
-      "Promoters are scored by niche, audience, location, and track record. See exactly why each match fits your campaign.",
-    icon: CheckCircle2,
-  },
-  {
-    title: "Verified creators only",
-    description:
-      "Every promoter goes through identity and audience verification. Work with real creators, not bots.",
-    icon: CheckCircle2,
-  },
-  {
-    title: "Structured collaborations",
-    description:
-      "Briefs, deliverables, approvals, and payments in one workspace. No more WhatsApp chaos.",
-    icon: CheckCircle2,
-  },
-];
-
-function Features() {
-  return (
-    <section id="features" className="bg-linen-canvas py-20 lg:py-28">
-      <div className="mx-auto max-w-[1200px] px-6">
-        <div className="mb-14 text-center">
-          <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">Features</p>
-          <h2 className="mx-auto max-w-2xl text-heading-lg text-midnight-ink">
-            Everything you need to run successful creator campaigns
-          </h2>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="rounded-cards border border-steel/10 bg-white p-6 shadow-product-card"
-            >
-              <span className="mb-4 flex h-8 w-8 items-center justify-center rounded-buttons bg-sky-wash">
-                <feature.icon size={16} className="text-signal-blue" />
-              </span>
-              <h3 className="mb-2 text-heading-sm text-graphite">{feature.title}</h3>
-              <p className="text-sm leading-relaxed text-ash">{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const businessFeatures = [
-  { icon: Building2, title: "Create campaigns in minutes", description: "Define your goals, budget, and audience. Our matching engine finds the right promoters automatically." },
-  { icon: Target, title: "Review qualified applicants", description: "Every application includes match scores, audience demographics, and past performance data." },
-  { icon: Users, title: "Manage collaborations", description: "Briefs, deliverables, approvals, and reviews — all in one structured workspace." },
-  { icon: LineChart, title: "Track ROI and results", description: "See campaign performance, engagement rates, and creator impact in real-time dashboards." },
-];
-
-function ForBusinesses() {
-  return (
-    <section id="businesses" className="bg-white py-20 lg:py-28">
-      <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
-        <div>
-          <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">For businesses</p>
-          <h2 className="mb-6 text-heading-lg text-midnight-ink">Run campaigns that actually convert</h2>
-          <p className="mb-8 max-w-lg text-body text-steel">
-            Stop guessing which creators to work with. Byparsathy scores promoters by niche, audience quality,
-            location, and track record — so you spend time on partnerships that drive results.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/register">
-              <Button>Start a campaign</Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="ghost">See how it works</Button>
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          {businessFeatures.map((feature) => (
-            <div key={feature.title} className="rounded-cards border border-steel/10 bg-linen-canvas p-5 shadow-product-card">
-              <span className="mb-3 flex h-8 w-8 items-center justify-center rounded-buttons bg-sky-wash">
-                <feature.icon size={16} className="text-signal-blue" />
-              </span>
-              <h3 className="mb-1 text-sm font-medium text-graphite">{feature.title}</h3>
-              <p className="text-xs leading-relaxed text-steel">{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const promoterFeatures = [
-  { icon: Trophy, title: "Get discovered by brands", description: "Complete your profile once and get matched to relevant campaigns automatically." },
-  { icon: Shield, title: "Build verified reputation", description: "Earn verified status and reviews from real businesses to stand out from the crowd." },
-  { icon: DollarSign, title: "Set your own rates", description: "You control your pricing. Accept or decline offers — no forced commitments." },
-  { icon: Camera, title: "Showcase your work", description: "Upload portfolio items, link social accounts, and present your best content." },
-];
-
-function ForPromoters() {
-  return (
-    <section id="promoters" className="bg-sky-wash/40 py-20 lg:py-28">
-      <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
-        <div className="order-2 lg:order-1">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {promoterFeatures.map((feature) => (
-              <div
-                key={feature.title}
-                className="rounded-cards border border-steel/10 bg-white p-5 shadow-product-card"
-              >
-                <span className="mb-3 flex h-8 w-8 items-center justify-center rounded-buttons bg-emerald-status/10">
-                  <feature.icon size={16} className="text-emerald-status" />
-                </span>
-                <h3 className="mb-1 text-sm font-medium text-graphite">{feature.title}</h3>
-                <p className="text-xs leading-relaxed text-steel">{feature.description}</p>
+          <div className="rounded-cards-lg border border-steel/10 bg-midnight-ink p-7 md:col-span-3">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center">
+              <div className="flex-1">
+                <h3 className="mb-2 text-heading-sm text-white">Chat lives inside the work</h3>
+                <p className="max-w-lg text-sm leading-relaxed text-white/70">
+                  Every conversation is tied to its collaboration. Full context on both sides, nothing lost between apps.
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="order-1 lg:order-2">
-          <p className="mb-3 text-caption font-medium uppercase tracking-wide text-emerald-status">For promoters</p>
-          <h2 className="mb-6 text-heading-lg text-midnight-ink">Turn your audience into income</h2>
-          <p className="mb-8 max-w-lg text-body text-steel">
-            Join Nepal&apos;s fastest-growing promoter marketplace. Connect with brands looking for creators
-            in your niche, and get paid for authentic promotion.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/register">
-              <Button>Join as a promoter</Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="ghost">Browse campaigns</Button>
-            </Link>
+              <div className="flex flex-1 flex-col gap-2">
+                {[
+                  { who: "Anita", text: "First cut is ready for review", time: "2m" },
+                  { who: "You", text: "Approved, please publish Friday", time: "1m", mine: true },
+                ].map((m) => (
+                  <div key={m.text} className={`flex ${m.mine ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[80%] rounded-cards px-3.5 py-2.5 ${m.mine ? "bg-signal-blue text-white" : "bg-white/10 text-white"}`}>
+                      <p className="text-xs leading-relaxed">{m.text}</p>
+                      <p className={`mt-1 text-[10px] ${m.mine ? "text-white/70" : "text-white/50"}`}>{m.who} · {m.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -497,102 +415,75 @@ function ForPromoters() {
   );
 }
 
-const steps = [
-  { step: "01", title: "Create your profile", description: "Sign up as a business or promoter. Add your details, niche, and preferences in under 5 minutes." },
-  { step: "02", title: "Get matched or browse", description: "Businesses post campaigns. Promoters browse the marketplace or receive AI-matched recommendations." },
-  { step: "03", title: "Collaborate and deliver", description: "Agree on terms, submit deliverables, and get feedback — all inside a structured workspace." },
-  { step: "04", title: "Review and grow", description: "Leave reviews, build reputation, and unlock better opportunities over time." },
-];
+/* ------------------------------- audience tabs ------------------------------ */
 
-function HowItWorks() {
-  return (
-    <section id="how-it-works" className="bg-white py-20 lg:py-28">
-      <div className="mx-auto max-w-[1200px] px-6">
-        <div className="mb-14 text-center">
-          <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">How it works</p>
-          <h2 className="mx-auto max-w-2xl text-heading-lg text-midnight-ink">
-            Four steps to your next great campaign
-          </h2>
-        </div>
+type Audience = "business" | "creator";
 
-        <div className="grid gap-6 md:grid-cols-4">
-          {steps.map((step) => (
-            <div
-              key={step.step}
-              className="relative rounded-cards border border-steel/10 bg-linen-canvas p-6 shadow-product-card"
-            >
-              <span className="absolute right-4 top-4 font-semibold text-display text-primary/20">{step.step}</span>
-              <span className="mb-4 flex h-8 w-8 items-center justify-center rounded-buttons bg-sky-wash">
-                <CheckCircle2 size={16} className="text-signal-blue" />
-              </span>
-              <h3 className="mb-2 text-heading-sm text-graphite">{step.title}</h3>
-              <p className="text-sm leading-relaxed text-ash">{step.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+const AUDIENCES: Record<Audience, { title: string; body: string; points: string[]; cta: string; icon: typeof Store }> = {
+  business: {
+    title: "Run campaigns that convert",
+    body: "Define goals and budget once. Get a ranked shortlist instead of a spreadsheet of maybes.",
+    points: ["Campaigns live in minutes", "Applicants arrive pre-scored", "Approve work without chasing"],
+    cta: "Start a campaign",
+    icon: Megaphone,
+  },
+  creator: {
+    title: "Turn audience into income",
+    body: "One strong profile puts you in front of brands already looking for your niche.",
+    points: ["Get discovered on fit, not followers", "Verified badge builds trust", "Set your own rates"],
+    cta: "Join as a creator",
+    icon: Store,
+  },
+};
 
-const showcaseStats = [
-  { value: "500+", label: "Verified promoters" },
-  { value: "120+", label: "Businesses" },
-  { value: "900+", label: "Campaigns launched" },
-  { value: "4.8/5", label: "Average rating" },
-];
-
-function Showcase() {
-  return (
-    <section className="bg-sky-wash/40 py-20 lg:py-28">
-      <div className="mx-auto max-w-[1200px] px-6">
-        <div className="mb-14 text-center">
-          <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">
-            Trusted by creators and brands
-          </p>
-          <h2 className="mx-auto max-w-2xl text-heading-lg text-midnight-ink">
-            Join a growing community of Nepal&apos;s best marketing partnerships
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8 px-6 md:grid-cols-4 md:gap-12">
-          {showcaseStats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="mb-2 text-heading-lg text-midnight-ink">{stat.value}</p>
-              <p className="text-body text-ash">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CTA() {
+function Audiences() {
+  const [tab, setTab] = useState<Audience>("business");
+  const a = AUDIENCES[tab];
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <div className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-12 text-center shadow-feature-section lg:p-16">
-          <h2 className="mx-auto mb-4 max-w-2xl text-heading-lg text-midnight-ink">
-            Ready to transform your marketing?
-          </h2>
-          <p className="mx-auto mb-8 max-w-xl text-body text-ash">
-            Join hundreds of businesses and promoters already using Byparsathy to run high-performing campaigns.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link href="/register">
-              <Button className="h-12 px-6 text-base">
+        <div className="grid items-start gap-10 lg:grid-cols-5 lg:gap-16">
+          <div className="lg:col-span-2">
+            <h2 className="mb-6 text-heading-lg text-midnight-ink">Built for both sides</h2>
+            <div className="mb-6 inline-flex gap-1 rounded-pill bg-sky-wash/70 p-1">
+              {(["business", "creator"] as Audience[]).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`rounded-pill px-5 py-2 text-sm font-medium transition-all ${
+                    tab === t ? "bg-white text-graphite shadow-product-card" : "text-ash hover:text-graphite"
+                  }`}
+                >
+                  {t === "business" ? "Business" : "Creator"}
+                </button>
+              ))}
+            </div>
+            <p className="max-w-md text-body leading-relaxed text-steel">{a.body}</p>
+            <Link href="/register" className="mt-6 inline-block">
+              <Button>
                 <span className="flex items-center gap-2">
-                  Get started free
+                  {a.cta}
                   <ArrowRight size={16} />
                 </span>
               </Button>
             </Link>
-            <Link href="/register">
-              <Button variant="ghost" className="h-12 px-6 text-base">
-                Get started free
-              </Button>
-            </Link>
+          </div>
+          <div key={tab} className="animate-fade-slide-in rounded-cards-lg border border-steel/10 bg-linen-canvas p-7 shadow-product-card lg:col-span-3">
+            <div className="mb-5 flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-buttons bg-sky-wash">
+                <a.icon size={18} className="text-signal-blue" />
+              </span>
+              <h3 className="text-heading-sm text-graphite">{a.title}</h3>
+            </div>
+            <ul className="flex flex-col gap-3">
+              {a.points.map((p, i) => (
+                <li key={p} className="flex items-center gap-4 rounded-cards border border-steel/10 bg-white p-4">
+                  <span className="font-roboto-mono text-xs text-ash">0{i + 1}</span>
+                  <span className="text-sm font-medium text-graphite">{p}</span>
+                  <Check size={15} className="ml-auto flex-shrink-0 text-emerald-status" />
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
@@ -600,67 +491,100 @@ function CTA() {
   );
 }
 
+/* ---------------------------------- steps ---------------------------------- */
+
+const STEPS = [
+  { title: "Create your profile", desc: "Sign up and add your details in minutes." },
+  { title: "Match or browse", desc: "Post a campaign or explore the marketplace." },
+  { title: "Collaborate", desc: "Deliver, review, and approve in one place." },
+  { title: "Grow reputation", desc: "Reviews unlock better partnerships." },
+];
+
+function HowItWorks() {
+  return (
+    <section id="how" className="bg-sky-wash/40 py-20 lg:py-28">
+      <div className="mx-auto max-w-[1200px] px-6">
+        <h2 className="mx-auto mb-12 max-w-xl text-center text-heading-lg text-midnight-ink">
+          Four steps to a launched campaign
+        </h2>
+        <ol className="relative grid gap-8 md:grid-cols-4 md:gap-6">
+          <div aria-hidden className="absolute left-0 right-0 top-5 hidden border-t border-dashed border-steel/25 md:block" />
+          {STEPS.map((s, i) => (
+            <li key={s.title} className="relative">
+              <span className="font-roboto-mono relative z-10 mb-4 flex h-10 w-10 items-center justify-center rounded-full border border-steel/15 bg-white text-sm text-signal-blue shadow-product-card">
+                {i + 1}
+              </span>
+              <h3 className="mb-1.5 text-heading-sm text-graphite">{s.title}</h3>
+              <p className="text-sm leading-relaxed text-ash">{s.desc}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------------- CTA ----------------------------------- */
+
+function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
+  const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
+  return (
+    <section className="bg-white py-20 lg:py-28">
+      <div className="mx-auto max-w-[1200px] px-6">
+        <div className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-12 text-center shadow-feature-section lg:p-16">
+          <h2 className="mx-auto mb-4 max-w-xl text-heading-lg text-midnight-ink">
+            Your next partnership starts here
+          </h2>
+          <p className="mx-auto mb-8 max-w-md text-body text-ash">
+            Join the brands and creators running campaigns on Byparsathy.
+          </p>
+          {isAuthed ? (
+            <Link href={dash}>
+              <Button className="h-12 px-6 text-base">Open dashboard</Button>
+            </Link>
+          ) : (
+            <Link href="/register">
+              <Button className="h-12 px-6 text-base">
+                <span className="flex items-center gap-2">
+                  Get started
+                  <ArrowRight size={16} />
+                </span>
+              </Button>
+            </Link>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------------------------- footer ---------------------------------- */
+
 function Footer() {
-  const cols = [
-    { title: "Product", links: [
-      { label: "Features", href: "#features" },
-      { label: "How it works", href: "#how-it-works" },
-      { label: "For businesses", href: "#businesses" },
-      { label: "For promoters", href: "#promoters" },
-    ] },
-    { title: "Company", links: [
-      { label: "About", href: null },
-      { label: "Contact", href: null },
-      { label: "Careers", href: null },
-    ] },
-    { title: "Legal", links: [
-      { label: "Privacy", href: null },
-      { label: "Terms", href: null },
-    ] },
-  ];
   return (
     <footer className="border-t border-steel/10 bg-white">
-      <div className="mx-auto max-w-[1200px] px-6 py-12">
-        <div className="grid gap-8 md:grid-cols-4">
-          <div>
-            <Link href="/" className="flex items-center gap-2 text-lg font-medium text-signal-blue">
-              Byparsathy
-            </Link>
-            <p className="mt-2 max-w-xs text-sm text-ash">
-              Nepal&apos;s brand-to-promoter collaboration platform. Connect, collaborate, and grow.
-            </p>
-          </div>
-
-          {cols.map((col) => (
-            <div key={col.title}>
-              <h4 className="mb-4 text-caption font-medium uppercase tracking-wider text-graphite">{col.title}</h4>
-              <ul className="space-y-2">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    {link.href ? (
-                      <a href={link.href} className="text-sm text-ash transition-colors hover:text-signal-blue">
-                        {link.label}
-                      </a>
-                    ) : (
-                      <span className="text-sm text-ash/60">
-                        {link.label}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+      <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-6 px-6 py-10 sm:flex-row">
+        <div>
+          <p className="text-lg font-medium text-signal-blue">Byparsathy</p>
+          <p className="mt-1 text-sm text-ash">Brand to promoter collaborations, made in Nepal.</p>
         </div>
-
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-steel/10 pt-8 sm:flex-row">
-          <p className="text-xs text-ash">© {new Date().getFullYear()} Byparsathy. All rights reserved.</p>
-          <p className="text-xs text-ash">Made in Nepal 🇳🇵</p>
+        <div className="flex items-center gap-6">
+          <a href="#platform" className="text-sm text-ash transition-colors hover:text-signal-blue">Platform</a>
+          <a href="#how" className="text-sm text-ash transition-colors hover:text-signal-blue">How it works</a>
+          <Link href="/login" className="text-sm text-ash transition-colors hover:text-signal-blue">Sign in</Link>
+          <Link href="/register" className="text-sm font-medium text-signal-blue hover:opacity-80">Get started</Link>
         </div>
+      </div>
+      <div className="border-t border-steel/10">
+        <p className="mx-auto max-w-[1200px] px-6 py-5 text-xs text-ash">
+          © {new Date().getFullYear()} Byparsathy. All rights reserved.
+        </p>
       </div>
     </footer>
   );
 }
+
+/* ---------------------------------- page ---------------------------------- */
 
 export default function LandingPage() {
   const { token, user } = useAuth();
@@ -672,15 +596,14 @@ export default function LandingPage() {
     <div className="min-h-screen bg-linen-canvas">
       <LandingNav isAuthed={isAuthed} role={user?.role} />
       <main>
-        <LandingHero isAuthed={isAuthed} role={user?.role} />
-        <Trust />
-        <ProblemSolution />
-        <Features />
-        <ForBusinesses />
-        <ForPromoters />
+        <Hero isAuthed={isAuthed} role={user?.role} />
+        <NicheMarquee />
+        <div id="business" />
+        <Platform />
+        <div id="creators" />
+        <Audiences />
         <HowItWorks />
-        <Showcase />
-        <CTA />
+        <CTA isAuthed={isAuthed} role={user?.role} />
       </main>
       <Footer />
     </div>
