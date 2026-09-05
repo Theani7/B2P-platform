@@ -14,6 +14,18 @@ function tokens(user) {
   };
 }
 
+// Minimum gap between two code emails to the same address (spam/abuse guard).
+// The UI already waits 30s; this enforces 60s server-side for direct API calls.
+const OTP_RESEND_COOLDOWN_MS = 60 * 1000;
+
+function assertOtpCooldown(lastSent) {
+  if (!lastSent) return;
+  const waitMs = OTP_RESEND_COOLDOWN_MS - (Date.now() - new Date(lastSent).getTime());
+  if (waitMs > 0) {
+    throw new AppError(`Please wait ${Math.ceil(waitMs / 1000)}s before requesting a new code`, 429);
+  }
+}
+
 export async function register(payload) {
   const existingEmail = await prisma.user.findUnique({ where: { email: payload.email } });
   const existingEmailPending = await prisma.pendingRegistration.findUnique({ where: { email: payload.email } });
@@ -30,7 +42,7 @@ export async function register(payload) {
   // Defer account creation until the email OTP is verified — store pending only.
   await prisma.pendingRegistration.upsert({
     where: { email: payload.email },
-    update: { username: payload.username, fullName: payload.fullName, passwordHash, role: payload.role, otpCode, otpExpiry },
+    update: { username: payload.username, fullName: payload.fullName, passwordHash, role: payload.role, otpCode, otpExpiry, lastOtpSentAt: new Date() },
     create: {
       username: payload.username,
       fullName: payload.fullName,
@@ -39,6 +51,7 @@ export async function register(payload) {
       role: payload.role,
       otpCode,
       otpExpiry,
+      lastOtpSentAt: new Date(),
     },
   });
 
@@ -56,9 +69,10 @@ export async function register(payload) {
 export async function resendRegistrationOtp(email) {
   const pending = await prisma.pendingRegistration.findUnique({ where: { email } });
   if (!pending) return;
+  assertOtpCooldown(pending.lastOtpSentAt);
   const otpCode = crypto.randomInt(100000, 1000000).toString();
   const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
-  await prisma.pendingRegistration.update({ where: { email }, data: { otpCode, otpExpiry } });
+  await prisma.pendingRegistration.update({ where: { email }, data: { otpCode, otpExpiry, lastOtpSentAt: new Date() } });
   try {
     await sendOtpEmail(email, otpCode);
   } catch (e) {
@@ -199,9 +213,10 @@ export async function resendVerification(email) {
 export async function forgotPassword(email) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return;
+  assertOtpCooldown(user.lastOtpSentAt);
   const resetCode = crypto.randomInt(100000, 1000000).toString();
   const resetCodeExpiry = new Date(Date.now() + 60 * 60 * 1000);
-  await prisma.user.update({ where: { id: user.id }, data: { resetCode, resetCodeExpiry } });
+  await prisma.user.update({ where: { id: user.id }, data: { resetCode, resetCodeExpiry, lastOtpSentAt: new Date() } });
   try {
     await sendOtpEmail(user.email, resetCode, 60);
   } catch (e) {
@@ -252,9 +267,10 @@ export async function requestOtp(email) {
   if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
     throw new AppError("Account temporarily locked due to failed attempts", 403);
   }
+  assertOtpCooldown(user.lastOtpSentAt);
   const otpCode = crypto.randomInt(100000, 1000000).toString();
   const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
-  await prisma.user.update({ where: { id: user.id }, data: { otpCode, otpExpiry } });
+  await prisma.user.update({ where: { id: user.id }, data: { otpCode, otpExpiry, lastOtpSentAt: new Date() } });
   try {
     await sendOtpEmail(user.email, otpCode);
   } catch (e) {

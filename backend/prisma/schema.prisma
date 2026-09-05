@@ -133,6 +133,7 @@ model User {
   otpExpiry               DateTime? @map("otp_expiry") @db.Timestamptz
   failedLoginAttempts     Int       @default(0) @map("failed_login_attempts")
   lockedUntil             DateTime? @map("locked_until") @db.Timestamptz
+  lastOtpSentAt           DateTime? @map("last_otp_sent_at") @db.Timestamptz
   lastLoginAt             DateTime? @map("last_login_at") @db.Timestamptz
   createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt               DateTime  @updatedAt @map("updated_at") @db.Timestamptz
@@ -166,6 +167,7 @@ model PendingRegistration {
   role         Role
   otpCode      String?  @map("otp_code") @db.VarChar(6)
   otpExpiry    DateTime? @map("otp_expiry") @db.Timestamptz
+  lastOtpSentAt DateTime? @map("last_otp_sent_at") @db.Timestamptz
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("pending_registrations")
