@@ -14,6 +14,7 @@ export interface PromoterDirectoryItem {
   yearsExperience?: number | null;
   verified: boolean;
   averageRating?: number;
+  inAppFollowers?: number;
 }
 
 export interface PromoterDirectoryResponse {
@@ -64,6 +65,7 @@ export interface PromoterPublicProfile {
   yearsExperience?: number | null;
   verified: boolean;
   averageRating?: number;
+  inAppFollowers?: number;
   portfolioItems: PortfolioItemRead[];
   socialLinks: SocialLinkRead[];
 }

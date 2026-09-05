@@ -6,6 +6,8 @@ import { useUserRating } from "@/features/reviews/api";
 import { Spinner } from "@/components/ui/Spinner";
 import { PublicLayout } from "@/components/common/PublicLayout";
 import { RatingStars } from "@/components/reviews/RatingStars";
+import { FollowButton } from "@/components/social/FollowButton";
+import { InAppFollowersCount } from "@/components/social/InAppFollowersCount";
 import { MapPin, Users, TrendingUp, Briefcase, LinkIcon, Camera, Music, Video, Globe, MessageSquare } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
@@ -66,6 +68,9 @@ function PromoterProfileContent({ username }: { username: string }) {
               )}
             </div>
             {profile.headline && <p className="mt-1 mb-3 text-lg text-graphite">{profile.headline}</p>}
+            <div className="mt-1">
+              <FollowButton userId={profile.userId} />
+            </div>
             <div className="flex flex-wrap items-center gap-4 text-sm text-ash">
               {profile.niche && <span className="rounded bg-sky-wash px-2 py-0.5 text-xs font-medium text-signal-blue">{profile.niche}</span>}
               {profile.location && (
@@ -99,8 +104,17 @@ function PromoterProfileContent({ username }: { username: string }) {
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-wash"><Users size={20} className="text-signal-blue" /></div>
               <div>
-                <p className="text-xs text-ash">Followers</p>
+                <p className="text-xs text-ash">Audience</p>
                 <p className="font-bold text-graphite">{formatCompactNumber(profile.followersCount)}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-wash"><Users size={20} className="text-signal-blue" /></div>
+              <div>
+                <p className="text-xs text-ash">In-app followers</p>
+                <p className="font-bold text-graphite">
+                  <InAppFollowersCount userId={profile.userId} fallback={profile.inAppFollowers} />
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">

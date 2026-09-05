@@ -1,5 +1,6 @@
 import type { PromoterDirectoryItem } from "@/features/discovery/api";
 import { Badge } from "@/components/ui/Card";
+import { FollowButton } from "@/components/social/FollowButton";
 
 function initials(name: string) {
   return name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 2).toUpperCase() || "PR";
@@ -51,7 +52,7 @@ export function PromoterCard({
           <span className="font-mono font-medium text-midnight-ink">
             {promoter.followersCount.toLocaleString()}
           </span>{" "}
-          followers
+          audience
         </span>
         <span>
           <span className="font-mono font-medium text-midnight-ink">
@@ -68,6 +69,11 @@ export function PromoterCard({
           </span>
         )}
       </div>
+      {promoter.userId && (
+        <div className="mt-3 border-t border-steel/10 pt-3">
+          <FollowButton userId={promoter.userId} />
+        </div>
+      )}
     </div>
   );
 }

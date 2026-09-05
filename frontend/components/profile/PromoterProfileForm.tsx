@@ -91,11 +91,12 @@ export function PromoterProfileForm() {
           <Input label="Location" name="location" value={form.location ?? ""} onChange={set("location")} />
           <Input label="Avatar URL" name="avatarUrl" value={form.avatarUrl ?? ""} onChange={set("avatarUrl")} />
           <Input
-            label="Followers"
+            label="Total audience size"
             name="followersCount"
             type="number"
             min={0}
             max={1000000000}
+            placeholder="e.g. 15000 across all platforms"
             value={form.followersCount ?? ""}
             onChange={set("followersCount")}
           />

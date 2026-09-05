@@ -403,8 +403,8 @@ function PromoterProfileInner() {
                     <input type="text" {...register("location")} placeholder="e.g. Kathmandu" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-graphite">Total Followers</label>
-                    <input type="number" {...register("followersCount", { valueAsNumber: true })} min="0" placeholder="e.g. 15000" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
+                    <label className="text-sm font-medium text-graphite">Total audience size</label>
+                    <input type="number" {...register("followersCount", { valueAsNumber: true })} min="0" placeholder="e.g. 15000 across all platforms" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
                     {errors.followersCount && <p className="text-xs text-coral-alert">{errors.followersCount.message}</p>}
                   </div>
                   <div className="space-y-2">

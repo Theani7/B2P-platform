@@ -9,6 +9,8 @@ import { usePublicPromoterProfile, useSavePromoter } from "@/features/discovery/
 import { useUserRating } from "@/features/reviews/api";
 import { RatingStars } from "@/components/reviews/RatingStars";
 import InvitePromoterModal from "@/components/discovery/InvitePromoterModal";
+import { FollowButton } from "@/components/social/FollowButton";
+import { InAppFollowersCount } from "@/components/social/InAppFollowersCount";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
@@ -98,7 +100,8 @@ function PromoterProfileInner({ username }: { username: string }) {
                   </div>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                <FollowButton userId={profile.userId} />
                 {user?.role === Role.BUSINESS && (
                   <>
                     <button
@@ -126,7 +129,8 @@ function PromoterProfileInner({ username }: { username: string }) {
               {profile.location && (
                 <span className="flex items-center gap-1.5"><MapPin size={14} className="text-steel" /> {profile.location}</span>
               )}
-              <span className="flex items-center gap-1.5"><Users size={14} className="text-steel" /> {formatCompactNumber(profile.followersCount)} followers</span>
+              <span className="flex items-center gap-1.5"><Users size={14} className="text-steel" /> {formatCompactNumber(profile.followersCount)} audience</span>
+              <span className="flex items-center gap-1.5"><Users size={14} className="text-steel" /> <InAppFollowersCount userId={profile.userId} fallback={profile.inAppFollowers} /></span>
               <span className="flex items-center gap-1.5"><TrendingUp size={14} className="text-steel" /> {profile.engagementRate.toFixed(1)}% engagement rate</span>
               {profile.yearsExperience != null && (
                 <span className="flex items-center gap-1.5"><Briefcase size={14} className="text-steel" /> {profile.yearsExperience} year{profile.yearsExperience !== 1 ? "s" : ""} experience</span>
