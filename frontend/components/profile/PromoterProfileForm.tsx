@@ -29,8 +29,6 @@ export function PromoterProfileForm() {
         niche: profile.niche,
         location: profile.location,
         avatarUrl: profile.avatarUrl,
-        followersCount: profile.followersCount,
-        engagementRate: profile.engagementRate,
         yearsExperience: profile.yearsExperience,
       });
     }
@@ -47,8 +45,6 @@ export function PromoterProfileForm() {
     e.preventDefault();
     const payload: PromoterProfileInput = {
       ...form,
-      followersCount: form.followersCount ? Number(form.followersCount) : undefined,
-      engagementRate: form.engagementRate ? Number(form.engagementRate) : undefined,
       yearsExperience: form.yearsExperience ? Number(form.yearsExperience) : undefined,
     };
     const mutation = hasProfile ? updateMutation : createMutation;
@@ -90,26 +86,6 @@ export function PromoterProfileForm() {
         <div className="grid gap-4 sm:grid-cols-2">
           <Input label="Location" name="location" value={form.location ?? ""} onChange={set("location")} />
           <Input label="Avatar URL" name="avatarUrl" value={form.avatarUrl ?? ""} onChange={set("avatarUrl")} />
-          <Input
-            label="Total audience size"
-            name="followersCount"
-            type="number"
-            min={0}
-            max={1000000000}
-            placeholder="e.g. 15000 across all platforms"
-            value={form.followersCount ?? ""}
-            onChange={set("followersCount")}
-          />
-          <Input
-            label="Engagement rate (%)"
-            name="engagementRate"
-            type="number"
-            min={0}
-            max={100}
-            step="0.01"
-            value={form.engagementRate ?? ""}
-            onChange={set("engagementRate")}
-          />
           <Input
             label="Years experience"
             name="yearsExperience"

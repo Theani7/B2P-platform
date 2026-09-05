@@ -19,6 +19,7 @@ import {
   type PromoterProfileInput,
 } from "@/features/profile/api";
 import { useUpload } from "@/features/upload/api";
+import { useFollowStatus } from "@/features/follows/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProfileCompletion } from "@/features/profile-completion/api";
 import api from "@/lib/apiClient";
@@ -38,8 +39,6 @@ const schema = z.object({
   bio: z.string().optional(),
   niche: z.string().min(1, "Niche required"),
   location: z.string().optional(),
-  followersCount: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").max(10_000_000_000, "Invalid number").optional(),
-  engagementRate: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").max(100, "Cannot exceed 100").optional(),
   yearsExperience: z.number({ invalid_type_error: "Must be a number" }).min(0, "Cannot be negative").max(100, "Invalid years of experience").optional(),
 });
 
@@ -60,6 +59,8 @@ function PromoterProfileInner() {
   const uploadAvatarMutation = useUpload("avatar");
   
   const { data: completionData, isLoading: completionLoading } = useProfileCompletion();
+  const { data: followStatus } = useFollowStatus(user?.id ?? "");
+  const realFollowers = followStatus?.followersCount ?? profile?.followersCount ?? 0;
   const { data: myVerificationRequests } = useMyVerificationRequests();
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -99,8 +100,6 @@ function PromoterProfileInner() {
       bio: profile?.bio || "",
       niche: profile?.niche || "OTHER",
       location: profile?.location || "",
-      followersCount: profile?.followersCount || 0,
-      engagementRate: profile?.engagementRate || 0,
       yearsExperience: profile?.yearsExperience || 0,
     },
   });
@@ -108,18 +107,16 @@ function PromoterProfileInner() {
   const headline = watch("headline");
   const niche = watch("niche");
   const location = watch("location");
-  const followersCount = watch("followersCount");
-  const engagementRate = watch("engagementRate");
   const yearsExperience = watch("yearsExperience");
 
-  const hasEnoughDetails = !!(niche && niche !== "OTHER" && location && (followersCount ?? 0) > 0);
-  const disableGenerateReason = "Please fill out your Primary Niche, Location, and Followers count in the Creator Details section before generating!";
-  
+  const hasEnoughDetails = !!(niche && niche !== "OTHER" && location);
+  const disableGenerateReason = "Please fill out your Primary Niche and Location in the Creator Details section before generating!";
+
   const aiContext = [
     niche && niche !== "OTHER" && `Primary Niche: ${niche}`,
     location && `Location: ${location}`,
-    (followersCount ?? 0) > 0 && `Followers: ${followersCount}`,
-    (engagementRate ?? 0) > 0 && `Engagement Rate: ${engagementRate}%`,
+    (profile?.followersCount ?? 0) > 0 && `Followers: ${profile?.followersCount}`,
+    (profile?.engagementRate ?? 0) > 0 && `Engagement Rate: ${profile?.engagementRate}%`,
     (yearsExperience ?? 0) > 0 && `Years Experience: ${yearsExperience}`,
   ].filter(Boolean).join("\n");
 
@@ -131,8 +128,6 @@ function PromoterProfileInner() {
         bio: profile.bio || "",
         niche: profile.niche || "OTHER",
         location: profile.location || "",
-        followersCount: profile.followersCount || 0,
-        engagementRate: profile.engagementRate || 0,
         yearsExperience: profile.yearsExperience || 0,
       });
     }
@@ -141,8 +136,6 @@ function PromoterProfileInner() {
   const onSubmit = (data: FormValues) => {
     const payload: PromoterProfileInput = {
       ...data,
-      followersCount: data.followersCount ? Number(data.followersCount) : undefined,
-      engagementRate: data.engagementRate ? Number(data.engagementRate) : undefined,
       yearsExperience: data.yearsExperience ? Number(data.yearsExperience) : undefined,
     };
     
@@ -315,11 +308,7 @@ function PromoterProfileInner() {
                   </span>
                 )}
                 <span className="flex items-center gap-1.5 ml-2">
-                  <strong className="text-graphite">{formatCompactNumber(followersCount || 0)}</strong> Followers
-                </span>
-                <span className="text-slate-custom/30 hidden sm:inline">•</span>
-                <span className="flex items-center gap-1.5">
-                  <strong className="text-graphite">{engagementRate ? engagementRate + '%' : '0%'}</strong> Engagement
+                  <strong className="text-graphite">{formatCompactNumber(realFollowers)}</strong> Followers
                 </span>
               </div>
             </div>
@@ -401,16 +390,6 @@ function PromoterProfileInner() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-graphite">Location</label>
                     <input type="text" {...register("location")} placeholder="e.g. Kathmandu" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-graphite">Total audience size</label>
-                    <input type="number" {...register("followersCount", { valueAsNumber: true })} min="0" placeholder="e.g. 15000 across all platforms" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
-                    {errors.followersCount && <p className="text-xs text-coral-alert">{errors.followersCount.message}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-graphite">Avg. Engagement Rate (%)</label>
-                    <input type="number" step="0.1" {...register("engagementRate", { valueAsNumber: true })} min="0" max="100" placeholder="e.g. 4.5" className="w-full h-11 px-4 rounded-inputs border border-slate-custom/20 focus:outline-none focus:border-signal-blue focus:ring-[3px] focus:ring-signal-blue/10 text-sm" />
-                    {errors.engagementRate && <p className="text-xs text-coral-alert">{errors.engagementRate.message}</p>}
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-graphite">Years of Experience</label>
