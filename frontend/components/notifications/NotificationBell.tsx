@@ -59,8 +59,8 @@ export function NotificationBell() {
       >
         <Bell size={20} className={open ? 'text-signal-blue' : 'text-graphite'} />
         {unread.data && unread.data.count > 0 && (
-          <span className="absolute right-2 top-2 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-coral-alert ring-2 ring-white">
-            <span className="absolute h-full w-full animate-ping rounded-full bg-coral-alert opacity-75"></span>
+          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-coral-alert px-1 text-[10px] font-bold text-white ring-2 ring-white">
+            {unread.data.count > 99 ? "99+" : unread.data.count}
           </span>
         )}
       </button>
