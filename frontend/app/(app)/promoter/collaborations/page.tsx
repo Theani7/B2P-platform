@@ -354,15 +354,19 @@ function PromoterCollaborationsInner() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-cards-lg shadow-product-card border border-slate-custom/10">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-graphite">Workspace</h1>
-          <p className="text-sm text-ash mt-2 max-w-xl">Manage your active and completed brand partnerships.</p>
-        </div>
-        <div className="flex items-center gap-3">
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Workspace</h1>
+            <p className="text-sm text-ash mt-2 max-w-xl">Manage your active and completed brand partnerships.</p>
+          </div>
           <Link
             href="/promoter/marketplace"
-            className="inline-flex items-center gap-2 bg-signal-blue text-white h-11 px-5 rounded-inputs text-sm font-semibold hover:opacity-90 transition-colors shadow-product-card-sm"
+            className="inline-flex items-center gap-2 bg-signal-blue text-white h-11 px-5 rounded-pill text-sm font-semibold hover:opacity-90 transition-all shadow-product-card"
           >
             <SearchIcon size={16} /> Browse Campaigns
           </Link>
@@ -370,47 +374,55 @@ function PromoterCollaborationsInner() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Active Projects" value={activeCount} hint="partnerships" />
-        <StatCard label="Completed" value={completedCount} hint="all time" />
-        <StatCard label="Pending Reviews" value={pendingReviewCount} hint="awaiting feedback" />
-        <StatCard label="Total Value" value={fmtNpr(totalValue)} hint="from completed" />
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Active Projects" value={activeCount} hint="partnerships" className="border-0 shadow-none bg-transparent" />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Completed" value={completedCount} hint="all time" className="border-0 shadow-none bg-transparent" />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Pending Reviews" value={pendingReviewCount} hint="awaiting feedback" className="border-0 shadow-none bg-transparent" />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Total Value" value={fmtNpr(totalValue)} hint="from completed" className="border-0 shadow-none bg-transparent" />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         <div className="xl:col-span-12 space-y-6">
           <div className="sticky top-0 z-30 bg-linen-canvas/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-            <div className="bg-white p-2 rounded-cards shadow-product-card border border-slate-custom/10 flex flex-col gap-3">
-              <div className="flex flex-col md:flex-row gap-2">
-                <div className="relative flex-1">
-                  <SearchIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-fog" />
-                  <input
-                    type="text"
-                    placeholder="Search projects by name or partner..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-fog text-graphite"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 overflow-x-auto px-2 pb-1">
-                {["All", "Active", "Completed", "Cancelled"].map((status) => (
-                  <button
-                    key={status}
-                    onClick={() => {
-                      setStatusFilter(status.toLowerCase());
-                      setPage(1);
-                    }}
-                    className={`whitespace-nowrap px-4 h-8 rounded-pill text-xs font-semibold tracking-wide transition-colors border ${
-                      statusFilter === status.toLowerCase()
-                        ? "bg-graphite text-white border-graphite"
-                        : "bg-white text-ash border-slate-custom/10 hover:bg-sky-wash"
-                    }`}
-                  >
-                    {status}
-                  </button>
-                ))}
-              </div>
+            <div className="flex flex-col gap-2.5 rounded-[1.75rem] border border-slate-custom/10 bg-white p-2.5 shadow-feature-section transition-shadow focus-within:border-signal-blue/40 focus-within:shadow-blue-focus md:flex-row md:items-center">
+            <div className="relative flex-1">
+              <span className="absolute left-2.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-2xl bg-sky-wash text-signal-blue">
+                <SearchIcon size={17} />
+              </span>
+              <input
+                type="text"
+                placeholder="Search projects by name or partner..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-14 w-full bg-transparent pl-16 pr-4 text-[15px] font-medium text-graphite placeholder-fog outline-none"
+              />
             </div>
+            <div className="flex gap-2 overflow-x-auto px-1 pb-1 md:pb-0 md:pr-1.5">
+              {["All", "Active", "Completed", "Cancelled"].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => {
+                    setStatusFilter(status.toLowerCase());
+                    setPage(1);
+                  }}
+                  className={`whitespace-nowrap px-4 h-10 rounded-pill text-xs font-semibold tracking-wide transition-all ${
+                    statusFilter === status.toLowerCase()
+                      ? "bg-midnight-ink text-white shadow-product-card"
+                      : "bg-linen-canvas text-ash hover:bg-sky-wash hover:text-graphite"
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </div>
           </div>
 
           {isLoading ? (
