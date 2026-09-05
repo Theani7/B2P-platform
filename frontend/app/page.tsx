@@ -14,6 +14,15 @@ import {
   MapPin,
   Heart,
   Smile,
+  PartyPopper,
+  MessagesSquare,
+  ShieldCheck,
+  Sprout,
+  Search,
+  Mail,
+  Sparkles,
+  Store,
+  Palette,
 } from "lucide-react";
 
 /* ------------------------------ scroll reveal ------------------------------ */
@@ -254,7 +263,7 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
           <div className="relative mx-auto w-full max-w-[560px] text-left">
             <div className="rounded-[2rem] border border-steel/10 bg-white p-6 shadow-feature-section sm:p-8">
               <div className="mb-5 flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-status/15 text-xl">🎉</span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-status/15"><PartyPopper size={18} className="text-emerald-status" /></span>
                 <div>
                   <p className="text-sm font-semibold text-graphite">You have a new match!</p>
                   <p className="text-xs text-ash">Food and lifestyle · 96% fit</p>
@@ -280,9 +289,9 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
 /* ------------------------------- love notes -------------------------------- */
 
 const NOTES = [
-  { emoji: "💬", title: "Chat that feels human", body: "Real conversations attached to real work. No cold emails, no ghosting." },
-  { emoji: "⭐", title: "Reviews you can trust", body: "Both sides rate every collab, so good work always gets noticed." },
-  { emoji: "🛡️", title: "Safe by design", body: "Verified profiles and clear briefs keep surprises out of the picture." },
+  { icon: MessagesSquare, tint: "bg-sky-wash text-signal-blue", title: "Chat that feels human", body: "Real conversations attached to real work. No cold emails, no ghosting." },
+  { icon: Star, tint: "bg-amber-tag/20 text-amber-tag", title: "Reviews you can trust", body: "Both sides rate every collab, so good work always gets noticed." },
+  { icon: ShieldCheck, tint: "bg-emerald-status/10 text-emerald-status", title: "Safe by design", body: "Verified profiles and clear briefs keep surprises out of the picture." },
 ];
 
 function LoveNotes() {
@@ -297,7 +306,9 @@ function LoveNotes() {
         <div className="grid gap-5 md:grid-cols-3">
           {NOTES.map((n, i) => (
             <Reveal key={n.title} delay={i * 100} className="rounded-[2rem] bg-linen-canvas p-8 text-center transition-transform hover:-translate-y-1">
-              <p className="mb-4 text-4xl">{n.emoji}</p>
+              <span className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl ${n.tint}`}>
+                <n.icon size={24} />
+              </span>
               <h3 className="mb-2 font-display text-2xl font-medium tracking-tight text-graphite">{n.title}</h3>
               <p className="mx-auto max-w-[260px] text-sm leading-relaxed text-ash">{n.body}</p>
             </Reveal>
@@ -311,10 +322,10 @@ function LoveNotes() {
 /* ------------------------------- how it works ------------------------------ */
 
 const STEPS = [
-  { emoji: "🌱", title: "Plant your profile", desc: "Tell us who you are and what you love. It takes minutes, not meetings." },
-  { emoji: "🔍", title: "Find your people", desc: "Browse by vibe and niche, or let smart matches tap you on the shoulder." },
-  { emoji: "💌", title: "Say hello", desc: "Chat directly, agree on the fun stuff, and start creating together." },
-  { emoji: "🌟", title: "Shine together", desc: "Publish, review each other, and watch the next invite roll in." },
+  { icon: Sprout, tint: "bg-emerald-status/10 text-emerald-status", title: "Plant your profile", desc: "Tell us who you are and what you love. It takes minutes, not meetings." },
+  { icon: Search, tint: "bg-sky-wash text-signal-blue", title: "Find your people", desc: "Browse by vibe and niche, or let smart matches tap you on the shoulder." },
+  { icon: Mail, tint: "bg-amber-tag/20 text-amber-tag", title: "Say hello", desc: "Chat directly, agree on the fun stuff, and start creating together." },
+  { icon: Sparkles, tint: "bg-signal-blue/10 text-signal-blue", title: "Shine together", desc: "Publish, review each other, and watch the next invite roll in." },
 ];
 
 function HowItWorks() {
@@ -329,7 +340,9 @@ function HowItWorks() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
             <Reveal key={s.title} delay={i * 90} className="rounded-[2rem] bg-white p-7 shadow-product-card">
-              <p className="mb-4 text-4xl">{s.emoji}</p>
+              <span className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${s.tint}`}>
+                <s.icon size={22} />
+              </span>
               <p className="font-roboto-mono mb-2 text-xs text-signal-blue">Step {i + 1}</p>
               <h3 className="mb-2 font-display text-xl font-medium tracking-tight text-graphite">{s.title}</h3>
               <p className="text-sm leading-relaxed text-ash">{s.desc}</p>
@@ -397,7 +410,9 @@ function Audiences() {
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto grid max-w-[1100px] gap-5 px-6 md:grid-cols-2">
         <Reveal className="rounded-[2.5rem] bg-midnight-ink p-9 lg:p-12">
-          <p className="mb-3 text-4xl">🏪</p>
+          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
+            <Store size={22} className="text-white" />
+          </span>
           <h3 className="mb-3 font-display text-3xl font-medium tracking-tight text-white">Brands, come hungry</h3>
           <p className="mb-7 max-w-sm text-sm leading-relaxed text-white/70">
             Post a brief at breakfast, wake up to creators who already love what you sell.
@@ -407,7 +422,9 @@ function Audiences() {
           </Link>
         </Reveal>
         <Reveal delay={120} className="rounded-[2.5rem] bg-amber-tag/20 p-9 lg:p-12">
-          <p className="mb-3 text-4xl">🎨</p>
+          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-graphite/5">
+            <Palette size={22} className="text-amber-tag" />
+          </span>
           <h3 className="mb-3 font-display text-3xl font-medium tracking-tight text-graphite">Creators, shine bright</h3>
           <p className="mb-7 max-w-sm text-sm leading-relaxed text-steel">
             One profile, endless dinner invitations from brands in your niche. Bring appetite.
@@ -483,8 +500,8 @@ function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
       <Reveal className="relative mx-auto max-w-[1100px] overflow-hidden rounded-[2.5rem] bg-signal-blue px-6 py-16 text-center shadow-feature-section lg:py-20">
         <span className="absolute -left-10 -top-10 h-44 w-44 rounded-full bg-white/10" />
         <span className="absolute -bottom-14 -right-14 h-56 w-56 rounded-full bg-white/10" />
-        <span className="absolute left-8 top-8 hidden text-3xl sm:block">✨</span>
-        <span className="absolute bottom-8 right-10 hidden text-3xl sm:block">🎈</span>
+        <Sparkles size={26} className="absolute left-8 top-8 hidden text-white/30 sm:block" />
+        <PartyPopper size={26} className="absolute bottom-8 right-10 hidden text-white/30 sm:block" />
         <div className="relative">
           <h2 className="mx-auto mb-4 max-w-xl font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
             Ready for your happily ever after?
@@ -535,7 +552,7 @@ function Footer() {
       <div className="mx-auto max-w-[1200px] px-6 py-14">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <p className="text-xl font-semibold text-white">Byparsathy 💛</p>
+            <p className="flex items-center gap-1.5 text-xl font-semibold text-white">Byparsathy <Heart size={16} className="fill-coral-alert text-coral-alert" /></p>
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/60">
               Where brands meet creators and everybody leaves smiling.
             </p>
