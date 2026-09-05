@@ -8,6 +8,7 @@ import {
   adminUserQuerySchema,
   adminCampaignQuerySchema,
   adminReviewQuerySchema,
+  auditLogQuerySchema,
   settingUpdateSchema,
 } from "./validation.js";
 
@@ -27,6 +28,8 @@ router.patch("/campaigns/:campaignId/cancel", controllers.cancelCampaign);
 
 router.get("/reviews", validate(adminReviewQuerySchema, "query"), controllers.listReviews);
 router.delete("/reviews/:reviewId", controllers.deleteReview);
+
+router.get("/audit-logs", validate(auditLogQuerySchema, "query"), controllers.auditLogs);
 
 router.get("/settings", controllers.settings);
 router.post("/settings/seed", controllers.seedSettings);

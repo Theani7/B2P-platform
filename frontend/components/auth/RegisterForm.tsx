@@ -16,7 +16,7 @@ const schema = z.object({
   username: z
     .string()
     .min(3, "At least 3 characters")
-    .regex(/^[a-zA-Z0-9_-]+$/, "Letters, numbers, - and _ only"),
+    .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers and _ only"),
   email: z.string().email("Enter a valid email"),
   password: z.string().min(6, "At least 6 characters"),
   role: z.enum([Role.BUSINESS, Role.PROMOTER]),

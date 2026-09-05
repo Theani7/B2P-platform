@@ -7,12 +7,11 @@ import { ROLE } from "../../shared/enums.js";
 import { marketplaceListQuerySchema } from "./validation.js";
 
 const router = express.Router();
-router.use(authenticate);
 
 const promoter = requireRole(ROLE.PROMOTER);
 
-router.get("/campaign-marketplace", validate(marketplaceListQuerySchema, "query"), controllers.list);
-router.post("/campaign-marketplace/:campaignId/bookmark", promoter, controllers.bookmark);
-router.delete("/campaign-marketplace/:campaignId/bookmark", promoter, controllers.removeBookmark);
+router.get("/campaign-marketplace", authenticate, validate(marketplaceListQuerySchema, "query"), controllers.list);
+router.post("/campaign-marketplace/:campaignId/bookmark", authenticate, promoter, controllers.bookmark);
+router.delete("/campaign-marketplace/:campaignId/bookmark", authenticate, promoter, controllers.removeBookmark);
 
 export default router;

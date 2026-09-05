@@ -23,6 +23,7 @@ export const login = wrap(async (req, res) => {
 });
 
 export const logout = wrap(async (req, res) => {
+  await authService.logout(req.body?.refresh_token);
   return ok(res, null, "Logged out");
 });
 
@@ -90,8 +91,22 @@ export const me = wrap(async (req, res) => {
 });
 
 export const updateMe = wrap(async (req, res) => {
-  const user = await authService.updateMe(req.user, req.body);
-  return ok(res, user, "Profile updated");
+  await authService.updateMe(req.user, req.body);
+  const u = await authService.getMe(req.user.id);
+  const safe = {
+    id: u.id,
+    username: u.username,
+    fullName: u.fullName,
+    email: u.email,
+    role: u.role,
+    isActive: u.isActive,
+    isVerified: u.isVerified,
+    createdAt: u.createdAt,
+    lastLoginAt: u.lastLoginAt,
+    promoterProfile: u.promoterProfile ?? null,
+    businessProfile: u.businessProfile ?? null,
+  };
+  return ok(res, safe, "Profile updated");
 });
 
 

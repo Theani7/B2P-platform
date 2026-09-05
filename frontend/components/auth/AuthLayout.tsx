@@ -57,8 +57,8 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           <div className="flex items-center justify-between text-xs font-medium text-white/50 border-t border-white/10 pt-6">
             <span>© 2026 Byparsathy. All rights reserved.</span>
             <div className="flex gap-6">
-              <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-              <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+              <span className="text-white/50">Privacy</span>
+              <span className="text-white/50">Terms</span>
             </div>
           </div>
         </div>

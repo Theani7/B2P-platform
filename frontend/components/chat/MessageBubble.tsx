@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Download } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { FileText, Download, Pencil, Trash2 } from "lucide-react";
 import type { ChatMessage } from "@/features/chat/api";
+import { useEditMessage, useDeleteMessage } from "@/features/chat/api";
+import { notifySuccess, notifyApiError } from "@/lib/notify";
 import { timeStr } from "@/lib/time";
 
 function handleDownload(e: React.MouseEvent, url: string, filename: string) {
@@ -27,6 +30,42 @@ const getFilename = (url: string) => url.split("/").pop() || "download";
 
 export function MessageBubble({ msg, mine }: { msg: ChatMessage; mine: boolean }) {
   const [showActions, setShowActions] = useState(false);
+  const qc = useQueryClient();
+  const editMessage = useEditMessage();
+  const deleteMessage = useDeleteMessage();
+
+  const refreshHistory = () => qc.invalidateQueries({ queryKey: ["chat-history"] });
+
+  const handleEdit = () => {
+    const next = window.prompt("Edit message", msg.message);
+    if (next === null) return;
+    const content = next.trim();
+    if (!content || content === msg.message) return;
+    editMessage.mutate(
+      { messageId: msg.id, content },
+      {
+        onSuccess: () => {
+          notifySuccess("Message updated");
+          refreshHistory();
+        },
+        onError: (err) => notifyApiError(err, "Failed to update message"),
+      }
+    );
+  };
+
+  const handleDelete = () => {
+    if (!window.confirm("Delete this message?")) return;
+    deleteMessage.mutate(msg.id, {
+      onSuccess: () => {
+        notifySuccess("Message deleted");
+        refreshHistory();
+      },
+      onError: (err) => notifyApiError(err, "Failed to delete message"),
+    });
+  };
+
+  const busy = editMessage.isPending || deleteMessage.isPending;
+  const canModify = mine && !msg.isDeleted;
 
   return (
     <div
@@ -62,15 +101,37 @@ export function MessageBubble({ msg, mine }: { msg: ChatMessage; mine: boolean }
           </div>
         </div>
 
-        {showActions && (msg.messageType === "IMAGE" || msg.messageType === "FILE") && (
+        {showActions && (canModify || msg.messageType === "IMAGE" || msg.messageType === "FILE") && (
           <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={(e) => handleDownload(e, msg.message, getFilename(msg.message))}
-              className="p-1.5 rounded-lg bg-white border border-slate-custom/10 text-ash hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-sm"
-              title="Download file"
-            >
-              <Download size={14} />
-            </button>
+            {(msg.messageType === "IMAGE" || msg.messageType === "FILE") && (
+              <button
+                onClick={(e) => handleDownload(e, msg.message, getFilename(msg.message))}
+                className="p-1.5 rounded-lg bg-white border border-slate-custom/10 text-ash hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-sm"
+                title="Download file"
+              >
+                <Download size={14} />
+              </button>
+            )}
+            {canModify && (
+              <>
+                <button
+                  onClick={handleEdit}
+                  disabled={busy}
+                  className="p-1.5 rounded-lg bg-white border border-slate-custom/10 text-ash hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-sm disabled:opacity-50"
+                  title="Edit message"
+                >
+                  <Pencil size={14} />
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={busy}
+                  className="p-1.5 rounded-lg bg-white border border-slate-custom/10 text-ash hover:text-red-500 hover:bg-red-50 transition-colors shadow-sm disabled:opacity-50"
+                  title="Delete message"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

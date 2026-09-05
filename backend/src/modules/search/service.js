@@ -32,7 +32,7 @@ function recordHistory(userId, q) {
   }).catch(() => {});
 }
 
-export async function performSearch(user, { q, type, limit = 10 }) {
+export async function performSearch(user, { q, type, limit = 10, page = 1 }) {
   recordHistory(user.id, q);
 
   const results = {
@@ -53,12 +53,13 @@ export async function performSearch(user, { q, type, limit = 10 }) {
         ],
       },
       include: { businessProfile: true },
+      skip: (Number(page) - 1) * Number(limit),
       take: limit,
     });
     for (const c of camps) {
       if (
         user.role === ROLE.ADMIN ||
-        c.status === "ACTIVE" ||
+        (c.status === "OPEN" && c.visibility === "PUBLIC") ||
         c.businessProfileId === user.businessProfile?.id
       ) {
         results.campaigns.push({
@@ -118,7 +119,7 @@ export async function performSearch(user, { q, type, limit = 10 }) {
         subtitle: b.industry,
         imageUrl: b.logoUrl,
         type: "business",
-        url: `/business/profile`,
+        url: `/search?q=${encodeURIComponent(b.companyName)}`,
         score: 0,
       });
     }

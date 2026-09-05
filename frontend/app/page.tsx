@@ -251,9 +251,9 @@ function LandingHero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
                       </span>
                     </Button>
                   </Link>
-                  <Link href="/login">
+                  <Link href="/register">
                     <Button variant="ghost" className="h-12 px-6 text-base">
-                      Book a demo
+                      Get started
                     </Button>
                   </Link>
                 </>
@@ -588,9 +588,9 @@ function CTA() {
                 </span>
               </Button>
             </Link>
-            <Link href="/login">
+            <Link href="/register">
               <Button variant="ghost" className="h-12 px-6 text-base">
-                Contact sales
+                Get started free
               </Button>
             </Link>
           </div>
@@ -609,13 +609,13 @@ function Footer() {
       { label: "For promoters", href: "#promoters" },
     ] },
     { title: "Company", links: [
-      { label: "About", href: "/" },
-      { label: "Contact", href: "/" },
-      { label: "Careers", href: "/" },
+      { label: "About", href: null },
+      { label: "Contact", href: null },
+      { label: "Careers", href: null },
     ] },
     { title: "Legal", links: [
-      { label: "Privacy", href: "/" },
-      { label: "Terms", href: "/" },
+      { label: "Privacy", href: null },
+      { label: "Terms", href: null },
     ] },
   ];
   return (
@@ -637,9 +637,15 @@ function Footer() {
               <ul className="space-y-2">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="text-sm text-ash transition-colors hover:text-signal-blue">
-                      {link.label}
-                    </a>
+                    {link.href ? (
+                      <a href={link.href} className="text-sm text-ash transition-colors hover:text-signal-blue">
+                        {link.label}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-ash/60">
+                        {link.label}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

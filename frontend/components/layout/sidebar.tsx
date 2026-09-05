@@ -19,6 +19,10 @@ import {
   BarChart3,
   Lock,
   Star,
+  Award,
+  Search,
+  Download,
+  Activity,
   Clock,
   Settings,
   Plus,
@@ -59,6 +63,7 @@ const businessSections = [
     links: [
       { to: "/business/campaigns", label: "My Campaigns", icon: Megaphone },
       { to: "/business/campaigns/create", label: "Create Campaign", icon: Plus },
+      { to: "/business/applications", label: "Applications", icon: FileText },
     ],
   },
   {
@@ -73,7 +78,17 @@ const businessSections = [
     links: [
       { to: "/business/collaborations", label: "Collaborations", icon: Handshake },
       { to: "/business/invitations", label: "Invitations", icon: Mail },
+      { to: "/business/reviews", label: "Reviews", icon: Star },
       { to: "/messages", label: "Messages", icon: MessageSquare },
+    ],
+  },
+  {
+    title: "Tools",
+    links: [
+      { to: "/achievements", label: "Achievements", icon: Award },
+      { to: "/activity", label: "Activity", icon: Activity },
+      { to: "/search", label: "Search", icon: Search },
+      { to: "/export", label: "Export", icon: Download },
     ],
   },
 ];
@@ -97,6 +112,15 @@ const promoterSections = [
       { to: "/promoter/collaborations", label: "Collaborations", icon: Handshake },
       { to: "/promoter/reviews", label: "My Reviews", icon: Star },
       { to: "/messages", label: "Messages", icon: MessageSquare },
+    ],
+  },
+  {
+    title: "Tools",
+    links: [
+      { to: "/achievements", label: "Achievements", icon: Award },
+      { to: "/activity", label: "Activity", icon: Activity },
+      { to: "/search", label: "Search", icon: Search },
+      { to: "/export", label: "Export", icon: Download },
     ],
   },
 ];
@@ -127,6 +151,15 @@ const adminSections = [
     title: "System",
     links: [
       { to: "/admin/settings", label: "Settings", icon: Settings },
+    ],
+  },
+  {
+    title: "Tools",
+    links: [
+      { to: "/achievements", label: "Achievements", icon: Award },
+      { to: "/activity", label: "Activity", icon: Activity },
+      { to: "/search", label: "Search", icon: Search },
+      { to: "/export", label: "Export", icon: Download },
     ],
   },
 ];

@@ -64,6 +64,7 @@ export async function analytics(user) {
     completedCollabCampaigns,
     dist,
     campaigns,
+    ratingAgg,
   ] = await Promise.all([
     prisma.campaign.count({ where: { businessProfileId: profile.id } }),
     prisma.campaign.count({ where: { businessProfileId: profile.id, status: "OPEN" } }),
@@ -85,6 +86,7 @@ export async function analytics(user) {
       orderBy: { applications: { _count: "desc" } },
       take: 5,
     }),
+    prisma.review.aggregate({ where: { revieweeId: user.id }, _avg: { rating: true } }),
   ]);
 
   const totalSpent = completedCollabCampaigns.reduce((sum, c) => sum + (c.campaign?.budget || 0), 0);
@@ -113,11 +115,9 @@ export async function analytics(user) {
       total_applications: totalApplications,
       active_collaborations: activeCollabs,
       collaborations_completed: completedCollabs,
-      average_roi: completedCollabs > 0 ? 320 : 0,
-      profile_views: totalCampaigns * 45,
-      total_reach: completedCollabs * 15000,
-      total_impressions: completedCollabs * 25000,
-      average_rating: 4.8,
+      average_roi: 0,
+      profile_views: 0,
+      average_rating: ratingAgg._avg.rating ? Math.round(ratingAgg._avg.rating * 10) / 10 : 0,
     },
     charts: {
       application_status_distribution: distData,

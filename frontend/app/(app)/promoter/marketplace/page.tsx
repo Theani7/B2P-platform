@@ -13,7 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { SkeletonCards } from "@/components/ui/Skeleton";
 import {
   Search, Calendar, Clock, Bookmark, Share2, Filter, Sparkles,
-  CheckCircle, X, Send, MoreVertical, Link as LinkIcon, Flag, Globe,
+  CheckCircle, X, Send, MoreVertical, Link as LinkIcon, Globe,
   Laptop, Heart, Utensils, Plane, Dumbbell, Gamepad2, GraduationCap, Film, Coins, Package,
 } from "lucide-react";
 
@@ -85,13 +85,6 @@ function CardMenu({ campaignId, campaignTitle }: { campaignId: string; campaignT
           </button>
           <button onClick={copyLink} className="w-full text-left px-4 py-2 text-sm text-graphite hover:bg-sky-wash flex items-center gap-2">
             <LinkIcon size={14} /> Copy Link
-          </button>
-          <div className="h-px bg-slate-custom/10 my-1" />
-          <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); notifySuccess("Campaign reported."); }}
-            className="w-full text-left px-4 py-2 text-sm text-coral-alert hover:bg-coral-alert/10 flex items-center gap-2"
-          >
-            <Flag size={14} /> Report
           </button>
         </div>
       )}

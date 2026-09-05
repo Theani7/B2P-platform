@@ -54,7 +54,7 @@ export const useMyAchievements = () =>
 export const useUserAchievements = (userId: string) =>
   useQuery<MyAchievementsResponse>({
     queryKey: ["achievements-user", userId],
-    queryFn: () => api.get<MyAchievementsResponse>(`/achievements/users/${userId}`).then((r) => r.data),
+    queryFn: () => api.get<MyAchievementsResponse>(`/achievements/users/${userId}/achievements`).then((r) => r.data),
     enabled: !!userId,
   });
 

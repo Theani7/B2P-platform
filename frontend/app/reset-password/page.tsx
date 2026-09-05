@@ -6,7 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { notifySuccess, notifyError } from "@/lib/notify";
-import { resetPassword } from "@/features/auth/api";
+import { resetPassword, verifyResetCode } from "@/features/auth/api";
+import { getApiError } from "@/lib/apiError";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -30,11 +31,12 @@ function ResetForm() {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await resetPassword({ token: values.code, new_password: values.password });
+      const { token } = await verifyResetCode({ email: values.email, code: values.code });
+      await resetPassword({ token, new_password: values.password });
       notifySuccess("Password reset. Please sign in.");
       router.push("/login");
-    } catch {
-      notifyError("Invalid or expired code.");
+    } catch (err) {
+      notifyError(getApiError(err, "Invalid or expired code."));
     }
   });
 

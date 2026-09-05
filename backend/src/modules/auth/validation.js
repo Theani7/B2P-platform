@@ -23,6 +23,10 @@ export const refreshSchema = z.object({
   refresh_token: z.string(),
 });
 
+export const logoutSchema = z.object({
+  refresh_token: z.string().optional(),
+});
+
 export const verifyEmailSchema = z.object({
   token: z.string(),
 });

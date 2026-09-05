@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/apiClient";
 import { ProfileCompletionWidget } from "@/components/profile/ProfileCompletionWidget";
 import { SocialEditor } from "@/components/social/SocialEditor";
-import { useBusinessProfile, useCreateBusinessProfile, useUpdateBusinessProfile } from "@/features/profile/api";
+import { useBusinessProfile, useCreateBusinessProfile, useUpdateBusinessProfile, useMyBusinessVerificationRequests } from "@/features/profile/api";
 import { useMySocialLinks, useDeleteSocialLink } from "@/features/social/api";
 import { useUpload } from "@/features/upload/api";
 import { useProfileCompletion } from "@/features/profile-completion/api";
@@ -44,6 +44,7 @@ export default function BusinessProfilePage() {
   const { data: profile, isLoading } = useBusinessProfile();
   const { data: completion, isLoading: completionLoading } = useProfileCompletion();
   const { data: links } = useMySocialLinks();
+  const { data: verificationRequests } = useMyBusinessVerificationRequests();
   
   const createMutation = useCreateBusinessProfile();
   const updateMutation = useUpdateBusinessProfile();
@@ -55,6 +56,9 @@ export default function BusinessProfilePage() {
   const [verifying, setVerifying] = useState(false);
   const [pendingVerification, setPendingVerification] = useState(false);
   const [editingSocial, setEditingSocial] = useState(false);
+
+  const hasPendingRequest = verificationRequests?.some((r) => r.status === "PENDING") ?? false;
+  const isPending = pendingVerification || hasPendingRequest;
 
   const {
     register,
@@ -132,6 +136,7 @@ export default function BusinessProfilePage() {
       await api.post("/business/verification-request");
       notifySuccess("Verification request submitted!");
       setPendingVerification(true);
+      qc.invalidateQueries({ queryKey: ["my-business-verification-requests"] });
     } catch (err: any) {
       notifyApiError(err, "Failed to submit request");
     } finally {
@@ -156,14 +161,14 @@ export default function BusinessProfilePage() {
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-button text-signal-blue font-semibold text-sm">
               <span>{completion?.completion ?? 0}% Complete</span>
             </div>
-            {pendingVerification || verified ? (
+            {isPending || verified ? (
               <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-sm font-medium">
                 <BadgeCheck size={16} /> {verified ? "Verified Business" : "Verification Pending"}
               </div>
             ) : isComplete ? (
               <button
                 onClick={requestVerification}
-                disabled={verifying}
+                disabled={verifying || hasPendingRequest}
                 className="flex items-center gap-2 px-4 py-2 rounded-button bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
               >
                 <BadgeCheck size={16} /> Request Verification

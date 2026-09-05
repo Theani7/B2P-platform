@@ -64,15 +64,33 @@ export async function analytics(user) {
     };
   }
 
-  const applicationsSubmitted = await prisma.campaignApplication.count({ where: { promoterProfileId: profile.id } });
-  const pendingApps = await prisma.campaignApplication.count({ where: { promoterProfileId: profile.id, status: "PENDING" } });
-  const acceptedApps = await prisma.campaignApplication.count({ where: { promoterProfileId: profile.id, status: "ACCEPTED" } });
-  const rejectedApps = await prisma.campaignApplication.count({ where: { promoterProfileId: profile.id, status: "REJECTED" } });
-  const activeCollabs = await prisma.collaboration.count({ where: { promoterProfileId: profile.id, status: "ACTIVE" } });
-  const completedCollabs = await prisma.collaboration.count({ where: { promoterProfileId: profile.id, status: "COMPLETED" } });
-  const reviewsReceived = await prisma.review.count({ where: { revieweeId: user.id } });
-  const avg = await prisma.review.aggregate({ where: { revieweeId: user.id }, _avg: { rating: true } });
-  const portfolioItems = await prisma.portfolioItem.count({ where: { promoterId: profile.id } });
+  const [
+    applicationsSubmitted,
+    pendingApps,
+    acceptedApps,
+    rejectedApps,
+    invitationsReceived,
+    invitationsAccepted,
+    invitationsPending,
+    activeCollabs,
+    completedCollabs,
+    reviewsReceived,
+    avg,
+    portfolioItems,
+  ] = await Promise.all([
+    prisma.campaignApplication.count({ where: { promoterProfileId: profile.id } }),
+    prisma.campaignApplication.count({ where: { promoterProfileId: profile.id, status: "PENDING" } }),
+    prisma.campaignApplication.count({ where: { promoterProfileId: profile.id, status: "ACCEPTED" } }),
+    prisma.campaignApplication.count({ where: { promoterProfileId: profile.id, status: "REJECTED" } }),
+    prisma.campaignInvitation.count({ where: { promoterProfileId: profile.id } }),
+    prisma.campaignInvitation.count({ where: { promoterProfileId: profile.id, status: "ACCEPTED" } }),
+    prisma.campaignInvitation.count({ where: { promoterProfileId: profile.id, status: "PENDING" } }),
+    prisma.collaboration.count({ where: { promoterProfileId: profile.id, status: "ACTIVE" } }),
+    prisma.collaboration.count({ where: { promoterProfileId: profile.id, status: "COMPLETED" } }),
+    prisma.review.count({ where: { revieweeId: user.id } }),
+    prisma.review.aggregate({ where: { revieweeId: user.id }, _avg: { rating: true } }),
+    prisma.portfolioItem.count({ where: { promoterId: profile.id } }),
+  ]);
 
   return {
     summary: {
@@ -81,9 +99,9 @@ export async function analytics(user) {
       accepted_applications: acceptedApps,
       pending_applications: pendingApps,
       rejected_applications: rejectedApps,
-      invitations_received: 0,
-      invitations_accepted: 0,
-      invitations_pending: 0,
+      invitations_received: invitationsReceived,
+      invitations_accepted: invitationsAccepted,
+      invitations_pending: invitationsPending,
       active_collaborations: activeCollabs,
       completed_collaborations: completedCollabs,
       average_rating: avg._avg.rating ? Number(avg._avg.rating.toFixed(1)) : 0,

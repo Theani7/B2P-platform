@@ -107,3 +107,9 @@ export const useMyVerificationRequests = () =>
     queryKey: ["my-verification-requests"],
     queryFn: () => api.get<VerificationRequestRead[]>("/promoter/verification-request").then((r) => r.data),
   });
+
+export const useMyBusinessVerificationRequests = () =>
+  useQuery<VerificationRequestRead[]>({
+    queryKey: ["my-business-verification-requests"],
+    queryFn: () => api.get<VerificationRequestRead[]>("/business/verification-request").then((r) => r.data),
+  });

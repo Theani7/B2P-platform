@@ -8,7 +8,6 @@ import rateLimit from "express-rate-limit";
 import { deliverableCreateSchema, deliverableReviewSchema, collaborationListQuerySchema } from "./validation.js";
 
 const router = express.Router();
-router.use(authenticate);
 
 const promoter = requireRole(ROLE.PROMOTER);
 const business = requireRole(ROLE.BUSINESS);
@@ -20,13 +19,13 @@ const deliverableLimiter = rateLimit({
 });
 
 // --- Business ---
-router.get("/business/collaborations", business, validate(collaborationListQuerySchema, "query"), controllers.businessList);
-router.get("/business/collaborations/:id/deliverables", business, controllers.businessDeliverables);
-router.patch("/business/collaborations/:id/deliverables/:deliverableId/review", business, validate(deliverableReviewSchema), controllers.reviewDeliverable);
+router.get("/business/collaborations", authenticate, business, validate(collaborationListQuerySchema, "query"), controllers.businessList);
+router.get("/business/collaborations/:id/deliverables", authenticate, business, controllers.businessDeliverables);
+router.patch("/business/collaborations/:id/deliverables/:deliverableId/review", authenticate, business, validate(deliverableReviewSchema), controllers.reviewDeliverable);
 
 // --- Promoter ---
-router.get("/promoter/collaborations", promoter, validate(collaborationListQuerySchema, "query"), controllers.promoterList);
-router.get("/promoter/collaborations/:id/deliverables", promoter, controllers.promoterDeliverables);
-router.post("/promoter/collaborations/:id/deliverables", promoter, deliverableLimiter, validate(deliverableCreateSchema), controllers.submitDeliverable);
+router.get("/promoter/collaborations", authenticate, promoter, validate(collaborationListQuerySchema, "query"), controllers.promoterList);
+router.get("/promoter/collaborations/:id/deliverables", authenticate, promoter, controllers.promoterDeliverables);
+router.post("/promoter/collaborations/:id/deliverables", authenticate, promoter, deliverableLimiter, validate(deliverableCreateSchema), controllers.submitDeliverable);
 
 export default router;

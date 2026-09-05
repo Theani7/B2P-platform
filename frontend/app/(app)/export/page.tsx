@@ -33,11 +33,11 @@ function ExportInner() {
     exp.mutate(
       { module, format },
       {
-        onSuccess: () =>
+        onSuccess: (data) =>
           notifySuccess(
             <span>
               Exported —{" "}
-              <a className="underline" href={exp.data?.downloadUrl} target="_blank" rel="noreferrer">
+              <a className="underline" href={data?.downloadUrl} target="_blank" rel="noreferrer">
                 download
               </a>
             </span> as any,

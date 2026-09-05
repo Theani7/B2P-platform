@@ -145,6 +145,28 @@ export async function refresh(refreshToken) {
   return tokens(user);
 }
 
+export async function logout(refreshToken) {
+  try {
+    if (!refreshToken || typeof refreshToken !== "string") return;
+    const hash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+    await prisma.revokedRefreshToken.create({
+      data: {
+        tokenHash: hash,
+        expiresAt: new Date(Date.now() + config.refreshTokenExpireDays * 24 * 60 * 60 * 1000),
+      },
+    });
+  } catch {
+    return;
+  }
+}
+
+export async function getMe(userId) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    include: { promoterProfile: true, businessProfile: true },
+  });
+}
+
 export async function verifyEmail(token) {
   const user = await prisma.user.findFirst({ where: { verificationToken: token } });
   if (!user) throw new AppError("Invalid token", 404);

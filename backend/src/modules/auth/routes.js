@@ -10,7 +10,7 @@ router.get("/check", validate(validators.checkSchema, "query"), controllers.chec
 router.post("/register", validate(validators.registerSchema), controllers.register);
 router.post("/resend-verification", validate(validators.resendVerificationSchema), controllers.resendVerification);
 router.post("/login", validate(validators.loginSchema), controllers.login);
-router.post("/logout", authenticate, controllers.logout);
+router.post("/logout", authenticate, validate(validators.logoutSchema), controllers.logout);
 router.post("/refresh", validate(validators.refreshSchema), controllers.refresh);
 router.post("/verify-email", validate(validators.verifyEmailSchema), controllers.verifyEmail);
 router.post("/forgot-password", validate(validators.forgotPasswordSchema), controllers.forgotPassword);

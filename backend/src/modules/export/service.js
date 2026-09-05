@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { prisma } from "../../config/db.js";
+import { AppError } from "../../shared/errors.js";
 import { ROLE } from "../../shared/enums.js";
 import { uploadBaseDir } from "../upload/service.js";
 
@@ -9,7 +10,8 @@ function toCsv(rows) {
   if (!rows.length) return "";
   const headers = Object.keys(rows[0]);
   const esc = (v) => {
-    const s = v == null ? "" : String(v);
+    let s = v == null ? "" : String(v);
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   const lines = [headers.join(",")];
@@ -19,11 +21,12 @@ function toCsv(rows) {
 
 async function gather(user, module) {
   if (module === "campaigns") {
+    if (user.role === ROLE.BUSINESS && !user.businessProfile) return [];
     const where =
       user.role === ROLE.BUSINESS && user.businessProfile
         ? { businessProfileId: user.businessProfile.id }
         : user.role === ROLE.PROMOTER
-        ? { status: "ACTIVE" }
+        ? { status: "OPEN", visibility: "PUBLIC" }
         : {};
     const camps = await prisma.campaign.findMany({
       where,
@@ -50,6 +53,9 @@ async function gather(user, module) {
   }
 
   if (module === "promoters") {
+    if (user.role !== ROLE.BUSINESS && user.role !== ROLE.ADMIN) {
+      throw new AppError("Only business and admin users can export promoters", 403);
+    }
     const proms = await prisma.promoterProfile.findMany({
       select: {
         id: true,

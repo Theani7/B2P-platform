@@ -60,7 +60,7 @@ export const useUpdatePortfolioItem = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<PortfolioItemInput> }) =>
-      api.patch<PortfolioItem>(`/portfolio/${id}`, data).then((r) => r.data),
+      api.put<PortfolioItem>(`/portfolio/${id}`, data).then((r) => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-portfolio"] });
       qc.invalidateQueries({ queryKey: ["profile-completion"] });

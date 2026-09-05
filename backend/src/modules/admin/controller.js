@@ -88,8 +88,13 @@ export const updateSetting = wrap(async (req, res) => {
 });
 
 export const deleteSetting = wrap(async (req, res) => {
-  const data = await adminService.deleteSetting(req.params.key);
+  const data = await adminService.deleteSetting(req.user, req.params.key, req);
   return ok(res, data, "Setting deleted");
+});
+
+export const auditLogs = wrap(async (req, res) => {
+  const data = await adminService.listAuditLogs(req.query);
+  return ok(res, data, "Audit logs");
 });
 
 export const analytics = wrap(async (req, res) => {

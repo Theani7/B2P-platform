@@ -106,10 +106,12 @@ export function CommandPalette() {
     } else if (user.role === Role.BUSINESS) {
       cmds.push({ id: "nav-campaigns", title: "Campaigns", type: "navigation", icon: "campaigns", action: () => router.push("/business/campaigns") });
       cmds.push({ id: "action-create-campaign", title: "Create Campaign", type: "action", icon: "plus", action: () => router.push("/business/campaigns/create") });
+      cmds.push({ id: "nav-applications", title: "Applications", type: "navigation", icon: "applications", action: () => router.push("/business/applications") });
       cmds.push({ id: "action-marketplace", title: "Find Promoters", type: "navigation", icon: "globe", action: () => router.push("/business/promoters") });
       cmds.push({ id: "nav-saved", title: "Saved Promoters", type: "navigation", icon: "portfolio", action: () => router.push("/business/saved-promoters") });
       cmds.push({ id: "nav-collaborations", title: "Collaborations", type: "navigation", icon: "collaborations", action: () => router.push("/business/collaborations") });
       cmds.push({ id: "nav-invitations", title: "Invitations", type: "navigation", icon: "applications", action: () => router.push("/business/invitations") });
+      cmds.push({ id: "nav-reviews", title: "Reviews", type: "navigation", icon: "reviews", action: () => router.push("/business/reviews") });
       cmds.push({ id: "nav-messages", title: "Messages", type: "navigation", icon: "messages", action: () => router.push("/messages") });
       cmds.push({ id: "nav-notifications", title: "Notifications", type: "navigation", icon: "notifications", action: () => router.push("/notifications") });
     } else if (user.role === Role.PROMOTER) {
@@ -122,6 +124,10 @@ export function CommandPalette() {
       cmds.push({ id: "nav-notifications", title: "Notifications", type: "navigation", icon: "notifications", action: () => router.push("/notifications") });
     }
 
+    cmds.push({ id: "nav-search", title: "Search", type: "navigation", icon: "search", action: () => router.push("/search") });
+    cmds.push({ id: "nav-export", title: "Export", type: "navigation", icon: "campaigns", action: () => router.push("/export") });
+    cmds.push({ id: "nav-achievements", title: "Achievements", type: "navigation", icon: "achievements", action: () => router.push("/achievements") });
+    cmds.push({ id: "nav-activity", title: "Activity", type: "navigation", icon: "clock", action: () => router.push("/activity") });
     cmds.push({ id: "action-logout", title: "Logout", type: "action", icon: "logout", action: () => logout() });
 
     return cmds;

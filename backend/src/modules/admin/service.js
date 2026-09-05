@@ -3,6 +3,23 @@ import { AppError } from "../../shared/errors.js";
 import { ROLE } from "../../shared/enums.js";
 
 
+async function auditLog(userId, action, entityType, entityId, req) {
+  try {
+    await prisma.auditLog.create({
+      data: {
+        userId: userId || null,
+        action,
+        entityType,
+        entityId: entityId ? String(entityId) : null,
+        ipAddress: req?.ip || null,
+        userAgent: req?.headers?.["user-agent"]?.slice(0, 500) || null,
+      },
+    });
+  } catch {
+    // Audit logging must never block the primary operation.
+  }
+}
+
 async function getUserOr404(userId) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -130,12 +147,14 @@ export async function suspendUser(adminUser, userId, req) {
   const user = await getUserOr404(userId);
   if (user.role === ROLE.ADMIN) throw new AppError("Cannot suspend admin users", 400);
   await prisma.user.update({ where: { id: user.id }, data: { isActive: false } });
+  await auditLog(adminUser?.id, "ADMIN_SUSPEND_USER", "user", user.id, req);
   return { success: true };
 }
 
 export async function activateUser(adminUser, userId, req) {
   const user = await getUserOr404(userId);
   await prisma.user.update({ where: { id: user.id }, data: { isActive: true } });
+  await auditLog(adminUser?.id, "ADMIN_ACTIVATE_USER", "user", user.id, req);
   return { success: true };
 }
 
@@ -143,6 +162,7 @@ export async function deleteUser(adminUser, userId, req) {
   const user = await getUserOr404(userId);
   if (user.role === ROLE.ADMIN) throw new AppError("Cannot delete admin users", 400);
   await prisma.user.delete({ where: { id: user.id } });
+  await auditLog(adminUser?.id, "ADMIN_DELETE_USER", "user", user.id, req);
   return { success: true };
 }
 
@@ -187,12 +207,14 @@ async function getCampaignOr404(campaignId) {
 export async function archiveCampaign(adminUser, campaignId, req) {
   await getCampaignOr404(campaignId);
   await prisma.campaign.update({ where: { id: campaignId }, data: { status: "ARCHIVED" } });
+  await auditLog(adminUser?.id, "ADMIN_ARCHIVE_CAMPAIGN", "campaign", campaignId, req);
   return { success: true };
 }
 
 export async function cancelCampaign(adminUser, campaignId, req) {
   await getCampaignOr404(campaignId);
   await prisma.campaign.update({ where: { id: campaignId }, data: { status: "CANCELLED" } });
+  await auditLog(adminUser?.id, "ADMIN_CANCEL_CAMPAIGN", "campaign", campaignId, req);
   return { success: true };
 }
 
@@ -232,10 +254,67 @@ export async function deleteReview(adminUser, reviewId, req) {
   const review = await prisma.review.findUnique({ where: { id: reviewId } });
   if (!review) throw new AppError("Review not found", 404);
   await prisma.review.delete({ where: { id: reviewId } });
+  await auditLog(adminUser?.id, "ADMIN_DELETE_REVIEW", "review", reviewId, req);
   return { success: true };
 }
 
 
+
+// --- Audit Logs ---
+export async function listAuditLogs({ page = 1, limit = 20, search, action, userId, dateFrom, dateTo }) {
+  const where = {};
+  if (action) where.action = action;
+  if (userId) where.userId = userId;
+  if (dateFrom || dateTo) {
+    where.createdAt = {};
+    if (dateFrom) {
+      const from = new Date(dateFrom);
+      if (!Number.isNaN(from.getTime())) where.createdAt.gte = from;
+    }
+    if (dateTo) {
+      const to = new Date(dateTo);
+      if (!Number.isNaN(to.getTime())) where.createdAt.lte = to;
+    }
+    if (Object.keys(where.createdAt).length === 0) delete where.createdAt;
+  }
+  if (search) {
+    where.OR = [
+      { action: { contains: search, mode: "insensitive" } },
+      { entityType: { contains: search, mode: "insensitive" } },
+      { entityId: { contains: search, mode: "insensitive" } },
+    ];
+  }
+
+  const [rows, total] = await Promise.all([
+    prisma.auditLog.findMany({
+      where,
+      include: { user: { select: { username: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (Number(page) - 1) * Number(limit),
+      take: Number(limit),
+    }),
+    prisma.auditLog.count({ where }),
+  ]);
+
+  const items = rows.map((a) => ({
+    id: a.id,
+    userId: a.userId,
+    username: a.user?.username || null,
+    action: a.action,
+    entityType: a.entityType,
+    entityId: a.entityId,
+    ipAddress: a.ipAddress,
+    createdAt: a.createdAt,
+  }));
+
+  return {
+    items,
+    total,
+    page: Number(page),
+    limit: Number(limit),
+    pages: Math.max(1, Math.ceil(total / Number(limit))),
+  };
+}
 
 // --- Platform Settings ---
 export async function getSettings() {
@@ -289,6 +368,7 @@ export async function updateSetting(adminUser, settingKey, settingValue, descrip
     update: { settingValue, description: description ?? undefined },
     create: { settingKey, settingValue, description },
   });
+  await auditLog(adminUser?.id, "ADMIN_UPDATE_SETTING", "platform_setting", settingKey, req);
   return {
     id: setting.id,
     settingKey: setting.settingKey,
@@ -298,10 +378,11 @@ export async function updateSetting(adminUser, settingKey, settingValue, descrip
   };
 }
 
-export async function deleteSetting(settingKey) {
+export async function deleteSetting(adminUser, settingKey, req) {
   const setting = await prisma.platformSetting.findUnique({ where: { settingKey } });
   if (!setting) throw new AppError("Setting not found", 404);
   await prisma.platformSetting.delete({ where: { settingKey } });
+  await auditLog(adminUser?.id, "ADMIN_DELETE_SETTING", "platform_setting", settingKey, req);
   return { success: true };
 }
 
