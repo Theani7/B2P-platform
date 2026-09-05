@@ -159,12 +159,12 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             <div className="flex flex-wrap items-center gap-4">
               {isAuthed ? (
                 <Link href={dash}>
-                  <Button className="h-13 rounded-pill px-8 text-base">Open dashboard <ArrowRight size={16} /></Button>
+                  <Button className="h-12 rounded-pill px-8 text-base">Open dashboard <ArrowRight size={16} /></Button>
                 </Link>
               ) : (
                 <>
                   <Link href="/register">
-                    <Button className="h-13 rounded-pill px-8 text-base">Start free <ArrowRight size={16} /></Button>
+                    <Button className="h-12 rounded-pill px-8 text-base">Start free <ArrowRight size={16} /></Button>
                   </Link>
                   <Link href="/login" className="px-2 py-2 text-sm font-medium text-slate-custom transition-colors hover:text-midnight-ink">
                     Sign in
@@ -281,7 +281,7 @@ function Steps() {
         </div>
         <div className="mt-10 text-center">
           <Link href="/register">
-            <Button className="h-13 rounded-pill px-8 text-base">Claim your handle <ArrowRight size={16} /></Button>
+            <Button className="h-12 rounded-pill px-8 text-base">Claim your handle <ArrowRight size={16} /></Button>
           </Link>
         </div>
       </div>
