@@ -19,7 +19,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-export function LoginForm() {
+export function LoginForm({ onForgot }: { onForgot?: () => void } = {}) {
   const router = useRouter();
   const [notVerified, setNotVerified] = useState<{ email: string } | null>(null);
   const [resending, setResending] = useState(false);
@@ -94,9 +94,15 @@ export function LoginForm() {
       </div>
 
       <div className="flex items-center justify-end">
-        <a href="/forgot-password" className="text-xs font-semibold text-signal-blue hover:text-signal-blue/80 transition-colors">
-          Forgot password?
-        </a>
+        {onForgot ? (
+          <button type="button" onClick={onForgot} className="text-xs font-semibold text-signal-blue hover:text-signal-blue/80 transition-colors">
+            Forgot password?
+          </button>
+        ) : (
+          <a href="/forgot-password" className="text-xs font-semibold text-signal-blue hover:text-signal-blue/80 transition-colors">
+            Forgot password?
+          </a>
+        )}
       </div>
 
       <button

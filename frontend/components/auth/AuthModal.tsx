@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
+import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { Role } from "@/lib/roles";
 
-export type AuthView = "login" | "register";
+export type AuthView = "login" | "register" | "forgot";
 
 export function AuthModal({
   open,
@@ -83,25 +84,27 @@ export function AuthModal({
           <span className="text-lg font-medium text-midnight-ink">Byparsathy</span>
         </div>
 
-        <div className="mb-7 grid grid-cols-2 gap-1 rounded-buttons bg-sky-wash/60 p-1">
-          {(["login", "register"] as AuthView[]).map((v) => (
-            <button
-              key={v}
-              type="button"
-              onClick={() => onSwitch(v)}
-              className={`h-9 rounded-buttons text-sm font-bold transition-all ${
-                view === v ? "bg-white text-graphite shadow-sm" : "text-ash hover:text-graphite"
-              }`}
-            >
-              {v === "login" ? "Sign in" : "Create account"}
-            </button>
-          ))}
-        </div>
+        {(view === "login" || view === "register") && (
+          <div className="mb-7 grid grid-cols-2 gap-1 rounded-buttons bg-sky-wash/60 p-1">
+            {(["login", "register"] as AuthView[]).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => onSwitch(v)}
+                className={`h-9 rounded-buttons text-sm font-bold transition-all ${
+                  view === v ? "bg-white text-graphite shadow-sm" : "text-ash hover:text-graphite"
+                }`}
+              >
+                {v === "login" ? "Sign in" : "Create account"}
+              </button>
+            ))}
+          </div>
+        )}
 
-        {view === "login" ? (
-          <LoginForm />
-        ) : (
-          <RegisterForm initialRole={role} />
+        {view === "login" && <LoginForm onForgot={() => onSwitch("forgot")} />}
+        {view === "register" && <RegisterForm initialRole={role} />}
+        {view === "forgot" && (
+          <ForgotPasswordForm onDone={() => onSwitch("login")} onBack={() => onSwitch("login")} />
         )}
       </div>
     </div>
