@@ -185,58 +185,74 @@ function CampaignsPageInner() {
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white border border-slate-custom/10 p-6 rounded-xl shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-signal-blue/10 text-signal-blue rounded-xl flex items-center justify-center shadow-sm">
-            <Megaphone size={24} />
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-signal-blue/10 text-signal-blue rounded-xl flex items-center justify-center shadow-sm">
+              <Megaphone size={24} />
+            </div>
+            <div>
+              <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">My Campaigns</h1>
+              <p className="text-sm text-ash mt-2">Manage, track, and publish your marketing campaigns.</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-graphite">My Campaigns</h1>
-            <p className="text-sm text-ash mt-0.5">Manage, track, and publish your marketing campaigns.</p>
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <ExportButton module="campaigns" data={campaigns} availableColumns={['title', 'status', 'budget', 'location']} />
+            <button
+              onClick={() => router.push("/business/campaigns/create")}
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 h-11 bg-signal-blue text-white rounded-pill text-sm font-bold shadow-product-card hover:bg-signal-blue/90 transition-colors"
+            >
+              <Plus size={18} /> Create Campaign
+            </button>
           </div>
-        </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <ExportButton module="campaigns" data={campaigns} availableColumns={['title', 'status', 'budget', 'location']} />
-          <button
-            onClick={() => router.push("/business/campaigns/create")}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 h-11 bg-signal-blue text-white rounded-inputs text-sm font-bold shadow-sm hover:bg-signal-blue/90 transition-colors"
-          >
-            <Plus size={18} /> Create Campaign
-          </button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Total Campaigns" value={stats.data?.total_campaigns ?? totalCampaigns} />
-        <StatCard label="Open for Apps" value={openCount} />
-        <StatCard label="Active Collabs" value={activeCount} />
-        <StatCard label="Drafts" value={draftCount} />
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Total Campaigns" value={stats.data?.total_campaigns ?? totalCampaigns} className="border-0 shadow-none bg-transparent" />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Open for Apps" value={openCount} className="border-0 shadow-none bg-transparent" />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Active Collabs" value={activeCount} className="border-0 shadow-none bg-transparent" />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Drafts" value={draftCount} className="border-0 shadow-none bg-transparent" />
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-1 bg-white border border-slate-custom/10 p-1 rounded-inputs shadow-sm overflow-x-auto hide-scrollbar w-full sm:w-auto">
+      <div className="flex flex-col gap-2.5 rounded-[1.75rem] border border-slate-custom/10 bg-white p-2.5 shadow-feature-section transition-shadow focus-within:border-signal-blue/40 focus-within:shadow-blue-focus lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar">
           {TABS.map((tab) => (
             <button
               key={tab}
               onClick={() => { setStatusFilter(tab); setPage(1); }}
-              className={`px-4 py-2 text-xs font-bold rounded-md whitespace-nowrap transition-colors ${
+              className={`px-4 py-2 text-xs font-bold rounded-pill whitespace-nowrap transition-colors ${
                 (statusFilter === tab || (!statusFilter && tab === "ALL"))
-                  ? "bg-sky-wash text-signal-blue"
-                  : "text-ash hover:text-graphite hover:bg-slate-custom/5"
+                  ? "bg-midnight-ink text-white shadow-product-card"
+                  : "text-ash hover:text-graphite hover:bg-sky-wash"
               }`}
             >
               {tab === "ALL" ? "All Campaigns" : tab}
             </button>
           ))}
         </div>
-        <div className="relative w-full sm:w-64">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ash" />
+        <div className="relative w-full lg:w-72">
+          <span className="absolute left-2.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-2xl bg-sky-wash text-signal-blue">
+            <Search size={16} />
+          </span>
           <input
             type="text"
             placeholder="Search campaigns..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full h-10 pl-9 pr-4 text-sm bg-white border border-slate-custom/10 rounded-inputs focus:border-signal-blue focus:ring-1 focus:ring-signal-blue outline-none transition-shadow shadow-sm"
+            className="h-14 w-full bg-transparent pl-16 pr-4 text-[15px] font-medium text-graphite placeholder-fog outline-none"
           />
         </div>
       </div>
@@ -244,12 +260,12 @@ function CampaignsPageInner() {
       {isLoading ? (
         <SkeletonCards count={6} />
       ) : campaigns.length === 0 ? (
-        <div className="bg-white border border-slate-custom/10 rounded-xl p-12 shadow-sm">
+        <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-12 shadow-product-card">
           <EmptyState
             title="No campaigns found"
             description={search || statusFilter ? "Try adjusting your search or filters." : "You haven't created any campaigns yet."}
             action={
-              <button onClick={() => router.push("/business/campaigns/create")} className="inline-flex items-center gap-2 px-6 h-10 bg-signal-blue text-white rounded-inputs text-sm font-bold shadow-sm hover:bg-signal-blue/90 transition-colors mt-2">
+              <button onClick={() => router.push("/business/campaigns/create")} className="inline-flex items-center gap-2 px-6 h-11 bg-signal-blue text-white rounded-pill text-sm font-bold shadow-product-card hover:bg-signal-blue/90 transition-colors mt-2">
                 <Plus size={16} /> Create your first campaign
               </button>
             }
@@ -261,7 +277,7 @@ function CampaignsPageInner() {
             <div
               key={campaign.id}
               onClick={() => router.push(`/business/campaigns/${campaign.id}`)}
-              className="group bg-white border border-slate-custom/10 rounded-xl shadow-product-card hover:-translate-y-1 hover:border-signal-blue/30 hover:shadow-elevated transition-all duration-300 cursor-pointer flex flex-col h-[240px] overflow-hidden relative"
+              className="group bg-white border border-steel/10 rounded-cards-lg shadow-product-card hover:-translate-y-1.5 hover:border-signal-blue/30 hover:shadow-elevated transition-all duration-300 cursor-pointer flex flex-col h-[240px] overflow-hidden relative"
             >
               <div className={`h-1.5 w-full absolute top-0 left-0 ${campaign.status === "OPEN" ? "bg-signal-blue" : campaign.status === "ACTIVE" ? "bg-emerald-status" : "bg-slate-custom/20"}`} />
               <div className="p-5 flex-1 flex flex-col">
@@ -298,7 +314,7 @@ function CampaignsPageInner() {
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); router.push(`/business/campaigns/${campaign.id}`); }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-wash text-signal-blue border border-signal-blue/20 rounded-md text-xs font-bold hover:bg-signal-blue hover:text-white transition-colors"
+                      className="flex items-center gap-1.5 px-4 py-1.5 bg-sky-wash text-signal-blue border border-signal-blue/20 rounded-pill text-xs font-bold hover:bg-signal-blue hover:text-white transition-colors"
                     >
                       <Users size={14} /> Apps
                     </button>
@@ -317,7 +333,7 @@ function CampaignsPageInner() {
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-8 h-8 rounded-inputs text-xs font-bold transition-colors ${
+                className={`h-8 px-4 rounded-pill text-xs font-bold transition-colors ${
                   p === page ? "bg-signal-blue text-white shadow-sm" : "text-ash hover:bg-sky-wash hover:text-graphite"
                 }`}
               >
@@ -330,7 +346,7 @@ function CampaignsPageInner() {
 
       {deleteConfirm && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/60 backdrop-blur-md p-4">
-          <div className="bg-white rounded-cards p-6 max-w-md w-full shadow-xl">
+          <div className="bg-white rounded-cards-lg p-6 max-w-md w-full shadow-xl">
             <h3 className="text-heading font-bold text-graphite">Delete Campaign</h3>
             <p className="text-sm text-ash mt-2">Are you sure you want to delete "{deleteConfirm.title}"? This action cannot be undone.</p>
             <div className="mt-6 flex justify-end gap-3">

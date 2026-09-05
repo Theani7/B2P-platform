@@ -165,7 +165,7 @@ function InvitationsPageInner() {
         {isLoading ? (
           <SkeletonList count={5} rowHeight="h-[104px]" />
         ) : filteredItems.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center py-20 text-center bg-white rounded-xl shadow-product-card-sm ring-1 ring-gray-200">
+          <div className="flex-1 flex flex-col items-center justify-center py-20 text-center rounded-cards-lg border border-slate-custom/10 bg-white shadow-product-card">
             <div className="w-20 h-20 rounded-full bg-linen-canvas flex items-center justify-center mb-5 ring-1 ring-gray-900/5">
               <Send size={32} className="text-gray-300 ml-1" />
             </div>
@@ -180,7 +180,7 @@ function InvitationsPageInner() {
             {!search && statusFilter === "all" && (
               <button
                 onClick={() => router.push("/business/promoters")}
-                className="mt-6 inline-flex items-center gap-2 bg-signal-blue text-white rounded-lg h-10 px-6 text-sm font-medium hover:opacity-90 transition-colors shadow-product-card-sm"
+                className="mt-6 inline-flex items-center gap-2 rounded-pill bg-signal-blue px-6 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90"
               >
                 <Users size={16} /> Browse Promoters
               </button>
@@ -202,7 +202,7 @@ function InvitationsPageInner() {
                   <div
                     key={inv.id}
                     style={{ zIndex: 100 - index, position: "relative" }}
-                    className="grid grid-cols-[minmax(260px,2.5fr)_minmax(220px,2fr)_minmax(180px,1.5fr)_minmax(320px,2.5fr)_140px] gap-8 items-center p-6 bg-white rounded-xl shadow-product-card-sm ring-1 ring-gray-200 hover:ring-signal-blue/30 hover:shadow-product-card-md transition-all group"
+                    className="grid grid-cols-[minmax(260px,2.5fr)_minmax(220px,2fr)_minmax(180px,1.5fr)_minmax(320px,2.5fr)_140px] gap-8 items-center p-6 rounded-cards-lg border border-slate-custom/10 bg-white shadow-product-card hover:-translate-y-0.5 hover:border-signal-blue/30 hover:shadow-feature-section transition-all duration-200 group"
                   >
                     <div className="flex items-start gap-4 min-w-0">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-product-card-sm flex-shrink-0 bg-signal-blue">
@@ -261,22 +261,22 @@ function InvitationsPageInner() {
                     <div className="flex items-center justify-end gap-2 w-[140px] flex-shrink-0">
                       <div className="flex-1">
                         {inv.status === "ACCEPTED" ? (
-                          <button onClick={() => router.push("/business/collaborations")} className="w-full bg-signal-blue text-white h-10 px-3 rounded-lg text-sm font-semibold hover:opacity-90 transition-colors shadow-product-card-sm whitespace-nowrap">
+                          <button onClick={() => router.push("/business/collaborations")} className="w-full rounded-pill bg-signal-blue px-3 py-2.5 text-sm font-semibold text-white shadow-product-card-sm transition-all hover:opacity-90 whitespace-nowrap">
                             View Collab
                           </button>
                         ) : inv.status === "PENDING" ? (
-                          <button onClick={() => setCancelConfirm(inv.id)} className="w-full bg-white border border-slate-custom/10 text-graphite h-10 px-3 rounded-lg text-sm font-semibold hover:bg-linen-canvas hover:text-coral-alert hover:border-coral-alert/20 transition-colors shadow-product-card-sm whitespace-nowrap">
+                          <button onClick={() => setCancelConfirm(inv.id)} className="w-full rounded-pill border border-slate-custom/10 bg-white px-3 py-2.5 text-sm font-semibold text-graphite shadow-product-card-sm transition-colors hover:bg-linen-canvas hover:text-coral-alert hover:border-coral-alert/20 whitespace-nowrap">
                             Cancel
                           </button>
                         ) : (
-                          <button onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)} className="w-full bg-white border border-slate-custom/10 text-graphite h-10 px-3 rounded-lg text-sm font-semibold hover:bg-linen-canvas transition-colors shadow-product-card-sm whitespace-nowrap">
+                          <button onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)} className="w-full rounded-pill border border-slate-custom/10 bg-white px-3 py-2.5 text-sm font-semibold text-graphite shadow-product-card-sm transition-colors hover:bg-linen-canvas whitespace-nowrap">
                             Profile
                           </button>
                         )}
                       </div>
                       <button
                         onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)}
-                        className="w-10 h-10 rounded-lg border border-slate-custom/10 text-ash hover:bg-linen-canvas hover:text-graphite transition-colors bg-white shadow-product-card-sm flex items-center justify-center"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-custom/10 bg-white text-ash shadow-product-card-sm transition-colors hover:bg-linen-canvas hover:text-graphite"
                         title="View promoter profile"
                       >
                         <Eye size={18} />
@@ -288,16 +288,16 @@ function InvitationsPageInner() {
             </div>
 
             {(data?.pages ?? 0) > 1 && (
-              <div className="bg-white px-6 py-4 rounded-xl shadow-product-card-sm ring-1 ring-gray-200 flex items-center justify-between mt-6">
+              <div className="rounded-cards-lg border border-slate-custom/10 bg-white px-6 py-4 shadow-product-card flex items-center justify-between mt-6">
                 <p className="text-sm text-ash">
                   Page <span className="font-semibold text-graphite">{page}</span> of <span className="font-semibold text-graphite">{data?.pages}</span>
                   {" "}· <span className="font-semibold text-graphite">{data?.total ?? 0}</span> total invitations
                 </p>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="p-2 rounded-lg border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
+                  <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
                     <ChevronLeft size={16} />
                   </button>
-                  <button onClick={() => setPage((p) => Math.min(data?.pages ?? 1, p + 1))} disabled={page >= (data?.pages ?? 1)} className="p-2 rounded-lg border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
+                  <button onClick={() => setPage((p) => Math.min(data?.pages ?? 1, p + 1))} disabled={page >= (data?.pages ?? 1)} className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
                     <ChevronRight size={16} />
                   </button>
                 </div>
@@ -309,7 +309,7 @@ function InvitationsPageInner() {
 
       {cancelConfirm && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/60 backdrop-blur-md p-4">
-          <div className="bg-white rounded-cards p-6 max-w-md w-full shadow-xl">
+          <div className="rounded-cards-lg border border-slate-custom/10 bg-white p-6 max-w-md w-full shadow-xl">
             <h3 className="text-heading font-bold text-graphite">Cancel Invitation</h3>
             <p className="text-sm text-ash mt-2">Are you sure you want to cancel this invitation? The promoter will be notified that the offer was withdrawn.</p>
             <div className="mt-6 flex justify-end gap-3">

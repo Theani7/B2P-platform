@@ -40,87 +40,117 @@ function DashboardInner() {
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-heading text-midnight-ink">Overview</h1>
-          <p className="text-body text-ash mt-2">
-            Welcome back, {user?.fullName?.split(" ")[0] || "there"}. Here&apos;s what&apos;s happening today.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/business/promoters"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-custom/20 text-slate-custom rounded-button text-sm font-medium hover:bg-sky-wash transition-colors"
-          >
-            <Search size={16} />
-            Find promoters
-          </Link>
-          <Link
-            href="/business/campaigns/create"
-            className="inline-flex items-center gap-2 px-4 py-2 hero-blue-fade text-white rounded-button text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            <Plus size={16} />
-            Create campaign
-          </Link>
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Overview</h1>
+            <p className="text-sm text-ash mt-2">
+              Welcome back, {user?.fullName?.split(" ")[0] || "there"}. Here&apos;s what&apos;s happening today.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/business/promoters"
+              className="inline-flex items-center gap-2 h-11 px-5 bg-white border border-slate-custom/20 text-slate-custom rounded-pill text-sm font-medium hover:bg-sky-wash transition-colors shadow-sm"
+            >
+              <Search size={16} />
+              Find promoters
+            </Link>
+            <Link
+              href="/business/campaigns/create"
+              className="inline-flex items-center gap-2 h-11 px-5 hero-blue-fade text-white rounded-pill text-sm font-medium hover:opacity-90 transition-opacity shadow-product-card"
+            >
+              <Plus size={16} />
+              Create campaign
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Total Campaigns"
-          value={statsLoading ? "—" : analytics?.summary.total_campaigns ?? 0}
-          icon={FolderDot}
-          trend={{ value: `${analytics?.growth.campaign_growth ?? 0}%`, positive: (analytics?.growth.campaign_growth ?? 0) >= 0 }}
-          subtitle="from last month"
-        />
-        <StatCard
-          label="Active Campaigns"
-          value={statsLoading ? "—" : analytics?.summary.active_campaigns ?? 0}
-          icon={FolderOpen}
-          subtitle="currently open"
-        />
-        <StatCard
-          label="Active Collaborations"
-          value={statsLoading ? "—" : analytics?.summary.active_collaborations ?? 0}
-          icon={ActivityIcon}
-          trend={{ value: `${analytics?.growth.collaboration_growth ?? 0}%`, positive: (analytics?.growth.collaboration_growth ?? 0) >= 0 }}
-          subtitle="from last month"
-        />
-        <StatCard
-          label="Total Applications"
-          value={statsLoading ? "—" : analytics?.summary.total_applications ?? 0}
-          icon={CheckCircle2}
-          trend={{ value: `${analytics?.growth.application_growth ?? 0}%`, positive: (analytics?.growth.application_growth ?? 0) >= 0 }}
-          subtitle="from last month"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Total Campaigns"
+            value={statsLoading ? "—" : analytics?.summary.total_campaigns ?? 0}
+            icon={FolderDot}
+            trend={{ value: `${analytics?.growth.campaign_growth ?? 0}%`, positive: (analytics?.growth.campaign_growth ?? 0) >= 0 }}
+            subtitle="from last month"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Active Campaigns"
+            value={statsLoading ? "—" : analytics?.summary.active_campaigns ?? 0}
+            icon={FolderOpen}
+            subtitle="currently open"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Active Collaborations"
+            value={statsLoading ? "—" : analytics?.summary.active_collaborations ?? 0}
+            icon={ActivityIcon}
+            trend={{ value: `${analytics?.growth.collaboration_growth ?? 0}%`, positive: (analytics?.growth.collaboration_growth ?? 0) >= 0 }}
+            subtitle="from last month"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Total Applications"
+            value={statsLoading ? "—" : analytics?.summary.total_applications ?? 0}
+            icon={CheckCircle2}
+            trend={{ value: `${analytics?.growth.application_growth ?? 0}%`, positive: (analytics?.growth.application_growth ?? 0) >= 0 }}
+            subtitle="from last month"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
-        <StatCard
-          label="Profile Views"
-          value={statsLoading ? "—" : `${(analytics?.summary.profile_views ?? 0).toLocaleString()}`}
-          icon={ActivityIcon}
-          subtitle="based on active collabs"
-        />
-        <StatCard
-          label="Completed Collabs"
-          value={statsLoading ? "—" : `${(analytics?.summary.collaborations_completed ?? 0).toLocaleString()}`}
-          icon={ActivityIcon}
-          subtitle="across all platforms"
-        />
-        <StatCard
-          label="Total Spent"
-          value={statsLoading ? "—" : `Rs. ${(analytics?.summary.total_spent ?? 0).toLocaleString()}`}
-          icon={FolderDot}
-          subtitle="on completed collabs"
-        />
-        <StatCard
-          label="Average ROI"
-          value={statsLoading ? "—" : `${analytics?.summary.average_roi ?? 0}%`}
-          icon={CheckCircle2}
-          trend={{ value: "+12%", positive: true }}
-          subtitle="estimated return"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-2">
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Profile Views"
+            value={statsLoading ? "—" : `${(analytics?.summary.profile_views ?? 0).toLocaleString()}`}
+            icon={ActivityIcon}
+            subtitle="based on active collabs"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Completed Collabs"
+            value={statsLoading ? "—" : `${(analytics?.summary.collaborations_completed ?? 0).toLocaleString()}`}
+            icon={ActivityIcon}
+            subtitle="across all platforms"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Total Spent"
+            value={statsLoading ? "—" : `Rs. ${(analytics?.summary.total_spent ?? 0).toLocaleString()}`}
+            icon={FolderDot}
+            subtitle="on completed collabs"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Average ROI"
+            value={statsLoading ? "—" : `${analytics?.summary.average_roi ?? 0}%`}
+            icon={CheckCircle2}
+            trend={{ value: "+12%", positive: true }}
+            subtitle="estimated return"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -129,11 +159,13 @@ function DashboardInner() {
         <div className="space-y-6">
           <ProfileCompletionWidget />
 
-          <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-custom/10">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-ash" />
-                <h2 className="text-sm font-medium text-graphite">Recent Applications</h2>
+          <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-custom/10 bg-gradient-to-r from-sky-wash/70 to-transparent">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-signal-blue text-white rounded-buttons shadow-product-card">
+                  <CheckCircle2 size={17} />
+                </div>
+                <h2 className="font-display text-lg font-medium tracking-tight text-graphite">Recent Applications</h2>
               </div>
             </div>
             {recentApplicationsLoading ? (

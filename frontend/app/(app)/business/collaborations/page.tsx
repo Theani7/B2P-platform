@@ -240,7 +240,7 @@ function CollabCard({ collab }: { collab: Collaboration }) {
   const formatBudget = (n: number) => "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0);
 
   return (
-    <div className="bg-white rounded-2xl shadow-product-card-sm ring-1 ring-gray-200 hover:shadow-product-card hover:ring-signal-blue/20 transition-all group flex flex-col overflow-hidden">
+    <div className="bg-white rounded-cards-lg shadow-product-card border border-slate-custom/10 hover:-translate-y-1 hover:border-signal-blue/30 hover:shadow-feature-section transition-all duration-200 group flex flex-col overflow-hidden">
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div className="flex items-center gap-3 min-w-0">
@@ -296,21 +296,21 @@ function CollabCard({ collab }: { collab: Collaboration }) {
 
       <div className="bg-linen-canvas border-t border-slate-custom/10 p-4 flex gap-3">
         {isActive && (
-          <button onClick={() => complete.mutate(collab.id, { onSuccess: () => notifySuccess("Collaboration completed"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Could not complete") })} className="flex-1 h-10 rounded-xl bg-gray-900 text-white text-sm font-bold hover:opacity-90 transition-colors flex items-center justify-center gap-2">
+          <button onClick={() => complete.mutate(collab.id, { onSuccess: () => notifySuccess("Collaboration completed"), onError: (e: any) => notifyError(e?.response?.data?.message ?? "Could not complete") })} className="flex-1 rounded-pill bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 flex items-center justify-center gap-2 shadow-product-card-sm">
             <CheckCircle2 size={16} /> Complete
           </button>
         )}
         {isCompleted && !collab.hasReview && (
-          <button onClick={() => setReviewing(true)} className="flex-1 h-10 rounded-xl bg-white border border-slate-custom/10 text-graphite text-sm font-bold hover:bg-linen-canvas transition-colors flex items-center justify-center gap-2">
+          <button onClick={() => setReviewing(true)} className="flex-1 rounded-pill border border-slate-custom/10 bg-white px-4 py-2.5 text-sm font-semibold text-graphite transition-colors hover:bg-linen-canvas flex items-center justify-center gap-2 shadow-product-card-sm">
             <Star size={16} /> Write Review
           </button>
         )}
         {isCompleted && collab.hasReview && (
-          <div className="flex-1 h-10 rounded-xl bg-emerald-status/10 text-emerald-status text-sm font-bold flex items-center justify-center gap-2">
+          <div className="flex-1 rounded-pill bg-emerald-status/10 px-4 py-2.5 text-sm font-semibold text-emerald-status flex items-center justify-center gap-2">
             <CheckCircle2 size={16} /> Reviewed
           </div>
         )}
-        <button onClick={() => router.push("/messages")} className="h-10 rounded-xl bg-white border border-slate-custom/10 text-graphite text-sm font-bold hover:bg-linen-canvas transition-colors flex items-center justify-center gap-2 flex-1">
+        <button onClick={() => router.push("/messages")} className="flex-1 rounded-pill border border-slate-custom/10 bg-white px-4 py-2.5 text-sm font-semibold text-graphite transition-colors hover:bg-linen-canvas flex items-center justify-center gap-2 shadow-product-card-sm">
           <MessageCircle size={16} /> Chat
         </button>
       </div>
@@ -346,23 +346,29 @@ function CollaborationsPageInner() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-graphite">Workspace</h1>
-          <p className="text-sm text-ash mt-2 max-w-xl">Manage your active and completed promoter partnerships.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push("/business/promoters")}
-            className="inline-flex items-center gap-2 bg-signal-blue text-white h-11 px-5 rounded-xl text-sm font-semibold hover:opacity-90 transition-colors shadow-product-card-sm"
-          >
-            <SearchIcon size={16} /> Find Promoters
-          </button>
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Workspace</h1>
+            <p className="text-sm text-ash mt-2 max-w-xl">Manage your active and completed promoter partnerships.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/business/promoters")}
+              className="inline-flex items-center gap-2 rounded-pill bg-signal-blue px-5 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90"
+            >
+              <SearchIcon size={16} /> Find Promoters
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-5 shadow-product-card transition-transform hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Active Projects</h3>
             <div className="w-8 h-8 rounded-lg bg-sky-wash text-signal-blue flex items-center justify-center"><Clock size={14} /></div>
@@ -370,7 +376,7 @@ function CollaborationsPageInner() {
           <div className="text-2xl font-bold text-graphite">{activeCount}</div>
           <p className="text-xs font-semibold text-emerald-status mt-1">Current collaborations</p>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-5 shadow-product-card transition-transform hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Completed</h3>
             <div className="w-8 h-8 rounded-lg bg-emerald-status/10 text-emerald-status flex items-center justify-center"><CheckCircle2 size={14} /></div>
@@ -378,7 +384,7 @@ function CollaborationsPageInner() {
           <div className="text-2xl font-bold text-graphite">{completedCount}</div>
           <p className="text-xs text-fog font-medium mt-1">All time</p>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-5 shadow-product-card transition-transform hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Pending Reviews</h3>
             <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-tag flex items-center justify-center"><Star size={14} /></div>
@@ -386,7 +392,7 @@ function CollaborationsPageInner() {
           <div className="text-2xl font-bold text-graphite">{pendingReviewCount}</div>
           <p className="text-xs text-fog font-medium mt-1">Awaiting your feedback</p>
         </div>
-        <div className="bg-white p-5 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200">
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-5 shadow-product-card transition-transform hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[11px] font-bold text-fog uppercase tracking-widest">Total Value</h3>
             <div className="w-8 h-8 rounded-lg bg-sky-wash text-signal-blue flex items-center justify-center"><Wallet size={14} /></div>
@@ -397,29 +403,44 @@ function CollaborationsPageInner() {
       </div>
 
       <div className="sticky top-0 z-30 bg-linen-canvas/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div className="bg-white p-2 rounded-2xl shadow-product-card-sm ring-1 ring-gray-200 flex flex-col gap-3">
-          <div className="flex flex-col md:flex-row gap-2">
-            <div className="relative flex-1">
-              <SearchIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-fog" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search projects by name or partner..."
-                className="w-full h-12 pl-11 pr-4 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-gray-400 text-graphite"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2 overflow-x-auto no-scrollbar px-2 pb-1">
-            {["All", "Active", "Completed", "Cancelled"].map((s) => (
+        <div className="flex flex-col gap-2.5 rounded-[1.75rem] border border-slate-custom/10 bg-white p-2.5 shadow-feature-section transition-shadow focus-within:border-signal-blue/40 focus-within:shadow-blue-focus md:flex-row md:items-center">
+          <div className="relative flex-1">
+            <span className="absolute left-2.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-2xl bg-sky-wash text-signal-blue">
+              <SearchIcon size={17} />
+            </span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search projects by name or partner..."
+              className="h-14 w-full bg-transparent pl-16 pr-11 text-[15px] font-medium text-graphite placeholder-fog outline-none"
+            />
+            {search && (
               <button
-                key={s}
-                onClick={() => setStatus(s.toLowerCase() === "all" ? "" : s.toUpperCase())}
-                className={`whitespace-nowrap px-4 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border ${status === (s.toLowerCase() === "all" ? "" : s.toUpperCase()) ? "bg-gray-900 text-white border-gray-900" : "bg-white text-ash border-slate-custom/10 hover:bg-linen-canvas"}`}
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-slate-custom/10 text-ash transition-colors hover:bg-slate-custom/20 hover:text-graphite"
               >
-                {s}
+                <XCircle size={14} />
               </button>
-            ))}
+            )}
+          </div>
+          <div className="flex items-center gap-2.5 pb-1 md:pb-0 md:pr-1.5">
+            <span className="font-roboto-mono hidden whitespace-nowrap text-xs text-fog md:inline">
+              {filtered.length} found
+            </span>
+            <span className="hidden h-8 w-px bg-slate-custom/10 md:inline-block" />
+            <div className="flex gap-2 overflow-x-auto no-scrollbar">
+              {["All", "Active", "Completed", "Cancelled"].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatus(s.toLowerCase() === "all" ? "" : s.toUpperCase())}
+                  className={`h-10 whitespace-nowrap rounded-pill px-4 text-xs font-semibold tracking-wide transition-all ${status === (s.toLowerCase() === "all" ? "" : s.toUpperCase()) ? "bg-midnight-ink text-white shadow-product-card" : "bg-linen-canvas text-ash hover:bg-sky-wash hover:text-graphite"}`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -429,11 +450,11 @@ function CollaborationsPageInner() {
       ) : isError ? (
         <p className="text-body text-coral-alert">Could not load collaborations.</p>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-product-card-sm ring-1 ring-gray-200 p-16 text-center flex flex-col items-center">
+        <div className="rounded-cards-lg border border-slate-custom/10 bg-white p-16 shadow-product-card text-center flex flex-col items-center">
           <div className="w-20 h-20 bg-linen-canvas rounded-full flex items-center justify-center text-gray-300 mb-4"><Briefcase size={32} /></div>
           <h2 className="text-xl font-bold text-graphite mb-2">No active projects</h2>
           <p className="text-sm text-ash max-w-sm mb-6">You don't have any collaborations right now. Start by finding new partners.</p>
-          <button onClick={() => router.push("/business/promoters")} className="h-11 px-6 flex items-center justify-center rounded-xl bg-signal-blue text-white text-sm font-bold hover:opacity-90 transition-colors shadow-product-card-sm">
+          <button onClick={() => router.push("/business/promoters")} className="inline-flex items-center justify-center rounded-pill bg-signal-blue px-6 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90">
             Explore Marketplace
           </button>
         </div>

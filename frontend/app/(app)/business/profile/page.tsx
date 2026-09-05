@@ -152,44 +152,50 @@ export default function BusinessProfilePage() {
   return (
     <RequireAuth role={Role.BUSINESS}>
       <div className="max-w-[1200px] mx-auto space-y-8 pb-32">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <h1 className="text-heading-lg text-midnight-ink">Business Profile</h1>
-            <p className="text-body text-steel mt-2">Manage your company information and public presence.</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-button text-signal-blue font-semibold text-sm">
-              <span>{completion?.completion ?? 0}% Complete</span>
+        <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+          />
+          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Business Profile</h1>
+              <p className="text-sm text-ash mt-2">Manage your company information and public presence.</p>
             </div>
-            {isPending || verified ? (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-sm font-medium">
-                <BadgeCheck size={16} /> {verified ? "Verified Business" : "Verification Pending"}
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-sky-wash rounded-pill text-signal-blue font-semibold text-sm">
+                <span>{completion?.completion ?? 0}% Complete</span>
               </div>
-            ) : isComplete ? (
+              {isPending || verified ? (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-pill bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-sm font-medium">
+                  <BadgeCheck size={16} /> {verified ? "Verified Business" : "Verification Pending"}
+                </div>
+              ) : isComplete ? (
+                <button
+                  onClick={requestVerification}
+                  disabled={verifying || hasPendingRequest}
+                  className="flex items-center gap-2 px-5 h-11 rounded-pill bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
+                >
+                  <BadgeCheck size={16} /> Request Verification
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-pill bg-amber-tag/10 text-amber-tag border border-amber-tag/20 text-sm font-medium">
+                  <Clock size={16} /> Complete profile to verify
+                </div>
+              )}
               <button
-                onClick={requestVerification}
-                disabled={verifying || hasPendingRequest}
-                className="flex items-center gap-2 px-4 py-2 rounded-button bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
+                onClick={handleSubmit(onSubmit)}
+                disabled={!isDirty || isSubmitting}
+                className={`flex items-center gap-2 px-6 h-11 rounded-pill text-sm font-medium transition-all shadow-product-card ${
+                  isDirty && !isSubmitting
+                    ? "hero-blue-fade text-white hover:opacity-90 hover:scale-[1.02]"
+                    : "bg-slate-custom/5 text-steel cursor-not-allowed"
+                }`}
               >
-                <BadgeCheck size={16} /> Request Verification
+                {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </button>
-            ) : (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-amber-tag/10 text-amber-tag border border-amber-tag/20 text-sm font-medium">
-                <Clock size={16} /> Complete profile to verify
-              </div>
-            )}
-            <button
-              onClick={handleSubmit(onSubmit)}
-              disabled={!isDirty || isSubmitting}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-button text-sm font-medium transition-all shadow-feature-section ${
-                isDirty && !isSubmitting
-                  ? "hero-blue-fade text-white hover:opacity-90 hover:scale-[1.02]"
-                  : "bg-slate-custom/5 text-steel cursor-not-allowed"
-              }`}
-            >
-              {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </button>
+            </div>
           </div>
         </div>
 
@@ -197,7 +203,7 @@ export default function BusinessProfilePage() {
           <div className="h-32 sm:h-40 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
             <div className="absolute inset-0 bg-black/5 mix-blend-overlay"></div>
             {verified && (
-              <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-button flex items-center gap-1.5 text-xs font-semibold text-white shadow-product-card-sm">
+              <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-pill flex items-center gap-1.5 text-xs font-semibold text-white shadow-product-card-sm">
                 <BadgeCheck size={16} /> Verified Business
               </div>
             )}
@@ -224,7 +230,7 @@ export default function BusinessProfilePage() {
                 <input type="file" ref={fileRef} onChange={onLogo} accept="image/*" className="hidden" />
               </div>
               <div className="flex-1 text-center sm:text-left sm:pb-2">
-                <h2 className="text-2xl sm:text-3xl font-bold text-graphite tracking-tight">
+                <h2 className="font-display text-2xl sm:text-3xl font-semibold text-graphite tracking-tight">
                   {profile?.companyName || "Your Company"}
                 </h2>
                 <p className="text-sm sm:text-base font-medium text-ash mt-1">{profile?.industry || "Industry not set"}</p>
@@ -236,9 +242,9 @@ export default function BusinessProfilePage() {
         <div className="flex flex-col lg:flex-row items-start gap-8">
           <div className="flex-1 min-w-0 space-y-8">
             <form id="profile-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
-                  <h2 className="text-heading text-graphite">Company Information</h2>
+              <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-custom/10 bg-gradient-to-r from-sky-wash/70 to-transparent">
+                  <h2 className="font-display text-lg font-medium tracking-tight text-graphite">Company Information</h2>
                   <p className="text-sm text-ash mt-1">Basic details about your business.</p>
                 </div>
                 <div className="p-6 space-y-6">
@@ -293,9 +299,9 @@ export default function BusinessProfilePage() {
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
-                  <h2 className="text-heading text-graphite">Online Presence</h2>
+              <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-custom/10 bg-gradient-to-r from-sky-wash/70 to-transparent">
+                  <h2 className="font-display text-lg font-medium tracking-tight text-graphite">Online Presence</h2>
                   <p className="text-sm text-ash mt-1">Links to your website and social profiles.</p>
                 </div>
                 <div className="p-6 space-y-6">
@@ -317,9 +323,9 @@ export default function BusinessProfilePage() {
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
-                  <h2 className="text-heading text-graphite">About Company</h2>
+              <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-custom/10 bg-gradient-to-r from-sky-wash/70 to-transparent">
+                  <h2 className="font-display text-lg font-medium tracking-tight text-graphite">About Company</h2>
                   <p className="text-sm text-ash mt-1">Tell promoters what your brand is all about.</p>
                 </div>
                 <div className="p-6 space-y-4">
@@ -338,9 +344,9 @@ export default function BusinessProfilePage() {
               </div>
             </form>
 
-            <Card>
-              <div className="px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
-                <h2 className="text-heading text-graphite">Company Socials</h2>
+            <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-custom/10 bg-gradient-to-r from-sky-wash/70 to-transparent">
+                <h2 className="font-display text-lg font-medium tracking-tight text-graphite">Company Socials</h2>
                 <p className="text-sm text-ash mt-1">Connect your brand&apos;s social media accounts for promoters to check out.</p>
               </div>
               <div className="p-6 space-y-4">
@@ -370,7 +376,7 @@ export default function BusinessProfilePage() {
                   </Button>
                 )}
               </div>
-            </Card>
+            </div>
 
           </div>
 
@@ -403,7 +409,7 @@ export default function BusinessProfilePage() {
               <button
                 onClick={handleSubmit(onSubmit)}
                 disabled={isSubmitting}
-                className="px-6 h-10 hero-blue-fade text-white rounded-button text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                className="px-6 h-10 hero-blue-fade text-white rounded-pill text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2 shadow-product-card"
               >
                 {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
                 {isSubmitting ? "Saving..." : "Save Changes"}

@@ -15,7 +15,7 @@ import { notifySuccess, notifyError } from "@/lib/notify";
 import { useRouter } from "next/navigation";
 import {
   Search, MapPin, Users, TrendingUp, BadgeCheck, ArrowRight, BookmarkX,
-  Star, ChevronLeft, ChevronRight, Filter,
+  Star, ChevronLeft, ChevronRight, Filter, X,
 } from "lucide-react";
 
 const NICHE_OPTIONS = ["LIFESTYLE", "TECH", "FASHION", "FOOD", "TRAVEL", "FITNESS", "GAMING", "BUSINESS"];
@@ -24,7 +24,7 @@ function RemoveButton({ promoterId, onRemove }: { promoterId: string; onRemove: 
   return (
     <button
       onClick={(e) => { e.stopPropagation(); onRemove(); }}
-      className="w-full bg-linen-canvas text-graphite h-9 rounded-inputs text-sm font-medium hover:bg-sky-wash transition-colors"
+      className="w-full rounded-pill bg-linen-canvas px-4 py-2 text-sm font-semibold text-graphite transition-colors hover:bg-sky-wash"
     >
       Remove
     </button>
@@ -74,69 +74,102 @@ function SavedPromotersPageInner() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-32">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-heading-lg text-graphite tracking-tight">Saved Promoters</h1>
-          <p className="text-sm text-ash mt-1.5">Manage and compare your shortlisted creators.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push("/business/promoters")}
-            className="inline-flex items-center gap-2 bg-white border border-slate-custom/10 text-graphite h-10 px-4 rounded-inputs text-sm font-medium hover:bg-sky-wash transition-all shadow-product-card-sm"
-          >
-            <Search size={16} /> Browse Promoters
-          </button>
-          <button
-            onClick={() => router.push("/business/campaigns/create")}
-            className="inline-flex items-center gap-2 bg-signal-blue text-white h-10 px-4 rounded-inputs text-sm font-medium hover:opacity-90 transition-all shadow-product-card-sm"
-          >
-            <ArrowRight size={16} /> Post Campaign
-          </button>
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Saved Promoters</h1>
+            <p className="text-sm text-ash mt-2 max-w-xl">Manage and compare your shortlisted creators.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => router.push("/business/promoters")}
+              className="inline-flex items-center gap-2 rounded-pill border border-slate-custom/10 bg-white px-5 py-2.5 text-sm font-semibold text-graphite shadow-product-card-sm transition-all hover:bg-sky-wash"
+            >
+              <Search size={16} /> Browse Promoters
+            </button>
+            <button
+              onClick={() => router.push("/business/campaigns/create")}
+              className="inline-flex items-center gap-2 rounded-pill bg-signal-blue px-5 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90"
+            >
+              <ArrowRight size={16} /> Post Campaign
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Saved Promoters" value={data?.total ?? "—"} />
-        <StatCard label="Verified Promoters" value={filteredPromoters.length ? filteredPromoters.filter(p => p.verified).length : "—"} />
-        <StatCard 
-          label="Average Engagement" 
-          value={filteredPromoters.length ? `${(filteredPromoters.reduce((acc, p) => acc + (p.engagementRate || 0), 0) / filteredPromoters.length).toFixed(1)}%` : "—"} 
-        />
-        <StatCard 
-          label="Combined Followers" 
-          value={filteredPromoters.length ? fmtCompact(filteredPromoters.reduce((acc, p) => acc + (p.followersCount || 0), 0)) : "—"} 
-        />
-      </div>
-
-      <div className="bg-white rounded-cards shadow-product-card border border-slate-custom/10 p-2 flex flex-col lg:flex-row gap-3">
-        <div className="relative flex-1 min-w-[250px]">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ash" />
-          <input
-            type="text"
-            placeholder="Search saved promoters..."
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-10 pr-4 h-10 bg-transparent border-none focus:ring-0 text-sm text-graphite placeholder-fog"
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Saved Promoters" value={data?.total ?? "—"} className="border-0 shadow-none bg-transparent" />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard label="Verified Promoters" value={filteredPromoters.length ? filteredPromoters.filter(p => p.verified).length : "—"} className="border-0 shadow-none bg-transparent" />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard 
+            label="Average Engagement" 
+            value={filteredPromoters.length ? `${(filteredPromoters.reduce((acc, p) => acc + (p.engagementRate || 0), 0) / filteredPromoters.length).toFixed(1)}%` : "—"} 
+            className="border-0 shadow-none bg-transparent"
           />
         </div>
-        <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 border-t lg:border-t-0 lg:border-l border-slate-custom/10 pt-2 lg:pt-0 lg:pl-3">
-          <select
-            value={nicheFilter}
-            onChange={(e) => { setNicheFilter(e.target.value); setPage(1); }}
-            className="h-9 px-3 rounded-inputs text-xs font-medium text-graphite bg-white border border-slate-custom/10 hover:bg-sky-wash transition-colors cursor-pointer"
-          >
-            <option value="">All Categories</option>
-            {NICHE_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-          <select
-            value={sortFilter}
-            onChange={(e) => { setSortFilter(e.target.value); setPage(1); }}
-            className="h-9 px-3 rounded-inputs text-xs font-medium text-graphite bg-white border border-slate-custom/10 hover:bg-sky-wash transition-colors cursor-pointer"
-          >
-            <option value="newest">Newest First</option>
-            <option value="followers">Most Followers</option>
-            <option value="engagement">Highest Engagement</option>
-          </select>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard 
+            label="Combined Followers" 
+            value={filteredPromoters.length ? fmtCompact(filteredPromoters.reduce((acc, p) => acc + (p.followersCount || 0), 0)) : "—"} 
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+      </div>
+
+      <div className="sticky top-0 z-30 bg-linen-canvas/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex flex-col gap-2.5 rounded-[1.75rem] border border-slate-custom/10 bg-white p-2.5 shadow-feature-section transition-shadow focus-within:border-signal-blue/40 focus-within:shadow-blue-focus lg:flex-row lg:items-center">
+          <div className="relative flex-1">
+            <span className="absolute left-2.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-2xl bg-sky-wash text-signal-blue">
+              <Search size={17} />
+            </span>
+            <input
+              type="text"
+              placeholder="Search saved promoters..."
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              className="h-14 w-full bg-transparent pl-16 pr-11 text-[15px] font-medium text-graphite placeholder-fog outline-none"
+            />
+            {search && (
+              <button
+                onClick={() => { setSearch(""); setPage(1); }}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-slate-custom/10 text-ash transition-colors hover:bg-slate-custom/20 hover:text-graphite"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2.5 pb-1 lg:pb-0 lg:pr-1.5">
+            <span className="font-roboto-mono hidden whitespace-nowrap text-xs text-fog md:inline">
+              {data?.total ?? 0} found
+            </span>
+            <span className="hidden h-8 w-px bg-slate-custom/10 md:inline-block" />
+            <select
+              value={nicheFilter}
+              onChange={(e) => { setNicheFilter(e.target.value); setPage(1); }}
+              className="h-11 cursor-pointer rounded-2xl bg-linen-canvas px-4 text-[13px] font-semibold text-graphite outline-none transition-colors hover:bg-sky-wash"
+            >
+              <option value="">All Categories</option>
+              {NICHE_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+            <select
+              value={sortFilter}
+              onChange={(e) => { setSortFilter(e.target.value); setPage(1); }}
+              className="h-11 cursor-pointer rounded-2xl bg-linen-canvas px-4 text-[13px] font-semibold text-graphite outline-none transition-colors hover:bg-sky-wash"
+            >
+              <option value="newest">Newest First</option>
+              <option value="followers">Most Followers</option>
+              <option value="engagement">Highest Engagement</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -152,7 +185,7 @@ function SavedPromotersPageInner() {
             <p className="text-sm text-ash mt-2 max-w-md">Save promoters from the directory to quickly access them later when building your campaigns.</p>
             <button
               onClick={() => router.push("/business/promoters")}
-              className="mt-6 inline-flex items-center gap-2 bg-signal-blue text-white rounded-inputs h-10 px-6 text-sm font-medium hover:opacity-90 transition-colors shadow-product-card-sm"
+              className="mt-6 inline-flex items-center gap-2 rounded-pill bg-signal-blue px-6 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90"
             >
               <Search size={16} /> Browse Promoters
             </button>
@@ -172,7 +205,7 @@ function SavedPromotersPageInner() {
                 <div
                   key={p.id}
                   onClick={() => router.push(`/u/${p.username}`)}
-                  className="bg-white rounded-cards-lg p-6 shadow-product-card border border-slate-custom/10 hover:border-signal-blue/20 transition-all cursor-pointer flex flex-col group"
+                  className="bg-white rounded-cards-lg p-6 shadow-product-card border border-slate-custom/10 hover:-translate-y-1 hover:border-signal-blue/30 hover:shadow-feature-section transition-all duration-200 cursor-pointer flex flex-col group"
                 >
                   <div className="flex items-start gap-4">
                     <div className="relative">
@@ -223,7 +256,7 @@ function SavedPromotersPageInner() {
             </div>
 
             {data.pages > 0 && (
-              <div className="mt-8 flex items-center justify-between bg-white px-6 py-4 rounded-cards shadow-product-card border border-slate-custom/10">
+              <div className="mt-8 flex items-center justify-between rounded-cards-lg border border-slate-custom/10 bg-white px-6 py-4 shadow-product-card">
                 <p className="text-sm text-ash">
                   Showing <span className="font-semibold text-graphite">{(page - 1) * 12 + 1}</span> to <span className="font-semibold text-graphite">{Math.min(page * 12, data.total || page * 12)}</span> of <span className="font-semibold text-graphite">{data.total || "?"}</span> profiles
                 </p>

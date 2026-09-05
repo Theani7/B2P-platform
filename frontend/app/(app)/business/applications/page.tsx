@@ -55,15 +55,24 @@ function ApplicationsPageInner() {
   const fmtCompact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K` : `${n}`);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <button onClick={() => router.push("/business/campaigns")} className="text-xs text-signal-blue hover:underline inline-flex items-center gap-1 font-medium mb-3">
-          &larr; Back to Campaigns
-        </button>
-        <PageHeader
-          title="Applications"
-          subtitle={`${data?.total ?? 0} applicant${(data?.total ?? 0) !== 1 ? "s" : ""} found for your campaigns.`}
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
         />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Applications</h1>
+            <p className="text-sm text-ash mt-2 max-w-xl">{`${data?.total ?? 0} applicant${(data?.total ?? 0) !== 1 ? "s" : ""} found for your campaigns.`}</p>
+          </div>
+          <button
+            onClick={() => router.push("/business/campaigns")}
+            className="inline-flex w-fit items-center gap-2 rounded-pill bg-midnight-ink px-5 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90"
+          >
+            <ArrowLeft size={16} /> Back to Campaigns
+          </button>
+        </div>
       </div>
 
       {isLoading && <Spinner />}
@@ -72,7 +81,7 @@ function ApplicationsPageInner() {
           title="No applications yet"
           description="Promoters haven't applied to your campaigns yet. Try promoting them more or inviting specific promoters."
           action={
-            <button onClick={() => router.push("/business/campaigns")} className="inline-flex items-center gap-2 bg-signal-blue text-white rounded-button px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
+            <button onClick={() => router.push("/business/campaigns")} className="inline-flex items-center gap-2 rounded-pill bg-signal-blue px-6 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90">
               <ArrowLeft size={16} /> Back to Campaigns
             </button>
           }
@@ -82,7 +91,7 @@ function ApplicationsPageInner() {
       {items.length > 0 && (
         <div className="space-y-4">
           {items.map((app: any) => (
-            <div key={app.id} className="bg-white border border-slate-custom/10 rounded-cards p-5 shadow-product-card">
+            <div key={app.id} className="rounded-cards-lg border border-slate-custom/10 bg-white p-5 shadow-product-card transition-all duration-200 hover:-translate-y-0.5 hover:border-signal-blue/30 hover:shadow-feature-section">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-center gap-3">
                   <div className="relative flex-shrink-0">
@@ -133,17 +142,17 @@ function ApplicationsPageInner() {
 
           {data && data.pages > 1 && (
             <div className="flex items-center justify-center gap-2 pt-4">
-              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="inline-flex items-center gap-1.5 rounded-inputs border border-slate-custom/10 px-3 py-1.5 text-xs font-medium text-graphite hover:bg-sky-wash disabled:opacity-50 transition-colors">
+              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="inline-flex items-center gap-1.5 rounded-pill border border-slate-custom/10 bg-white px-4 py-2 text-xs font-semibold text-graphite shadow-product-card-sm transition-colors hover:bg-sky-wash disabled:opacity-50">
                 <ArrowLeft size={12} /> Previous
               </button>
               <div className="flex items-center gap-1">
                 {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
-                  <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-inputs text-xs font-medium transition-colors ${p === page ? "bg-signal-blue text-white" : "text-ash hover:bg-sky-wash"}`}>
+                  <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-full text-xs font-semibold transition-colors ${p === page ? "bg-signal-blue text-white" : "text-ash hover:bg-sky-wash"}`}>
                     {p}
                   </button>
                 ))}
               </div>
-              <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="inline-flex items-center gap-1.5 rounded-inputs border border-slate-custom/10 px-3 py-1.5 text-xs font-medium text-graphite hover:bg-sky-wash disabled:opacity-50 transition-colors">
+              <button onClick={() => setPage((p) => Math.min(data.pages, p + 1))} disabled={page >= data.pages} className="inline-flex items-center gap-1.5 rounded-pill border border-slate-custom/10 bg-white px-4 py-2 text-xs font-semibold text-graphite shadow-product-card-sm transition-colors hover:bg-sky-wash disabled:opacity-50">
                 Next <ArrowLeft size={12} className="rotate-180" />
               </button>
             </div>
@@ -153,7 +162,7 @@ function ApplicationsPageInner() {
 
       {selectedApp && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/60 backdrop-blur-md p-4">
-          <div className="bg-white rounded-cards p-6 max-w-lg w-full shadow-xl max-h-[80vh] overflow-y-auto">
+          <div className="rounded-cards-lg border border-slate-custom/10 bg-white p-6 max-w-lg w-full shadow-xl max-h-[80vh] overflow-y-auto">
             <div className="flex items-center gap-4">
               {selectedApp.promoterProfile?.avatarUrl ? (
                 <img src={selectedApp.promoterProfile.avatarUrl} alt="" className="w-16 h-16 rounded-full object-cover shadow-sm ring-2 ring-slate-custom/5" />
@@ -207,7 +216,7 @@ function ApplicationsPageInner() {
 
       {rejectConfirm && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/60 backdrop-blur-md p-4">
-          <div className="bg-white rounded-cards p-6 max-w-md w-full shadow-xl">
+          <div className="rounded-cards-lg border border-slate-custom/10 bg-white p-6 max-w-md w-full shadow-xl">
             <h3 className="text-heading font-bold text-graphite">Reject Application</h3>
             <p className="text-sm text-ash mt-2">Are you sure you want to reject this application? This action cannot be undone.</p>
             <div className="mt-6 flex justify-end gap-3">

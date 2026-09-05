@@ -4,7 +4,7 @@ import { use, useState } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { notifySuccess, notifyError } from "@/lib/notify";
-import { Card, PageHeader, Badge } from "@/components/ui/Card";
+import { Card, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useMatches, useGenerateMatches, type MatchClassification, type MatchScoreBreakdown } from "@/features/matching/api";
@@ -32,8 +32,8 @@ function MatchBreakdown({ breakdown }: { breakdown?: MatchScoreBreakdown }) {
   const entries = Object.entries(breakdown).map(([k, v]) => ({ k, v: v as number })).filter((e) => typeof e.v === "number");
   const max = Math.max(15, ...entries.map((e) => e.v || 0));
   return (
-    <Card>
-      <h2 className="mb-3 text-heading-sm font-semibold text-graphite">Score Breakdown</h2>
+    <Card className="border border-steel/10">
+      <h2 className="mb-3 font-display text-lg font-medium tracking-tight text-graphite">Score Breakdown</h2>
       <div className="space-y-3">
         {entries.map((e) => (
           <div key={e.k}>
@@ -63,16 +63,25 @@ function MatchesInner({ id }: { id: string }) {
   const invite = useInvitePromoter();
 
   return (
-    <div>
-      <PageHeader
-        title="Matches"
-        subtitle="AI-scored promoters for this campaign."
-        action={
-          <div className="flex gap-2">
-            <a href={`/business/campaigns/${id}`}>
-              <Button variant="ghost">Back to campaign</Button>
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Matches</h1>
+            <p className="text-sm text-ash mt-2">AI-scored promoters for this campaign.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={`/business/campaigns/${id}`}
+              className="inline-flex items-center justify-center h-11 px-5 rounded-pill bg-white border border-slate-custom/15 text-sm font-semibold text-graphite hover:border-signal-blue/40 hover:text-signal-blue transition-all shadow-sm"
+            >
+              Back to campaign
             </a>
-            <Button
+            <button
               disabled={generate.isPending}
               onClick={() =>
                 generate.mutate(id, {
@@ -80,19 +89,20 @@ function MatchesInner({ id }: { id: string }) {
                   onError: (e: any) => notifyError(e?.response?.data?.message ?? "Could not generate"),
                 })
               }
+              className="inline-flex items-center justify-center h-11 px-5 rounded-pill bg-signal-blue text-white text-sm font-semibold hover:opacity-90 transition-all shadow-product-card disabled:cursor-not-allowed disabled:opacity-60"
             >
               Generate matches
-            </Button>
+            </button>
           </div>
-        }
-      />
+        </div>
+      </div>
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-1.5 rounded-[1.75rem] border border-slate-custom/10 bg-white p-2.5 shadow-feature-section">
         {CLASSES.map((c) => (
           <button
             key={c || "all"}
             onClick={() => { setClassification(c); setPage(1); }}
-            className={`rounded-pill px-3 py-1.5 text-caption font-medium ${classification === c ? "bg-primary text-white" : "bg-sky-wash text-graphite hover:bg-steel/10"}`}
+            className={`rounded-pill px-4 py-2 text-xs font-bold transition-colors ${classification === c ? "bg-midnight-ink text-white shadow-product-card" : "text-ash hover:text-graphite hover:bg-sky-wash"}`}
           >
             {c ? c.replace("_", " ") : "All"}
           </button>
@@ -102,7 +112,7 @@ function MatchesInner({ id }: { id: string }) {
       {isLoading && <Spinner />}
       {isError && <p className="text-body text-coral-alert">Could not load matches.</p>}
       {data && data.items.length === 0 && (
-        <Card><p className="text-body text-steel">No matches yet. Click “Generate matches”.</p></Card>
+        <Card className="border border-steel/10"><p className="text-body text-steel">No matches yet. Click “Generate matches”.</p></Card>
       )}
 
       {data && data.items.length > 0 && (
@@ -110,7 +120,7 @@ function MatchesInner({ id }: { id: string }) {
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="space-y-4 lg:col-span-2">
               {data.items.map((m) => (
-                <Card key={m.id}>
+                <Card key={m.id} className="border border-steel/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-signal-blue/30 hover:shadow-elevated">
                   <div className="flex items-start justify-between gap-2">
                     <a href={`/u/${m.promoter.username}`} className="font-medium text-midnight-ink hover:text-primary">
                       @{m.promoter.username}

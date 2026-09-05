@@ -116,19 +116,31 @@ export default function BusinessReviewsPage() {
   return (
     <RequireAuth role={Role.BUSINESS}>
       <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-cards shadow-product-card border border-slate-custom/10">
-          <div>
-            <h1 className="text-heading-lg text-graphite font-bold tracking-tight">My Reviews</h1>
-            <p className="text-sm text-ash mt-2 max-w-xl">Manage your creator reputation and review history.</p>
+        <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: "radial-gradient(55% 120% at 100% 0%, rgba(255,166,77,0.25) 0%, rgba(240,244,254,0) 60%)" }}
+          />
+          <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div>
+              <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">My Reviews</h1>
+              <p className="text-sm text-ash mt-2 max-w-xl">Manage your creator reputation and review history.</p>
+            </div>
+            <a
+              href="/business/collaborations"
+              className="inline-flex w-fit items-center gap-2 rounded-pill bg-signal-blue px-5 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90"
+            >
+              View Collaborations
+            </a>
           </div>
         </div>
 
-        <div className="flex gap-1 border-b border-slate-custom/10">
+        <div className="inline-flex gap-1 rounded-pill bg-sky-wash/70 p-1 w-fit">
           {(["received", "given"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-6 py-3 text-sm font-bold transition-colors ${tab === t ? "text-signal-blue border-b-2 border-signal-blue" : "text-ash hover:bg-sky-wash hover:text-graphite rounded-t-lg"}`}
+              className={`rounded-pill px-5 py-2 text-sm font-semibold transition-all ${tab === t ? "bg-white text-graphite shadow-product-card" : "text-ash hover:text-graphite"}`}
             >
               {t === "received" ? "Ratings Received" : "Reviews Given"}
             </button>
@@ -137,11 +149,11 @@ export default function BusinessReviewsPage() {
 
         {tab === "received" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="bg-white border border-slate-custom/10 shadow-product-card rounded-cards p-8 flex flex-col items-center justify-center text-center">
+            <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-b from-amber-tag/10 to-white p-8 shadow-product-card flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-0.5">
               <h2 className="text-base font-bold text-graphite mb-6">Overall Trust Score</h2>
               <div className="relative mb-6">
-                <div className="w-32 h-32 rounded-full border-[12px] border-amber-tag/10 flex items-center justify-center bg-white shadow-sm">
-                  <span className="text-5xl font-black text-graphite tracking-tighter">{rating?.averageRating?.toFixed(1) || "0.0"}</span>
+                <div className="w-32 h-32 rounded-full border-[12px] border-amber-tag/15 flex items-center justify-center bg-white shadow-product-card">
+                  <span className="font-display text-5xl font-medium tracking-tight text-graphite">{rating?.averageRating?.toFixed(1) || "0.0"}</span>
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-amber-tag text-white w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-sm">
                   <Star size={20} className="fill-white" />
@@ -150,7 +162,7 @@ export default function BusinessReviewsPage() {
               <Stars rating={Math.round(rating?.averageRating || 0)} />
               <p className="text-xs font-semibold uppercase tracking-wider text-ash mt-3">Based on {rating?.totalReviews || 0} reviews</p>
             </div>
-            <div className="bg-white border border-slate-custom/10 shadow-product-card rounded-cards p-8 flex flex-col items-center justify-center text-center">
+            <div className="rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-0.5">
               <div className="w-9 h-9 text-slate-custom/20 mb-4"><Star size={36} /></div>
               <h2 className="text-base font-bold text-graphite mb-6">Rating Distribution</h2>
               <div className="w-full max-w-xs">
@@ -164,7 +176,7 @@ export default function BusinessReviewsPage() {
           {active.isLoading ? (
             <SkeletonList count={3} rowHeight="h-48" />
           ) : items.length === 0 ? (
-            <div className="bg-white rounded-cards border border-slate-custom/10 shadow-product-card p-16 text-center flex flex-col items-center">
+            <div className="rounded-cards-lg border border-slate-custom/10 bg-white p-16 shadow-product-card text-center flex flex-col items-center">
               <div className="w-20 h-20 bg-sky-wash rounded-full flex items-center justify-center text-signal-blue mb-4">
                 <MessageSquare size={32} />
               </div>
@@ -176,14 +188,14 @@ export default function BusinessReviewsPage() {
                   ? "You haven't received any reviews from promoters yet. Complete collaborations to start building your reputation."
                   : "You haven't reviewed any businesses yet. Complete a collaboration to leave a review."}
               </p>
-              <a href="/business/collaborations" className="bg-signal-blue text-white rounded-inputs px-6 h-12 flex items-center justify-center text-sm font-bold hover:bg-signal-blue/90 transition-colors shadow-sm">
+              <a href="/business/collaborations" className="inline-flex items-center justify-center rounded-pill bg-signal-blue px-6 py-3 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90">
                 View Collaborations
               </a>
             </div>
           ) : (
             <div className="space-y-4">
               {items.map((r) => (
-                <div key={r.id} className="bg-white rounded-cards border border-slate-custom/10 shadow-product-card p-6 transition-all hover:border-signal-blue/30">
+                <div key={r.id} className="rounded-cards-lg border border-slate-custom/10 bg-white p-6 shadow-product-card transition-all duration-200 hover:-translate-y-0.5 hover:border-signal-blue/30 hover:shadow-feature-section">
                   <div className="flex items-start justify-between gap-4 mb-5">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full bg-periwinkle-glow/30 flex items-center justify-center text-base font-bold text-signal-blue">
