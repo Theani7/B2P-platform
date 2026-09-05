@@ -5,14 +5,12 @@ import { useRouter } from "next/navigation";
 import {
   Search,
   X,
-  Loader2,
   LayoutDashboard,
   Target,
   Layers,
   MessageSquare,
   Bell,
   Star,
-  Award,
   Briefcase,
   User,
   Settings,
@@ -24,8 +22,6 @@ import {
   Globe,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
-import { useSearch } from "@/features/search/api";
-import { useDebounce } from "@/lib/useDebounce";
 import { useRecentPages, useRecentCommands, Command, CommandType } from "@/features/command-palette";
 import { Role } from "@/lib/roles";
 
@@ -37,7 +33,6 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   messages: <MessageSquare size={16} />,
   notifications: <Bell size={16} />,
   reviews: <Star size={16} />,
-  achievements: <Award size={16} />,
   portfolio: <Briefcase size={16} />,
   profile: <User size={16} />,
   settings: <Settings size={16} />,
@@ -45,7 +40,6 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   admin: <Shield size={16} />,
   plus: <Plus size={16} />,
   globe: <Globe size={16} />,
-  search: <Search size={16} />,
   clock: <Clock size={16} />,
 };
 
@@ -53,7 +47,6 @@ export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const debouncedQuery = useDebounce(query, 300);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -62,9 +55,6 @@ export function CommandPalette() {
 
   const { recentPages } = useRecentPages();
   const { recentCommands, addRecentCommand, clearRecentCommands } = useRecentCommands();
-  const { data: searchResults, isLoading: isSearching } = useSearch(
-    debouncedQuery.trim().length >= 2 ? { q: debouncedQuery.trim() } : null,
-  );
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -101,7 +91,6 @@ export function CommandPalette() {
       cmds.push({ id: "nav-verification", title: "Verification Requests", type: "navigation", icon: "shield", action: () => router.push("/admin/verification") });
       cmds.push({ id: "nav-campaigns", title: "Campaign Moderation", type: "navigation", icon: "campaigns", action: () => router.push("/admin/campaigns") });
       cmds.push({ id: "nav-reviews", title: "Review Moderation", type: "navigation", icon: "reviews", action: () => router.push("/admin/reviews") });
-      cmds.push({ id: "nav-analytics", title: "Analytics", type: "navigation", icon: "dashboard", action: () => router.push("/admin/analytics") });
       cmds.push({ id: "nav-settings", title: "Platform Settings", type: "navigation", icon: "settings", action: () => router.push("/admin/settings") });
     } else if (user.role === Role.BUSINESS) {
       cmds.push({ id: "nav-campaigns", title: "Campaigns", type: "navigation", icon: "campaigns", action: () => router.push("/business/campaigns") });
@@ -124,10 +113,7 @@ export function CommandPalette() {
       cmds.push({ id: "nav-notifications", title: "Notifications", type: "navigation", icon: "notifications", action: () => router.push("/notifications") });
     }
 
-    cmds.push({ id: "nav-search", title: "Search", type: "navigation", icon: "search", action: () => router.push("/search") });
     cmds.push({ id: "nav-export", title: "Export", type: "navigation", icon: "campaigns", action: () => router.push("/export") });
-    cmds.push({ id: "nav-achievements", title: "Achievements", type: "navigation", icon: "achievements", action: () => router.push("/achievements") });
-    cmds.push({ id: "nav-activity", title: "Activity", type: "navigation", icon: "clock", action: () => router.push("/activity") });
     cmds.push({ id: "action-logout", title: "Logout", type: "action", icon: "logout", action: () => logout() });
 
     return cmds;
@@ -141,34 +127,9 @@ export function CommandPalette() {
     );
   }, [query, staticCommands]);
 
-  const searchResultCommands = useMemo<Command[]>(() => {
-    if (!searchResults || query.trim().length < 2) return [];
-
-    const cmds: Command[] = [];
-    const mapItems = (items: any[], typeName: string, iconKey: string) => {
-      items?.forEach((item: any) => {
-        cmds.push({
-          id: `search-${item.id}`,
-          title: item.title,
-          subtitle: `${typeName} • ${item.subtitle || ""}`,
-          type: "search",
-          icon: iconKey,
-          action: () => router.push(item.url),
-        });
-      });
-    };
-
-    mapItems(searchResults.campaigns, "Campaign", "campaigns");
-    mapItems(searchResults.promoters, "Creator", "profile");
-    mapItems(searchResults.businesses, "Brand", "briefcase");
-    mapItems(searchResults.collaborations, "Collaboration", "collaborations");
-
-    return cmds;
-  }, [searchResults, query, router]);
-
   const activeItems = useMemo<Command[]>(() => {
     if (query.trim().length >= 2) {
-      return [...filteredCommands, ...searchResultCommands];
+      return [...filteredCommands];
     }
     const recents: Command[] = recentPages.map((rp) => ({
       id: `recent-page-${rp.path}`,
@@ -189,7 +150,7 @@ export function CommandPalette() {
       ...staticCommands.filter((c) => c.type === "action"),
       ...staticCommands.filter((c) => c.type === "navigation"),
     ];
-  }, [query, filteredCommands, searchResultCommands, recentPages, recentCommands, staticCommands, router]);
+  }, [query, filteredCommands, recentPages, recentCommands, staticCommands, router]);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -253,8 +214,7 @@ export function CommandPalette() {
                 placeholder="What do you need?"
                 className="flex-1 bg-transparent border-none outline-none text-lg placeholder:text-fog text-graphite"
               />
-              {isSearching && <Loader2 size={18} className="text-signal-blue animate-spin" />}
-              {query && !isSearching && (
+              {query && (
                 <button
                   onClick={() => setQuery("")}
                   className="p-1 rounded bg-sky-wash hover:bg-slate-custom/10 text-ash text-xs font-semibold px-2"

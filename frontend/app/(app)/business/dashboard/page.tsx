@@ -9,7 +9,6 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useBusinessAnalytics } from "@/features/analytics/api";
 import { useBusinessInvitations } from "@/features/invitations/api";
 import { useBusinessApplications } from "@/features/applications/api";
-import { useBusinessActivities } from "@/features/activity/api";
 import { StatCard } from "@/components/ui/Stats";
 import { ProfileCompletionWidget } from "@/components/profile/ProfileCompletionWidget";
 import { RequireAuth } from "@/components/common/RequireAuth";
@@ -18,7 +17,6 @@ import { Spinner } from "@/components/ui/Spinner";
 import { useProfileCompletion } from "@/features/profile-completion/api";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { timeAgo } from "@/lib/time";
 
 const DashboardCharts = nextDynamic(
   () => import("@/components/charts/BusinessDashboardCharts"),
@@ -30,7 +28,6 @@ function DashboardInner() {
   const router = useRouter();
   const { data: analytics, isLoading: statsLoading } = useBusinessAnalytics();
   const { data: applicationsData, isLoading: recentApplicationsLoading } = useBusinessApplications({ limit: 5 });
-  const { data: activityData, isLoading: activityLoading } = useBusinessActivities({ size: 5 });
   const { data: profileCompletion, isLoading: completionLoading } = useProfileCompletion();
 
   useEffect(() => {
@@ -176,36 +173,6 @@ function DashboardInner() {
                     >
                       Review
                     </Link>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white border border-slate-custom/10 rounded-cards shadow-product-card overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-custom/10">
-              <div className="flex items-center gap-2">
-                <ActivityIcon size={16} className="text-ash" />
-                <h2 className="text-sm font-medium text-graphite">Recent Activity</h2>
-              </div>
-            </div>
-            {activityLoading ? (
-              <div className="p-8 flex justify-center"><Spinner /></div>
-            ) : !activityData?.items?.length ? (
-              <div className="p-8 text-center">
-                <div className="w-12 h-12 rounded-full bg-sky-wash flex items-center justify-center mx-auto mb-3">
-                  <ActivityIcon size={20} className="text-signal-blue" />
-                </div>
-                <p className="text-sm font-medium text-graphite">No recent activity</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-slate-custom/10 flex-1">
-                {activityData.items.map((a: any) => (
-                  <div key={a.id} className="p-4">
-                    <p className="text-sm text-graphite">
-                      <span className="font-medium">{a.actorName || "Someone"}</span> {a.description}
-                    </p>
-                    <p className="text-xs text-ash mt-0.5">{timeAgo(a.createdAt)}</p>
                   </div>
                 ))}
               </div>

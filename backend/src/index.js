@@ -38,23 +38,6 @@ async function seedAdmin() {
   }
 }
 
-const ACHIEVEMENT_DEFS = [
-  { key: "COMPLETE_PROFILE", title: "Profile Complete", description: "Create your promoter profile.", category: "profile", points: 10 },
-  { key: "COMPLETE_BUSINESS_PROFILE", title: "Business Ready", description: "Create your business profile.", category: "profile", points: 10 },
-  { key: "FIRST_SOCIAL_LINK", title: "Connected", description: "Add your first social link.", category: "engagement", points: 5 },
-  { key: "FIRST_PORTFOLIO", title: "Showcase Started", description: "Add your first portfolio item.", category: "portfolio", points: 5 },
-];
-
-async function seedAchievements() {
-  for (const def of ACHIEVEMENT_DEFS) {
-    await prisma.achievement.upsert({
-      where: { key: def.key },
-      update: {},
-      create: { ...def, isActive: true },
-    });
-  }
-}
-
 process.on("unhandledRejection", (reason) => {
   console.error("[unhandledRejection]", reason);
 });
@@ -74,7 +57,6 @@ server.listen(port, () => {
 });
 
 seedAdmin().catch((e) => console.error("Admin seed failed", e));
-seedAchievements().catch((e) => console.error("Achievement seed failed", e));
 seedSettings().catch((e) => console.error("Settings seed failed", e));
 
 function shutdown(signal) {

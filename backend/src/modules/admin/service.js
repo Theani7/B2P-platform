@@ -240,8 +240,7 @@ export async function deleteUser(adminUser, userId, req) {
     await tx.portfolioLike.deleteMany({ where: { userId: user.id } });
     await tx.auditLog.deleteMany({ where: { userId: user.id } });
     await tx.verificationRequest.updateMany({ where: { reviewedBy: user.id }, data: { reviewedBy: null } });
-    // Cascades (profiles, social links, notification prefs, achievements,
-    // search history, activity logs, received notifications) delete automatically.
+    // Cascades (profiles, social links, notification prefs, received notifications) delete automatically.
     await tx.user.delete({ where: { id: user.id } });
   });
 

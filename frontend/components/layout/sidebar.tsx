@@ -16,13 +16,9 @@ import {
   Store,
   FileText,
   ShieldCheck,
-  BarChart3,
   Lock,
   Star,
-  Award,
-  Search,
   Download,
-  Activity,
   Clock,
   Settings,
   Plus,
@@ -85,9 +81,6 @@ const businessSections = [
   {
     title: "Tools",
     links: [
-      { to: "/achievements", label: "Achievements", icon: Award },
-      { to: "/activity", label: "Activity", icon: Activity },
-      { to: "/search", label: "Search", icon: Search },
       { to: "/export", label: "Export", icon: Download },
     ],
   },
@@ -117,9 +110,6 @@ const promoterSections = [
   {
     title: "Tools",
     links: [
-      { to: "/achievements", label: "Achievements", icon: Award },
-      { to: "/activity", label: "Activity", icon: Activity },
-      { to: "/search", label: "Search", icon: Search },
       { to: "/export", label: "Export", icon: Download },
     ],
   },
@@ -130,7 +120,6 @@ const adminSections = [
     title: "Overview",
     links: [
       { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
     ],
   },
   {
@@ -156,9 +145,6 @@ const adminSections = [
   {
     title: "Tools",
     links: [
-      { to: "/achievements", label: "Achievements", icon: Award },
-      { to: "/activity", label: "Activity", icon: Activity },
-      { to: "/search", label: "Search", icon: Search },
       { to: "/export", label: "Export", icon: Download },
     ],
   },

@@ -14,7 +14,6 @@ import { usePromoterCollaborations } from "@/features/collaborations/api";
 import { usePromoterInvitations, useAcceptInvitation, useRejectInvitation } from "@/features/invitations/api";
 import { Spinner } from "@/components/ui/Spinner";
 import { SkeletonList } from "@/components/ui/Skeleton";
-import { useMyActivities } from "@/features/activity/api";
 import { usePromoterProfile, useUpdatePromoterProfile } from "@/features/profile/api";
 import { useUserRating } from "@/features/reviews/api";
 import { useUpload } from "@/features/upload/api";
@@ -28,22 +27,10 @@ import {
   Star,
   Camera,
   Mail,
-  BarChart3,
   CheckCircle2,
   ChevronRight,
   ArrowRight,
 } from "lucide-react";
-
-function relativeTime(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
-}
 
 function DashboardInner() {
   const { user } = useAuth();
@@ -66,7 +53,6 @@ function DashboardInner() {
   const { data: invitations, isLoading: invsLoading } = usePromoterInvitations({ status: "PENDING", limit: 20 });
   // Fetch only ACTIVE collaborations from the server for accurate stats + preview
   const { data: collabs, isLoading: collabsLoading } = usePromoterCollaborations({ status: "ACTIVE", limit: 5 });
-  const { data: activityData, isLoading: activityLoading } = useMyActivities({ size: 5 });
   const { data: profile } = usePromoterProfile();
   const { data: rating } = useUserRating(user?.id ?? "");
 
@@ -283,48 +269,8 @@ function DashboardInner() {
             </div>
           </div>
 
-          {/* Sub-grid: Recent Activity & Pending Invites Side by Side */}
+          {/* Pending Invites */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            {/* Recent Activity */}
-            <div className="bg-white border border-slate-custom/10 rounded-xl shadow-sm overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-slate-custom/5 rounded-md">
-                    <BarChart3 size={18} className="text-graphite" />
-                  </div>
-                  <h2 className="text-base font-bold text-graphite">Recent Activity</h2>
-                </div>
-              </div>
-              {activityLoading ? (
-                <div className="p-6"><SkeletonList count={3} rowHeight="h-12" roundedWrapper="rounded-lg" /></div>
-              ) : !activityData?.items?.length ? (
-                <div className="p-12 text-center border-t border-slate-custom/5 flex flex-col items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-sky-wash flex items-center justify-center mx-auto mb-4">
-                    <BarChart3 size={24} className="text-signal-blue" />
-                  </div>
-                  <p className="text-base font-bold text-graphite mb-1">No recent activity</p>
-                  <p className="text-sm text-ash">Your notifications and actions will appear here.</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-slate-custom/5">
-                  {activityData.items.map((activity) => (
-                    <div key={activity.id} className="flex items-start gap-3 px-6 py-4">
-                      <div className="w-8 h-8 rounded-full bg-periwinkle-glow/30 text-signal-blue flex items-center justify-center text-xs font-bold flex-shrink-0">
-                        {(activity.actorName?.[0] ?? "A").toUpperCase()}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-graphite">{activity.title}</p>
-                        {activity.description && (
-                          <p className="text-xs text-ash mt-0.5">{activity.description}</p>
-                        )}
-                        <p className="text-[10px] text-fog uppercase tracking-wider mt-1">{relativeTime(activity.createdAt)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Pending Invitations Widget */}
             <div className="bg-white border border-slate-custom/10 rounded-xl shadow-sm overflow-hidden flex flex-col">
               <div className="flex items-center justify-between px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">

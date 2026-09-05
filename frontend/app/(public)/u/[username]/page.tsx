@@ -3,11 +3,10 @@ import { use } from "react";
 import Link from "next/link";
 import { usePublicPromoterProfile } from "@/features/discovery/api";
 import { useUserRating } from "@/features/reviews/api";
-import { useUserAchievements } from "@/features/achievements/api";
 import { Spinner } from "@/components/ui/Spinner";
 import { PublicLayout } from "@/components/common/PublicLayout";
 import { RatingStars } from "@/components/reviews/RatingStars";
-import { MapPin, Users, TrendingUp, Briefcase, LinkIcon, Camera, Music, Video, Globe, MessageSquare, Medal } from "lucide-react";
+import { MapPin, Users, TrendingUp, Briefcase, LinkIcon, Camera, Music, Video, Globe, MessageSquare } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
@@ -43,13 +42,10 @@ const getPlatformIcon = (platform: string) => {
 function PromoterProfileContent({ username }: { username: string }) {
   const { data: profile, isLoading, isError } = usePublicPromoterProfile(username);
   const { data: ratingSummary } = useUserRating(profile?.userId ?? "");
-  const { data: achievementsData } = useUserAchievements(profile?.userId ?? "");
 
   if (isLoading) return <Spinner />;
   if (isError || !profile)
     return <p className="text-body text-coral-alert">Could not load this promoter.</p>;
-
-  const earnedAchievements = (achievementsData?.achievements ?? []).filter((a) => a.earnedAt);
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 p-6">
@@ -134,20 +130,6 @@ function PromoterProfileContent({ username }: { username: string }) {
             </div>
           )}
         </div>
-
-        {earnedAchievements.length > 0 && (
-          <div className="rounded-lg border bg-white p-6">
-            <h2 className="mb-4 text-lg font-bold text-graphite">Achievements</h2>
-            <div className="flex flex-wrap gap-2">
-              {earnedAchievements.map((ua) => (
-                <div key={ua.achievementId} className="flex items-center gap-2 rounded-full border border-amber-tag/20 bg-amber-tag/10 px-3 py-1.5">
-                  <Medal size={14} className="text-amber-tag" />
-                  <span className="text-sm font-medium text-graphite">{ua.achievement.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {profile.bio && (

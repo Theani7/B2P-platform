@@ -29,7 +29,6 @@ Core concepts:
 - Collaborations: an active partnership linking a campaign, business, and promoter. Deliverables are submitted by promoters and reviewed by businesses (APPROVED / REVISION_REQUESTED / PUBLISHED).
 - Reviews & Ratings: After a collaboration completes, both parties leave 1-5 star mutual reviews; ratings feed a public average + star distribution.
 - Chat & Notifications: Real-time messaging (socket.io) is available inside active collaborations; notifications are delivered in-app and realtime.
-- Achievements: Users earn badges (e.g. Complete Profile, First Portfolio) for platform activity.
 - Help is available via the AI assistant for both businesses and promoters to explain features and guide actions.`;
 
 const rolePrompt = (role) => {

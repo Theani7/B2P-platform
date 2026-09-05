@@ -7,14 +7,13 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Role } from "@/lib/roles";
 import { usePublicPromoterProfile, useSavePromoter } from "@/features/discovery/api";
 import { useUserRating } from "@/features/reviews/api";
-import { useUserAchievements } from "@/features/achievements/api";
 import { RatingStars } from "@/components/reviews/RatingStars";
 import InvitePromoterModal from "@/components/discovery/InvitePromoterModal";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { notifySuccess, notifyError } from "@/lib/notify";
-import { MapPin, Users, TrendingUp, Briefcase, LinkIcon, Camera, Music, Video, Globe, MessageSquare, Trophy, Send, Check, Medal } from "lucide-react";
+import { MapPin, Users, TrendingUp, Briefcase, LinkIcon, Camera, Music, Video, Globe, MessageSquare, Send, Check } from "lucide-react";
 
 function formatCompactNumber(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -38,7 +37,6 @@ function PromoterProfileInner({ username }: { username: string }) {
   const { user } = useAuth();
   const { data: profile, isLoading, isError } = usePublicPromoterProfile(username);
   const { data: ratingSummary } = useUserRating(profile?.userId ?? "");
-  const { data: achievementsData } = useUserAchievements(profile?.userId ?? "");
   const savePromoter = useSavePromoter();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
@@ -53,8 +51,6 @@ function PromoterProfileInner({ username }: { username: string }) {
       onError: (e: any) => notifyError(e?.message ?? "Failed to save"),
     });
   };
-
-  const earnedAchievements = (achievementsData?.achievements ?? []).filter((a) => a.earnedAt);
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 p-6">
@@ -166,28 +162,6 @@ function PromoterProfileInner({ username }: { username: string }) {
                 );
               })}
             </div>
-          </div>
-        </div>
-      )}
-
-      {earnedAchievements.length > 0 && (
-        <div className="rounded-lg border bg-white p-6">
-          <div className="mb-6 flex items-center gap-2">
-            <Trophy size={20} className="text-primary" />
-            <h2 className="text-lg font-semibold text-graphite">Creator Achievements</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {earnedAchievements.slice(0, 4).map((ua) => (
-              <div key={ua.id ?? ua.achievementId} className="flex items-center gap-3 rounded-lg border border-steel/10 bg-steel/5 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-signal-blue/10 text-xl text-signal-blue">
-                  <Medal size={20} className="text-amber-tag" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-graphite">{ua.achievement.title}</p>
-                  <p className="text-xs text-steel">{ua.achievement.points} pts</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       )}
