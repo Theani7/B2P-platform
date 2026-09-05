@@ -273,7 +273,7 @@ function LoveNotes() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal className="mb-12 text-center">
           <h2 className="mx-auto max-w-xl font-display text-4xl font-semibold tracking-tight text-midnight-ink md:text-5xl">
-            Why everyone stays for dessert
+            Why teams stay with Byparsathy
           </h2>
         </Reveal>
         <div className="grid gap-5 md:grid-cols-3">
@@ -295,10 +295,10 @@ function LoveNotes() {
 /* ------------------------------- how it works ------------------------------ */
 
 const STEPS = [
-  { icon: Sprout, tint: "bg-emerald-status/10 text-emerald-status", title: "Plant your profile", desc: "Tell the marketplace who you are, what you love making, and who you want to work with. A complete profile takes minutes, and every field helps the matcher place you better." },
-  { icon: Search, tint: "bg-sky-wash text-signal-blue", title: "Find your people", desc: "Brands filter vetted creators by niche, platform, and location. Creators browse open briefs the same way. Shortlist, compare, and keep the ones that feel right." },
-  { icon: Mail, tint: "bg-amber-tag/20 text-amber-tag", title: "Say hello", desc: "Chat directly inside the collaboration, agree on deliverables and timelines, and start creating together. No agencies relaying messages, no games." },
-  { icon: Sparkles, tint: "bg-signal-blue/10 text-signal-blue", title: "Shine together", desc: "Publish the work, rate each other honestly, and let every finished collaboration raise your standing for the next one." },
+  { icon: Sprout, tint: "bg-emerald-status/10 text-emerald-status", title: "Build your profile", desc: "Tell the marketplace who you are, what you create, and who you want to work with. A complete profile takes minutes, and every field helps the matcher place you better." },
+  { icon: Search, tint: "bg-sky-wash text-signal-blue", title: "Find your match", desc: "Brands filter vetted creators by niche, platform, and location. Creators browse open briefs the same way. Shortlist, compare, and keep the ones that fit." },
+  { icon: Mail, tint: "bg-amber-tag/20 text-amber-tag", title: "Start the conversation", desc: "Chat directly inside the collaboration, agree on deliverables and timelines, and start creating together. No agencies relaying messages." },
+  { icon: Sparkles, tint: "bg-signal-blue/10 text-signal-blue", title: "Launch together", desc: "Publish the work, rate each other honestly, and let every finished collaboration raise your standing for the next one." },
 ];
 
 function HowItWorks() {
@@ -307,7 +307,7 @@ function HowItWorks() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal className="mb-12 text-center">
           <h2 className="mx-auto max-w-xl font-display text-4xl font-semibold tracking-tight text-midnight-ink md:text-5xl">
-            Easy as Sunday morning
+            Simple from day one
           </h2>
         </Reveal>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -507,10 +507,10 @@ function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
         <PartyPopper size={26} className="absolute bottom-8 right-10 hidden text-white/30 sm:block" />
         <div className="relative">
           <h2 className="mx-auto mb-4 max-w-xl font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
-            Ready for your happily ever after?
+            Ready to meet your match?
           </h2>
           <p className="mx-auto mb-9 max-w-md text-white/80">
-            Your perfect brand-creator match is one click away. No frogs, we checked.
+            Your next brand-creator collaboration is one click away.
           </p>
           {isAuthed ? (
             <Link href={dash} className="inline-block rounded-full bg-white px-8 py-4 text-sm font-semibold text-signal-blue transition-transform hover:-translate-y-0.5">
@@ -582,7 +582,7 @@ function Footer() {
           ))}
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-7 sm:flex-row">
-          <p className="text-xs text-white/40">© {new Date().getFullYear()} Byparsathy. All smiles reserved.</p>
+          <p className="text-xs text-white/40">© {new Date().getFullYear()} Byparsathy. All rights reserved.</p>
           <p className="flex items-center gap-1.5 text-xs text-white/40">
             Made with <MapPin size={12} /> in Nepal
           </p>
