@@ -16,7 +16,7 @@ import {
   useUpdateReview,
   type ReviewRead,
 } from "@/features/reviews/api";
-import { Star, Calendar, Briefcase, Edit, Trash2, ChevronRight, MessageSquare, Eye } from "lucide-react";
+import { Star, Calendar, Briefcase, Edit, Trash2, ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 type TabType = "received" | "given";
@@ -120,17 +120,11 @@ export default function PromoterReviewsPage() {
             className="pointer-events-none absolute inset-0"
             style={{ background: "radial-gradient(55% 120% at 100% 0%, rgba(255,166,77,0.25) 0%, rgba(240,244,254,0) 60%)" }}
           />
-          <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="relative">
             <div>
               <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">My Reviews</h1>
               <p className="text-sm text-ash mt-2 max-w-xl">Manage your creator reputation and review history.</p>
             </div>
-            <Link
-              href={`/u/${user?.promoterProfile?.username}`}
-              className="bg-white border border-slate-custom/15 text-graphite rounded-pill px-5 h-11 text-sm font-semibold hover:border-signal-blue/40 hover:text-signal-blue transition-all flex items-center justify-center gap-2 shadow-sm"
-            >
-              <Eye size={16} /> View Public Profile
-            </Link>
           </div>
         </div>
 
