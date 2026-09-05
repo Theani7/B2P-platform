@@ -123,8 +123,9 @@ export const useSuspendUser = () => {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (userId) => api.patch(`/admin/users/${userId}/suspend`),
-    onSuccess: () => {
+    onSuccess: (_data, userId) => {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-user", userId] });
     },
   });
 };
@@ -173,8 +174,9 @@ export const useActivateUser = () => {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (userId) => api.patch(`/admin/users/${userId}/activate`),
-    onSuccess: () => {
+    onSuccess: (_data, userId) => {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-user", userId] });
     },
   });
 };
