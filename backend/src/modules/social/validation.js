@@ -1,15 +1,25 @@
 import { z } from "zod";
 
-export const socialLinkCreateSchema = z.object({
-  platform: z.string().min(1).max(50),
-  username: z.string().max(255).optional(),
-  url: z.string().url().max(500),
-  followersCount: z.coerce.number().int().min(0).optional(),
-});
+export const SOCIAL_PLATFORMS = ["INSTAGRAM", "TIKTOK", "YOUTUBE", "FACEBOOK", "X", "LINKEDIN"];
+
+const platformField = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .pipe(z.enum(SOCIAL_PLATFORMS));
+
+export const socialLinkCreateSchema = z
+  .object({
+    platform: platformField,
+    username: z.string().trim().max(255).optional(),
+    url: z.string().url().max(500).optional(),
+    followersCount: z.coerce.number().int().min(0).optional(),
+  })
+  .refine((v) => v.username || v.url, { message: "Provide a username or a URL" });
 
 export const socialLinkUpdateSchema = z.object({
-  platform: z.string().min(1).max(50).optional(),
-  username: z.string().max(255).optional(),
+  platform: platformField.optional(),
+  username: z.string().trim().max(255).optional(),
   url: z.string().url().max(500).optional(),
   followersCount: z.coerce.number().int().min(0).optional(),
 });

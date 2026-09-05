@@ -13,7 +13,7 @@ export interface SocialLink {
 export interface SocialLinkInput {
   platform: string;
   username?: string;
-  url: string;
+  url?: string;
   followersCount?: number;
 }
 
