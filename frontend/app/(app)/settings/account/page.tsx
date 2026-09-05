@@ -5,9 +5,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RequireAuth } from "@/components/common/RequireAuth";
-import { Card, PageHeader } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { getApiError } from "@/lib/apiError";
 import api, { clearTokens } from "@/lib/apiClient";
@@ -106,7 +107,7 @@ function DownloadDataCard() {
 }
 
 function DeleteAccountCard() {
-  const [confirming, setConfirming] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [deleting, setDeleting] = useState(false);
 
@@ -138,35 +139,29 @@ function DeleteAccountCard() {
       <p className="mb-5 max-w-lg text-sm leading-relaxed text-ash">
         Permanently removes your account, profile, portfolio, messages, and reviews. This cannot be undone.
       </p>
-      {!confirming ? (
-        <Button variant="danger" onClick={() => setConfirming(true)}>
-          Delete my account
-        </Button>
-      ) : (
-        <div className="max-w-md rounded-cards border border-coral-alert/25 bg-coral-alert/5 p-4">
-          <p className="mb-3 text-sm font-medium text-graphite">
-            Type your password to permanently delete everything.
-          </p>
-          <div className="flex flex-col gap-3">
-            <Input
-              label="Password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Your current password"
-            />
-            <div className="flex gap-2">
-              <Button variant="ghost" onClick={() => { if (!deleting) { setConfirming(false); setPassword(""); } }}>
-                Keep my account
-              </Button>
-              <Button variant="danger" disabled={deleting} onClick={doDelete}>
-                {deleting ? "Deleting…" : "Delete forever"}
-              </Button>
-            </div>
-          </div>
+      <Button variant="danger" onClick={() => { setPassword(""); setConfirmOpen(true); }}>
+        Delete my account
+      </Button>
+      <ConfirmModal
+        isOpen={confirmOpen}
+        title="Delete account?"
+        message="Everything tied to your account will be permanently removed."
+        confirmText={deleting ? "Deleting…" : "Delete forever"}
+        isDanger
+        onCancel={() => !deleting && setConfirmOpen(false)}
+        onConfirm={doDelete}
+      >
+        <div className="mb-2">
+          <Input
+            label="Confirm with your password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Your current password"
+          />
         </div>
-      )}
+      </ConfirmModal>
     </Card>
   );
 }
@@ -175,7 +170,18 @@ export default function AccountSettingsPage() {
   return (
     <RequireAuth>
       <div className="mx-auto max-w-[800px] space-y-6 pb-20">
-        <PageHeader title="Account settings" subtitle="Password, your data, and account removal." />
+        <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: "radial-gradient(60% 130% at 100% 0%, rgba(182,203,253,0.55) 0%, rgba(240,244,254,0) 60%)" }}
+          />
+          <div className="relative">
+            <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Account settings</h1>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-ash">
+              Password, a copy of your data, and account removal. Everything here acts immediately.
+            </p>
+          </div>
+        </div>
         <ChangePasswordCard />
         <DownloadDataCard />
         <DeleteAccountCard />
