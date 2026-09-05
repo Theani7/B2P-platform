@@ -15,6 +15,9 @@ import {
   Zap,
   ChevronDown,
   MapPin,
+  PartyPopper,
+  BadgeCheck,
+  Heart,
 } from "lucide-react";
 
 /* ---------------------------------- nav ---------------------------------- */
@@ -40,12 +43,12 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   return (
     <nav
       className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? "border-b border-steel/10 bg-linen-canvas/80 backdrop-blur-md" : "bg-transparent"
+        scrolled ? "border-b border-steel/10 bg-linen-canvas/85 backdrop-blur-md" : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2 text-lg font-medium text-signal-blue">
-          <span className="flex h-7 w-7 items-center justify-center rounded-buttons bg-signal-blue text-sm font-semibold text-white">B</span>
+        <Link href="/" className="flex items-center gap-2 text-lg font-medium text-midnight-ink">
+          <span className="-rotate-6 flex h-8 w-8 items-center justify-center rounded-buttons bg-signal-blue text-sm font-semibold text-white shadow-product-card">B</span>
           Byparsathy
         </Link>
 
@@ -54,7 +57,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-slate-custom transition-colors hover:text-signal-blue"
+              className="text-sm font-medium text-slate-custom transition-colors hover:text-signal-blue"
             >
               {link.label}
             </a>
@@ -68,11 +71,11 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             </Link>
           ) : (
             <>
-              <Link href="/login" className="px-3 py-2 text-sm text-slate-custom transition-colors hover:text-signal-blue">
+              <Link href="/login" className="px-3 py-2 text-sm font-medium text-slate-custom transition-colors hover:text-signal-blue">
                 Sign in
               </Link>
               <Link href="/register">
-                <Button>Get started</Button>
+                <Button className="shadow-product-card">Get started</Button>
               </Link>
             </>
           )}
@@ -95,7 +98,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
           />
           <div className="fixed bottom-0 right-0 top-0 z-50 flex w-72 flex-col bg-linen-canvas md:hidden">
             <div className="flex h-16 items-center justify-between border-b border-steel/10 px-6">
-              <span className="text-lg font-medium text-signal-blue">Byparsathy</span>
+              <span className="text-lg font-medium text-midnight-ink">Byparsathy</span>
               <button
                 onClick={() => setMobileOpen(false)}
                 className="rounded-buttons p-2 text-slate-custom hover:bg-sky-wash"
@@ -110,7 +113,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block rounded-buttons px-3 py-3 text-sm text-slate-custom transition-colors hover:bg-sky-wash"
+                  className="block rounded-buttons px-3 py-3 text-sm font-medium text-slate-custom transition-colors hover:bg-sky-wash"
                 >
                   {link.label}
                 </a>
@@ -141,11 +144,12 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
 
 /* -------------------------------- match lab -------------------------------- */
 
-const LAB_DATA: Record<string, { name: string; meta: string; score: number; bars: { label: string; value: number; max: number }[] }> = {
+const LAB_DATA: Record<string, { name: string; meta: string; score: number; color: string; bars: { label: string; value: number; max: number }[] }> = {
   Food: {
     name: "Supriya Thapa",
     meta: "Food and lifestyle · 42K followers",
     score: 96,
+    color: "#ffa64d",
     bars: [
       { label: "Niche fit", value: 40, max: 40 },
       { label: "Location", value: 20, max: 20 },
@@ -157,6 +161,7 @@ const LAB_DATA: Record<string, { name: string; meta: string; score: number; bars
     name: "Niraj Tamang",
     meta: "Travel vlogs · 28K followers",
     score: 91,
+    color: "#16ca2e",
     bars: [
       { label: "Niche fit", value: 40, max: 40 },
       { label: "Location", value: 18, max: 20 },
@@ -168,6 +173,7 @@ const LAB_DATA: Record<string, { name: string; meta: string; score: number; bars
     name: "Aashish Karki",
     meta: "Gadgets and reviews · 31K followers",
     score: 89,
+    color: "#145aff",
     bars: [
       { label: "Niche fit", value: 38, max: 40 },
       { label: "Location", value: 20, max: 20 },
@@ -179,6 +185,7 @@ const LAB_DATA: Record<string, { name: string; meta: string; score: number; bars
     name: "Divya Shrestha",
     meta: "Style and lookbooks · 56K followers",
     score: 93,
+    color: "#f26052",
     bars: [
       { label: "Niche fit", value: 40, max: 40 },
       { label: "Location", value: 19, max: 20 },
@@ -198,13 +205,22 @@ function MatchLab() {
 
   return (
     <div className="relative">
-      <div className="absolute -inset-4 rounded-cards-lg bg-signal-blue/5 blur-2xl" />
-      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-6 shadow-feature-section sm:p-7">
+      <div className="absolute -right-4 -top-5 z-10 rotate-6 rounded-pill bg-amber-tag px-4 py-1.5 text-xs font-semibold text-white shadow-product-card">
+        <span className="flex items-center gap-1"><PartyPopper size={12} /> {d.score}% match</span>
+      </div>
+      <div className="absolute -left-3 bottom-16 z-10 -rotate-6 rounded-pill bg-white px-4 py-1.5 text-xs font-semibold text-emerald-status shadow-product-card border border-steel/10">
+        <span className="flex items-center gap-1"><BadgeCheck size={12} /> Verified</span>
+      </div>
+
+      <div className="relative overflow-hidden rounded-cards-lg border-2 border-midnight-ink/80 bg-white p-6 shadow-feature-section sm:p-7">
         <div className="mb-5 flex items-center justify-between">
-          <p className="text-caption font-medium uppercase tracking-wide text-ash">Try the matcher</p>
-          <span className="inline-flex items-center gap-1.5 rounded-badges bg-emerald-status/10 px-2 py-0.5 text-xs font-medium text-emerald-status">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-status" />
-            Live demo
+          <p className="rounded-pill bg-midnight-ink px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">Try the matcher</p>
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-status">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-status opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-status" />
+            </span>
+            Live
           </span>
         </div>
 
@@ -213,9 +229,9 @@ function MatchLab() {
             <button
               key={n}
               onClick={() => setNiche(n)}
-              className={`rounded-pill px-4 py-1.5 text-sm font-medium transition-all ${
+              className={`rounded-pill px-4 py-1.5 text-sm font-semibold transition-all active:scale-95 ${
                 niche === n
-                  ? "bg-midnight-ink text-white"
+                  ? "bg-signal-blue text-white shadow-product-card"
                   : "bg-sky-wash/70 text-slate-custom hover:bg-sky-wash hover:text-graphite"
               }`}
             >
@@ -233,7 +249,7 @@ function MatchLab() {
                 cy="50"
                 r={radius}
                 fill="none"
-                stroke="#145aff"
+                stroke={d.color}
                 strokeWidth="10"
                 strokeLinecap="round"
                 strokeDasharray={circ}
@@ -247,25 +263,25 @@ function MatchLab() {
             </div>
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-graphite">{d.name}</p>
+            <p className="truncate text-base font-semibold text-graphite">{d.name}</p>
             <p className="truncate text-xs text-ash">{d.meta}</p>
-            <p className="mt-2 inline-flex items-center gap-1 rounded-badges bg-sky-wash px-2 py-0.5 text-[11px] font-medium text-signal-blue">
-              <Check size={11} /> Verified creator
+            <p className="mt-2 inline-flex items-center gap-1 rounded-badges bg-amber-tag/15 px-2 py-0.5 text-[11px] font-semibold text-amber-tag">
+              <Star size={11} className="fill-amber-tag" /> Top pick for {niche}
             </p>
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-3 border-t border-steel/10 pt-5">
+        <div className="mt-6 flex flex-col gap-3 border-t-2 border-dashed border-steel/15 pt-5">
           {d.bars.map((b) => (
             <div key={b.label}>
               <div className="mb-1 flex items-center justify-between text-xs">
-                <span className="font-medium text-graphite">{b.label}</span>
+                <span className="font-semibold text-graphite">{b.label}</span>
                 <span className="font-roboto-mono text-ash">{b.value}/{b.max}</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-sky-wash">
+              <div className="h-2.5 overflow-hidden rounded-full bg-sky-wash">
                 <div
-                  className="h-full rounded-full bg-signal-blue transition-all duration-700 ease-out"
-                  style={{ width: `${(b.value / b.max) * 100}%` }}
+                  className="h-full rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${(b.value / b.max) * 100}%`, background: d.color }}
                 />
               </div>
             </div>
@@ -281,62 +297,103 @@ function MatchLab() {
 function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
   return (
-    <section className="relative overflow-hidden pb-16 pt-28 lg:pb-24 lg:pt-36">
+    <section className="relative overflow-hidden pb-16 pt-28 lg:pb-24 lg:pt-32">
       <div
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(70% 55% at 18% 10%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0.55) 45%, rgba(252,252,252,0) 75%)",
+            "radial-gradient(45% 40% at 12% 20%, rgba(255,166,77,0.25) 0%, rgba(252,252,252,0) 70%), radial-gradient(50% 45% at 88% 15%, rgba(22,202,46,0.18) 0%, rgba(252,252,252,0) 70%), radial-gradient(70% 55% at 50% 0%, rgba(182,203,253,0.55) 0%, rgba(240,244,254,0.5) 45%, rgba(252,252,252,0) 75%)",
         }}
       />
       <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-10">
         <div className="text-left">
+          <span className="mb-5 inline-flex -rotate-2 items-center gap-1.5 rounded-pill bg-midnight-ink px-4 py-1.5 text-xs font-semibold text-white shadow-product-card">
+            <Zap size={12} className="text-amber-tag" />
+            Made in Nepal, for Nepal
+          </span>
+
           <h1 className="mb-5 text-display text-midnight-ink">
-            Find creators.<br />Post briefs.<br /><span className="text-signal-blue">Connect directly.</span>
+            Find your{" "}
+            <span className="relative inline-block whitespace-nowrap">
+              <span className="absolute inset-x-0 bottom-1 top-1/2 -z-10 -rotate-1 rounded-sm bg-amber-tag/40" />
+              perfect match
+            </span>
+            <br />make something great
           </h1>
 
           <p className="mb-8 max-w-md text-body leading-relaxed text-graphite/80">
-            Byparsathy is where brands and creators meet. Browse by niche, get smart-matched on fit, and run the deal with no middlemen.
+            Brands post briefs. Creators bring the buzz. Byparsathy scores the fit so every collab starts at yes.
           </p>
 
           {isAuthed ? (
             <div className="mb-10 flex flex-wrap items-center gap-4">
               <Link href={dash}>
-                <Button className="h-12 px-6 text-base">Open dashboard</Button>
+                <Button className="h-12 px-7 text-base shadow-product-card">Open dashboard</Button>
               </Link>
             </div>
           ) : (
             <div className="mb-10 grid max-w-md grid-cols-2 gap-3">
               <Link
                 href="/register?role=BUSINESS"
-                className="group rounded-cards border border-steel/10 bg-white p-4 shadow-product-card transition-all hover:-translate-y-0.5 hover:border-signal-blue/40"
+                className="group rounded-cards border-2 border-midnight-ink/80 bg-white p-4 shadow-product-card transition-all hover:-translate-y-1 hover:rotate-1"
               >
-                <p className="font-medium text-graphite">I am a brand</p>
-                <p className="mt-0.5 text-xs text-ash">Find creators <ArrowUpRight size={11} className="inline text-signal-blue" /></p>
+                <p className="font-semibold text-graphite">I am a brand</p>
+                <p className="mt-0.5 text-xs text-ash">Hire creators <ArrowUpRight size={11} className="inline text-signal-blue" /></p>
               </Link>
               <Link
                 href="/register?role=PROMOTER"
-                className="group rounded-cards bg-midnight-ink p-4 shadow-product-card transition-all hover:-translate-y-0.5"
+                className="group rounded-cards bg-signal-blue p-4 shadow-product-card transition-all hover:-translate-y-1 hover:-rotate-1"
               >
-                <p className="font-medium text-white">I am a creator</p>
-                <p className="mt-0.5 text-xs text-white/60">Get discovered <ArrowUpRight size={11} className="inline" /></p>
+                <p className="font-semibold text-white">I am a creator</p>
+                <p className="mt-0.5 text-xs text-white/70">Get hired <ArrowUpRight size={11} className="inline" /></p>
               </Link>
             </div>
           )}
 
-          <div className="flex flex-col gap-2.5">
-            {["Free to join for everyone", "Verified profiles only", "Your deal, your terms"].map((t) => (
-              <span key={t} className="inline-flex items-center gap-2 text-sm text-ash">
-                <Check size={15} className="flex-shrink-0 text-emerald-status" />
-                {t}
-              </span>
-            ))}
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-2.5">
+              {[
+                "https://randomuser.me/api/portraits/women/44.jpg",
+                "https://randomuser.me/api/portraits/men/32.jpg",
+                "https://randomuser.me/api/portraits/women/68.jpg",
+                "https://randomuser.me/api/portraits/men/75.jpg",
+              ].map((src) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={src} src={src} alt="Creator" loading="lazy" className="h-9 w-9 rounded-full border-2 border-linen-canvas object-cover" />
+              ))}
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-linen-canvas bg-emerald-status text-[10px] font-semibold text-white">+9</span>
+            </div>
+            <p className="text-xs leading-snug text-ash">Creators getting<br />hired this week</p>
           </div>
         </div>
 
-        <div id="match">
-          <MatchLab />
-        </div>
+        <MatchLab />
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------- ticker ---------------------------------- */
+
+const TICKS = [
+  { text: "Supriya booked a festival collab", dot: "bg-amber-tag" },
+  { text: "Aashish hit 89% on a gadget brief", dot: "bg-signal-blue" },
+  { text: "Divya got verified", dot: "bg-emerald-status" },
+  { text: "Niraj published a travel reel", dot: "bg-coral-alert" },
+  { text: "Kabita landed her first brand deal", dot: "bg-amber-tag" },
+];
+
+function Ticker() {
+  const row = [...TICKS, ...TICKS];
+  return (
+    <section aria-label="Marketplace activity" className="overflow-hidden border-y-2 border-midnight-ink/80 bg-white py-4">
+      <div className="animate-marquee-x flex w-max items-center gap-8 pr-8">
+        {row.map((t, i) => (
+          <span key={i} className="flex items-center gap-2.5 whitespace-nowrap text-sm font-medium text-graphite">
+            <span className={`inline-block h-2 w-2 rounded-full ${t.dot}`} />
+            {t.text}
+          </span>
+        ))}
       </div>
     </section>
   );
@@ -345,41 +402,45 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
 /* -------------------------------- spotlight -------------------------------- */
 
 const SPOTLIGHT = [
-  { name: "Supriya Thapa", niche: "Food", location: "Kathmandu", followers: "42K", rating: "4.9", img: "https://randomuser.me/api/portraits/women/44.jpg" },
-  { name: "Aashish Karki", niche: "Tech", location: "Lalitpur", followers: "31K", rating: "4.8", img: "https://randomuser.me/api/portraits/men/32.jpg" },
-  { name: "Niraj Tamang", niche: "Travel", location: "Pokhara", followers: "28K", rating: "4.9", img: "https://randomuser.me/api/portraits/men/75.jpg" },
-  { name: "Divya Shrestha", niche: "Fashion", location: "Kathmandu", followers: "56K", rating: "5.0", img: "https://randomuser.me/api/portraits/women/68.jpg" },
-  { name: "Kabita Rai", niche: "Wellness", location: "Bhaktapur", followers: "15K", rating: "4.8", img: "https://randomuser.me/api/portraits/women/17.jpg" },
+  { name: "Supriya Thapa", niche: "Food", tag: "bg-amber-tag/15 text-amber-tag", location: "Kathmandu", followers: "42K", rating: "4.9", img: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { name: "Aashish Karki", niche: "Tech", tag: "bg-signal-blue/10 text-signal-blue", location: "Lalitpur", followers: "31K", rating: "4.8", img: "https://randomuser.me/api/portraits/men/32.jpg" },
+  { name: "Niraj Tamang", niche: "Travel", tag: "bg-emerald-status/10 text-emerald-status", location: "Pokhara", followers: "28K", rating: "4.9", img: "https://randomuser.me/api/portraits/men/75.jpg" },
+  { name: "Divya Shrestha", niche: "Fashion", tag: "bg-coral-alert/10 text-coral-alert", location: "Kathmandu", followers: "56K", rating: "5.0", img: "https://randomuser.me/api/portraits/women/68.jpg" },
+  { name: "Kabita Rai", niche: "Wellness", tag: "bg-amber-tag/15 text-amber-tag", location: "Bhaktapur", followers: "15K", rating: "4.8", img: "https://randomuser.me/api/portraits/women/17.jpg" },
 ];
 
 function Spotlight() {
   return (
-    <section id="creators" className="overflow-hidden border-y border-steel/10 bg-white py-20 lg:py-24">
+    <section id="creators" className="overflow-hidden bg-linen-canvas py-20 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="mb-2 text-heading-lg text-midnight-ink">Creators ready to collaborate</h2>
-            <p className="max-w-md text-body text-ash">Verified profiles across every major niche, with audiences and track records you can see.</p>
+            <p className="mb-2 inline-block -rotate-2 rounded-pill bg-emerald-status px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">Fresh faces</p>
+            <h2 className="text-heading-lg text-midnight-ink">Creators brands love</h2>
           </div>
-          <Link href="/register?role=BUSINESS" className="inline-flex items-center gap-1.5 text-sm font-medium text-signal-blue hover:opacity-80">
-            Browse as a brand <ArrowRight size={15} />
+          <Link href="/register?role=BUSINESS" className="inline-flex items-center gap-1.5 text-sm font-semibold text-signal-blue hover:opacity-80">
+            Hire one <ArrowRight size={15} />
           </Link>
         </div>
       </div>
       <div className="overflow-x-auto pb-2">
-        <div className="flex w-max gap-4 px-6 lg:mx-auto lg:w-full lg:max-w-[1200px] lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-6">
-          {SPOTLIGHT.map((c) => (
-            <div key={c.name} className="w-52 flex-shrink-0 overflow-hidden rounded-cards border border-steel/10 bg-linen-canvas lg:w-auto">
+        <div className="flex w-max gap-4 px-6 lg:mx-auto lg:w-full lg:max-w-[1200px] lg:grid lg:grid-cols-5 lg:overflow-visible">
+          {SPOTLIGHT.map((c, i) => (
+            <div
+              key={c.name}
+              className={`w-52 flex-shrink-0 overflow-hidden rounded-cards-lg border-2 border-midnight-ink/80 bg-white transition-transform hover:-translate-y-1.5 hover:rotate-1 lg:w-auto ${i % 2 === 1 ? "lg:translate-y-4" : ""}`}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={c.img} alt={`${c.name}, ${c.niche} creator`} loading="lazy" className="h-44 w-full object-cover" />
               <div className="p-4">
-                <p className="truncate text-sm font-medium text-graphite">{c.name}</p>
+                <span className={`mb-2 inline-block rounded-badges px-2 py-0.5 text-[11px] font-semibold ${c.tag}`}>{c.niche}</span>
+                <p className="truncate text-sm font-semibold text-graphite">{c.name}</p>
                 <p className="mt-0.5 flex items-center gap-1 text-xs text-ash">
-                  {c.niche} · <MapPin size={10} /> {c.location}
+                  <MapPin size={10} /> {c.location}
                 </p>
-                <div className="mt-3 flex items-center justify-between border-t border-steel/10 pt-3">
+                <div className="mt-3 flex items-center justify-between border-t-2 border-dashed border-steel/15 pt-3">
                   <span className="font-roboto-mono text-xs text-graphite">{c.followers}</span>
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-tag">
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-tag">
                     <Star size={12} className="fill-amber-tag" /> {c.rating}
                   </span>
                 </div>
@@ -392,22 +453,22 @@ function Spotlight() {
   );
 }
 
-/* ------------------------------- trust band -------------------------------- */
+/* -------------------------------- trust band ------------------------------- */
 
 const TRUST = [
-  { value: "Rs 0", label: "to join, for brands and creators" },
-  { value: "100", label: "point scoring on every match" },
-  { value: "1", label: "workspace from brief to review" },
+  { value: "Rs 0", label: "to join, brands and creators", bg: "bg-amber-tag/15", text: "text-amber-tag" },
+  { value: "100", label: "point scoring on every match", bg: "bg-signal-blue/10", text: "text-signal-blue" },
+  { value: "2-way", label: "reviews keep everyone honest", bg: "bg-emerald-status/10", text: "text-emerald-status" },
 ];
 
 function TrustBand() {
   return (
-    <section className="bg-linen-canvas py-16 lg:py-20">
-      <div className="mx-auto grid max-w-[1200px] gap-10 px-6 text-center sm:grid-cols-3">
+    <section className="bg-white py-16 lg:py-20">
+      <div className="mx-auto grid max-w-[1200px] gap-4 px-6 text-center sm:grid-cols-3">
         {TRUST.map((t) => (
-          <div key={t.label}>
-            <p className="font-roboto-mono mb-2 text-heading-lg text-midnight-ink">{t.value}</p>
-            <p className="mx-auto max-w-[220px] text-sm text-ash">{t.label}</p>
+          <div key={t.label} className={`rounded-cards-lg border-2 border-midnight-ink/80 p-8 ${t.bg}`}>
+            <p className={`font-roboto-mono mb-2 text-heading-lg ${t.text}`}>{t.value}</p>
+            <p className="mx-auto max-w-[220px] text-sm font-medium text-graphite">{t.label}</p>
           </div>
         ))}
       </div>
@@ -415,118 +476,111 @@ function TrustBand() {
   );
 }
 
-/* --------------------------------- brands ---------------------------------- */
-
-const BRAND_POINTS = [
-  "Search creators by niche, audience, and location",
-  "Every application arrives with a match score",
-  "Direct chat, clear deliverables, honest reviews",
-];
+/* ------------------------------ brands/creators ----------------------------- */
 
 function Brands() {
   return (
-    <section id="brands" className="bg-white py-20 lg:py-28">
+    <section id="brands" className="bg-sky-wash/50 py-20 lg:py-28">
       <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-6 lg:grid-cols-2 lg:gap-16">
         <div>
-          <p className="mb-2 text-caption font-medium uppercase tracking-wide text-signal-blue">For brands</p>
-          <h2 className="mb-4 text-heading-lg text-midnight-ink">Authentic voices for your story</h2>
+          <p className="mb-2 inline-block rotate-2 rounded-pill bg-signal-blue px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">For brands</p>
+          <h2 className="mb-4 text-heading-lg text-midnight-ink">Fill your feed with fans</h2>
           <p className="mb-6 max-w-md text-body leading-relaxed text-steel">
-            Read past reviews, compare audiences, and send a brief in minutes. The terms you agree are the terms you keep.
+            Post one brief and watch ranked creators roll in. Chat, approve, publish, all in a single happy thread.
           </p>
           <ul className="mb-8 flex flex-col gap-3">
-            {BRAND_POINTS.map((p) => (
-              <li key={p} className="flex items-start gap-2.5 text-sm text-graphite">
-                <Check size={15} className="mt-0.5 flex-shrink-0 text-emerald-status" />
+            {["Ranked shortlists in hours, not weeks", "Chat and approvals in one place", "Pay for buzz, not guesswork"].map((p) => (
+              <li key={p} className="flex items-start gap-2.5 text-sm font-medium text-graphite">
+                <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-status/15">
+                  <Check size={12} className="text-emerald-status" />
+                </span>
                 {p}
               </li>
             ))}
           </ul>
           <Link href="/register?role=BUSINESS">
-            <Button>
-              <span className="flex items-center gap-2">Explore for brands <ArrowRight size={16} /></span>
+            <Button className="shadow-product-card">
+              <span className="flex items-center gap-2">Start hiring <ArrowRight size={16} /></span>
             </Button>
           </Link>
         </div>
-        <div className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-6 shadow-product-card sm:p-7">
-          <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">Sample brief</p>
+        <div className="-rotate-1 rounded-cards-lg border-2 border-midnight-ink/80 bg-white p-6 shadow-feature-section sm:p-7">
+          <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">This week on your brief</p>
           <p className="mb-4 text-heading-sm text-graphite">Festival snack launch</p>
           <div className="flex flex-col gap-2">
             {[
-              { name: "Supriya Thapa", score: 96 },
-              { name: "Kabita Rai", score: 90 },
-              { name: "Divya Shrestha", score: 84 },
+              { name: "Supriya Thapa", score: 96, bar: "bg-amber-tag" },
+              { name: "Kabita Rai", score: 90, bar: "bg-emerald-status" },
+              { name: "Divya Shrestha", score: 84, bar: "bg-signal-blue" },
             ].map((m, i) => (
-              <div key={m.name} className="flex items-center justify-between rounded-cards border border-steel/10 bg-white px-4 py-3">
-                <span className="flex items-center gap-3 text-sm font-medium text-graphite">
-                  <span className="font-roboto-mono text-xs text-fog">0{i + 1}</span>
-                  {m.name}
-                </span>
-                <span className="font-roboto-mono text-sm text-signal-blue">{m.score}%</span>
+              <div key={m.name} className="rounded-cards border border-steel/10 bg-linen-canvas px-4 py-3">
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="flex items-center gap-3 text-sm font-semibold text-graphite">
+                    <span className="font-roboto-mono text-xs text-fog">0{i + 1}</span>
+                    {m.name}
+                  </span>
+                  <span className="font-roboto-mono text-sm text-signal-blue">{m.score}%</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-white">
+                  <div className={`h-full rounded-full ${m.bar}`} style={{ width: `${m.score}%` }} />
+                </div>
               </div>
             ))}
           </div>
-          <p className="mt-4 text-center text-xs text-ash">Ranked by fit to your brief</p>
         </div>
       </div>
     </section>
   );
 }
 
-/* -------------------------------- creators --------------------------------- */
-
-const CREATOR_POINTS = [
-  "One profile puts you in front of hiring brands",
-  "Apply to matched campaigns in one click",
-  "Reviews compound into rates you set yourself",
-];
-
 function Creators() {
   return (
-    <section className="bg-sky-wash/40 py-20 lg:py-28">
+    <section className="bg-linen-canvas py-20 lg:py-28">
       <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-6 lg:grid-cols-2 lg:gap-16">
-        <div className="order-2 rounded-cards-lg border border-steel/10 bg-white p-6 shadow-product-card sm:p-7 lg:order-1">
-          <p className="mb-1 text-caption font-medium uppercase tracking-wide text-ash">Creator profile</p>
+        <div className="order-2 rotate-1 rounded-cards-lg border-2 border-midnight-ink/80 bg-white p-6 shadow-feature-section sm:p-7 lg:order-1">
           <div className="mb-4 flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Creator profile preview" loading="lazy" className="h-12 w-12 rounded-full object-cover" />
+            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Creator profile preview" loading="lazy" className="h-12 w-12 rounded-full border-2 border-amber-tag object-cover" />
             <div>
-              <p className="text-sm font-medium text-graphite">Supriya Thapa</p>
+              <p className="text-sm font-semibold text-graphite">Supriya Thapa</p>
               <p className="text-xs text-ash">Food · Kathmandu</p>
             </div>
-            <span className="ml-auto inline-flex items-center gap-1 rounded-badges bg-emerald-status/10 px-2 py-0.5 text-xs font-medium text-emerald-status">
-              <Check size={11} /> Verified
+            <span className="ml-auto inline-flex -rotate-3 items-center gap-1 rounded-pill bg-emerald-status px-2.5 py-1 text-[11px] font-semibold text-white">
+              <Heart size={10} className="fill-white" /> Verified
             </span>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { k: "Followers", v: "42K" },
-              { k: "Rating", v: "4.9" },
-              { k: "Collabs", v: "18" },
+              { k: "Followers", v: "42K", bg: "bg-amber-tag/15" },
+              { k: "Rating", v: "4.9", bg: "bg-signal-blue/10" },
+              { k: "Collabs", v: "18", bg: "bg-emerald-status/10" },
             ].map((s) => (
-              <div key={s.k} className="rounded-cards bg-linen-canvas p-3 text-center">
+              <div key={s.k} className={`rounded-cards ${s.bg} p-3 text-center`}>
                 <p className="font-roboto-mono text-sm font-medium text-graphite">{s.v}</p>
-                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-ash">{s.k}</p>
+                <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-ash">{s.k}</p>
               </div>
             ))}
           </div>
         </div>
         <div className="order-1 lg:order-2">
-          <p className="mb-2 text-caption font-medium uppercase tracking-wide text-emerald-status">For creators</p>
-          <h2 className="mb-4 text-heading-lg text-midnight-ink">Get discovered in your niche</h2>
+          <p className="mb-2 inline-block -rotate-2 rounded-pill bg-coral-alert px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">For creators</p>
+          <h2 className="mb-4 text-heading-lg text-midnight-ink">Your audience pays rent now</h2>
           <p className="mb-6 max-w-md text-body leading-relaxed text-steel">
-            Real brands browse by what you actually do. No follower-count gatekeeping, no agency cut.
+            One profile, zero gatekeeping. Brands find you by vibe and numbers, then the deals roll in.
           </p>
           <ul className="mb-8 flex flex-col gap-3">
-            {CREATOR_POINTS.map((p) => (
-              <li key={p} className="flex items-start gap-2.5 text-sm text-graphite">
-                <Check size={15} className="mt-0.5 flex-shrink-0 text-emerald-status" />
+            {["Discovered by niche, not follower count", "One-click applies to matched briefs", "Reviews that raise your rates"].map((p) => (
+              <li key={p} className="flex items-start gap-2.5 text-sm font-medium text-graphite">
+                <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-amber-tag/20">
+                  <Check size={12} className="text-amber-tag" />
+                </span>
                 {p}
               </li>
             ))}
           </ul>
           <Link href="/register?role=PROMOTER">
-            <Button>
-              <span className="flex items-center gap-2">Create creator profile <ArrowRight size={16} /></span>
+            <Button className="bg-midnight-ink shadow-product-card">
+              <span className="flex items-center gap-2">Join the fun <ArrowRight size={16} /></span>
             </Button>
           </Link>
         </div>
@@ -538,10 +592,10 @@ function Creators() {
 /* ---------------------------------- steps ---------------------------------- */
 
 const STEPS = [
-  { title: "Create your profile", desc: "Business or creator, done in minutes." },
-  { title: "Match and apply", desc: "Scores guide both sides to the fit." },
-  { title: "Deliver together", desc: "Briefs, drafts, and approvals in one thread." },
-  { title: "Review and repeat", desc: "Every collaboration builds your record." },
+  { title: "Say hello", desc: "A profile takes minutes, promise.", bg: "bg-amber-tag", tilt: "-rotate-2" },
+  { title: "Match up", desc: "Scores point both sides to the one.", bg: "bg-signal-blue", tilt: "rotate-2" },
+  { title: "Make stuff", desc: "Briefs, drafts, and high fives in one thread.", bg: "bg-emerald-status", tilt: "-rotate-2" },
+  { title: "Glow up", desc: "Reviews stack up and rates follow.", bg: "bg-coral-alert", tilt: "rotate-2" },
 ];
 
 function HowItWorks() {
@@ -549,12 +603,14 @@ function HowItWorks() {
     <section id="how" className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
         <h2 className="mx-auto mb-12 max-w-xl text-center text-heading-lg text-midnight-ink">
-          From signup to published
+          Easy as one, two, yum
         </h2>
-        <ol className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+        <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
-            <li key={s.title} className="rounded-cards border border-steel/10 bg-linen-canvas p-6">
-              <p className="font-roboto-mono mb-3 text-sm text-signal-blue">0{i + 1}</p>
+            <li key={s.title} className={`rounded-cards-lg border-2 border-midnight-ink/80 bg-linen-canvas p-6 transition-transform hover:-translate-y-1.5 ${s.tilt} hover:rotate-0`}>
+              <span className={`font-roboto-mono mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium text-white ${s.bg}`}>
+                {i + 1}
+              </span>
               <h3 className="mb-1.5 text-heading-sm text-graphite">{s.title}</h3>
               <p className="text-sm leading-relaxed text-ash">{s.desc}</p>
             </li>
@@ -584,32 +640,30 @@ const FAQS = [
     q: "How do creators get paid?",
     a: "Terms are agreed inside the collaboration before work starts, and reviews on completion build the record both sides rely on.",
   },
-  {
-    q: "What stops fake followers?",
-    a: "Promoters pass identity and audience verification before they can apply, and review history is visible to hiring businesses.",
-  },
 ];
 
 function Faq() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="bg-linen-canvas py-20 lg:py-28">
+    <section id="faq" className="bg-sky-wash/50 py-20 lg:py-28">
       <div className="mx-auto max-w-[800px] px-6">
-        <h2 className="mb-10 text-center text-heading-lg text-midnight-ink">Questions, answered</h2>
+        <h2 className="mb-10 text-center text-heading-lg text-midnight-ink">Curious minds ask</h2>
         <div className="flex flex-col gap-3">
           {FAQS.map((f, i) => {
             const isOpen = open === i;
             return (
               <div
                 key={f.q}
-                className={`overflow-hidden rounded-cards border transition-colors ${isOpen ? "border-signal-blue/30 bg-sky-wash/40" : "border-steel/10 bg-white"}`}
+                className={`overflow-hidden rounded-cards border-2 transition-all ${isOpen ? "rotate-0 border-midnight-ink/80 bg-white shadow-product-card" : "border-steel/10 bg-white/70 -rotate-[0.5deg]"}`}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
                   className="flex w-full items-center justify-between gap-4 p-5 text-left"
                 >
                   <span className="text-heading-sm text-graphite">{f.q}</span>
-                  <ChevronDown size={18} className={`flex-shrink-0 text-signal-blue transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                  <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full transition-colors ${isOpen ? "bg-signal-blue text-white" : "bg-sky-wash text-signal-blue"}`}>
+                    <ChevronDown size={16} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                  </span>
                 </button>
                 {isOpen && (
                   <p className="animate-fade-slide-up px-5 pb-5 text-sm leading-relaxed text-ash">{f.a}</p>
@@ -628,28 +682,36 @@ function Faq() {
 function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
   return (
-    <section className="bg-white py-20 lg:py-28">
+    <section className="bg-linen-canvas py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
-        <div className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-12 text-center shadow-feature-section lg:p-16">
-          <div className="mx-auto mb-6 flex max-w-md items-center justify-center gap-3">
-            <Link href="/register?role=BUSINESS" className="flex-1 rounded-buttons border border-steel/15 bg-white px-4 py-3 text-sm font-medium text-graphite transition-colors hover:border-signal-blue/50">
-              I am a brand
-            </Link>
-            <Link href="/register?role=PROMOTER" className="flex-1 rounded-buttons bg-midnight-ink px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90">
-              I am a creator
-            </Link>
+        <div className="relative overflow-hidden rounded-cards-lg bg-signal-blue p-12 text-center shadow-feature-section lg:p-16">
+          <span className="absolute -left-6 -top-6 h-28 w-28 rounded-full bg-white/10" />
+          <span className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/10" />
+          <span className="absolute right-10 top-8 hidden rotate-12 rounded-pill bg-amber-tag px-4 py-1.5 text-xs font-semibold text-white sm:block">
+            Free to join
+          </span>
+          <div className="relative">
+            <h2 className="mx-auto mb-4 max-w-xl text-heading-lg text-white">
+              Come for the match, stay for the magic
+            </h2>
+            <p className="mx-auto mb-8 max-w-md text-body text-white/80">
+              Pick a side. Your first collaboration is minutes away.
+            </p>
+            {isAuthed ? (
+              <Link href={dash}>
+                <Button className="h-12 bg-white px-6 text-base font-semibold text-signal-blue hover:opacity-90">Open dashboard</Button>
+              </Link>
+            ) : (
+              <div className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row">
+                <Link href="/register?role=BUSINESS" className="flex-1 rounded-buttons bg-white px-4 py-3 text-sm font-semibold text-signal-blue transition-transform hover:-translate-y-0.5">
+                  I am a brand
+                </Link>
+                <Link href="/register?role=PROMOTER" className="flex-1 rounded-buttons bg-midnight-ink px-4 py-3 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">
+                  I am a creator
+                </Link>
+              </div>
+            )}
           </div>
-          <h2 className="mx-auto mb-4 max-w-xl text-heading-lg text-midnight-ink">
-            Your next collaboration starts here
-          </h2>
-          <p className="mx-auto mb-2 max-w-md text-body text-ash">
-            Free to join. No middlemen. Pick your side to begin.
-          </p>
-          {isAuthed && (
-            <Link href={dash} className="mt-6 inline-block">
-              <Button className="h-12 px-6 text-base">Open dashboard</Button>
-            </Link>
-          )}
         </div>
       </div>
     </section>
@@ -661,7 +723,6 @@ function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
 function Footer() {
   const cols = [
     { title: "Platform", links: [
-      { label: "Matching", href: "#match" },
       { label: "Creators", href: "#creators" },
       { label: "For Brands", href: "#brands" },
       { label: "How it works", href: "#how" },
@@ -676,21 +737,21 @@ function Footer() {
     ] },
   ];
   return (
-    <footer className="border-t border-steel/10 bg-white">
+    <footer className="border-t-2 border-midnight-ink/80 bg-white">
       <div className="mx-auto max-w-[1200px] px-6 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           <div>
-            <p className="flex items-center gap-2 text-lg font-medium text-signal-blue">
-              <span className="flex h-7 w-7 items-center justify-center rounded-buttons bg-signal-blue text-sm font-semibold text-white">B</span>
+            <p className="flex items-center gap-2 text-lg font-medium text-midnight-ink">
+              <span className="-rotate-6 flex h-7 w-7 items-center justify-center rounded-buttons bg-signal-blue text-sm font-semibold text-white">B</span>
               Byparsathy
             </p>
             <p className="mt-2 max-w-xs text-sm text-ash">
-              The creator and brand collaboration platform. Direct connections, smart matching.
+              Where brands meet creators and great collabs happen.
             </p>
           </div>
           {cols.map((col) => (
             <div key={col.title}>
-              <h4 className="mb-4 text-caption font-medium uppercase tracking-wider text-graphite">{col.title}</h4>
+              <h4 className="mb-4 text-caption font-semibold uppercase tracking-wider text-graphite">{col.title}</h4>
               <ul className="space-y-2">
                 {col.links.map((link) => (
                   <li key={link.label}>
@@ -711,7 +772,9 @@ function Footer() {
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-steel/10 pt-8 sm:flex-row">
           <p className="text-xs text-ash">© {new Date().getFullYear()} Byparsathy. All rights reserved.</p>
-          <p className="text-xs text-ash">Made in Nepal</p>
+          <p className="inline-flex items-center gap-1.5 text-xs font-medium text-ash">
+            Made with <Heart size={12} className="fill-coral-alert text-coral-alert" /> in Nepal
+          </p>
         </div>
       </div>
     </footer>
@@ -731,6 +794,7 @@ export default function LandingPage() {
       <LandingNav isAuthed={isAuthed} role={user?.role} />
       <main>
         <Hero isAuthed={isAuthed} role={user?.role} />
+        <Ticker />
         <Spotlight />
         <TrustBand />
         <Brands />
