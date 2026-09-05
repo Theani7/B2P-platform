@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { use } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { useAuth } from "@/providers/AuthProvider";
 import { Role } from "@/lib/roles";
-import { usePublicPromoterProfile, useSavePromoter } from "@/features/discovery/api";
+import { usePublicPromoterProfile, useSavePromoter, useRemoveSavedPromoter, useSavedPromoters } from "@/features/discovery/api";
 import { useUserRating } from "@/features/reviews/api";
 import { RatingStars } from "@/components/reviews/RatingStars";
 import InvitePromoterModal from "@/components/discovery/InvitePromoterModal";
@@ -15,7 +15,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { notifySuccess, notifyError } from "@/lib/notify";
-import { MapPin, Users, TrendingUp, Briefcase, LinkIcon, Camera, Music, Video, Globe, MessageSquare, Send, Check } from "lucide-react";
+import { MapPin, Users, TrendingUp, Briefcase, LinkIcon, Camera, Music, Video, Globe, MessageSquare, Send, Check, Bookmark } from "lucide-react";
 
 function formatCompactNumber(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -40,18 +40,46 @@ function PromoterProfileInner({ username }: { username: string }) {
   const { data: profile, isLoading, isError } = usePublicPromoterProfile(username);
   const { data: ratingSummary } = useUserRating(profile?.userId ?? "");
   const savePromoter = useSavePromoter();
+  const removePromoter = useRemoveSavedPromoter();
+  const { data: savedData } = useSavedPromoters({ limit: 100 });
+  const [isSaved, setIsSaved] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (profile && savedData?.items) {
+      setIsSaved(
+        savedData.items.some(
+          (p: any) => p.promoterProfileId === profile.id || p.promoterProfile?.id === profile.id
+        )
+      );
+    }
+  }, [profile, savedData]);
 
   if (isLoading) return <Spinner />;
   if (isError || !profile)
     return <p className="text-body text-coral-alert">Could not load this promoter.</p>;
 
-  const handleSave = () => {
+  const handleToggleSave = () => {
     if (!profile) return;
-    savePromoter.mutate(profile.id, {
-      onSuccess: () => notifySuccess("Promoter saved to shortlist"),
-      onError: (e: any) => notifyError(e?.message ?? "Failed to save"),
-    });
+    if (isSaved) {
+      setIsSaved(false);
+      removePromoter.mutate(profile.id, {
+        onSuccess: () => notifySuccess("Promoter removed from shortlist"),
+        onError: (e: any) => {
+          setIsSaved(true);
+          notifyError(e?.response?.data?.message ?? "Failed to remove");
+        },
+      });
+    } else {
+      setIsSaved(true);
+      savePromoter.mutate(profile.id, {
+        onSuccess: () => notifySuccess("Promoter saved to shortlist"),
+        onError: (e: any) => {
+          setIsSaved(false);
+          notifyError(e?.response?.data?.message ?? "Failed to save");
+        },
+      });
+    }
   };
 
   return (
@@ -105,11 +133,16 @@ function PromoterProfileInner({ username }: { username: string }) {
                 {user?.role === Role.BUSINESS && (
                   <>
                     <button
-                      onClick={handleSave}
-                      disabled={savePromoter.isPending}
-                      className="rounded bg-steel/10 px-4 py-2 text-sm font-medium text-graphite transition-colors hover:bg-steel/20 disabled:opacity-50"
+                      onClick={handleToggleSave}
+                      disabled={savePromoter.isPending || removePromoter.isPending}
+                      className={`flex items-center gap-1.5 rounded px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${
+                        isSaved
+                          ? "bg-sky-wash text-signal-blue border border-signal-blue/30 hover:bg-sky-wash/80"
+                          : "bg-steel/10 text-graphite hover:bg-steel/20"
+                      }`}
                     >
-                      Save to Shortlist
+                      <Bookmark size={15} className={isSaved ? "fill-current" : ""} />
+                      {isSaved ? "Saved to Shortlist" : "Save to Shortlist"}
                     </button>
                     <button
                       onClick={() => setIsInviteModalOpen(true)}

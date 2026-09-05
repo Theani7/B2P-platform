@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSavedPromoters, useRemoveSavedPromoter } from "@/features/discovery/api";
 import { SkeletonCards } from "@/components/ui/Skeleton";
 import { Avatar } from "@/components/ui/Avatar";
@@ -30,9 +30,14 @@ export function SavedPromotersList() {
   const [page, setPage] = useState(1);
   const [nicheFilter, setNicheFilter] = useState("");
   const [sortFilter, setSortFilter] = useState("newest");
+  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
 
   const { data, isLoading, error } = useSavedPromoters({ search: search || undefined, page, limit: 12 });
   const removeSaved = useRemoveSavedPromoter();
+
+  useEffect(() => {
+    setRemovedIds(new Set());
+  }, [data]);
 
   if (error) return (
     <div className="flex flex-col items-center justify-center py-16">
@@ -45,18 +50,32 @@ export function SavedPromotersList() {
   );
 
   const handleRemove = (id: string, username: string) => {
+    // Optimistically remove from view immediately
+    setRemovedIds((prev) => new Set(prev).add(id));
     removeSaved.mutate(id, {
       onSuccess: () => notifySuccess(`${username} removed from shortlist`),
-      onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed to remove"),
+      onError: (e: any) => {
+        setRemovedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+        notifyError(e?.response?.data?.message ?? "Failed to remove");
+      },
     });
   };
 
   const filteredPromoters = (() => {
     if (!data?.items) return [];
-    let items = data.items.map((item: any) => ({
-      ...(item.promoterProfile || item.promoter || {}),
-      savedId: item.id
-    }));
+    let items = data.items
+      .filter((item: any) => {
+        const promoterId = item.promoterProfileId || item.promoterProfile?.id || item.id;
+        return !removedIds.has(promoterId);
+      })
+      .map((item: any) => ({
+        ...(item.promoterProfile || item.promoter || {}),
+        savedId: item.promoterProfileId || item.id,
+      }));
     if (nicheFilter) items = items.filter((p: any) => p.niche === nicheFilter);
     if (sortFilter === "followers") items.sort((a: any, b: any) => (b.followersCount || 0) - (a.followersCount || 0));
     else if (sortFilter === "engagement") items.sort((a: any, b: any) => (b.engagementRate || 0) - (a.engagementRate || 0));

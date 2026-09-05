@@ -114,8 +114,8 @@ export const useSavePromoter = () => {
   return useMutation<void, Error, string>({
     mutationFn: (promoterId) => api.post(`/business/saved-promoters/${promoterId}`),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["saved-promoters"] });
-      qc.invalidateQueries({ queryKey: ["promoter-directory"] });
+      qc.invalidateQueries({ queryKey: ["saved-promoters"], refetchType: "all" });
+      qc.invalidateQueries({ queryKey: ["promoter-directory"], refetchType: "all" });
     },
   });
 };
@@ -125,8 +125,8 @@ export const useRemoveSavedPromoter = () => {
   return useMutation<void, Error, string>({
     mutationFn: (promoterId) => api.delete(`/business/saved-promoters/${promoterId}`),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["saved-promoters"] });
-      qc.invalidateQueries({ queryKey: ["promoter-directory"] });
+      qc.invalidateQueries({ queryKey: ["saved-promoters"], refetchType: "all" });
+      qc.invalidateQueries({ queryKey: ["promoter-directory"], refetchType: "all" });
     },
   });
 };
@@ -135,4 +135,5 @@ export const useSavedPromoters = (params: { search?: string; page?: number; limi
   useQuery<PromoterDirectoryResponse>({
     queryKey: ["saved-promoters", params],
     queryFn: () => api.get("/business/saved-promoters", { params }).then((r) => r.data),
+    staleTime: 0,
   });

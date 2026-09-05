@@ -17,7 +17,7 @@ router.delete("/profile", controllers.deleteProfile);
 
 router.post("/saved-promoters/:promoterId", controllers.addSavedPromoter);
 router.delete("/saved-promoters/:promoterId", controllers.deleteSavedPromoter);
-router.get("/saved-promoters", validate(savedQuerySchema), controllers.listSavedPromoters);
+router.get("/saved-promoters", validate(savedQuerySchema, "query"), controllers.listSavedPromoters);
 
 router.get("/analytics", controllers.analytics);
 

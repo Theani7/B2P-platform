@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePromoterDirectory, useSavePromoter, useRemoveSavedPromoter, useSavedPromoters, type DirectorySearchParams } from "@/features/discovery/api";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -55,21 +55,47 @@ export function PromoterDirectoryList() {
   });
 
   const { data: savedData } = useSavedPromoters({ limit: 100 });
-  const savedPromoterIds = new Set(savedData?.items?.map((p: any) => p.promoterProfileId) || []);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (savedData?.items) {
+      setSavedIds(new Set(savedData.items.map((p: any) => p.promoterProfileId || p.id || p.promoterProfile?.id)));
+    }
+  }, [savedData]);
 
   const savePromoter = useSavePromoter();
   const removePromoter = useRemoveSavedPromoter();
 
   const handleSave = (id: string) => {
-    if (savedPromoterIds.has(id)) {
+    const isCurrentlySaved = savedIds.has(id);
+
+    // Optimistically update React state immediately
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (isCurrentlySaved) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+    if (isCurrentlySaved) {
       removePromoter.mutate(id, {
-        onSuccess: () => { notifySuccess("Promoter removed from shortlist"); savedPromoterIds.delete(id); },
-        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed"),
+        onSuccess: () => notifySuccess("Promoter removed from shortlist"),
+        onError: (e: any) => {
+          setSavedIds((prev) => new Set(prev).add(id));
+          notifyError(e?.response?.data?.message ?? "Failed to remove promoter");
+        },
       });
     } else {
       savePromoter.mutate(id, {
-        onSuccess: () => { notifySuccess("Promoter saved to shortlist!"); savedPromoterIds.add(id); },
-        onError: (e: any) => notifyError(e?.response?.data?.message ?? "Failed"),
+        onSuccess: () => notifySuccess("Promoter saved to shortlist!"),
+        onError: (e: any) => {
+          setSavedIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+          notifyError(e?.response?.data?.message ?? "Failed to save promoter");
+        },
       });
     }
   };
@@ -181,7 +207,7 @@ export function PromoterDirectoryList() {
                     <div className="flex-1 min-w-0 pt-1">
                       <div className="flex items-center justify-between">
                         <h3 className="text-base font-bold text-graphite truncate group-hover:text-signal-blue transition-colors">{p.username}</h3>
-                        <SaveButton promoterId={p.id} saved={savedPromoterIds.has(p.id)} onToggle={() => handleSave(p.id)} />
+                        <SaveButton promoterId={p.id} saved={savedIds.has(p.id)} onToggle={() => handleSave(p.id)} />
                       </div>
                       <p className="text-xs text-ash mt-0.5 truncate flex items-center gap-1.5">
                         <MapPin size={12} className="text-fog" /> {p.location || "Anywhere"}
@@ -239,7 +265,7 @@ export function PromoterDirectoryList() {
         isOpen={!!drawerPromoter} 
         onClose={() => setDrawerPromoter(null)} 
         promoter={drawerPromoter}
-        isSaved={drawerPromoter ? savedPromoterIds.has(drawerPromoter.id) : false}
+        isSaved={drawerPromoter ? savedIds.has(drawerPromoter.id) : false}
         onSave={(id: string) => { handleSave(id); }}
       />
     </div>
