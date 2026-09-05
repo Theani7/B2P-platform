@@ -5,16 +5,24 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { useCreateSocialLink, useUpdateSocialLink, type SocialLink } from "@/features/social/api";
-import { Music2, Link2, type LucideIcon } from "lucide-react";
+import { Link2 } from "lucide-react";
+import {
+  InstagramLogo,
+  TiktokLogo,
+  YoutubeLogo,
+  FacebookLogo,
+  XLogo,
+  LinkedinLogo,
+} from "@phosphor-icons/react";
 
-export const SOCIAL_PLATFORMS: { key: string; label: string; short: string; tile: string; icon?: LucideIcon }[] = [
-  { key: "INSTAGRAM", label: "Instagram", short: "IG", tile: "bg-gradient-to-tr from-amber-tag to-coral-alert text-white" },
-  { key: "TIKTOK", label: "TikTok", short: "TT", tile: "bg-midnight-ink text-white", icon: Music2 },
-  { key: "YOUTUBE", label: "YouTube", short: "YT", tile: "bg-coral-alert text-white" },
-  { key: "FACEBOOK", label: "Facebook", short: "FB", tile: "bg-signal-blue text-white" },
-  { key: "X", label: "X", short: "X", tile: "bg-graphite text-white" },
-  { key: "LINKEDIN", label: "LinkedIn", short: "IN", tile: "bg-azure-info text-white" },
-];
+export const SOCIAL_PLATFORMS = [
+  { key: "INSTAGRAM", label: "Instagram", icon: InstagramLogo },
+  { key: "TIKTOK", label: "TikTok", icon: TiktokLogo },
+  { key: "YOUTUBE", label: "YouTube", icon: YoutubeLogo },
+  { key: "FACEBOOK", label: "Facebook", icon: FacebookLogo },
+  { key: "X", label: "X", icon: XLogo },
+  { key: "LINKEDIN", label: "LinkedIn", icon: LinkedinLogo },
+] as const;
 
 export type SocialPlatformKey = (typeof SOCIAL_PLATFORMS)[number]["key"];
 
@@ -86,13 +94,10 @@ export function SocialEditor({ link, onDone }: { link?: SocialLink; onDone: () =
                     : "border-slate-custom/20 bg-white text-graphite hover:border-signal-blue hover:bg-sky-wash/30"
                 } ${disabled ? "cursor-not-allowed opacity-40 hover:border-slate-custom/20 hover:bg-white" : ""}`}
               >
-                {p.icon ? (
-                  <p.icon size={16} />
-                ) : (
-                  <span className={`flex h-5 w-8 items-center justify-center rounded-md text-[10px] font-bold ${p.tile}`}>
-                    {p.short}
-                  </span>
-                )}
+                {(() => {
+                  const Glyph = p.icon;
+                  return <Glyph size={18} weight="duotone" />;
+                })()}
                 {p.label}
               </button>
             );
