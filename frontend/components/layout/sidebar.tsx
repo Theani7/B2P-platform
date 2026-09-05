@@ -108,6 +108,12 @@ const promoterSections = [
       { to: "/messages", label: "Messages", icon: MessageSquare },
     ],
   },
+  {
+    title: "Account",
+    links: [
+      { to: "/settings/account", label: "Settings", icon: Settings },
+    ],
+  },
 ];
 
 const adminSections = [

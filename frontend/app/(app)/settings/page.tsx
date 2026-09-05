@@ -345,9 +345,9 @@ function SettingsInner() {
   const { user } = useAuth();
   const isAdmin = user?.role === Role.ADMIN;
 
-  // Promoters have no use for this page — send them home.
+  // Promoters have no use for this page — send them to account settings.
   if (user?.role === Role.PROMOTER) {
-    if (typeof window !== "undefined") window.location.href = "/promoter/dashboard";
+    if (typeof window !== "undefined") window.location.href = "/settings/account";
     return <Spinner />;
   }
 
