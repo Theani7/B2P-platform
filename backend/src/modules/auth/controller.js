@@ -72,8 +72,7 @@ export const resendRegistrationOtp = wrap(async (req, res) => {
   return ok(res, null, "If a pending signup exists, a code was sent");
 });
 
-export const me = wrap(async (req, res) => {
-  const u = req.user;
+export const me = wrap(async (req, res) => {  const u = req.user;
   const safe = {
     id: u.id,
     username: u.username,
@@ -107,6 +106,16 @@ export const updateMe = wrap(async (req, res) => {
     businessProfile: u.businessProfile ?? null,
   };
   return ok(res, safe, "Profile updated");
+});
+
+export const changePassword = wrap(async (req, res) => {
+  const data = await authService.changePassword(req.user.id, req.body.current_password, req.body.new_password);
+  return ok(res, data, "Password changed");
+});
+
+export const deleteMe = wrap(async (req, res) => {
+  const data = await authService.deleteMe(req.user.id, req.body.password);
+  return ok(res, data, "Account deleted");
 });
 
 

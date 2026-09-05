@@ -167,9 +167,8 @@ export async function activateUser(adminUser, userId, req) {
   return { success: true };
 }
 
-export async function deleteUser(adminUser, userId, req) {
-  const user = await getUserOr404(userId);
-  if (user.role === ROLE.ADMIN) throw new AppError("Cannot delete admin users", 400);
+/** Delete a user plus every dependent row. Shared by admin delete and self-service account deletion. */
+export async function deleteUserCascade(user) {
 
   // Explicit cleanup in dependency order: several relations (reviews, messages,
   // likes, campaigns, applications, ...) have no ON DELETE cascade, so a plain
@@ -243,6 +242,15 @@ export async function deleteUser(adminUser, userId, req) {
     // Cascades (profiles, social links, notification prefs, received notifications) delete automatically.
     await tx.user.delete({ where: { id: user.id } });
   });
+
+  return { success: true };
+}
+
+export async function deleteUser(adminUser, userId, req) {
+  const user = await getUserOr404(userId);
+  if (user.role === ROLE.ADMIN) throw new AppError("Cannot delete admin users", 400);
+
+  await deleteUserCascade(user);
 
   await auditLog(adminUser?.id, "ADMIN_DELETE_USER", "user", user.id, req);
   return { success: true };

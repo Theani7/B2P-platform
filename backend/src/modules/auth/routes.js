@@ -22,5 +22,7 @@ router.post("/verify-registration-otp", validate(validators.verifyOtpSchema), co
 router.post("/resend-registration-otp", validate(validators.resendVerificationSchema), controllers.resendRegistrationOtp);
 router.get("/me", authenticate, controllers.me);
 router.patch("/me", authenticate, validate(validators.updateMeSchema), controllers.updateMe);
+router.post("/change-password", authenticate, validate(validators.changePasswordSchema), controllers.changePassword);
+router.delete("/me", authenticate, validate(validators.deleteMeSchema), controllers.deleteMe);
 
 export default router;

@@ -261,6 +261,36 @@ export async function resetPassword(token, newPassword) {
   });
 }
 
+export async function changePassword(userId, currentPassword, newPassword) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new AppError("User not found", 404);
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!valid) throw new AppError("Current password is incorrect", 401);
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash, failedLoginAttempts: 0, lockedUntil: null },
+  });
+  return { success: true };
+}
+
+export async function deleteMe(userId, password) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { businessProfile: true, promoterProfile: true },
+  });
+  if (!user) throw new AppError("User not found", 404);
+  if (user.role === "ADMIN") {
+    const adminCount = await prisma.user.count({ where: { role: "ADMIN", isActive: true } });
+    if (adminCount <= 1) throw new AppError("Cannot delete the last active admin", 400);
+  }
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  if (!valid) throw new AppError("Password is incorrect", 401);
+  const { deleteUserCascade } = await import("../admin/service.js");
+  await deleteUserCascade(user);
+  return { success: true };
+}
+
 export async function requestOtp(email) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new AppError("Invalid credentials", 401);

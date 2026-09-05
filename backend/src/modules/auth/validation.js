@@ -63,6 +63,15 @@ export const updateMeSchema = z.object({
   email: z.string().email().optional(),
 });
 
+export const changePasswordSchema = z.object({
+  current_password: z.string().min(1),
+  new_password: z.string().min(6),
+});
+
+export const deleteMeSchema = z.object({
+  password: z.string().min(1),
+});
+
 export const checkSchema = z.object({
   username: z.string().optional(),
   email: z.string().email().optional(),
