@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer";
-import { config } from "../config/env.js";
 
 // Prefer Gmail SMTP when configured — it delivers to any recipient.
 // Fall back to the configured SMTP (Resend) only if Gmail isn't set.
@@ -42,7 +41,7 @@ async function deliver(message) {
 
 const from = process.env.EMAIL_FROM || "Byparsathy <onboarding@resend.dev>";
 
-function otpHtml(code) {
+function otpHtml(code, validMinutes = 10) {
   const digits = code
     .split("")
     .map(
@@ -65,7 +64,7 @@ function otpHtml(code) {
         </td></tr>
         <tr><td style="padding:24px 32px 0;">
           <h1 style="margin:0;font-size:22px;line-height:1.25;font-weight:600;color:#020520;letter-spacing:-0.3px;">Your security code</h1>
-          <p style="margin:10px 0 0;font-size:15px;line-height:1.55;color:#696a72;">Use the code below to continue. This code is valid for <strong style="color:#374151;">10 minutes</strong> and can only be used once.</p>
+          <p style="margin:10px 0 0;font-size:15px;line-height:1.55;color:#696a72;">Use the code below to continue. This code is valid for <strong style="color:#374151;">${validMinutes} minutes</strong> and can only be used once.</p>
         </td></tr>
         <tr><td style="padding:24px 32px 0;" align="center">
           <table role="presentation" cellpadding="0" cellspacing="0"><tr>${digits}</tr></table>
@@ -127,16 +126,11 @@ export async function sendVerificationEmail(email, token) {
   });
 }
 
-export async function sendPasswordResetEmail(email, code) {
-  const link = `${config.frontendUrl}/reset-password?token=${code}`;
-  await deliver({ to: email, subject: "Reset your Byparsathy password", text: `Reset your password: ${link}` });
-}
-
-export async function sendOtpEmail(email, code) {
+export async function sendOtpEmail(email, code, validMinutes = 10) {
   await deliver({
     to: email,
     subject: "Your Byparsathy security code",
-    text: `Your one-time code is: ${code}\nIt expires in 10 minutes.`,
-    html: otpHtml(code),
+    text: `Your one-time code is: ${code}\nIt expires in ${validMinutes} minutes.`,
+    html: otpHtml(code, validMinutes),
   });
 }

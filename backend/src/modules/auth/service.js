@@ -4,7 +4,7 @@ import { prisma } from "../../config/db.js";
 import { signAccessToken, signRefreshToken, verifyToken } from "../../shared/jwt.js";
 import { AppError } from "../../shared/errors.js";
 import { config } from "../../config/env.js";
-import { sendVerificationEmail, sendPasswordResetEmail, sendOtpEmail } from "../../utils/email.js";
+import { sendVerificationEmail, sendOtpEmail } from "../../utils/email.js";
 
 function tokens(user) {
   return {
@@ -203,7 +203,7 @@ export async function forgotPassword(email) {
   const resetCodeExpiry = new Date(Date.now() + 60 * 60 * 1000);
   await prisma.user.update({ where: { id: user.id }, data: { resetCode, resetCodeExpiry } });
   try {
-    await sendOtpEmail(user.email, resetCode);
+    await sendOtpEmail(user.email, resetCode, 60);
   } catch (e) {
     console.error("reset email failed", e);
   }
