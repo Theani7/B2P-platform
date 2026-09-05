@@ -117,16 +117,27 @@ function DashboardInner() {
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
       {/* Hero Header */}
-      <div className="bg-white border border-slate-custom/10 rounded-xl shadow-sm overflow-hidden border-t-4 border-t-signal-blue">
-        <div className="h-24 bg-gradient-to-r from-sky-wash via-periwinkle-glow/30 to-sky-wash relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay" />
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white shadow-feature-section">
+        <div
+          className="relative h-32 overflow-hidden"
+          style={{
+            background:
+              "linear-gradient(100deg, #145aff 0%, #3b82f6 35%, #b6cbfd 70%, #f0f4fe 100%)",
+          }}
+        >
+          <div className="absolute -right-10 -top-16 h-56 w-56 rounded-full bg-white/15 blur-2xl" />
+          <div className="absolute -left-8 -bottom-20 h-48 w-48 rounded-full bg-midnight-ink/10 blur-2xl" />
+          <div className="absolute inset-0 opacity-[0.12] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay" />
+          <p className="absolute bottom-3 left-8 font-roboto-mono text-[11px] uppercase tracking-[0.2em] text-white/80">
+            Creator studio
+          </p>
         </div>
-        <div className="px-8 pb-8 relative">
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 -mt-10">
+        <div className="px-6 pb-7 pt-0 sm:px-8 relative">
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 -mt-11">
             <div className="flex items-end gap-5">
               <div className="relative group">
                 {avatarUploading ? (
-                  <div className="w-24 h-24 rounded-full bg-sky-wash border-4 border-white flex items-center justify-center shadow-sm">
+                  <div className="w-24 h-24 rounded-full bg-sky-wash border-4 border-white flex items-center justify-center shadow-product-card">
                     <Spinner />
                   </div>
                 ) : (
@@ -134,32 +145,37 @@ function DashboardInner() {
                     src={profile?.avatarUrl}
                     initials={(user?.fullName?.[0] ?? "P").toUpperCase()}
                     size="lg"
-                    className="w-24 h-24 text-2xl ring-4 ring-white shadow-sm"
+                    className="w-24 h-24 text-2xl ring-4 ring-white shadow-product-card"
                     colorIndex={2}
                   />
+                )}
+                {profile?.verified && !avatarUploading && (
+                  <span className="absolute bottom-1 right-1 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-status text-white ring-4 ring-white" title="Verified creator">
+                    <CheckCircle2 size={15} />
+                  </span>
                 )}
                 <button
                   type="button"
                   onClick={onCameraClick}
                   disabled={avatarUploading}
-                  className="absolute bottom-1 right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center border border-slate-custom/10 hover:bg-sky-wash transition-colors text-graphite disabled:opacity-50 shadow-sm opacity-0 group-hover:opacity-100"
+                  className="absolute bottom-1 right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center border border-slate-custom/10 hover:bg-sky-wash transition-all text-graphite disabled:opacity-50 shadow-sm opacity-0 group-hover:opacity-100"
                 >
                   <Camera size={14} />
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
               </div>
               <div className="mb-1">
+                <p className="text-xs font-medium text-ash">Welcome back,</p>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-graphite tracking-tight">{user?.fullName ?? "Creator"}</h1>
-                  {profile?.verified && <CheckCircle2 size={20} className="text-emerald-status" />}
+                  <h1 className="font-display text-3xl font-semibold tracking-tight text-graphite">{user?.fullName ?? "Creator"}</h1>
                 </div>
-                <p className="text-sm font-medium text-ash mt-0.5 flex items-center gap-1.5">
+                <p className="text-sm font-medium text-ash mt-1 flex items-center gap-1.5">
                   <Star size={14} className="fill-amber-tag text-amber-tag" />
                   <span className="text-graphite font-bold">{avgRating.toFixed(1)}</span>
                   <span>({reviewsReceived} {reviewsReceived === 1 ? "review" : "reviews"})</span>
                 </p>
                 {profile?.niche && (
-                  <p className="text-xs text-ash mt-0.5 uppercase tracking-wider font-medium">{profile.niche}</p>
+                  <p className="mt-1.5 inline-block rounded-badges bg-sky-wash px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-signal-blue">{profile.niche}</p>
                 )}
               </div>
             </div>
@@ -167,15 +183,15 @@ function DashboardInner() {
             <div className="flex items-center gap-3 w-full md:w-auto">
               <Link
                 href="/promoter/profile"
-                className="flex-1 md:flex-none flex justify-center items-center h-11 px-6 rounded-inputs bg-white border border-slate-custom/10 text-sm font-bold text-graphite hover:bg-sky-wash transition-colors shadow-sm"
+                className="flex-1 md:flex-none flex justify-center items-center h-11 px-6 rounded-pill bg-white border border-slate-custom/15 text-sm font-semibold text-graphite hover:border-signal-blue/40 hover:text-signal-blue transition-all shadow-sm"
               >
                 Edit Profile
               </Link>
               <Link
                 href="/promoter/marketplace"
-                className="flex-1 md:flex-none flex justify-center items-center h-11 px-6 rounded-inputs bg-signal-blue text-white text-sm font-bold hover:bg-signal-blue/90 transition-colors shadow-sm"
+                className="flex-1 md:flex-none flex justify-center items-center gap-1.5 h-11 px-6 rounded-pill bg-signal-blue text-white text-sm font-semibold hover:opacity-90 transition-all shadow-product-card"
               >
-                Browse Campaigns
+                Browse Campaigns <ArrowRight size={15} />
               </Link>
             </div>
           </div>
@@ -183,41 +199,50 @@ function DashboardInner() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <StatCard
-          label="Pending Invites"
-          value={invsLoading ? "—" : pendingInvites}
-          icon={Mail}
-          hint={pendingInvites > 0 ? "Action required" : "All caught up"}
-        />
-        <StatCard
-          label="Active Collabs"
-          value={collabsLoading ? "—" : activeCollabs}
-          icon={Handshake}
-          hint="In progress"
-        />
-        <StatCard
-          label="Avg. Rating"
-          value={reviewsReceived === 0 ? "—" : avgRating.toFixed(1)}
-          icon={Star}
-          hint={reviewsReceived > 0 ? `${reviewsReceived} ${reviewsReceived === 1 ? "review" : "reviews"}` : "No reviews yet"}
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Pending Invites"
+            value={invsLoading ? "—" : pendingInvites}
+            icon={Mail}
+            hint={pendingInvites > 0 ? "Action required" : "All caught up"}
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Active Collabs"
+            value={collabsLoading ? "—" : activeCollabs}
+            icon={Handshake}
+            hint="In progress"
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
+        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
+          <StatCard
+            label="Avg. Rating"
+            value={reviewsReceived === 0 ? "—" : avgRating.toFixed(1)}
+            icon={Star}
+            hint={reviewsReceived > 0 ? `${reviewsReceived} ${reviewsReceived === 1 ? "review" : "reviews"}` : "No reviews yet"}
+            className="border-0 shadow-none bg-transparent"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column (Main Content) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Active Collaborations */}
-          <div className="bg-white border border-slate-custom/10 rounded-xl shadow-sm overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+          <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-custom/10 bg-gradient-to-r from-sky-wash/70 to-transparent">
               <div className="flex items-center gap-2.5">
-                <div className="p-1.5 bg-signal-blue/10 rounded-md">
-                  <Handshake size={18} className="text-signal-blue" />
+                <div className="p-2 bg-signal-blue text-white rounded-buttons shadow-product-card">
+                  <Handshake size={17} />
                 </div>
-                <h2 className="text-base font-bold text-graphite">Active Collaborations</h2>
+                <h2 className="font-display text-lg font-medium tracking-tight text-graphite">Active Collaborations</h2>
               </div>
-              <Link href="/promoter/collaborations" className="text-xs font-bold text-signal-blue hover:underline flex items-center gap-1">
-                View All <ArrowRight size={14} />
+              <Link href="/promoter/collaborations" className="text-xs font-semibold text-signal-blue hover:opacity-75 flex items-center gap-1 rounded-pill bg-sky-wash/70 px-3 py-1.5 transition-colors">
+                View All <ArrowRight size={13} />
               </Link>
             </div>
 
@@ -272,13 +297,13 @@ function DashboardInner() {
           {/* Pending Invites */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             {/* Pending Invitations Widget */}
-            <div className="bg-white border border-slate-custom/10 rounded-xl shadow-sm overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between px-6 py-5 border-b border-slate-custom/10 bg-linen-canvas/50">
+            <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-slate-custom/10 bg-gradient-to-r from-amber-tag/10 to-transparent">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-amber-tag/10 rounded-md">
-                    <Mail size={18} className="text-amber-tag" />
+                  <div className="p-2 bg-amber-tag text-white rounded-buttons shadow-product-card">
+                    <Mail size={17} />
                   </div>
-                  <h2 className="text-base font-bold text-graphite">Pending Invites</h2>
+                  <h2 className="font-display text-lg font-medium tracking-tight text-graphite">Pending Invites</h2>
                   {pendingInvites > 0 && (
                     <span className="bg-amber-tag text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
                       {pendingInvites}
