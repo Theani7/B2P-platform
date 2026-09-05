@@ -10,32 +10,20 @@ import { Menu, X, ArrowRight, ArrowUpRight } from "lucide-react";
 /* ---------------------------------- nav ---------------------------------- */
 
 const NAV_LINKS = [
-  { href: "#live", label: "Live" },
-  { href: "#score", label: "Scoring" },
-  { href: "#chapters", label: "Platform" },
-  { href: "#faq", label: "FAQ" },
+  { href: "#index", label: "Index" },
+  { href: "#creed", label: "Creed" },
+  { href: "#steps", label: "Steps" },
 ];
 
 function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <nav
-      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? "border-b border-steel/10 bg-linen-canvas/80 backdrop-blur-md" : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-        <Link href="/" className="text-lg font-medium tracking-tight text-midnight-ink">
-          Byparsathy<span className="text-signal-blue">.</span>
+    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-midnight-ink/10 bg-linen-canvas/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-6">
+        <Link href="/" className="text-lg font-semibold tracking-tight text-midnight-ink">
+          Byparsathy<span className="text-signal-blue">®</span>
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
@@ -43,21 +31,21 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-slate-custom transition-colors hover:text-midnight-ink"
+              className="font-roboto-mono text-xs uppercase tracking-widest text-slate-custom transition-colors hover:text-midnight-ink"
             >
               {link.label}
             </a>
           ))}
         </div>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
           {isAuthed ? (
             <Link href={dash}>
-              <Button variant="ghost">Dashboard</Button>
+              <Button className="rounded-pill">Dashboard <ArrowUpRight size={15} /></Button>
             </Link>
           ) : (
             <>
-              <Link href="/login" className="px-3 py-2 text-sm text-slate-custom transition-colors hover:text-midnight-ink">
+              <Link href="/login" className="px-3 py-2 text-sm font-medium text-slate-custom transition-colors hover:text-midnight-ink">
                 Sign in
               </Link>
               <Link href="/register">
@@ -84,7 +72,7 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
           />
           <div className="fixed bottom-0 right-0 top-0 z-50 flex w-72 flex-col bg-linen-canvas md:hidden">
             <div className="flex h-16 items-center justify-between border-b border-steel/10 px-6">
-              <span className="text-lg font-medium text-midnight-ink">Byparsathy.</span>
+              <span className="text-lg font-semibold text-midnight-ink">Byparsathy®</span>
               <button
                 onClick={() => setMobileOpen(false)}
                 className="rounded-buttons p-2 text-slate-custom hover:bg-sky-wash"
@@ -128,152 +116,65 @@ function LandingNav({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   );
 }
 
-/* -------------------------------- live feed -------------------------------- */
+/* ---------------------------------- hero ---------------------------------- */
 
-const FEED = [
-  { brief: "Festival snack launch", detail: "Food · Kathmandu · Rs 45K", score: 96 },
-  { brief: "Trek gear field test", detail: "Travel · Pokhara · Rs 30K", score: 91 },
-  { brief: "Gadget unboxing wave", detail: "Tech · Lalitpur · Rs 60K", score: 89 },
-  { brief: "Winter lookbook", detail: "Fashion · Kathmandu · Rs 38K", score: 93 },
-];
-
-function LiveFeed() {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-
-  useEffect(() => {
-    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % FEED.length), 3200);
-    return () => clearInterval(id);
-  }, [paused]);
-
-  const item = FEED[index];
-
+function SpinBadge() {
   return (
-    <div
-      id="live"
-      className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-7 shadow-feature-section sm:p-8"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      <div className="mb-6 flex items-center justify-between">
-        <p className="text-caption font-medium uppercase tracking-wide text-ash">Happening now</p>
-        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-status">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-status" />
-          Live
+    <div className="animate-spin-slower relative h-28 w-28">
+      <svg viewBox="0 0 100 100" className="h-full w-full">
+        <defs>
+          <path id="badge-circle" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
+        </defs>
+        <text className="fill-midnight-ink text-[10.5px] font-semibold uppercase" style={{ letterSpacing: "2.5px" }}>
+          <textPath href="#badge-circle">free to join · nepal · free to join ·</textPath>
+        </text>
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-signal-blue text-white">
+          <ArrowRight size={18} className="-rotate-45" />
         </span>
-      </div>
-
-      <div key={index} className="animate-fade-slide-up">
-        <p className="mb-1 text-heading text-graphite">{item.brief}</p>
-        <p className="mb-5 text-sm text-ash">{item.detail}</p>
-        <div className="flex items-end justify-between">
-          <p className="text-caption uppercase tracking-wide text-fog">Top match</p>
-          <p className="font-roboto-mono text-display leading-none text-signal-blue">{item.score}<span className="text-lg text-ash">%</span></p>
-        </div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-sky-wash">
-          <div className="h-full rounded-full bg-signal-blue transition-all duration-700" style={{ width: `${item.score}%` }} />
-        </div>
-      </div>
-
-      <div className="mt-6 flex gap-1.5">
-        {FEED.map((_, i) => (
-          <button
-            key={i}
-            aria-label={`Show brief ${i + 1}`}
-            onClick={() => setIndex(i)}
-            className={`h-1 flex-1 rounded-full transition-colors ${i === index ? "bg-signal-blue" : "bg-steel/15 hover:bg-steel/30"}`}
-          />
-        ))}
       </div>
     </div>
   );
 }
 
-/* ---------------------------------- hero ---------------------------------- */
-
 function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
   const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
   return (
-    <section className="relative overflow-hidden pb-16 pt-32 lg:pb-24 lg:pt-40">
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(60% 50% at 85% 20%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0.5) 50%, rgba(252,252,252,0) 75%)",
-        }}
-      />
-      <div className="mx-auto grid max-w-[1200px] items-center gap-14 px-6 lg:grid-cols-[1.15fr_1fr] lg:gap-10">
-        <div>
-          <p className="font-roboto-mono mb-6 text-xs text-signal-blue">brand × creator marketplace — nepal</p>
-          <h1 className="text-display text-midnight-ink">
-            Put your brand<br />in trusted hands<span className="text-signal-blue">.</span>
-          </h1>
-          <p className="mb-9 mt-6 max-w-md text-body leading-relaxed text-graphite/80">
-            Post a brief. Meet creators scored on fit, not fame. Launch work you can measure.
-          </p>
-          <div className="flex flex-wrap items-center gap-3">
-            {isAuthed ? (
-              <Link href={dash}>
-                <Button className="h-12 rounded-pill px-7 text-base">Open dashboard</Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/register">
-                  <Button className="h-12 rounded-pill px-7 text-base">
-                    <span className="flex items-center gap-2">Start free <ArrowRight size={16} /></span>
-                  </Button>
-                </Link>
-                <Link href="/login" className="px-2 py-2 text-sm font-medium text-slate-custom transition-colors hover:text-midnight-ink">
-                  Sign in
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-        <LiveFeed />
-      </div>
-    </section>
-  );
-}
+    <section className="relative overflow-hidden pb-14 pt-32 lg:pt-40">
+      <div className="mx-auto max-w-[1400px] px-6">
+        <p className="font-roboto-mono mb-6 text-xs uppercase tracking-widest text-signal-blue">
+          The brand × creator marketplace
+        </p>
+        <h1 className="font-semibold uppercase leading-[0.92] tracking-tight text-midnight-ink text-[clamp(3.5rem,11vw,10rem)]">
+          Brands<br />
+          <span className="text-outline-ink">meet</span> creators<span className="text-signal-blue">.</span>
+        </h1>
 
-/* ------------------------------- score band -------------------------------- */
-
-const SEGMENTS = [
-  { label: "Niche", pts: 40 },
-  { label: "Place", pts: 20 },
-  { label: "Crowd", pts: 15 },
-  { label: "Proof", pts: 25 },
-];
-
-function ScoreBand() {
-  return (
-    <section id="score" className="border-y border-steel/10 bg-white py-16 lg:py-20">
-      <div className="mx-auto max-w-[1200px] px-6">
-        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+        <div className="mt-10 grid items-end gap-10 lg:grid-cols-[1fr_auto] lg:gap-6">
           <div>
-            <h2 className="mb-3 text-heading-lg text-midnight-ink">One number, fully open</h2>
-            <p className="max-w-sm text-body leading-relaxed text-ash">
-              Every match is scored out of 100. Nothing hidden, nothing averaged away.
+            <p className="mb-8 max-w-md text-body leading-relaxed text-graphite/80">
+              Post a brief. Get scored on fit, not fame. Launch work worth talking about.
             </p>
+            <div className="flex flex-wrap items-center gap-4">
+              {isAuthed ? (
+                <Link href={dash}>
+                  <Button className="h-13 rounded-pill px-8 text-base">Open dashboard <ArrowRight size={16} /></Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/register">
+                    <Button className="h-13 rounded-pill px-8 text-base">Start free <ArrowRight size={16} /></Button>
+                  </Link>
+                  <Link href="/login" className="px-2 py-2 text-sm font-medium text-slate-custom transition-colors hover:text-midnight-ink">
+                    Sign in
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
-          <div>
-            <div className="flex h-14 w-full overflow-hidden rounded-buttons">
-              {SEGMENTS.map((s) => (
-                <div
-                  key={s.label}
-                  className="flex h-full flex-col justify-center border-r border-white/60 bg-sky-wash px-4 last:border-0"
-                  style={{ width: `${s.pts}%` }}
-                >
-                  <span className="font-roboto-mono text-sm text-midnight-ink">{s.pts}</span>
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-ash">{s.label}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 flex justify-between">
-              <span className="text-xs text-fog">Fit · Place · Crowd · Proof</span>
-              <span className="font-roboto-mono text-xs text-signal-blue">100 pts</span>
-            </div>
+          <div className="hidden justify-end lg:flex">
+            <SpinBadge />
           </div>
         </div>
       </div>
@@ -281,166 +182,108 @@ function ScoreBand() {
   );
 }
 
-/* --------------------------------- chapters --------------------------------- */
+/* --------------------------------- marquee --------------------------------- */
 
-const CHAPTERS = [
-  {
-    n: "01",
-    title: "Brief it",
-    body: "Describe the work, the crowd, and the budget. A structured brief takes minutes and answers every question a creator would ask.",
-    tags: ["Goals", "Budget", "Requirements"],
-  },
-  {
-    n: "02",
-    title: "Meet the shortlist",
-    body: "Applications arrive ranked by the open score. Open a profile, check the record, and invite your favorites.",
-    tags: ["Ranked applicants", "Verified profiles", "Direct invites"],
-  },
-  {
-    n: "03",
-    title: "Ship it together",
-    body: "Drafts, feedback, and approvals move through one thread. Chat stays attached to the work it is about.",
-    tags: ["Deliverables", "Approvals", "In-context chat"],
-  },
-];
+const WORDS = ["Post a brief", "Get scored", "Meet creators", "Launch together"];
 
-function Chapters() {
+function Marquee() {
+  const row = [...WORDS, ...WORDS, ...WORDS, ...WORDS];
   return (
-    <section id="chapters" className="bg-linen-canvas py-20 lg:py-28">
-      <div className="mx-auto max-w-[1200px] px-6">
-        {CHAPTERS.map((c, i) => (
-          <div
-            key={c.n}
-            className={`grid gap-6 border-t border-steel/10 py-12 lg:py-16 ${i === CHAPTERS.length - 1 ? "border-b" : ""} lg:grid-cols-[120px_1fr_1fr] lg:gap-10`}
-          >
-            <p className="font-roboto-mono text-display leading-none text-steel/25">{c.n}</p>
-            <h3 className="text-heading-lg text-midnight-ink">{c.title}</h3>
-            <div>
-              <p className="mb-5 max-w-md text-body leading-relaxed text-ash">{c.body}</p>
-              <div className="flex flex-wrap gap-2">
-                {c.tags.map((t) => (
-                  <span key={t} className="rounded-badges bg-sky-wash px-2.5 py-1 text-xs font-medium text-signal-blue">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+    <section aria-label="What happens here" className="overflow-hidden border-y-2 border-midnight-ink bg-signal-blue py-4">
+      <div className="animate-marquee-x flex w-max items-center gap-8 pr-8">
+        {row.map((w, i) => (
+          <span key={i} className="flex items-center gap-8 whitespace-nowrap text-lg font-semibold uppercase tracking-tight text-white">
+            {w}
+            <span className="inline-block h-2 w-2 rounded-full bg-white/70" />
+          </span>
         ))}
       </div>
     </section>
   );
 }
 
-/* ----------------------------------- roles ---------------------------------- */
+/* ---------------------------------- index ---------------------------------- */
 
-function Roles() {
-  return (
-    <section className="bg-white py-20 lg:py-28">
-      <div className="mx-auto grid max-w-[1200px] gap-px overflow-hidden rounded-cards-lg border border-steel/10 bg-steel/10 sm:grid-cols-2">
-        <div className="bg-white p-10 lg:p-14">
-          <p className="font-roboto-mono mb-4 text-xs text-signal-blue">for brands</p>
-          <h3 className="mb-3 text-heading-lg text-midnight-ink">Hire on evidence</h3>
-          <p className="mb-8 max-w-sm text-body leading-relaxed text-ash">
-            Compare audiences, read real reviews, and approve work without leaving the thread.
-          </p>
-          <Link href="/register?role=BUSINESS" className="inline-flex items-center gap-1.5 text-sm font-medium text-signal-blue hover:opacity-75">
-            Start hiring <ArrowRight size={15} />
-          </Link>
-        </div>
-        <div className="bg-midnight-ink p-10 lg:p-14">
-          <p className="font-roboto-mono mb-4 text-xs text-white/50">for creators</p>
-          <h3 className="mb-3 text-heading-lg text-white">Get found for your thing</h3>
-          <p className="mb-8 max-w-sm text-body leading-relaxed text-white/70">
-            One profile, matched briefs, reviews that raise your rate. No follower gatekeeping.
-          </p>
-          <Link href="/register?role=PROMOTER" className="inline-flex items-center gap-1.5 text-sm font-medium text-white hover:opacity-75">
-            Join as a creator <ArrowRight size={15} />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------------------- FAQ ----------------------------------- */
-
-const FAQS = [
-  {
-    q: "What does it cost?",
-    a: "Joining and building a profile is free. Businesses pay only for the campaigns they run.",
-  },
-  {
-    q: "How is the score calculated?",
-    a: "Niche fit (40), location (20), audience (15), and track record (25). The full split shows on every match.",
-  },
-  {
-    q: "Who owns the content?",
-    a: "Creators do. Posting it here only lets the platform display it for marketplace purposes.",
-  },
+const INDEX_ROWS = [
+  { n: "01", title: "Scored matching", body: "Niche 40 · Place 20 · Crowd 15 · Proof 25. The math is printed on every match." },
+  { n: "02", title: "Verified humans", body: "Identity and audience checks before anyone touches your brief." },
+  { n: "03", title: "One thread", body: "Briefs, drafts, approvals, and chat live in a single collaboration." },
+  { n: "04", title: "Public record", body: "Two sided reviews. Reputation you can hire on, rates you can trust." },
 ];
 
-function Faq() {
-  const [open, setOpen] = useState<number | null>(0);
+function Index() {
   return (
-    <section id="faq" className="bg-linen-canvas py-20 lg:py-28">
-      <div className="mx-auto max-w-[720px] px-6">
-        <h2 className="mb-10 text-heading-lg text-midnight-ink">Asked often</h2>
-        <div className="border-t border-steel/10">
-          {FAQS.map((f, i) => {
-            const isOpen = open === i;
-            return (
-              <div key={f.q} className="border-b border-steel/10">
-                <button
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between gap-4 py-5 text-left"
-                >
-                  <span className="text-heading-sm text-graphite">{f.q}</span>
-                  <span className={`font-roboto-mono text-sm ${isOpen ? "text-signal-blue" : "text-fog"}`}>
-                    {isOpen ? "—" : "+"}
-                  </span>
-                </button>
-                {isOpen && (
-                  <p className="animate-fade-slide-up max-w-2xl pb-6 text-sm leading-relaxed text-ash">{f.a}</p>
-                )}
-              </div>
-            );
-          })}
+    <section id="index" className="bg-linen-canvas py-20 lg:py-28">
+      <div className="mx-auto max-w-[1400px] px-6">
+        {INDEX_ROWS.map((r) => (
+          <Link
+            key={r.n}
+            href="/register"
+            className="group grid gap-2 border-t-2 border-midnight-ink py-8 transition-colors last:border-b hover:bg-midnight-ink lg:grid-cols-[100px_1fr_1fr] lg:gap-10 lg:py-10"
+          >
+            <span className="font-roboto-mono text-sm text-signal-blue group-hover:text-white/60">{r.n}</span>
+            <span className="text-3xl font-semibold uppercase tracking-tight text-midnight-ink group-hover:text-white lg:text-5xl">
+              {r.title}
+            </span>
+            <span className="max-w-md self-center text-body leading-relaxed text-ash group-hover:text-white/70">
+              {r.body}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------------------------------- creed ---------------------------------- */
+
+function Creed() {
+  return (
+    <section id="creed" className="bg-midnight-ink py-24 lg:py-36">
+      <div className="mx-auto max-w-[1400px] px-6">
+        <p className="font-roboto-mono mb-8 text-xs uppercase tracking-widest text-white/40">The creed</p>
+        <p className="max-w-5xl text-3xl font-medium leading-tight tracking-tight text-white lg:text-6xl">
+          Fame is cheap. <span className="text-outline-paper">Fit is rare.</span> We built the marketplace
+          that can tell the difference<span className="text-signal-blue">.</span>
+        </p>
+        <div className="mt-12 flex flex-wrap gap-x-12 gap-y-6">
+          {[
+            ["100", "points in every score"],
+            ["04", "steps to published"],
+            ["02", "sides, one workspace"],
+          ].map(([v, l]) => (
+            <div key={l}>
+              <p className="font-roboto-mono text-5xl text-white lg:text-6xl">{v}</p>
+              <p className="mt-2 text-sm text-white/50">{l}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-/* ----------------------------------- CTA ----------------------------------- */
+/* ---------------------------------- steps ---------------------------------- */
 
-function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
-  const dash = DashboardPath[(role as Role) ?? "BUSINESS"];
+const STEPS = ["Profile in minutes", "Briefs meet matches", "Deliver in thread", "Review, repeat"];
+
+function Steps() {
   return (
-    <section className="bg-linen-canvas px-6 pb-20 lg:pb-28">
-      <div className="mx-auto max-w-[1200px] rounded-cards-lg bg-midnight-ink px-6 py-16 text-center lg:py-20">
-        <h2 className="mx-auto mb-4 max-w-xl text-heading-lg text-white">
-          Your next collab is one brief away
-        </h2>
-        <p className="mx-auto mb-9 max-w-md text-body text-white/65">
-          Free to start. Pick a side and meet your match.
-        </p>
-        {isAuthed ? (
-          <Link href={dash}>
-            <Button className="h-12 rounded-pill bg-white px-7 text-base font-medium text-midnight-ink hover:opacity-90">
-              Open dashboard
-            </Button>
+    <section id="steps" className="bg-linen-canvas py-20 lg:py-28">
+      <div className="mx-auto max-w-[1400px] px-6">
+        <div className="grid gap-px overflow-hidden rounded-cards-lg border-2 border-midnight-ink bg-midnight-ink sm:grid-cols-2 lg:grid-cols-4">
+          {STEPS.map((s, i) => (
+            <div key={s} className="bg-linen-canvas p-8 lg:p-10">
+              <p className="font-roboto-mono mb-6 text-6xl leading-none text-signal-blue">0{i + 1}</p>
+              <p className="text-xl font-semibold uppercase tracking-tight text-midnight-ink">{s}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 text-center">
+          <Link href="/register">
+            <Button className="h-13 rounded-pill px-8 text-base">Claim your handle <ArrowRight size={16} /></Button>
           </Link>
-        ) : (
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/register?role=BUSINESS" className="rounded-pill bg-white px-7 py-3 text-sm font-medium text-midnight-ink transition-opacity hover:opacity-90">
-              I am a brand
-            </Link>
-            <Link href="/register?role=PROMOTER" className="rounded-pill border border-white/25 px-7 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10">
-              I am a creator
-            </Link>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );
@@ -450,43 +293,48 @@ function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
 
 function Footer() {
   return (
-    <footer className="border-t border-steel/10 bg-linen-canvas">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 py-12 md:flex-row md:items-start md:justify-between">
-        <div>
-          <p className="text-lg font-medium tracking-tight text-midnight-ink">Byparsathy<span className="text-signal-blue">.</span></p>
-          <p className="mt-2 max-w-xs text-sm leading-relaxed text-ash">
-            The brand to creator marketplace. Direct briefs, open scoring, honest reviews.
-          </p>
+    <footer className="overflow-hidden bg-midnight-ink pt-16">
+      <div className="mx-auto max-w-[1400px] px-6">
+        <div className="flex flex-col justify-between gap-10 pb-14 md:flex-row">
+          <div className="flex gap-4">
+            <Link href="/register?role=BUSINESS" className="rounded-pill bg-white px-6 py-3 text-sm font-semibold text-midnight-ink transition-opacity hover:opacity-85">
+              I am a brand
+            </Link>
+            <Link href="/register?role=PROMOTER" className="rounded-pill border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+              I am a creator
+            </Link>
+          </div>
+          <div className="flex gap-10">
+            {[
+              { title: "Map", links: [{ label: "Index", href: "#index" }, { label: "Creed", href: "#creed" }, { label: "Steps", href: "#steps" }] },
+              { title: "Co", links: [{ label: "About", href: "/about" }, { label: "Sign in", href: "/login" }] },
+              { title: "Law", links: [{ label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }] },
+            ].map((col) => (
+              <div key={col.title}>
+                <p className="font-roboto-mono mb-3 text-[11px] uppercase tracking-widest text-white/35">{col.title}</p>
+                <ul className="space-y-2">
+                  {col.links.map((l) => (
+                    <li key={l.label}>
+                      {l.href.startsWith("/") ? (
+                        <Link href={l.href} className="text-sm text-white/70 transition-colors hover:text-white">
+                          {l.label}
+                        </Link>
+                      ) : (
+                        <a href={l.href} className="text-sm text-white/70 transition-colors hover:text-white">
+                          {l.label}
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
-          {[
-            { title: "Platform", links: [{ label: "Live", href: "#live" }, { label: "Scoring", href: "#score" }, { label: "FAQ", href: "#faq" }] },
-            { title: "Company", links: [{ label: "About", href: "/about" }] },
-            { title: "Legal", links: [{ label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }] },
-          ].map((col) => (
-            <div key={col.title}>
-              <p className="mb-3 text-caption font-medium uppercase tracking-wide text-fog">{col.title}</p>
-              <ul className="space-y-2">
-                {col.links.map((l) => (
-                  <li key={l.label}>
-                    {l.href.startsWith("/") ? (
-                      <Link href={l.href} className="text-sm text-slate-custom transition-colors hover:text-midnight-ink">
-                        {l.label}
-                      </Link>
-                    ) : (
-                      <a href={l.href} className="text-sm text-slate-custom transition-colors hover:text-midnight-ink">
-                        {l.label}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="border-t border-steel/10">
-        <p className="mx-auto max-w-[1200px] px-6 py-5 text-xs text-fog">
+        <p aria-hidden className="select-none whitespace-nowrap text-center font-semibold uppercase leading-none tracking-tight text-white/[0.07] text-[clamp(4rem,14.5vw,13rem)]">
+          Byparsathy
+        </p>
+        <p className="border-t border-white/10 py-5 text-xs text-white/35">
           © {new Date().getFullYear()} Byparsathy · Made in Nepal
         </p>
       </div>
@@ -507,11 +355,10 @@ export default function LandingPage() {
       <LandingNav isAuthed={isAuthed} role={user?.role} />
       <main>
         <Hero isAuthed={isAuthed} role={user?.role} />
-        <ScoreBand />
-        <Chapters />
-        <Roles />
-        <Faq />
-        <CTA isAuthed={isAuthed} role={user?.role} />
+        <Marquee />
+        <Index />
+        <Creed />
+        <Steps />
       </main>
       <Footer />
     </div>

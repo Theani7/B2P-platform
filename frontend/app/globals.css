@@ -192,9 +192,30 @@
   .animate-fade-slide-up,
   .animate-fade-slide-in,
   .animate-fade-in,
-  .animate-pop-in {
+  .animate-pop-in,
+  .animate-spin-slower {
     animation: none;
   }
+}
+
+.text-outline-ink {
+  -webkit-text-stroke: 2px #020520;
+  color: transparent;
+}
+
+.text-outline-paper {
+  -webkit-text-stroke: 2px rgba(252, 252, 252, 0.85);
+  color: transparent;
+}
+
+@keyframes spin-slower {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slower {
+  animation: spin-slower 18s linear infinite;
 }
 
 html,
