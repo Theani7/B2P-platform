@@ -133,9 +133,9 @@ function DashboardInner() {
           </p>
         </div>
         <div className="px-6 pb-7 pt-0 sm:px-8 relative">
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 -mt-11">
-            <div className="flex items-end gap-5">
-              <div className="relative group">
+          <div className="flex flex-col gap-5 -mt-12 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+              <div className="relative group w-fit shrink-0">
                 {avatarUploading ? (
                   <div className="w-24 h-24 rounded-full bg-sky-wash border-4 border-white flex items-center justify-center shadow-product-card">
                     <Spinner />
@@ -164,32 +164,30 @@ function DashboardInner() {
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
               </div>
-              <div className="mb-1">
+              <div className="min-w-0 sm:pb-1">
                 <p className="text-xs font-medium text-ash">Welcome back,</p>
-                <div className="flex items-center gap-2">
-                  <h1 className="font-display text-3xl font-semibold tracking-tight text-graphite">{user?.fullName ?? "Creator"}</h1>
-                </div>
-                <p className="text-sm font-medium text-ash mt-1 flex items-center gap-1.5">
+                <h1 className="mt-0.5 truncate font-display text-2xl font-semibold tracking-tight text-graphite sm:text-3xl">{user?.fullName ?? "Creator"}</h1>
+                <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-ash">
                   <Star size={14} className="fill-amber-tag text-amber-tag" />
                   <span className="text-graphite font-bold">{avgRating.toFixed(1)}</span>
                   <span>({reviewsReceived} {reviewsReceived === 1 ? "review" : "reviews"})</span>
+                  {profile?.niche && (
+                    <span className="rounded-badges bg-sky-wash px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-signal-blue">{profile.niche}</span>
+                  )}
                 </p>
-                {profile?.niche && (
-                  <p className="mt-1.5 inline-block rounded-badges bg-sky-wash px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-signal-blue">{profile.niche}</p>
-                )}
               </div>
             </div>
 
-            <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="flex items-center gap-3 sm:pb-1">
               <Link
                 href="/promoter/profile"
-                className="flex-1 md:flex-none flex justify-center items-center h-11 px-6 rounded-pill bg-white border border-slate-custom/15 text-sm font-semibold text-graphite hover:border-signal-blue/40 hover:text-signal-blue transition-all shadow-sm"
+                className="flex flex-1 justify-center items-center h-11 px-6 rounded-pill bg-white border border-slate-custom/15 text-sm font-semibold text-graphite hover:border-signal-blue/40 hover:text-signal-blue transition-all shadow-sm sm:flex-none"
               >
                 Edit Profile
               </Link>
               <Link
                 href="/promoter/marketplace"
-                className="flex-1 md:flex-none flex justify-center items-center gap-1.5 h-11 px-6 rounded-pill bg-signal-blue text-white text-sm font-semibold hover:opacity-90 transition-all shadow-product-card"
+                className="flex flex-1 justify-center items-center gap-1.5 h-11 px-6 rounded-pill bg-signal-blue text-white text-sm font-semibold hover:opacity-90 transition-all shadow-product-card sm:flex-none"
               >
                 Browse Campaigns <ArrowRight size={15} />
               </Link>
