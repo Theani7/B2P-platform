@@ -64,6 +64,7 @@ export default {
       fontFamily: {
         inter: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        display: ["var(--font-display)", "var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       spacing: {
         "52": "52px",

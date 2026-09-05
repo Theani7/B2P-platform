@@ -205,7 +205,7 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
       />
       <div className="mx-auto max-w-[1200px] px-6 text-center">
         <Reveal>
-          <h1 className="mx-auto mb-5 max-w-3xl text-display text-midnight-ink">
+          <h1 className="mx-auto mb-5 max-w-3xl font-display text-6xl font-medium leading-[1.02] tracking-tight text-midnight-ink md:text-7xl">
             Find creators.<br />Post briefs.<br /><span className="text-signal-blue">Connect directly.</span>
           </h1>
         </Reveal>
@@ -316,7 +316,7 @@ function FeatureBlock({
       <Reveal className={flip ? "lg:order-2" : ""}>{visual}</Reveal>
       <Reveal delay={120} className={flip ? "lg:order-1" : ""}>
         <p className="mb-2 text-caption font-medium uppercase tracking-wide text-signal-blue">{label}</p>
-        <h3 className="mb-3 text-heading-lg text-midnight-ink">{title}</h3>
+        <h3 className="mb-3 font-display text-3xl font-medium tracking-tight text-midnight-ink">{title}</h3>
         <p className="mb-6 max-w-md text-body leading-relaxed text-steel">{desc}</p>
         <ul className="flex flex-col gap-2.5">
           {points.map((p) => (
@@ -346,7 +346,7 @@ function HowItWorks() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal className="mb-16 text-center">
           <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">How it works</p>
-          <h2 className="mx-auto max-w-2xl text-heading-lg text-midnight-ink">
+          <h2 className="mx-auto max-w-2xl font-display text-4xl font-medium tracking-tight text-midnight-ink md:text-5xl">
             Everything you need, nothing in the way
           </h2>
         </Reveal>
@@ -475,7 +475,7 @@ function Directory() {
         <Reveal className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">Directory</p>
-            <h2 className="max-w-md text-heading-lg text-midnight-ink">A growing network of real creators</h2>
+            <h2 className="max-w-md font-display text-4xl font-medium tracking-tight text-midnight-ink md:text-5xl">A growing network of real creators</h2>
           </div>
           <Link href="/register?role=BUSINESS" className="inline-flex items-center gap-1.5 text-sm font-medium text-signal-blue hover:opacity-80">
             Browse the full directory <ArrowRight size={15} />
@@ -514,7 +514,7 @@ function Audiences() {
       <div className="mx-auto grid max-w-[1200px] gap-4 px-6 md:grid-cols-2">
         <Reveal className="rounded-cards-lg bg-sky-wash/60 p-8 lg:p-10">
           <p className="mb-2 text-caption font-medium uppercase tracking-wide text-signal-blue">For brands</p>
-          <h3 className="mb-6 text-heading-lg text-midnight-ink">Find voices that represent you</h3>
+          <h3 className="mb-6 font-display text-3xl font-medium tracking-tight text-midnight-ink md:text-4xl">Find voices that represent you</h3>
           <ul className="mb-8 flex flex-col gap-3">
             {["Search by niche, audience, and platform", "Post unlimited briefs", "Direct chat, no commission games", "Honest ratings from past partners"].map((p) => (
               <li key={p} className="flex items-start gap-2.5 text-sm text-graphite">
@@ -529,7 +529,7 @@ function Audiences() {
         </Reveal>
         <Reveal delay={120} className="rounded-cards-lg border border-steel/10 bg-linen-canvas p-8 lg:p-10">
           <p className="mb-2 text-caption font-medium uppercase tracking-wide text-emerald-status">For creators</p>
-          <h3 className="mb-6 text-heading-lg text-midnight-ink">Get discovered in your niche</h3>
+          <h3 className="mb-6 font-display text-3xl font-medium tracking-tight text-midnight-ink md:text-4xl">Get discovered in your niche</h3>
           <ul className="mb-8 flex flex-col gap-3">
             {["Build a profile once, get found often", "Apply to matched briefs in one click", "Showcase work brands can browse", "Reviews that compound over time"].map((p) => (
               <li key={p} className="flex items-start gap-2.5 text-sm text-graphite">
@@ -599,7 +599,7 @@ function Faq() {
       <div className="mx-auto max-w-[800px] px-6">
         <Reveal className="mb-10 text-center">
           <p className="mb-3 text-caption font-medium uppercase tracking-wide text-signal-blue">FAQ</p>
-          <h2 className="text-heading-lg text-midnight-ink">Questions, answered</h2>
+          <h2 className="mb-10 text-center font-display text-4xl font-medium tracking-tight text-midnight-ink md:text-5xl">Questions, answered</h2>
         </Reveal>
         <div className="divide-y divide-steel/10 border-y border-steel/10">
           {FAQS.map((f) => {
@@ -635,7 +635,7 @@ function CTA({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
     <section className="bg-linen-canvas py-20 lg:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal className="rounded-cards-lg border border-steel/10 bg-white p-12 text-center shadow-feature-section lg:p-16">
-          <h2 className="mx-auto mb-4 max-w-xl text-heading-lg text-midnight-ink">
+          <h2 className="mx-auto mb-4 max-w-xl font-display text-4xl font-medium tracking-tight text-midnight-ink md:text-5xl">
             Ready to make your next collaboration?
           </h2>
           <p className="mx-auto mb-8 max-w-md text-body text-ash">
