@@ -70,7 +70,7 @@ export async function getDashboardStats() {
 }
 
 // --- User Management ---
-export async function getAdminUsers({ page = 1, limit = 20, search, role, isActive }) {
+export async function getAdminUsers({ page = 1, limit = 20, search, role, isActive, sort = "newest" }) {
   const where = {};
   if (search) {
     where.OR = [
@@ -81,6 +81,15 @@ export async function getAdminUsers({ page = 1, limit = 20, search, role, isActi
   }
   if (role) where.role = role;
   if (isActive !== undefined && isActive !== null) where.isActive = isActive === true;
+
+  const orderBy =
+    sort === "oldest"
+      ? { createdAt: "asc" }
+      : sort === "name"
+        ? [{ fullName: "asc" }, { username: "asc" }]
+        : sort === "role"
+          ? [{ role: "asc" }, { createdAt: "desc" }]
+          : { createdAt: "desc" };
 
   const [rows, total] = await Promise.all([
     prisma.user.findMany({
@@ -98,7 +107,7 @@ export async function getAdminUsers({ page = 1, limit = 20, search, role, isActi
         businessProfile: { select: { id: true } },
         promoterProfile: { select: { id: true } },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy,
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),
     }),
@@ -161,7 +170,81 @@ export async function activateUser(adminUser, userId, req) {
 export async function deleteUser(adminUser, userId, req) {
   const user = await getUserOr404(userId);
   if (user.role === ROLE.ADMIN) throw new AppError("Cannot delete admin users", 400);
-  await prisma.user.delete({ where: { id: user.id } });
+
+  // Explicit cleanup in dependency order: several relations (reviews, messages,
+  // likes, campaigns, applications, ...) have no ON DELETE cascade, so a plain
+  // user.delete would 500 with a FK violation for active users.
+  const bizId = user.businessProfile?.id;
+  const promId = user.promoterProfile?.id;
+
+  // Campaign + collaboration ids owned by these profiles (needed for dependents).
+  const campaignIds = bizId
+    ? (await prisma.campaign.findMany({ where: { businessProfileId: bizId }, select: { id: true } })).map((c) => c.id)
+    : [];
+  const collabIds = await prisma.collaboration
+    .findMany({
+      where: {
+        OR: [
+          ...(bizId ? [{ businessProfileId: bizId }] : []),
+          ...(promId ? [{ promoterProfileId: promId }] : []),
+        ],
+      },
+      select: { id: true },
+    })
+    .then((rows) => rows.map((c) => c.id));
+
+  await prisma.$transaction(async (tx) => {
+    if (collabIds.length) {
+      await tx.review.deleteMany({ where: { collaborationId: { in: collabIds } } });
+      await tx.deliverable.deleteMany({ where: { collaborationId: { in: collabIds } } });
+      // NOTE: Conversation.campaignId stores the collaboration id (see schema).
+      const convos = await tx.conversation.findMany({
+        where: { campaignId: { in: collabIds } },
+        select: { id: true },
+      });
+      if (convos.length) {
+        await tx.message.deleteMany({ where: { conversationId: { in: convos.map((c) => c.id) } } });
+        await tx.conversation.deleteMany({ where: { id: { in: convos.map((c) => c.id) } } });
+      }
+      await tx.collaboration.deleteMany({ where: { id: { in: collabIds } } });
+    }
+    if (campaignIds.length) {
+      await tx.campaignApplication.deleteMany({ where: { campaignId: { in: campaignIds } } });
+      await tx.campaignInvitation.deleteMany({ where: { campaignId: { in: campaignIds } } });
+      await tx.matchResult.deleteMany({ where: { campaignId: { in: campaignIds } } });
+      await tx.savedCampaign.deleteMany({ where: { campaignId: { in: campaignIds } } });
+      await tx.campaign.deleteMany({ where: { id: { in: campaignIds } } });
+    }
+    if (promId) {
+      const itemIds = (
+        await tx.portfolioItem.findMany({ where: { promoterId: promId }, select: { id: true } })
+      ).map((i) => i.id);
+      if (itemIds.length) {
+        await tx.portfolioLike.deleteMany({ where: { portfolioItemId: { in: itemIds } } });
+        await tx.portfolioItem.deleteMany({ where: { id: { in: itemIds } } });
+      }
+      await tx.campaignApplication.deleteMany({ where: { promoterProfileId: promId } });
+      await tx.campaignInvitation.deleteMany({ where: { promoterProfileId: promId } });
+      await tx.matchResult.deleteMany({ where: { promoterProfileId: promId } });
+      await tx.savedCampaign.deleteMany({ where: { promoterProfileId: promId } });
+      await tx.savedPromoter.deleteMany({ where: { promoterProfileId: promId } });
+      await tx.verificationRequest.deleteMany({ where: { promoterProfileId: promId } });
+    }
+    if (bizId) {
+      await tx.savedPromoter.deleteMany({ where: { businessProfileId: bizId } });
+      await tx.verificationRequest.deleteMany({ where: { businessProfileId: bizId } });
+    }
+    // User-level dependents without cascade.
+    await tx.review.deleteMany({ where: { OR: [{ reviewerId: user.id }, { revieweeId: user.id }] } });
+    await tx.message.deleteMany({ where: { senderId: user.id } });
+    await tx.portfolioLike.deleteMany({ where: { userId: user.id } });
+    await tx.auditLog.deleteMany({ where: { userId: user.id } });
+    await tx.verificationRequest.updateMany({ where: { reviewedBy: user.id }, data: { reviewedBy: null } });
+    // Cascades (profiles, social links, notification prefs, achievements,
+    // search history, activity logs, received notifications) delete automatically.
+    await tx.user.delete({ where: { id: user.id } });
+  });
+
   await auditLog(adminUser?.id, "ADMIN_DELETE_USER", "user", user.id, req);
   return { success: true };
 }

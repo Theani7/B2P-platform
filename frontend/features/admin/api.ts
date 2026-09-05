@@ -44,6 +44,7 @@ export interface AdminUserQuery {
   search?: string;
   role?: "BUSINESS" | "PROMOTER" | "ADMIN";
   isActive?: boolean;
+  sort?: "newest" | "oldest" | "name" | "role";
 }
 
 export interface Paginated<T> {

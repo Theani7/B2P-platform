@@ -22,6 +22,7 @@ function UsersInner() {
   const [search, setSearch] = useState("");
   const [role, setRole] = useState<string>("");
   const [activeOnly, setActiveOnly] = useState<string>("");
+  const [sort, setSort] = useState<string>("newest");
   const [userToDelete, setUserToDelete] = useState<{ id: string, username: string } | null>(null);
 
   const params = {
@@ -30,6 +31,7 @@ function UsersInner() {
     search: search || undefined,
     role: (role || undefined) as any,
     isActive: activeOnly === "" ? undefined : activeOnly === "active",
+    sort: (sort || undefined) as any,
   };
 
   const { data, isFetching } = useAdminUsers(params);
@@ -78,6 +80,19 @@ function UsersInner() {
             <option value="">Any status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
+          </select>
+          <select
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setPage(1);
+            }}
+            className="rounded-inputs border border-steel/30 bg-white px-3 py-2 text-body text-midnight-ink"
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="name">Name A–Z</option>
+            <option value="role">Role (Business · Promoter · Admin)</option>
           </select>
         </div>
       </Card>

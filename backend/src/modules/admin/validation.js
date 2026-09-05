@@ -5,7 +5,13 @@ export const adminUserQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional(),
   search: z.string().optional(),
   role: z.enum(["BUSINESS", "PROMOTER", "ADMIN"]).optional(),
-  isActive: z.coerce.boolean().optional(),
+  // Query strings arrive as text, so Boolean("false") would wrongly coerce to
+  // true — accept explicit "true"/"false" strings instead.
+  isActive: z
+    .union([z.enum(["true", "false"]), z.boolean()])
+    .transform((v) => (typeof v === "boolean" ? v : v === "true"))
+    .optional(),
+  sort: z.enum(["newest", "oldest", "name", "role"]).optional(),
 });
 
 export const adminCampaignQuerySchema = z.object({
