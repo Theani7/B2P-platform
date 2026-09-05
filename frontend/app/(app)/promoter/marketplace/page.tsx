@@ -117,7 +117,6 @@ function MarketplaceInner() {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("createdAt");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showCategories, setShowCategories] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [selectedCampaignTitle, setSelectedCampaignTitle] = useState("");
@@ -192,47 +191,40 @@ function MarketplaceInner() {
           </div>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-          <button
-            onClick={() => setShowCategories(!showCategories)}
-            className={`flex-1 md:flex-none h-11 px-6 rounded-inputs flex items-center justify-center gap-2 text-sm font-semibold transition-colors shadow-sm ${
-              showCategories ? "bg-sky-wash text-signal-blue border border-signal-blue/20" : "bg-signal-blue text-white hover:opacity-90"
-            }`}
-          >
-            <Filter size={16} /> Browse Categories
-          </button>
+          <span className="flex-1 md:flex-none h-11 px-6 rounded-inputs hidden items-center justify-center gap-2 text-sm font-semibold text-ash">
+            <Filter size={16} /> {data?.total ?? 0} campaigns
+          </span>
         </div>
       </div>
 
-      {/* CATEGORIES PANEL */}
-      {showCategories && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-custom/10 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+      {/* CATEGORIES — always visible, act as search filters */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+        <button
+          onClick={() => { setSelectedCategory(null); setPage(1); }}
+          className={`flex flex-shrink-0 items-center gap-1.5 rounded-pill px-4 py-2 text-xs font-semibold transition-all ${
+            selectedCategory === null
+              ? "bg-midnight-ink text-white shadow-product-card"
+              : "bg-white text-ash border border-slate-custom/10 hover:border-signal-blue/40 hover:text-graphite"
+          }`}
+        >
+          <Globe size={14} />
+          All
+        </button>
+        {MARKETPLACE_CATEGORIES.map((cat) => (
           <button
-            onClick={() => { setSelectedCategory(null); setPage(1); }}
-            className={`p-4 rounded-inputs border flex flex-col items-center justify-center gap-2 transition-all ${
-              selectedCategory === null
-                ? "bg-sky-wash border-signal-blue text-signal-blue font-semibold"
-                : "border-slate-custom/10 hover:border-slate-custom/20 bg-linen-canvas text-graphite"
+            key={cat}
+            onClick={() => { setSelectedCategory(selectedCategory === cat ? null : cat); setPage(1); }}
+            className={`flex flex-shrink-0 items-center gap-1.5 rounded-pill px-4 py-2 text-xs font-semibold transition-all ${
+              selectedCategory === cat
+                ? "bg-midnight-ink text-white shadow-product-card"
+                : "bg-white text-ash border border-slate-custom/10 hover:border-signal-blue/40 hover:text-graphite"
             }`}
           >
-            <Globe size={20} className={selectedCategory === null ? "text-signal-blue" : "text-ash"} />
-            <span className="text-xs">All Categories</span>
+            {getCategoryIcon(cat, selectedCategory === cat)}
+            {cat}
           </button>
-          {MARKETPLACE_CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => { setSelectedCategory(cat); setPage(1); }}
-              className={`p-4 rounded-inputs border flex flex-col items-center justify-center gap-2 transition-all ${
-                selectedCategory === cat
-                  ? "bg-sky-wash border-signal-blue text-signal-blue font-semibold"
-                  : "border-slate-custom/10 hover:border-slate-custom/20 bg-linen-canvas text-graphite"
-              }`}
-            >
-              {getCategoryIcon(cat, selectedCategory === cat)}
-              <span className="text-xs">{cat}</span>
-            </button>
-          ))}
-        </div>
-      )}
+        ))}
+      </div>
 
       {/* STICKY SEARCH TOOLBAR */}
       <div className="sticky top-0 z-30 bg-linen-canvas/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
