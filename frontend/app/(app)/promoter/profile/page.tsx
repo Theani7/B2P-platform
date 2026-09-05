@@ -208,9 +208,6 @@ function PromoterProfileInner() {
           <p className="text-body text-steel mt-2">Manage your public profile and improve your discoverability.</p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-button text-signal-blue font-semibold text-sm">
-            <span>{completionData?.completion || 0}% Complete</span>
-          </div>
           {pendingVerification || profile?.verified ? (
             <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-sm font-medium">
               <BadgeCheck size={16} /> {profile?.verified ? "Verified Creator" : "Verification Pending"}
