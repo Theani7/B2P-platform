@@ -10,7 +10,6 @@ import {
   X,
   ArrowRight,
   Check,
-  Star,
   MapPin,
   Heart,
   Smile,
@@ -354,55 +353,6 @@ function HowItWorks() {
   );
 }
 
-/* -------------------------------- directory -------------------------------- */
-
-const DIRECTORY = [
-  { name: "Supriya", niche: "Food lover", img: "https://randomuser.me/api/portraits/women/44.jpg", bg: "bg-amber-tag/20" },
-  { name: "Aashish", niche: "Tech geek", img: "https://randomuser.me/api/portraits/men/32.jpg", bg: "bg-signal-blue/10" },
-  { name: "Niraj", niche: "Wanderer", img: "https://randomuser.me/api/portraits/men/75.jpg", bg: "bg-emerald-status/10" },
-  { name: "Divya", niche: "Style star", img: "https://randomuser.me/api/portraits/women/68.jpg", bg: "bg-coral-alert/10" },
-];
-
-function Directory() {
-  return (
-    <section id="creators" className="overflow-hidden bg-linen-canvas py-20 lg:py-28">
-      <div className="mx-auto max-w-[1200px] px-6">
-        <Reveal className="mb-10 text-center">
-          <h2 className="mx-auto max-w-xl font-display text-4xl font-semibold tracking-tight text-midnight-ink md:text-5xl">
-            Say hi to your next favorite creator
-          </h2>
-        </Reveal>
-      </div>
-      <div className="overflow-x-auto pb-2">
-        <div className="flex w-max gap-5 px-6 lg:mx-auto lg:w-full lg:max-w-[1000px] lg:grid lg:grid-cols-4 lg:overflow-visible">
-          {DIRECTORY.map((c, i) => (
-            <Reveal key={c.name} delay={i * 80} className={`w-56 flex-shrink-0 lg:w-auto ${i % 2 === 1 ? "lg:mt-8" : ""}`}>
-              <div className="overflow-hidden rounded-[2rem] bg-white text-center shadow-product-card">
-                <div className={`${c.bg} px-6 pb-0 pt-6`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.img} alt={`${c.name}, creator`} loading="lazy" className="mx-auto h-28 w-28 rounded-full border-4 border-white object-cover shadow-product-card" />
-                </div>
-                <div className="p-5">
-                  <p className="font-display text-xl font-medium text-graphite">{c.name}</p>
-                  <p className="mt-0.5 text-xs font-medium text-ash">{c.niche}</p>
-                  <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-emerald-status/10 px-3 py-1 text-[11px] font-semibold text-emerald-status">
-                    <Star size={10} className="fill-emerald-status" /> Open to collabs
-                  </span>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-      <Reveal className="mt-10 text-center">
-        <Link href="/register?role=BUSINESS" className="inline-flex items-center gap-1.5 text-sm font-semibold text-signal-blue hover:opacity-80">
-          Meet everybody <ArrowRight size={15} />
-        </Link>
-      </Reveal>
-    </section>
-  );
-}
-
 /* --------------------------------- audiences ------------------------------- */
 
 function Audiences() {
@@ -604,7 +554,6 @@ export default function LandingPage() {
         <Hero isAuthed={isAuthed} role={user?.role} />
         <LoveNotes />
         <HowItWorks />
-        <Directory />
         <Audiences />
         <Faq />
         <CTA isAuthed={isAuthed} role={user?.role} />
