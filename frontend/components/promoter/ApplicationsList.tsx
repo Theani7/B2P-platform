@@ -58,23 +58,7 @@ export function ApplicationsInner() {
   const acceptRate = applications.length > 0 ? Math.round((acceptedCount / applications.length) * 100) : 0;
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
-      {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl shadow-sm ring-1 ring-slate-custom/10">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-graphite">My Applications</h1>
-          <p className="text-sm text-ash mt-2 max-w-xl">Track every campaign you've applied for, monitor progress, and manage your creator pipeline.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/promoter/marketplace"
-            className="inline-flex items-center gap-2 bg-signal-blue text-white h-11 px-5 rounded-inputs text-sm font-semibold hover:opacity-90 transition-colors shadow-sm"
-          >
-            <FileText size={16} /> Browse Marketplace
-          </Link>
-        </div>
-      </div>
-
+    <div className="space-y-8">
       {/* SUMMARY CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-slate-custom/10">
