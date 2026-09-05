@@ -244,40 +244,13 @@ function Hero({ isAuthed, role }: { isAuthed: boolean; role?: string }) {
         </Reveal>
 
         <Reveal delay={280}>
-          <div className="mb-3 flex items-center justify-center">
+          <div className="flex items-center justify-center">
             <div className="flex -space-x-3">
               {HERO_AVATARS.map((src) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img key={src} src={src} alt="Happy creator" loading="lazy" className="h-11 w-11 rounded-full border-[3px] border-linen-canvas object-cover shadow-product-card" />
               ))}
               <span className="flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-linen-canvas bg-midnight-ink text-[10px] font-semibold text-white">You?</span>
-            </div>
-          </div>
-          <p className="mb-12 inline-flex items-center gap-1.5 text-sm text-ash">
-            Join the friendliest marketplace in town
-            <Heart size={13} className="fill-coral-alert text-coral-alert" />
-          </p>
-        </Reveal>
-
-        <Reveal delay={340}>
-          <div className="relative mx-auto w-full max-w-[560px] text-left">
-            <div className="rounded-[2rem] border border-steel/10 bg-white p-6 shadow-feature-section sm:p-8">
-              <div className="mb-5 flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-status/15"><PartyPopper size={18} className="text-emerald-status" /></span>
-                <div>
-                  <p className="text-sm font-semibold text-graphite">You have a new match!</p>
-                  <p className="text-xs text-ash">Food and lifestyle · 96% fit</p>
-                </div>
-              </div>
-              <div className="rounded-3xl bg-sky-wash/60 p-4">
-                <p className="text-sm leading-relaxed text-graphite">
-                  “Your snack launch is perfect for my audience. I already have three video ideas!”
-                </p>
-              </div>
-              <div className="mt-4 flex gap-3">
-                <span className="flex-1 rounded-full bg-signal-blue py-2.5 text-center text-xs font-semibold text-white">Say hello</span>
-                <span className="flex-1 rounded-full bg-steel/10 py-2.5 text-center text-xs font-semibold text-steel">Peek profile</span>
-              </div>
             </div>
           </div>
         </Reveal>
