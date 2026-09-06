@@ -38,7 +38,7 @@ const industryOptions = ["Technology", "Fashion", "Food", "Other", "Finance", "H
 
 export default function BusinessProfilePage() {
   const qc = useQueryClient();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const router = useRouter();
   
   const { data: profile, isLoading } = useBusinessProfile();
@@ -65,6 +65,7 @@ export default function BusinessProfilePage() {
     handleSubmit,
     reset,
     getValues,
+    watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -100,6 +101,7 @@ export default function BusinessProfilePage() {
       }
       notifySuccess("Profile updated successfully");
       reset(data);
+      refreshUser();
     } catch (err: any) {
       notifyApiError(err, "Failed to update profile");
     }
@@ -121,6 +123,7 @@ export default function BusinessProfilePage() {
         await createMutation.mutateAsync({ ...currentValues, logoUrl: url });
       }
       notifySuccess("Logo updated");
+      refreshUser();
     } catch (err: any) {
       notifyApiError(err, "Failed to upload logo");
     } finally {
@@ -152,89 +155,115 @@ export default function BusinessProfilePage() {
   return (
     <RequireAuth role={Role.BUSINESS}>
       <div className="max-w-[1200px] mx-auto space-y-8 pb-32">
+        {/* SIGNATURE HERO BANNER */}
         <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
           <div
             className="pointer-events-none absolute inset-0"
             style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
           />
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Business Profile</h1>
-              <p className="text-sm text-ash mt-2">Manage your company information and public presence.</p>
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-sky-wash rounded-pill text-signal-blue font-semibold text-sm">
-                <span>{completion?.completion ?? 0}% Complete</span>
-              </div>
-              {isPending || verified ? (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-pill bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-sm font-medium">
-                  <BadgeCheck size={16} /> {verified ? "Verified Business" : "Verification Pending"}
-                </div>
-              ) : isComplete ? (
-                <button
-                  onClick={requestVerification}
-                  disabled={verifying || hasPendingRequest}
-                  className="flex items-center gap-2 px-5 h-11 rounded-pill bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
-                >
-                  <BadgeCheck size={16} /> Request Verification
-                </button>
-              ) : (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-pill bg-amber-tag/10 text-amber-tag border border-amber-tag/20 text-sm font-medium">
-                  <Clock size={16} /> Complete profile to verify
-                </div>
-              )}
-              <button
-                onClick={handleSubmit(onSubmit)}
-                disabled={!isDirty || isSubmitting}
-                className={`flex items-center gap-2 px-6 h-11 rounded-pill text-sm font-medium transition-all shadow-product-card ${
-                  isDirty && !isSubmitting
-                    ? "hero-blue-fade text-white hover:opacity-90 hover:scale-[1.02]"
-                    : "bg-slate-custom/5 text-steel cursor-not-allowed"
-                }`}
-              >
-                {isSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
-                {isSubmitting ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card flex flex-col relative overflow-hidden">
-          <div className="h-32 sm:h-40 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
-            <div className="absolute inset-0 bg-black/5 mix-blend-overlay"></div>
-            {verified && (
-              <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-pill flex items-center gap-1.5 text-xs font-semibold text-white shadow-product-card-sm">
-                <BadgeCheck size={16} /> Verified Business
-              </div>
-            )}
-          </div>
-          <div className="px-6 sm:px-8 pb-6 sm:pb-8">
-            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 sm:gap-6">
-              <div className="relative shrink-0 -mt-12 sm:-mt-16 z-10">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-white shadow-sm flex items-center justify-center overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+              {/* Logo with upload trigger */}
+              <div className="relative group w-fit shrink-0">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-white overflow-hidden shadow-md bg-sky-wash flex items-center justify-center">
                   {logoUpload.isPending ? (
                     <Spinner />
                   ) : profile?.logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={profile.logoUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <Avatar initials={profile?.companyName?.[0] || "C"} size="xl" colorIndex={0} />
+                    <Avatar initials={(watch("companyName")?.[0] || profile?.companyName?.[0] || "C").toUpperCase()} size="lg" colorIndex={0} className="w-full h-full text-3xl" />
                   )}
                 </div>
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-8 h-8 bg-white border border-slate-custom/10 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-product-card-sm"
+                  disabled={logoUpload.isPending}
+                  title="Upload company logo"
+                  className="absolute bottom-0 right-0 w-7 h-7 bg-white border border-steel/20 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-all shadow-sm disabled:opacity-50 opacity-0 group-hover:opacity-100"
                 >
-                  <Upload size={14} />
+                  <Upload size={13} />
                 </button>
                 <input type="file" ref={fileRef} onChange={onLogo} accept="image/*" className="hidden" />
               </div>
-              <div className="flex-1 text-center sm:text-left sm:pb-2">
-                <h2 className="font-display text-2xl sm:text-3xl font-semibold text-graphite tracking-tight">
-                  {profile?.companyName || "Your Company"}
-                </h2>
-                <p className="text-sm sm:text-base font-medium text-ash mt-1">{profile?.industry || "Industry not set"}</p>
+
+              {/* Company Identity */}
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-signal-blue font-mono uppercase tracking-wider">
+                    Business Profile
+                  </span>
+                  {verified && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-status bg-emerald-status/10 px-2 py-0.5 rounded-pill border border-emerald-status/20">
+                      <BadgeCheck size={12} /> Verified
+                    </span>
+                  )}
+                </div>
+
+                {/* Company Name - Live Bound */}
+                <h1 className="mt-1 truncate font-display text-2xl sm:text-3xl font-bold tracking-tight text-midnight-ink">
+                  {watch("companyName") || profile?.companyName || "Your Company"}
+                </h1>
+
+                {/* Industry & Location */}
+                <div className="flex flex-wrap items-center gap-2.5 mt-2 text-xs font-medium text-ash">
+                  {(watch("industry") || profile?.industry) && (
+                    <span className="inline-flex items-center gap-1 bg-sky-wash text-signal-blue px-2.5 py-0.5 rounded-pill font-semibold text-[11px] border border-signal-blue/20">
+                      <Briefcase size={12} /> {watch("industry") || profile?.industry}
+                    </span>
+                  )}
+                  {(watch("location") || profile?.location) && (
+                    <span className="inline-flex items-center gap-1 bg-linen-canvas text-graphite px-2.5 py-0.5 rounded-pill text-[11px] border border-steel/15">
+                      <MapPin size={12} className="text-ash" /> {watch("location") || profile?.location}
+                    </span>
+                  )}
+                  {(watch("website") || profile?.website) && (
+                    <span className="inline-flex items-center gap-1 text-ash text-[11px]">
+                      <Globe size={12} className="text-ash" /> {watch("website") || profile?.website}
+                    </span>
+                  )}
+                </div>
               </div>
+            </div>
+
+            {/* Action CTAs */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <div className="hidden sm:inline-flex items-center gap-1.5 h-10 px-4 bg-sky-wash rounded-pill text-signal-blue font-semibold text-xs border border-signal-blue/20">
+                <span>{completion?.completion ?? 0}% Complete</span>
+              </div>
+
+              {isPending || verified ? (
+                <div className="inline-flex items-center gap-1.5 h-10 px-4 rounded-pill bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-xs font-semibold">
+                  <BadgeCheck size={14} /> {verified ? "Verified" : "Pending"}
+                </div>
+              ) : isComplete ? (
+                <button
+                  type="button"
+                  onClick={requestVerification}
+                  disabled={verifying || hasPendingRequest}
+                  className="inline-flex items-center gap-1.5 h-10 px-4 rounded-pill bg-signal-blue/10 text-signal-blue text-xs font-semibold hover:bg-signal-blue/20 transition-all border border-signal-blue/20"
+                >
+                  <BadgeCheck size={14} /> Request Verification
+                </button>
+              ) : (
+                <div className="inline-flex items-center gap-1.5 h-10 px-4 rounded-pill bg-amber-tag/10 text-amber-tag border border-amber-tag/20 text-xs font-semibold">
+                  <Clock size={14} /> Complete to verify
+                </div>
+              )}
+
+              <button
+                type="submit"
+                form="profile-form"
+                disabled={!isDirty || isSubmitting}
+                className={`inline-flex items-center gap-1.5 h-10 px-5 rounded-pill text-xs font-semibold shadow-product-card transition-all ${
+                  isDirty && !isSubmitting
+                    ? "bg-signal-blue hover:bg-signal-blue/90 text-white hover:shadow-elevated"
+                    : "bg-steel/10 text-steel cursor-not-allowed"
+                }`}
+              >
+                {isSubmitting ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
+                <span>{isSubmitting ? "Saving..." : "Save Changes"}</span>
+              </button>
             </div>
           </div>
         </div>
