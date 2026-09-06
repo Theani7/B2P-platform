@@ -12,6 +12,7 @@ import {
   type PromoterProfileInput,
 } from "@/features/profile/api";
 import { usePublicSettings } from "@/features/settings/api";
+import { getNicheIcon } from "@/components/discovery/NicheBadge";
 
 const FALLBACK_NICHES = ["TECH","FASHION","FOOD","TRAVEL","FITNESS","LIFESTYLE","GAMING","BUSINESS","HEALTH","EDUCATION","ENTERTAINMENT","OTHER"];
 
@@ -100,11 +101,11 @@ export function PromoterProfileForm() {
               return (
                 <label
                   key={opt}
-                  className={`inline-flex cursor-pointer items-center gap-2 rounded-button border px-3 py-1.5 text-sm font-medium transition-colors ${checked ? "border-primary bg-sky-wash text-primary" : "border-steel/30 bg-white text-midnight-ink"} ${disabled ? "cursor-not-allowed opacity-40" : ""}`}
+                  className={`inline-flex cursor-pointer items-center gap-2 rounded-button border px-3 py-1.5 text-sm font-medium transition-colors ${checked ? "border-primary bg-sky-wash text-primary shadow-xs" : "border-steel/30 bg-white text-midnight-ink hover:border-primary/40"} ${disabled ? "cursor-not-allowed opacity-40" : ""}`}
                 >
                   <input
                     type="checkbox"
-                    className="h-4 w-4"
+                    className="h-4 w-4 rounded accent-primary"
                     checked={checked}
                     disabled={disabled}
                     onChange={() => {
@@ -117,6 +118,7 @@ export function PromoterProfileForm() {
                       });
                     }}
                   />
+                  {getNicheIcon(opt, { size: 16, className: checked ? "text-primary" : "text-steel" })}
                   {formatNicheLabel(opt)}
                 </label>
               );

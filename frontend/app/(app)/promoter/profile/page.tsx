@@ -31,6 +31,7 @@ import AIGenerateButton from "@/components/ui/AIGenerateButton";
 import {
   BadgeCheck, Save, Trophy, AlertTriangle, MapPin, Briefcase, Upload, RefreshCw, Share, Clock
 } from "lucide-react";
+import { getNicheIcon } from "@/components/discovery/NicheBadge";
 import { usePublicSettings } from "@/features/settings/api";
 
 const schema = z.object({
@@ -281,10 +282,20 @@ function PromoterProfileInner() {
               {/* Badges / Metrics */}
               <div className="flex flex-wrap items-center gap-2.5 mt-2 text-xs font-medium text-ash">
                 {(niches?.length ?? 0) > 0 && (
-                  <span className="inline-flex items-center gap-1 bg-sky-wash text-signal-blue px-2.5 py-0.5 rounded-pill font-semibold text-[11px] border border-signal-blue/20">
-                    <Briefcase size={12} /> {NICHE_OPTIONS.find((o: any) => o.value === niches[0])?.label || niches[0]}
-                    {niches.length > 1 && <span className="font-bold">+{niches.length - 1}</span>}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {niches.map((nicheVal: string) => {
+                      const label = NICHE_OPTIONS.find((o: any) => o.value === nicheVal)?.label || nicheVal;
+                      return (
+                        <span
+                          key={nicheVal}
+                          className="inline-flex items-center gap-1.5 bg-sky-wash text-signal-blue px-2.5 py-0.5 rounded-pill font-semibold text-[11px] border border-signal-blue/20 shadow-xs"
+                        >
+                          {getNicheIcon(nicheVal, { size: 12, className: "text-signal-blue flex-shrink-0" })}
+                          <span>{label}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
                 )}
                 {location && (
                   <span className="inline-flex items-center gap-1 bg-linen-canvas text-graphite px-2.5 py-0.5 rounded-pill text-[11px] border border-steel/15">
@@ -423,11 +434,11 @@ function PromoterProfileInner() {
                         return (
                           <label
                             key={opt.value}
-                            className={`inline-flex cursor-pointer items-center gap-2 rounded-button border px-3 py-1.5 text-sm font-medium transition-colors ${checked ? "border-signal-blue bg-sky-wash text-signal-blue" : "border-slate-custom/20 bg-white text-graphite"} ${disabled ? "cursor-not-allowed opacity-40" : "hover:border-signal-blue"}`}
+                            className={`inline-flex cursor-pointer items-center gap-2 rounded-button border px-3 py-2 text-sm font-medium transition-all ${checked ? "border-signal-blue bg-sky-wash text-signal-blue shadow-xs" : "border-slate-custom/20 bg-white text-graphite hover:border-signal-blue/40"} ${disabled ? "cursor-not-allowed opacity-40" : ""}`}
                           >
                             <input
                               type="checkbox"
-                              className="h-4 w-4 accent-[#145aff]"
+                              className="h-4 w-4 rounded accent-[#145aff]"
                               checked={checked}
                               disabled={disabled}
                               onChange={() => {
@@ -437,7 +448,8 @@ function PromoterProfileInner() {
                                 setValue("niches", next, { shouldDirty: true, shouldValidate: true });
                               }}
                             />
-                            {opt.label}
+                            {getNicheIcon(opt.value, { size: 16, className: checked ? "text-signal-blue" : "text-ash" })}
+                            <span>{opt.label}</span>
                           </label>
                         );
                       })}

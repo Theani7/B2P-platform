@@ -10,20 +10,31 @@ import {
   Barbell,
   GameController,
   Briefcase,
+  Heart,
+  FirstAid,
+  GraduationCap,
+  FilmStrip,
+  Coins,
+  MusicNotes,
+  Palette,
+  Camera,
   Tag,
   IconProps,
 } from "@phosphor-icons/react";
 
 export function getNicheIcon(niche?: string, props: IconProps = {}) {
-  const norm = (niche || "").toUpperCase().trim();
+  const norm = (niche || "").toUpperCase().trim().replace(/[\s-]+/g, "_");
   switch (norm) {
     case "LIFESTYLE":
       return <Sparkle weight="bold" {...props} />;
     case "TECH":
+    case "TECHNOLOGY":
       return <Laptop weight="bold" {...props} />;
     case "FASHION":
       return <TShirt weight="bold" {...props} />;
     case "FOOD":
+    case "FOOD_BEVERAGE":
+    case "FOOD_AND_BEVERAGE":
       return <ForkKnife weight="bold" {...props} />;
     case "TRAVEL":
       return <AirplaneTilt weight="bold" {...props} />;
@@ -33,6 +44,24 @@ export function getNicheIcon(niche?: string, props: IconProps = {}) {
       return <GameController weight="bold" {...props} />;
     case "BUSINESS":
       return <Briefcase weight="bold" {...props} />;
+    case "BEAUTY":
+      return <Heart weight="bold" {...props} />;
+    case "HEALTH":
+    case "WELLNESS":
+      return <FirstAid weight="bold" {...props} />;
+    case "EDUCATION":
+      return <GraduationCap weight="bold" {...props} />;
+    case "ENTERTAINMENT":
+      return <FilmStrip weight="bold" {...props} />;
+    case "FINANCE":
+      return <Coins weight="bold" {...props} />;
+    case "MUSIC":
+      return <MusicNotes weight="bold" {...props} />;
+    case "ART":
+    case "DESIGN":
+      return <Palette weight="bold" {...props} />;
+    case "PHOTOGRAPHY":
+      return <Camera weight="bold" {...props} />;
     default:
       return <Tag weight="bold" {...props} />;
   }
