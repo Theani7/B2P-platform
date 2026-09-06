@@ -8,14 +8,21 @@ export class AppError extends Error {
     this.name = "AppError";
     this.statusCode = statusCode;
     this.details = details;
+    Object.setPrototypeOf(this, AppError.prototype);
   }
 }
 
 export function errorHandler(err, req, res, next) {
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
+  const isAppError =
+    err instanceof AppError ||
+    err?.name === "AppError" ||
+    (err && typeof err.statusCode === "number" && err.statusCode >= 400 && err.statusCode < 600);
+
+  if (isAppError) {
+    const status = err.statusCode || 400;
+    return res.status(status).json({
       success: false,
-      message: err.message,
+      message: err.message || "An error occurred",
       errors: err.details || [],
     });
   }
