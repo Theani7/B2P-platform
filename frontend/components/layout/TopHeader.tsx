@@ -106,6 +106,15 @@ export function TopHeader() {
                 <p className="text-sm font-medium text-graphite truncate">{user?.fullName || "User"}</p>
                 <p className="text-sm text-steel truncate">{user?.email}</p>
               </div>
+              {user?.role !== Role.ADMIN && (
+                <Link
+                  href={user?.role === Role.BUSINESS ? "/business/profile" : "/promoter/profile"}
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-graphite hover:bg-sky-wash transition-colors"
+                >
+                  <User size={16} className="text-graphite" />
+                  Edit Profile
+                </Link>
+              )}
               <Link
                 href={user?.role === Role.ADMIN ? "/admin/settings" : "/settings/account"}
                 className="flex items-center gap-3 px-4 py-2 text-sm text-graphite hover:bg-sky-wash transition-colors"

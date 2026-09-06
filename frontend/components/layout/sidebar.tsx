@@ -24,6 +24,7 @@ import {
   Plus,
   LogOut,
   Inbox,
+  User,
 } from "lucide-react";
 import { notifyError } from "@/lib/notify";
 import { useEffect, useRef } from "react";
@@ -81,6 +82,7 @@ const businessSections = [
   {
     title: "Account",
     links: [
+      { to: "/business/profile", label: "Profile", icon: User },
       { to: "/settings/account", label: "Settings", icon: Settings },
     ],
   },
@@ -109,6 +111,7 @@ const promoterSections = [
   {
     title: "Account",
     links: [
+      { to: "/promoter/profile", label: "Profile", icon: User },
       { to: "/settings/account", label: "Settings", icon: Settings },
     ],
   },
