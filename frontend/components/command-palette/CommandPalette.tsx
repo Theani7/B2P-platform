@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -48,6 +49,10 @@ export function CommandPalette() {
   const [visible, setVisible] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -58,10 +63,25 @@ export function CommandPalette() {
   const { recentCommands, addRecentCommand, clearRecentCommands } = useRecentCommands();
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 180);
+  };
+
+  useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setIsOpen((prev) => !prev);
+        if (isOpenRef.current) {
+          handleClose();
+        } else {
+          setIsOpen(true);
+        }
       }
     };
     window.addEventListener("keydown", handleGlobalKeyDown);
@@ -178,14 +198,14 @@ export function CommandPalette() {
       if (activeItems[activeIndex]) executeCommand(activeItems[activeIndex]);
     } else if (e.key === "Escape") {
       e.preventDefault();
-      setIsOpen(false);
+      handleClose();
     }
   };
 
   const executeCommand = (cmd: Command) => {
     addRecentCommand(cmd.id);
+    handleClose();
     cmd.action();
-    setIsOpen(false);
   };
 
   useEffect(() => {
@@ -219,17 +239,18 @@ export function CommandPalette() {
         </div>
       </div>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4 pb-4">
+      {isOpen && mounted && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-[10vh] sm:pt-[14vh] px-4 pb-4">
           <div
-            className={`fixed inset-0 bg-midnight-ink/40 transition-all duration-300 ease-out ${
-              visible ? "opacity-100 backdrop-blur-md" : "opacity-0 backdrop-blur-none"
+            className={`fixed inset-0 bg-midnight-ink/50 backdrop-blur-sm transition-opacity duration-200 ease-out ${
+              visible ? "opacity-100" : "opacity-0"
             }`}
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
+            aria-hidden="true"
           />
 
-          <div className={`relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-steel/15 overflow-hidden flex flex-col max-h-[80vh] transition-all duration-300 ease-out ${
-            visible ? "translate-y-0 scale-100 opacity-100" : "-translate-y-3 scale-[0.98] opacity-0"
+          <div className={`relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-steel/15 overflow-hidden flex flex-col max-h-[80vh] transition-all duration-200 ease-out ${
+            visible ? "translate-y-0 scale-100 opacity-100" : "-translate-y-2 scale-[0.98] opacity-0"
           }`}>
             <div className="flex items-center gap-3 px-4 py-3.5 border-b border-steel/10 bg-linen-canvas/30">
               <Search size={18} className="text-signal-blue flex-shrink-0" />
@@ -310,7 +331,8 @@ export function CommandPalette() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
