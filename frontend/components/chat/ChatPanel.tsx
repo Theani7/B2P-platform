@@ -17,8 +17,8 @@ interface ChatPanelProps {
 }
 
 function formatBudget(n?: number | null) {
-  if (!n) return "0";
-  return `${n.toLocaleString()}`;
+  if (!n) return "Rs. 0";
+  return `Rs. ${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n)}`;
 }
 
 export function ChatPanel({ active, userId, onBack }: ChatPanelProps) {

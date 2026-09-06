@@ -46,7 +46,11 @@ export function StatusBadge({ status, className = "" }: { status: CampaignStatus
 }
 
 export function formatBudget(n: number) {
-  return `$${n.toLocaleString()}`;
+  if (n == null) return "Rs. 0";
+  const formatted = new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 0,
+  }).format(n);
+  return `Rs. ${formatted}`;
 }
 
 export function formatDate(s: string) {

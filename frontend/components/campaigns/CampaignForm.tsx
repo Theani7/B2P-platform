@@ -94,7 +94,7 @@ export function CampaignForm({
 
   const aiContext = [
     form.category && `Category: ${form.category}`,
-    form.budget && `Budget: $${form.budget}`,
+    form.budget && `Budget: Rs. ${form.budget}`,
     form.location && `Location: ${form.location}`,
     form.targetAudience && `Target Audience: ${form.targetAudience}`,
   ].filter(Boolean).join("\n");
@@ -140,7 +140,7 @@ export function CampaignForm({
             ))}
           </select>
         </label>
-        <Input label="Budget" type="number" min={1} max={1000000000} value={form.budget} onChange={set("budget")} required />
+        <Input label="Budget (Rs.)" type="number" min={1} max={1000000000} value={form.budget} onChange={set("budget")} placeholder="e.g. 50000" required />
         <Input label="Location" value={form.location} onChange={set("location")} maxLength={255} placeholder="e.g., Kathmandu, Nepal or Online" required />
         <label className="block">
           <div className="flex justify-between items-end mb-1">

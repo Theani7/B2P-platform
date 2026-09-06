@@ -15,7 +15,9 @@ import {
 } from "lucide-react";
 
 const fmtBudget = (n?: number | null) =>
-  typeof n === "number" ? "$" + n.toLocaleString() : "—";
+  typeof n === "number"
+    ? "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n)
+    : "—";
 
 // Map filter tab labels to API status values
 const STATUS_FILTER_MAP: Record<string, string | undefined> = {

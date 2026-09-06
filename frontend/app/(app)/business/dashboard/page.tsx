@@ -18,7 +18,7 @@ import {
   MegaphoneSimple,
   Handshake,
   UsersThree,
-  CurrencyDollar,
+  Coins,
   Eye,
   CheckCircle,
   TrendUp,
@@ -157,13 +157,13 @@ function DashboardInner() {
 
         <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-signal-blue/20 transition-all">
           <div className="w-10 h-10 rounded-xl bg-sky-wash text-signal-blue flex items-center justify-center flex-shrink-0">
-            <CurrencyDollar size={20} weight="bold" />
+            <Coins size={20} weight="bold" />
           </div>
           <div className="min-w-0">
             <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Total Investment</p>
             <div className="flex items-baseline gap-1 mt-0.5">
               <span className="text-2xl font-bold font-mono text-midnight-ink">
-                {statsLoading ? "—" : `$${(analytics?.summary.total_spent ?? 0).toLocaleString()}`}
+                {statsLoading ? "—" : `Rs. ${(analytics?.summary.total_spent ?? 0).toLocaleString("en-IN")}`}
               </span>
             </div>
           </div>
