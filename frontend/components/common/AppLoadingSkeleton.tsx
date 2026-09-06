@@ -1,8 +1,8 @@
 export function AppLoadingSkeleton() {
-  const shimmer = "bg-gradient-to-r from-slate-custom/5 via-slate-custom/12 to-slate-custom/5 bg-[length:200%_100%] animate-shimmer";
+  const shimmer = "bg-gradient-to-r from-slate-custom/5 via-slate-custom/12 to-slate-custom/5 bg-[length:200%_100%] motion-safe:animate-shimmer";
 
   return (
-    <div className="w-full space-y-6 p-2 sm:p-4 transition-opacity duration-200 ease-out">
+    <div className="w-full space-y-6 p-2 sm:p-4 animate-fade-in transition-opacity duration-200 ease-out">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-custom/10">
         <div className="space-y-2.5">
