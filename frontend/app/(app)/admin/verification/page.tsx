@@ -11,7 +11,8 @@ import {
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { notifySuccess, notifyError } from "@/lib/notify";
-import { Filter, CheckCircle, XCircle, FileText, Calendar, ShieldAlert } from "lucide-react";
+import { Filter, CheckCircle, XCircle, FileText, Calendar, ShieldAlert, ExternalLink } from "lucide-react";
+import type { AdminVerificationRequest } from "@/features/admin/types";
 
 function Dialog({
   isOpen,
@@ -128,8 +129,10 @@ function VerificationRequests() {
         <EmptyState title="No verification requests" description="There are currently no requests matching your criteria." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {data.items.map((req) => {
+          {(data.items as AdminVerificationRequest[]).map((req) => {
             const statusStyle = getStatusStyle(req.status);
+            const docUrl = req.document_url || req.documentUrl;
+            const docName = req.document_name || req.documentName || "Verification Document.pdf";
             return (
               <div
                 key={req.id}
@@ -220,6 +223,23 @@ function VerificationRequests() {
                           <span className="font-medium text-graphite">{req.profile_data.location}</span>
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {docUrl && (
+                    <div className="mt-3 pt-3 border-t border-slate-custom/10 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs text-graphite font-medium min-w-0 pr-2">
+                        <FileText size={15} className="text-signal-blue shrink-0" />
+                        <span className="truncate max-w-[150px]" title={docName}>{docName}</span>
+                      </div>
+                      <a
+                        href={docUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-signal-blue hover:underline shrink-0"
+                      >
+                        View PDF <ExternalLink size={12} />
+                      </a>
                     </div>
                   )}
 
