@@ -67,7 +67,6 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
 
 const NAV_LINKS = [
   { href: "#how", label: "How it works" },
-  { href: "#creators", label: "Creators" },
   { href: "#stories", label: "Why us" },
   { href: "#faq", label: "FAQ" },
 ];
@@ -537,7 +536,6 @@ function Footer() {
   const cols = [
     { title: "Wander", links: [
       { label: "How it works", href: "#how" },
-      { label: "Creators", href: "#creators" },
       { label: "Why us", href: "#stories" },
     ] },
     { title: "Company", links: [
