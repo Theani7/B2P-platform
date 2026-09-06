@@ -3,14 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
-import { Button } from "@/components/ui/Button";
-import { Card, PageHeader } from "@/components/ui/Card";
-import { Spinner } from "@/components/ui/Spinner";
 import { SkeletonCards } from "@/components/ui/Skeleton";
-import { StatCard } from "@/components/ui/Stats";
-import { Avatar } from "@/components/ui/Avatar";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { StatusBadge, formatBudget } from "@/components/campaigns/StatusBadge";
+import { NicheBadge } from "@/components/discovery/NicheBadge";
 import { CampaignStatus } from "@/features/campaigns/types";
 import {
   useCampaigns,
@@ -22,11 +17,26 @@ import {
 import { notifySuccess, notifyError } from "@/lib/notify";
 import { useRouter } from "next/navigation";
 import {
-  Megaphone, Plus, Search, Edit3, Archive, Trash2,
-  MoreVertical, Eye, FolderDot, FolderOpen, Rocket,
-  MapPin, Calendar, Users,
-} from "lucide-react";
-
+  MegaphoneSimple,
+  Plus,
+  MagnifyingGlass,
+  MapPin,
+  CalendarBlank,
+  DotsThreeVertical,
+  Eye,
+  PencilSimple,
+  Archive,
+  Trash,
+  RocketLaunch,
+  ArrowClockwise,
+  XCircle,
+  Broadcast,
+  Handshake,
+  NotePencil,
+  X,
+  CaretRight,
+  WarningCircle,
+} from "@phosphor-icons/react";
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
   useEffect(() => {
@@ -39,7 +49,21 @@ function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () =
   }, [ref, handler]);
 }
 
-function ActionMenu({ campaign, onPublish, onArchive, onReopen, onCancel, onDelete }: any) {
+function ActionMenu({
+  campaign,
+  onPublish,
+  onArchive,
+  onReopen,
+  onCancel,
+  onDelete,
+}: {
+  campaign: any;
+  onPublish: (id: string) => void;
+  onArchive: (id: string) => void;
+  onReopen: (id: string) => void;
+  onCancel: (id: string) => void;
+  onDelete: (id: string, title: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useClickOutside(menuRef, () => setOpen(false));
@@ -48,62 +72,96 @@ function ActionMenu({ campaign, onPublish, onArchive, onReopen, onCancel, onDele
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
-        className="p-1.5 text-fog hover:text-signal-blue hover:bg-signal-blue/10 rounded-md transition-colors"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(!open);
+        }}
+        aria-label="Campaign actions"
+        className="p-1 text-fog hover:text-midnight-ink hover:bg-sky-wash rounded-lg transition-colors"
       >
-        <MoreVertical size={18} />
+        <DotsThreeVertical size={20} weight="bold" />
       </button>
       {open && (
-        <div className="absolute right-0 mt-1 w-48 bg-white border border-slate-custom/10 rounded-xl shadow-xl z-50 overflow-hidden py-1">
-          <button
-            onClick={(e) => { e.stopPropagation(); router.push(`/business/campaigns/${campaign.id}`); }}
-            className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-graphite hover:bg-sky-wash transition-colors"
-          >
-            <Eye size={16} className="text-ash" /> View Details
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); router.push(`/business/campaigns/${campaign.id}`); }}
-            className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-graphite hover:bg-sky-wash transition-colors"
-          >
-            <Edit3 size={16} className="text-ash" /> Edit Campaign
-          </button>
-          <div className="h-px bg-slate-custom/10 my-1" />
-          {campaign.status === "DRAFT" ? (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="absolute right-0 mt-1.5 w-48 bg-white border border-steel/15 rounded-xl shadow-xl z-50 overflow-hidden py-1 divide-y divide-steel/10"
+        >
+          <div className="py-1">
             <button
-              onClick={(e) => { e.stopPropagation(); setOpen(false); onPublish(campaign.id); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm font-bold text-signal-blue hover:bg-signal-blue/5 transition-colors"
+              onClick={() => {
+                setOpen(false);
+                router.push(`/business/campaigns/${campaign.id}`);
+              }}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-graphite hover:bg-sky-wash transition-colors text-left"
             >
-              <Rocket size={16} /> Publish
+              <Eye size={15} weight="bold" className="text-ash" /> View Details
             </button>
-          ) : campaign.status !== "ARCHIVED" && campaign.status !== "CANCELLED" ? (
-            <>
-              <button
-                onClick={(e) => { e.stopPropagation(); setOpen(false); onArchive(campaign.id); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-amber-tag hover:bg-amber-tag/10 transition-colors"
-              >
-                <Archive size={16} /> Archive
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); setOpen(false); onCancel(campaign.id); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-coral-alert hover:bg-coral-alert/10 transition-colors"
-              >
-                <Trash2 size={16} /> Cancel
-              </button>
-            </>
-          ) : (
             <button
-              onClick={(e) => { e.stopPropagation(); setOpen(false); onReopen(campaign.id); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-signal-blue hover:bg-signal-blue/5 transition-colors"
+              onClick={() => {
+                setOpen(false);
+                router.push(`/business/campaigns/${campaign.id}/edit`);
+              }}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-graphite hover:bg-sky-wash transition-colors text-left"
             >
-              <FolderOpen size={16} /> Reopen
+              <PencilSimple size={15} weight="bold" className="text-ash" /> Edit Campaign
             </button>
-          )}
-          <button
-            onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(campaign.id, campaign.title); }}
-            className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-coral-alert hover:bg-coral-alert/10 transition-colors"
-          >
-            <Trash2 size={16} /> Delete
-          </button>
+          </div>
+          <div className="py-1">
+            {campaign.status === "DRAFT" ? (
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  onPublish(campaign.id);
+                }}
+                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-signal-blue hover:bg-signal-blue/10 transition-colors text-left"
+              >
+                <RocketLaunch size={15} weight="bold" /> Publish
+              </button>
+            ) : campaign.status !== "ARCHIVED" && campaign.status !== "CANCELLED" ? (
+              <>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    onArchive(campaign.id);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-amber-tag hover:bg-amber-tag/10 transition-colors text-left"
+                >
+                  <Archive size={15} weight="bold" /> Archive
+                </button>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    onCancel(campaign.id);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-coral-alert hover:bg-coral-alert/10 transition-colors text-left"
+                >
+                  <XCircle size={15} weight="bold" /> Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  onReopen(campaign.id);
+                }}
+                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-signal-blue hover:bg-signal-blue/10 transition-colors text-left"
+              >
+                <ArrowClockwise size={15} weight="bold" /> Reopen
+              </button>
+            )}
+          </div>
+          <div className="py-1">
+            <button
+              onClick={() => {
+                setOpen(false);
+                onDelete(campaign.id, campaign.title);
+              }}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-coral-alert hover:bg-coral-alert/10 transition-colors text-left"
+            >
+              <Trash size={15} weight="bold" /> Delete
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -114,11 +172,11 @@ function CampaignsPageInner() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const router = useRouter();
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 500);
+    const timer = setTimeout(() => setDebouncedSearch(search), 400);
     return () => clearTimeout(timer);
   }, [search]);
 
@@ -142,19 +200,41 @@ function CampaignsPageInner() {
   const confirmDelete = () => {
     if (!deleteConfirm) return;
     deleteCampaign.mutate(deleteConfirm.id, {
-      onSuccess: () => { notifySuccess("Campaign deleted"); setDeleteConfirm(null); },
-      onError: () => { notifyError("Failed to delete campaign"); setDeleteConfirm(null); },
+      onSuccess: () => {
+        notifySuccess("Campaign deleted");
+        setDeleteConfirm(null);
+      },
+      onError: () => {
+        notifyError("Failed to delete campaign");
+        setDeleteConfirm(null);
+      },
     });
   };
+
   const handleArchive = (id: string) =>
-    archiveCampaign.mutate(id, { onSuccess: () => notifySuccess("Campaign archived"), onError: () => notifyError("Failed to archive campaign") });
+    archiveCampaign.mutate(id, {
+      onSuccess: () => notifySuccess("Campaign archived"),
+      onError: () => notifyError("Failed to archive campaign"),
+    });
+
   const handleReopen = (id: string) =>
-    reopenCampaign.mutate(id, { onSuccess: () => notifySuccess("Campaign reopened"), onError: () => notifyError("Failed to reopen campaign") });
+    reopenCampaign.mutate(id, {
+      onSuccess: () => notifySuccess("Campaign reopened"),
+      onError: () => notifyError("Failed to reopen campaign"),
+    });
+
   const handleCancel = (id: string) =>
-    updateCampaign.mutate({ id, data: { status: CampaignStatus.CANCELLED } }, { onSuccess: () => notifySuccess("Campaign cancelled"), onError: () => notifyError("Failed to cancel campaign") });
+    updateCampaign.mutate(
+      { id, data: { status: CampaignStatus.CANCELLED } },
+      {
+        onSuccess: () => notifySuccess("Campaign cancelled"),
+        onError: () => notifyError("Failed to cancel campaign"),
+      }
+    );
+
   const handlePublish = (id: string) =>
     publishCampaign.mutate(id, {
-      onSuccess: () => notifySuccess("Campaign published! It's now visible in the marketplace."),
+      onSuccess: () => notifySuccess("Campaign published! It's now live on the marketplace."),
       onError: (e: any) => notifyError(e?.response?.data?.message || "Failed to publish campaign"),
     });
 
@@ -163,120 +243,239 @@ function CampaignsPageInner() {
   const openCount = stats.data?.open_campaigns ?? 0;
   const draftCount = stats.data?.draft_campaigns ?? 0;
   const activeCount = stats.data?.active_campaigns ?? 0;
+  const completedCount = stats.data?.completed_campaigns ?? 0;
 
-  const TABS = ["ALL", "DRAFT", "OPEN", "ACTIVE", "COMPLETED"];
+  const TABS = [
+    { key: "ALL", label: "All", count: stats.data?.total_campaigns ?? totalCampaigns },
+    { key: "OPEN", label: "Open", count: openCount },
+    { key: "ACTIVE", label: "Active", count: activeCount },
+    { key: "DRAFT", label: "Drafts", count: draftCount },
+    { key: "COMPLETED", label: "Completed", count: completedCount },
+  ];
 
-  if (error) return (
-    <div className="flex flex-col items-center justify-center py-16">
-      <div className="w-16 h-16 rounded-full bg-coral-alert/10 flex items-center justify-center mb-4">
-        <Megaphone size={32} className="text-coral-alert" />
+  const fmtDate = (s: string) => {
+    if (!s) return "";
+    try {
+      return new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    } catch {
+      return "";
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="w-14 h-14 rounded-2xl bg-coral-alert/10 text-coral-alert flex items-center justify-center mb-4">
+          <WarningCircle size={28} weight="bold" />
+        </div>
+        <p className="text-base font-bold text-graphite">Failed to load campaigns</p>
+        <p className="text-xs text-ash mt-1.5 max-w-sm text-center">{(error as Error).message}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-sky-wash text-signal-blue text-xs font-semibold rounded-pill hover:bg-signal-blue hover:text-white transition-colors"
+        >
+          Try Again
+        </button>
       </div>
-      <p className="text-lg font-bold text-graphite">Error loading campaigns</p>
-      <p className="text-sm text-ash mt-2">{(error as Error).message}</p>
-    </div>
-  );
-
-  const fmtDate = (s: string) => new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    );
+  }
 
   return (
-    <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
-      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
-        />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-signal-blue/10 text-signal-blue rounded-xl flex items-center justify-center shadow-sm">
-              <Megaphone size={24} />
-            </div>
-            <div>
-              <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">My Campaigns</h1>
-              <p className="text-sm text-ash mt-2">Manage, track, and publish your marketing campaigns.</p>
-            </div>
+    <div className="max-w-[1240px] mx-auto space-y-6 pb-20">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-midnight-ink">
+              My Campaigns
+            </h1>
+            <span className="text-xs font-bold font-mono px-2.5 py-0.5 rounded-pill bg-sky-wash text-signal-blue border border-signal-blue/20">
+              {stats.data?.total_campaigns ?? totalCampaigns}
+            </span>
           </div>
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <button
-              onClick={() => router.push("/business/campaigns/create")}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 h-11 bg-signal-blue text-white rounded-pill text-sm font-bold shadow-product-card hover:bg-signal-blue/90 transition-colors"
-            >
-              <Plus size={18} /> Create Campaign
-            </button>
+          <p className="text-xs sm:text-sm text-ash mt-1">
+            Track performance, review applications, and manage campaign lifecycles.
+          </p>
+        </div>
+        <button
+          onClick={() => router.push("/business/campaigns/create")}
+          className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-signal-blue hover:bg-signal-blue/90 text-white rounded-pill text-xs sm:text-sm font-semibold shadow-product-card transition-all hover:shadow-elevated self-start sm:self-auto"
+        >
+          <Plus size={16} weight="bold" />
+          <span>Create Campaign</span>
+        </button>
+      </div>
+
+      {/* Metrics Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-signal-blue/20 transition-all">
+          <div className="w-10 h-10 rounded-xl bg-sky-wash text-signal-blue flex items-center justify-center flex-shrink-0">
+            <MegaphoneSimple size={20} weight="bold" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Total Campaigns</p>
+            <p className="text-2xl font-bold font-mono text-midnight-ink mt-0.5">
+              {stats.data?.total_campaigns ?? totalCampaigns}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-emerald-status/20 transition-all">
+          <div className="w-10 h-10 rounded-xl bg-emerald-status/10 text-emerald-status flex items-center justify-center flex-shrink-0">
+            <Broadcast size={20} weight="bold" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Open for Apps</p>
+            <p className="text-2xl font-bold font-mono text-midnight-ink mt-0.5">
+              {openCount}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-amber-tag/20 transition-all">
+          <div className="w-10 h-10 rounded-xl bg-amber-tag/15 text-amber-tag flex items-center justify-center flex-shrink-0">
+            <Handshake size={20} weight="bold" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Active Collabs</p>
+            <p className="text-2xl font-bold font-mono text-midnight-ink mt-0.5">
+              {activeCount}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-steel/30 transition-all">
+          <div className="w-10 h-10 rounded-xl bg-steel/10 text-ash flex items-center justify-center flex-shrink-0">
+            <NotePencil size={20} weight="bold" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Drafts</p>
+            <p className="text-2xl font-bold font-mono text-midnight-ink mt-0.5">
+              {draftCount}
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
-          <StatCard label="Total Campaigns" value={stats.data?.total_campaigns ?? totalCampaigns} className="border-0 shadow-none bg-transparent" />
+      {/* Filter & Search Toolbar */}
+      <div className="bg-white border border-steel/10 rounded-2xl p-2.5 shadow-product-card flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 hide-scrollbar">
+          {TABS.map((tab) => {
+            const isSelected = statusFilter === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => {
+                  setStatusFilter(tab.key);
+                  setPage(1);
+                }}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-pill whitespace-nowrap transition-all ${
+                  isSelected
+                    ? "bg-midnight-ink text-white shadow-sm"
+                    : "text-ash hover:text-graphite hover:bg-sky-wash/70"
+                }`}
+              >
+                <span>{tab.label}</span>
+                {tab.count !== undefined && (
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded-pill leading-none ${
+                      isSelected ? "bg-white/20 text-white" : "bg-sky-wash text-ash"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
-        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-emerald-status/5 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
-          <StatCard label="Open for Apps" value={openCount} className="border-0 shadow-none bg-transparent" />
-        </div>
-        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-amber-tag/10 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
-          <StatCard label="Active Collabs" value={activeCount} className="border-0 shadow-none bg-transparent" />
-        </div>
-        <div className="rounded-cards-lg border border-steel/10 bg-gradient-to-br from-white to-sky-wash/50 p-[1px] shadow-product-card transition-transform hover:-translate-y-0.5">
-          <StatCard label="Drafts" value={draftCount} className="border-0 shadow-none bg-transparent" />
-        </div>
-      </div>
 
-      <div className="flex flex-col gap-2.5 rounded-[1.75rem] border border-slate-custom/10 bg-white p-2.5 shadow-feature-section transition-shadow focus-within:border-signal-blue/40 focus-within:shadow-blue-focus lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar">
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => { setStatusFilter(tab); setPage(1); }}
-              className={`px-4 py-2 text-xs font-bold rounded-pill whitespace-nowrap transition-colors ${
-                (statusFilter === tab || (!statusFilter && tab === "ALL"))
-                  ? "bg-midnight-ink text-white shadow-product-card"
-                  : "text-ash hover:text-graphite hover:bg-sky-wash"
-              }`}
-            >
-              {tab === "ALL" ? "All Campaigns" : tab}
-            </button>
-          ))}
-        </div>
-        <div className="relative w-full lg:w-72">
-          <span className="absolute left-2.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-2xl bg-sky-wash text-signal-blue">
-            <Search size={16} />
-          </span>
+        <div className="relative w-full md:w-72 flex-shrink-0">
+          <MagnifyingGlass
+            size={16}
+            weight="bold"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fog pointer-events-none"
+          />
           <input
             type="text"
             placeholder="Search campaigns..."
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="h-14 w-full bg-transparent pl-16 pr-4 text-[15px] font-medium text-graphite placeholder-fog outline-none"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className="h-9.5 w-full bg-linen-canvas border border-steel/15 rounded-pill pl-9 pr-8 text-xs font-medium text-graphite placeholder:text-fog focus:bg-white focus:border-signal-blue focus:ring-2 focus:ring-signal-blue/10 outline-none transition-all"
           />
+          {search && (
+            <button
+              onClick={() => {
+                setSearch("");
+                setPage(1);
+              }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-fog hover:text-graphite p-1 rounded-full"
+            >
+              <X size={13} weight="bold" />
+            </button>
+          )}
         </div>
       </div>
 
+      {/* Campaigns Grid */}
       {isLoading ? (
         <SkeletonCards count={6} />
       ) : campaigns.length === 0 ? (
-        <div className="bg-white border border-slate-custom/10 rounded-cards-lg p-12 shadow-product-card">
-          <EmptyState
-            title="No campaigns found"
-            description={search || statusFilter ? "Try adjusting your search or filters." : "You haven't created any campaigns yet."}
-            action={
-              <button onClick={() => router.push("/business/campaigns/create")} className="inline-flex items-center gap-2 px-6 h-11 bg-signal-blue text-white rounded-pill text-sm font-bold shadow-product-card hover:bg-signal-blue/90 transition-colors mt-2">
-                <Plus size={16} /> Create your first campaign
+        <div className="bg-white border border-steel/10 rounded-2xl p-12 shadow-product-card text-center flex flex-col items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-sky-wash text-signal-blue flex items-center justify-center mb-4">
+            <MegaphoneSimple size={28} weight="bold" />
+          </div>
+          <h3 className="text-base font-bold text-graphite">
+            {search || statusFilter !== "ALL"
+              ? "No matching campaigns found"
+              : "You haven't created any campaigns yet"}
+          </h3>
+          <p className="text-xs text-ash mt-1 max-w-sm leading-relaxed">
+            {search || statusFilter !== "ALL"
+              ? "Try adjusting your search terms or filter to see more campaigns."
+              : "Launch a new campaign to discover, invite, and collaborate with top promoters."}
+          </p>
+          <div className="mt-5 flex items-center gap-3">
+            {search || statusFilter !== "ALL" ? (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("ALL");
+                  setPage(1);
+                }}
+                className="px-4 py-2 rounded-pill bg-sky-wash text-signal-blue text-xs font-semibold hover:bg-signal-blue hover:text-white transition-colors"
+              >
+                Clear Filters
               </button>
-            }
-          />
+            ) : null}
+            <button
+              onClick={() => router.push("/business/campaigns/create")}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-signal-blue text-white rounded-pill text-xs font-bold shadow-product-card hover:bg-signal-blue/90 transition-colors"
+            >
+              <Plus size={15} weight="bold" /> Create Campaign
+            </button>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {campaigns.map((campaign: any) => (
             <div
               key={campaign.id}
               onClick={() => router.push(`/business/campaigns/${campaign.id}`)}
-              className="group bg-white border border-steel/10 rounded-cards-lg shadow-product-card hover:-translate-y-1.5 hover:border-signal-blue/30 hover:shadow-elevated transition-all duration-300 cursor-pointer flex flex-col h-[240px] overflow-hidden relative"
+              className="group bg-white border border-steel/10 rounded-2xl p-5 shadow-product-card hover:-translate-y-1 hover:border-signal-blue/30 hover:shadow-elevated transition-all duration-200 cursor-pointer flex flex-col justify-between relative"
             >
-              <div className={`h-1.5 w-full absolute top-0 left-0 ${campaign.status === "OPEN" ? "bg-signal-blue" : campaign.status === "ACTIVE" ? "bg-emerald-status" : "bg-slate-custom/20"}`} />
-              <div className="p-5 flex-1 flex flex-col">
-                <div className="flex items-start justify-between mb-3 mt-1">
-                  <StatusBadge status={campaign.status} />
+              {/* Header: Category + Status Badge on Left, Action Menu on Right */}
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {campaign.category && (
+                      <NicheBadge niche={campaign.category} className="!py-0.5 !px-2 text-[10px]" />
+                    )}
+                    <StatusBadge status={campaign.status} />
+                  </div>
                   <ActionMenu
                     campaign={campaign}
                     onPublish={handlePublish}
@@ -286,33 +485,54 @@ function CampaignsPageInner() {
                     onDelete={handleDelete}
                   />
                 </div>
-                <h3 className="text-base font-bold text-graphite mb-1.5 line-clamp-1 group-hover:text-signal-blue transition-colors">
+
+                {/* Campaign Title & Description */}
+                <h3 className="text-base font-bold text-graphite group-hover:text-signal-blue transition-colors line-clamp-1 mt-3">
                   {campaign.title}
                 </h3>
-                <p className="text-xs text-ash line-clamp-2 mb-4 flex-1">{campaign.description}</p>
-                <div className="mt-auto space-y-3">
-                  <div className="flex items-center gap-4 text-xs font-medium text-fog">
-                    <span className="flex items-center gap-1.5">
-                      <MapPin size={14} className="text-ash" />
-                      <span className="truncate max-w-[100px]">{campaign.location || "Remote"}</span>
+                <p className="text-xs text-ash line-clamp-2 mt-1.5 leading-relaxed">
+                  {campaign.description}
+                </p>
+              </div>
+
+              {/* Bottom Metadata & Footer */}
+              <div className="mt-4 pt-3.5 border-t border-steel/10 space-y-3">
+                {/* Meta details with icons */}
+                <div className="flex items-center gap-3.5 text-xs font-medium text-ash">
+                  <span className="inline-flex items-center gap-1.5 truncate">
+                    <MapPin size={13} weight="bold" className="text-signal-blue/80 flex-shrink-0" />
+                    <span className="truncate max-w-[110px]">{campaign.location || "Remote"}</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 flex-shrink-0">
+                    <CalendarBlank size={13} weight="bold" className="text-signal-blue/80 flex-shrink-0" />
+                    <span>
+                      {fmtDate(campaign.startDate)}
+                      {campaign.endDate ? ` - ${fmtDate(campaign.endDate)}` : ""}
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <Calendar size={14} className="text-ash" />
-                      <span>{fmtDate(campaign.startDate)}</span>
+                  </span>
+                </div>
+
+                {/* Budget & Quick Action */}
+                <div className="flex items-center justify-between pt-1">
+                  <div>
+                    <span className="text-[10px] font-semibold text-fog uppercase tracking-wider block">
+                      Budget
+                    </span>
+                    <span className="text-sm font-bold font-mono text-midnight-ink">
+                      {formatBudget(campaign.budget)}
                     </span>
                   </div>
-                  <div className="pt-3 border-t border-slate-custom/5 flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-fog uppercase tracking-wider">Budget</span>
-                      <span className="text-sm font-bold text-graphite">{formatBudget(campaign.budget)}</span>
-                    </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); router.push(`/business/campaigns/${campaign.id}`); }}
-                      className="flex items-center gap-1.5 px-4 py-1.5 bg-sky-wash text-signal-blue border border-signal-blue/20 rounded-pill text-xs font-bold hover:bg-signal-blue hover:text-white transition-colors"
-                    >
-                      <Users size={14} /> Apps
-                    </button>
-                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/business/campaigns/${campaign.id}`);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-sky-wash text-signal-blue group-hover:bg-signal-blue group-hover:text-white text-xs font-semibold transition-colors"
+                  >
+                    <span>Manage</span>
+                    <CaretRight size={13} weight="bold" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -320,32 +540,50 @@ function CampaignsPageInner() {
         </div>
       )}
 
+      {/* Pagination */}
       {data && data.pages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-4">
-          <div className="flex items-center gap-1">
-            {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`h-8 px-4 rounded-pill text-xs font-bold transition-colors ${
-                  p === page ? "bg-signal-blue text-white shadow-sm" : "text-ash hover:bg-sky-wash hover:text-graphite"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center justify-center gap-1 pt-4">
+          {Array.from({ length: data.pages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`h-8 min-w-[32px] px-2.5 rounded-pill text-xs font-bold transition-colors ${
+                p === page
+                  ? "bg-signal-blue text-white shadow-sm"
+                  : "text-ash hover:bg-sky-wash hover:text-graphite"
+              }`}
+            >
+              {p}
+            </button>
+          ))}
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/60 backdrop-blur-md p-4">
-          <div className="bg-white rounded-cards-lg p-6 max-w-md w-full shadow-xl">
-            <h3 className="text-heading font-bold text-graphite">Delete Campaign</h3>
-            <p className="text-sm text-ash mt-2">Are you sure you want to delete "{deleteConfirm.title}"? This action cannot be undone.</p>
-            <div className="mt-6 flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
-              <Button variant="danger" onClick={confirmDelete}>Delete</Button>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-steel/10">
+            <div className="w-11 h-11 rounded-xl bg-coral-alert/10 text-coral-alert flex items-center justify-center mb-3">
+              <Trash size={22} weight="bold" />
+            </div>
+            <h3 className="text-base font-bold text-graphite">Delete Campaign</h3>
+            <p className="text-xs text-ash mt-1.5 leading-relaxed">
+              Are you sure you want to delete <strong className="text-graphite">"{deleteConfirm.title}"</strong>?
+              All associated applications, invitations, and data will be permanently removed.
+            </p>
+            <div className="mt-6 flex justify-end gap-2.5">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="px-4 py-2 rounded-pill text-xs font-semibold text-ash hover:text-graphite hover:bg-sky-wash transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-pill text-xs font-bold bg-coral-alert hover:bg-coral-alert/90 text-white shadow-sm transition-colors"
+              >
+                Delete Campaign
+              </button>
             </div>
           </div>
         </div>
