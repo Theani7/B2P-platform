@@ -149,16 +149,16 @@ export async function generateMatches(user, campaignId) {
   return count;
 }
 
-export async function getMatches(user, campaignId, params = {}) {
+export async function getMatches(user: any, campaignId: any, params: any = {}) {
   const profile = await businessProfileOf(user);
   const campaign = await campaignForBusiness(campaignId, profile.id);
   const { page = 1, limit = 10, classification, minScore, verified } = params;
 
-  const where = { campaignId: campaign.id };
+  const where: any = { campaignId: campaign.id };
   if (classification) where.classification = classification;
   if (minScore != null) where.score = { gte: Number(minScore) };
 
-  const queryOptions = {
+  const queryOptions: any = {
     where,
     include: { promoterProfile: true },
     orderBy: { score: "desc" },
@@ -174,7 +174,7 @@ export async function getMatches(user, campaignId, params = {}) {
     prisma.matchResult.count({ where: queryOptions.where }),
   ]);
 
-  const items = raw
+  const items = (raw as any[])
     .filter((m) => m.promoterProfile)
     .map((m) => {
       const p = m.promoterProfile;
@@ -202,5 +202,5 @@ export async function getMatches(user, campaignId, params = {}) {
       };
     });
 
-  return [items, total];
+  return [items, total] as [any[], number];
 }

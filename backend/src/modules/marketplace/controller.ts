@@ -4,8 +4,8 @@ import { ok } from "../../shared/response.js";
 
 export const list = wrap(async (req, res) => {
   const [items, total] = await marketplaceService.listMarketplaceCampaigns(req.user, req.query);
-  const { page = 1, limit = 20 } = req.query;
-  return ok(res, { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(total / Number(limit))) }, "Marketplace campaigns");
+  const { page = 1, limit = 20 }: any = req.query;
+  return ok(res, { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(Number(total) / Number(limit))) }, "Marketplace campaigns");
 });
 
 export const bookmark = wrap(async (req, res) => {

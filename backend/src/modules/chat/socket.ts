@@ -29,7 +29,7 @@ export function registerChatSocket(io) {
   io.on("connection", (socket) => {
     if (!socket.userId) return;
 
-    socket.on("join_conversation", async ({ conversationId } = {}, cb) => {
+    socket.on("join_conversation", async ({ conversationId }: any = {}, cb) => {
       const user = await loadUser(socket);
       if (!user || !conversationId) {
         cb?.({ ok: false });
@@ -46,7 +46,7 @@ export function registerChatSocket(io) {
       cb?.({ ok: true, conversationId });
     });
 
-    socket.on("message", async (data = {}) => {
+    socket.on("message", async (data: any = {}) => {
       const user = await loadUser(socket);
       if (!user) return;
       const { conversationId, text, messageType } = data;
@@ -79,7 +79,7 @@ export function registerChatSocket(io) {
       }
     });
 
-    socket.on("typing_start", ({ conversationId } = {}) => {
+    socket.on("typing_start", ({ conversationId }: any = {}) => {
       if (!conversationId) return;
       socket.to(`conversation:${conversationId}`).emit("typing_start", {
         conversationId,
@@ -87,7 +87,7 @@ export function registerChatSocket(io) {
       });
     });
 
-    socket.on("typing_stop", ({ conversationId } = {}) => {
+    socket.on("typing_stop", ({ conversationId }: any = {}) => {
       if (!conversationId) return;
       socket.to(`conversation:${conversationId}`).emit("typing_stop", {
         conversationId,

@@ -26,9 +26,9 @@ export const listPromoterRequests = wrap(async (req, res) => {
 
 // --- Admin ---
 export const listRequests = wrap(async (req, res) => {
-  const { status, page = 1, limit = 20 } = req.query;
-  const [items, total] = await verificationService.listRequests({ status, page: Number(page), limit: Number(limit) });
-  const mapped = items.map((vr) => {
+  const { status, page = 1, limit = 20 }: any = req.query;
+  const [items, total]: any = await verificationService.listRequests({ status, page: Number(page), limit: Number(limit) });
+  const mapped = items.map((vr: any) => {
     const isPromoter = !!vr.promoterProfileId;
     const profile = isPromoter ? vr.promoterProfile : vr.businessProfile;
     return {
@@ -56,7 +56,7 @@ export const listRequests = wrap(async (req, res) => {
   });
   return ok(
     res,
-    { items: mapped, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(total / Number(limit))) },
+    { items: mapped, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(Number(total) / Number(limit))) },
     "Verification requests"
   );
 });

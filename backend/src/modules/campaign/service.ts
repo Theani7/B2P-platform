@@ -46,11 +46,11 @@ export async function get(user, campaignId) {
   return campaignForBusiness(campaignId, profile.id);
 }
 
-export async function list(user, params = {}) {
+export async function list(user: any, params: any = {}) {
   const profile = await businessProfileOf(user);
   const { search, status, location, page = 1, limit = 10, sort = "createdAt" } = params;
 
-  const where = { businessProfileId: profile.id };
+  const where: any = { businessProfileId: profile.id };
   if (search) {
     where.OR = [
       { title: { contains: search, mode: "insensitive" } },
@@ -67,7 +67,7 @@ export async function list(user, params = {}) {
     skip: (page - 1) * limit,
     take: limit,
   });
-  return [items, total];
+  return [items, total] as [any[], number];
 }
 
 export async function update(user, campaignId, payload) {

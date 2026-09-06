@@ -118,7 +118,7 @@ export async function login(payload) {
 
 async function incrementFailed(user) {
   const attempts = (user.failedLoginAttempts || 0) + 1;
-  const data = { failedLoginAttempts: attempts };
+  const data: any = { failedLoginAttempts: attempts };
   if (attempts >= config.maxFailedLoginAttempts) {
     data.lockedUntil = new Date(Date.now() + config.lockMinutes * 60 * 1000);
   }
@@ -347,7 +347,7 @@ export async function verifyRegistrationOtp(email, code) {
 }
 
 export async function updateMe(user, payload) {
-  const data = {};
+  const data: any = {};
   if (payload.fullName !== undefined) data.fullName = payload.fullName;
   if (payload.email !== undefined) {
     if (payload.email !== user.email) {

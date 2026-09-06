@@ -29,9 +29,9 @@ function toNotificationRead(n) {
   };
 }
 
-export async function listNotifications(user, params = {}) {
+export async function listNotifications(user: any, params: any = {}) {
   const { page = 1, limit = 50, unread_only = false } = params;
-  const where = { recipientId: user.id };
+  const where: any = { recipientId: user.id };
   if (unread_only) where.isRead = false;
 
   const [rows, total] = await Promise.all([
@@ -54,7 +54,7 @@ export async function listNotifications(user, params = {}) {
     }),
     prisma.notification.count({ where }),
   ]);
-  return [rows.map(toNotificationRead), total];
+  return [rows.map(toNotificationRead), total] as [any[], number];
 }
 
 export async function unreadCount(user) {

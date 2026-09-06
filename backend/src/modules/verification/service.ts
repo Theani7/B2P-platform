@@ -84,9 +84,9 @@ export async function getMyPromoterRequests(user) {
   });
 }
 
-export async function listRequests(params = {}) {
+export async function listRequests(params: any = {}) {
   const { status, page = 1, limit = 20 } = params;
-  const where = {};
+  const where: any = {};
   if (status) where.status = status;
 
   const [items, total] = await Promise.all([
@@ -102,7 +102,7 @@ export async function listRequests(params = {}) {
     }),
     prisma.verificationRequest.count({ where }),
   ]);
-  return [items, total];
+  return [items, total] as [any[], number];
 }
 
 async function loadPending(id) {

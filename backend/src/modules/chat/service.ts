@@ -58,7 +58,7 @@ async function loadConversationForParticipant(userId, conversationId, user) {
   return conv;
 }
 
-export async function getConversations(user, params = {}) {
+export async function getConversations(user: any, params: any = {}) {
   const { page = 1, limit = 50 } = params;
   const profileIds = participantProfiles(user);
   if (profileIds.length === 0) {
@@ -167,7 +167,7 @@ export async function getConversations(user, params = {}) {
   items.sort((a, b) => {
     const da = a.lastMessage ? new Date(a.lastMessage.createdAt) : new Date(a.createdAt);
     const db = b.lastMessage ? new Date(b.lastMessage.createdAt) : new Date(b.createdAt);
-    return db - da;
+    return db.getTime() - da.getTime();
   });
 
   const total = items.length;
@@ -212,7 +212,7 @@ export async function canAccessConversation(user, conversationId) {
   }
 }
 
-export async function getHistory(user, collaborationId, params = {}) {
+export async function getHistory(user: any, collaborationId: any, params: any = {}) {
   const { page = 1, limit = 50 } = params;
   const conv = await getOrCreateConversation(collaborationId, user);
 

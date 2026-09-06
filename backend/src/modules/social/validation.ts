@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const SOCIAL_PLATFORMS = ["INSTAGRAM", "TIKTOK", "YOUTUBE", "FACEBOOK", "X", "LINKEDIN"];
+export const SOCIAL_PLATFORMS = ["INSTAGRAM", "TIKTOK", "YOUTUBE", "FACEBOOK", "X", "LINKEDIN"] as const;
 
 const platformField = z
   .string()

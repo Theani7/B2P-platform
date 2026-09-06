@@ -2,10 +2,10 @@ import { prisma } from "../../config/db.js";
 import { AppError } from "../../shared/errors.js";
 import { ROLE } from "../../shared/enums.js";
 
-export async function listMarketplaceCampaigns(user, params = {}) {
+export async function listMarketplaceCampaigns(user: any, params: any = {}) {
   const { search, category, page = 1, limit = 20, sort = "createdAt" } = params;
 
-  const where = { status: "OPEN", visibility: "PUBLIC" };
+  const where: any = { status: "OPEN", visibility: "PUBLIC" };
   if (category) where.category = { contains: category, mode: "insensitive" };
   if (search) {
     where.OR = [
@@ -68,16 +68,16 @@ export async function listMarketplaceCampaigns(user, params = {}) {
     startDate: c.startDate,
     endDate: c.endDate,
     createdAt: c.createdAt,
-    businessName: c.businessProfile?.companyName ?? "",
+    businessName: (c as any).businessProfile?.companyName ?? "",
     hasApplied: appliedSet.has(c.id),
     isBookmarked: bookmarkedSet.has(c.id),
     applicantCount: applicantCounts[c.id] ?? 0,
   }));
 
-  return [items, total];
+  return [items, total] as [any[], number];
 }
 
-export async function toggleBookmark(user, campaignId, bookmarked) {
+export async function toggleBookmark(user: any, campaignId: any, bookmarked: any) {
   if (user.role !== ROLE.PROMOTER) throw new AppError("Only promoters can bookmark campaigns", 403);
   const profile = user.promoterProfile;
   if (!profile) throw new AppError("Promoter profile not found", 404);

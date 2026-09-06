@@ -72,10 +72,10 @@ function toRead(collab, user) {
   };
 }
 
-export async function listBusinessCollaborations(user, params = {}) {
+export async function listBusinessCollaborations(user: any, params: any = {}) {
   const profile = await businessProfileOf(user);
   const { status, page = 1, limit = 20 } = params;
-  const where = { businessProfileId: profile.id };
+  const where: any = { businessProfileId: profile.id };
   if (status) where.status = status;
 
   const [items, total] = await Promise.all([
@@ -90,13 +90,13 @@ export async function listBusinessCollaborations(user, params = {}) {
   ]);
 
   const reviewed = await reviewedCollabIds(user.id, items.map((c) => c.id));
-  return [items.map((c) => toRead({ ...c, _hasReview: reviewed.has(c.id) }, user)), total];
+  return [items.map((c) => toRead({ ...c, _hasReview: reviewed.has(c.id) }, user)), total] as [any[], number];
 }
 
-export async function listPromoterCollaborations(user, params = {}) {
+export async function listPromoterCollaborations(user: any, params: any = {}) {
   const profile = await promoterProfileOf(user);
   const { status, page = 1, limit = 20 } = params;
-  const where = { promoterProfileId: profile.id };
+  const where: any = { promoterProfileId: profile.id };
   if (status) where.status = status;
 
   const [items, total] = await Promise.all([
@@ -111,7 +111,7 @@ export async function listPromoterCollaborations(user, params = {}) {
   ]);
 
   const reviewed = await reviewedCollabIds(user.id, items.map((c) => c.id));
-  return [items.map((c) => toRead({ ...c, _hasReview: reviewed.has(c.id) }, user)), total];
+  return [items.map((c) => toRead({ ...c, _hasReview: reviewed.has(c.id) }, user)), total] as [any[], number];
 }
 
 export async function getDeliverables(user, collaborationId) {

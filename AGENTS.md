@@ -1,4 +1,4 @@
-> **STACK: Next.js + Express (Node.js, JavaScript/ESM, Prisma + PostgreSQL)** on branch `convert/nextjs-express`. The conversion from FastAPI + React/Vite is **complete** (all backend Sprint 1–8 and frontend FS1–FS6 done). The "Backend specifics" / "Frontend specifics" sections below describe the **legacy FastAPI/React stack** and are kept for reference only. The authoritative conversion tracking is in the **[Backend Conversion Plan](#backend-conversion-plan-fastapi--nodeexpress)** section at the bottom of this file.
+> **STACK: Next.js + Express (Node.js, TypeScript/ESM, Prisma + PostgreSQL)**. The conversion from FastAPI + React/Vite is **complete** (all backend Sprint 1–8 and frontend FS1–FS6 done; backend converted to TypeScript). The "Backend specifics" / "Frontend specifics" sections below describe the **legacy FastAPI/React stack** and are kept for reference only. The authoritative conversion tracking is in the **[Backend Conversion Plan](#backend-conversion-plan-fastapi--nodeexpress)** section at the bottom of this file.
 
 ## Git workflow
 

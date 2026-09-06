@@ -4,14 +4,14 @@ import { ok } from "../../shared/response.js";
 
 export const businessList = wrap(async (req, res) => {
   const [items, total] = await collaborationService.listBusinessCollaborations(req.user, req.query);
-  const { page = 1, limit = 20 } = req.query;
-  return ok(res, { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(total / Number(limit))) }, "Collaborations");
+  const { page = 1, limit = 20 }: any = req.query;
+  return ok(res, { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(Number(total) / Number(limit))) }, "Collaborations");
 });
 
 export const promoterList = wrap(async (req, res) => {
   const [items, total] = await collaborationService.listPromoterCollaborations(req.user, req.query);
-  const { page = 1, limit = 20 } = req.query;
-  return ok(res, { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(total / Number(limit))) }, "Collaborations");
+  const { page = 1, limit = 20 }: any = req.query;
+  return ok(res, { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(Number(total) / Number(limit))) }, "Collaborations");
 });
 
 export const businessDeliverables = wrap(async (req, res) => {

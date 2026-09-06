@@ -139,14 +139,14 @@ export async function updateReview(user, reviewId, payload) {
   if (!review) throw new AppError("Review not found", 404);
   if (review.reviewerId !== user.id) throw new AppError("You can only edit your own reviews", 403);
 
-  const data = {};
+  const data: any = {};
   if (payload.rating !== undefined) data.rating = payload.rating;
   if (payload.comment !== undefined) data.comment = payload.comment;
 
   return prisma.review.update({ where: { id: reviewId }, data });
 }
 
-export async function deleteReview(user, reviewId) {
+export async function deleteReview(user: any, reviewId: any) {
   const review = await prisma.review.findUnique({ where: { id: reviewId } });
   if (!review) throw new AppError("Review not found", 404);
   if (review.reviewerId !== user.id) throw new AppError("You can only delete your own reviews", 403);
@@ -154,7 +154,7 @@ export async function deleteReview(user, reviewId) {
   await prisma.review.delete({ where: { id: reviewId } });
 }
 
-export async function getMyReviews(user, params = {}) {
+export async function getMyReviews(user: any, params: any = {}) {
   const { page = 1, limit = 20 } = params;
   const where = { reviewerId: user.id };
   const [rows, total] = await Promise.all([
@@ -167,10 +167,10 @@ export async function getMyReviews(user, params = {}) {
     }),
     prisma.review.count({ where }),
   ]);
-  return [rows.map(toReviewRead), total];
+  return [rows.map(toReviewRead), total] as [any[], number];
 }
 
-export async function getReceivedReviews(userId, params = {}) {
+export async function getReceivedReviews(userId: any, params: any = {}) {
   const { page = 1, limit = 20 } = params;
   const where = { revieweeId: userId };
   const [rows, total] = await Promise.all([
@@ -183,10 +183,10 @@ export async function getReceivedReviews(userId, params = {}) {
     }),
     prisma.review.count({ where }),
   ]);
-  return [rows.map(toReviewRead), total];
+  return [rows.map(toReviewRead), total] as [any[], number];
 }
 
-export async function getUserReviews(userId, params = {}) {
+export async function getUserReviews(userId: any, params: any = {}) {
   const { page = 1, limit = 20 } = params;
   const where = { revieweeId: userId };
   const [rows, total] = await Promise.all([
@@ -209,7 +209,7 @@ export async function getUserReviews(userId, params = {}) {
     }),
     prisma.review.count({ where }),
   ]);
-  return [rows.map(toReviewRead), total];
+  return [rows.map(toReviewRead), total] as [any[], number];
 }
 
 export async function getRatingSummary(userId) {

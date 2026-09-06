@@ -1,6 +1,9 @@
 /** Standard error envelope: { success:false, message, errors } */
 export class AppError extends Error {
-  constructor(message, statusCode = 400, details = []) {
+  statusCode: number;
+  details: any[];
+
+  constructor(message: string, statusCode = 400, details: any = []) {
     super(message);
     this.name = "AppError";
     this.statusCode = statusCode;

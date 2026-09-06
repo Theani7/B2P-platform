@@ -22,13 +22,13 @@ function toCsv(rows) {
 async function gather(user, module) {
   if (module === "campaigns") {
     if (user.role === ROLE.BUSINESS && !user.businessProfile) return [];
-    const where =
+    const where: any =
       user.role === ROLE.BUSINESS && user.businessProfile
         ? { businessProfileId: user.businessProfile.id }
         : user.role === ROLE.PROMOTER
         ? { status: "OPEN", visibility: "PUBLIC" }
         : {};
-    const camps = await prisma.campaign.findMany({
+    const camps: any[] = await prisma.campaign.findMany({
       where,
       select: {
         id: true,
@@ -104,10 +104,10 @@ async function gather(user, module) {
 export async function exportData(user, { module, format, columns }) {
   const rows = await gather(user, module);
 
-  let dataRows = rows;
+  let dataRows: any[] = rows;
   if (columns && columns.length && rows.length) {
-    dataRows = rows.map((r) => {
-      const o = {};
+    dataRows = rows.map((r: any) => {
+      const o: any = {};
       for (const c of columns) if (c in r) o[c] = r[c];
       return o;
     });

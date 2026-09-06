@@ -68,9 +68,9 @@ export async function cancel(user, invitationId) {
   return { success: true, message: "Invitation cancelled" };
 }
 
-export async function getBusinessInvitations(user, { status, page = 1, limit = 20 }) {
+export async function getBusinessInvitations(user, { status, page = 1, limit = 20 }: any) {
   const business = await businessProfileOf(user);
-  const where = { campaign: { businessProfileId: business.id } };
+  const where: any = { campaign: { businessProfileId: business.id } };
   if (status) where.status = status;
   const [items, total] = await Promise.all([
     prisma.campaignInvitation.findMany({
@@ -82,14 +82,14 @@ export async function getBusinessInvitations(user, { status, page = 1, limit = 2
     }),
     prisma.campaignInvitation.count({ where }),
   ]);
-  return [items, total];
+  return [items, total] as [any[], number];
 }
 
 // --- Promoter ---
 
-export async function getPromoterInvitations(user, { status, page = 1, limit = 20 }) {
+export async function getPromoterInvitations(user, { status, page = 1, limit = 20 }: any) {
   const promoter = await promoterProfileOf(user);
-  const where = { promoterProfileId: promoter.id };
+  const where: any = { promoterProfileId: promoter.id };
   if (status) where.status = status;
   const [items, total] = await Promise.all([
     prisma.campaignInvitation.findMany({
@@ -101,7 +101,7 @@ export async function getPromoterInvitations(user, { status, page = 1, limit = 2
     }),
     prisma.campaignInvitation.count({ where }),
   ]);
-  return [items, total];
+  return [items, total] as [any[], number];
 }
 
 export async function accept(user, invitationId) {

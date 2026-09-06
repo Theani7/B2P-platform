@@ -9,7 +9,7 @@ export function signAccessToken(userId, role) {
     audience: config.jwtAudience,
     issuer: config.jwtIssuer,
   };
-  return jwt.sign(payload, config.secretKey, options);
+  return jwt.sign(payload, config.secretKey, options as any);
 }
 
 export function signRefreshToken(userId) {
@@ -19,7 +19,7 @@ export function signRefreshToken(userId) {
     audience: config.jwtAudience,
     issuer: config.jwtIssuer,
   };
-  return jwt.sign(payload, config.secretKey, options);
+  return jwt.sign(payload, config.secretKey, options as any);
 }
 
 export function verifyToken(token) {

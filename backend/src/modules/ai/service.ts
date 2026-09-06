@@ -62,7 +62,7 @@ async function buildBusinessContext(user, campaignId) {
     where: { businessProfileId: bpId, status: "ACTIVE" },
   });
 
-  const ctx = {
+  const ctx: any = {
     role: "BUSINESS",
     companyName: user.businessProfile.companyName,
     campaigns: { total: all, open: open, active: active, draft: draft },

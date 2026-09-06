@@ -27,7 +27,7 @@ router.get(
     const [items, total] = await discovery.searchPromoters(p);
     return ok(
       res,
-      { items, total, page: p.page, limit: p.limit, pages: Math.max(1, Math.ceil(total / p.limit)) },
+      { items, total, page: Number(p.page), limit: Number(p.limit), pages: Math.max(1, Math.ceil(total / (Number(p.limit) || 20))) },
       "Directory"
     );
   })

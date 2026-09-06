@@ -44,8 +44,8 @@ export async function getDashboardStats() {
     avgAgg,
   ] = await Promise.all([
     prisma.user.count(),
-    prisma.user.count({ where: { role: ROLE.BUSINESS } }),
-    prisma.user.count({ where: { role: ROLE.PROMOTER } }),
+    prisma.user.count({ where: { role: ROLE.BUSINESS as any } }),
+    prisma.user.count({ where: { role: ROLE.PROMOTER as any } }),
     prisma.promoterProfile.count({ where: { verified: true } }),
     prisma.campaign.count(),
     prisma.campaignApplication.count(),
@@ -70,8 +70,8 @@ export async function getDashboardStats() {
 }
 
 // --- User Management ---
-export async function getAdminUsers({ page = 1, limit = 20, search, role, isActive, sort = "newest" }) {
-  const where = {};
+export async function getAdminUsers({ page = 1, limit = 20, search, role, isActive, sort = "newest" }: any) {
+  const where: any = {};
   if (search) {
     where.OR = [
       { username: { contains: search, mode: "insensitive" } },
@@ -82,7 +82,7 @@ export async function getAdminUsers({ page = 1, limit = 20, search, role, isActi
   if (role) where.role = role;
   if (isActive !== undefined && isActive !== null) where.isActive = isActive === true;
 
-  const orderBy =
+  const orderBy: any =
     sort === "oldest"
       ? { createdAt: "asc" }
       : sort === "name"
@@ -114,7 +114,7 @@ export async function getAdminUsers({ page = 1, limit = 20, search, role, isActi
     prisma.user.count({ where }),
   ]);
 
-  const items = rows.map((u) => ({
+  const items = rows.map((u: any) => ({
     id: u.id,
     username: u.username,
     fullName: u.fullName,
@@ -128,7 +128,7 @@ export async function getAdminUsers({ page = 1, limit = 20, search, role, isActi
     hasPromoterProfile: !!u.promoterProfile,
   }));
 
-  return [items, total];
+  return [items, total] as [any[], number];
 }
 
 function userRead(u) {
@@ -257,8 +257,8 @@ export async function deleteUser(adminUser, userId, req) {
 }
 
 // --- Campaign Moderation ---
-export async function getAdminCampaigns({ page = 1, limit = 20, search, status }) {
-  const where = {};
+export async function getAdminCampaigns({ page = 1, limit = 20, search, status }: any = {}) {
+  const where: any = {};
   if (search) where.title = { contains: search, mode: "insensitive" };
   if (status) where.status = status;
 
@@ -285,23 +285,23 @@ export async function getAdminCampaigns({ page = 1, limit = 20, search, status }
     createdAt: c.createdAt,
   }));
 
-  return [items, total];
+  return [items, total] as [any[], number];
 }
 
-async function getCampaignOr404(campaignId) {
+async function getCampaignOr404(campaignId: string) {
   const campaign = await prisma.campaign.findUnique({ where: { id: campaignId } });
   if (!campaign) throw new AppError("Campaign not found", 404);
   return campaign;
 }
 
-export async function archiveCampaign(adminUser, campaignId, req) {
+export async function archiveCampaign(adminUser: any, campaignId: string, req?: any) {
   await getCampaignOr404(campaignId);
   await prisma.campaign.update({ where: { id: campaignId }, data: { status: "ARCHIVED" } });
   await auditLog(adminUser?.id, "ADMIN_ARCHIVE_CAMPAIGN", "campaign", campaignId, req);
   return { success: true };
 }
 
-export async function cancelCampaign(adminUser, campaignId, req) {
+export async function cancelCampaign(adminUser: any, campaignId: string, req?: any) {
   await getCampaignOr404(campaignId);
   await prisma.campaign.update({ where: { id: campaignId }, data: { status: "CANCELLED" } });
   await auditLog(adminUser?.id, "ADMIN_CANCEL_CAMPAIGN", "campaign", campaignId, req);
@@ -309,8 +309,8 @@ export async function cancelCampaign(adminUser, campaignId, req) {
 }
 
 // --- Review Moderation ---
-export async function getAdminReviews({ page = 1, limit = 20, search }) {
-  const where = {};
+export async function getAdminReviews({ page = 1, limit = 20, search }: any = {}) {
+  const where: any = {};
   if (search) where.comment = { contains: search, mode: "insensitive" };
 
   const [rows, total] = await Promise.all([
@@ -337,10 +337,10 @@ export async function getAdminReviews({ page = 1, limit = 20, search }) {
     createdAt: r.createdAt,
   }));
 
-  return [items, total];
+  return [items, total] as [any[], number];
 }
 
-export async function deleteReview(adminUser, reviewId, req) {
+export async function deleteReview(adminUser: any, reviewId: string, req?: any) {
   const review = await prisma.review.findUnique({ where: { id: reviewId } });
   if (!review) throw new AppError("Review not found", 404);
   await prisma.review.delete({ where: { id: reviewId } });
@@ -351,8 +351,8 @@ export async function deleteReview(adminUser, reviewId, req) {
 
 
 // --- Audit Logs ---
-export async function listAuditLogs({ page = 1, limit = 20, search, action, userId, dateFrom, dateTo }) {
-  const where = {};
+export async function listAuditLogs({ page = 1, limit = 20, search, action, userId, dateFrom, dateTo }: any = {}) {
+  const where: any = {};
   if (action) where.action = action;
   if (userId) where.userId = userId;
   if (dateFrom || dateTo) {
@@ -452,7 +452,7 @@ export async function seedSettings() {
   return { success: true };
 }
 
-export async function updateSetting(adminUser, settingKey, settingValue, description, req) {
+export async function updateSetting(adminUser: any, settingKey: string, settingValue: any, description?: string, req?: any) {
   const setting = await prisma.platformSetting.upsert({
     where: { settingKey },
     update: { settingValue, description: description ?? undefined },
@@ -468,7 +468,7 @@ export async function updateSetting(adminUser, settingKey, settingValue, descrip
   };
 }
 
-export async function deleteSetting(adminUser, settingKey, req) {
+export async function deleteSetting(adminUser: any, settingKey: string, req?: any) {
   const setting = await prisma.platformSetting.findUnique({ where: { settingKey } });
   if (!setting) throw new AppError("Setting not found", 404);
   await prisma.platformSetting.delete({ where: { settingKey } });
@@ -492,8 +492,8 @@ export async function getAnalytics() {
     locations,
   ] = await Promise.all([
     prisma.user.count(),
-    prisma.user.count({ where: { role: ROLE.BUSINESS } }),
-    prisma.user.count({ where: { role: ROLE.PROMOTER } }),
+    prisma.user.count({ where: { role: ROLE.BUSINESS as any } }),
+    prisma.user.count({ where: { role: ROLE.PROMOTER as any } }),
     prisma.promoterProfile.count({ where: { verified: true } }),
     prisma.campaign.count(),
     prisma.campaignApplication.count(),
@@ -518,10 +518,10 @@ export async function getAnalytics() {
   const acceptanceRate =
     totalCollaborations > 0 ? Math.round((accepted / totalCollaborations) * 100 * 10) / 10 : 0;
 
-  const topNiches = {};
-  for (const n of niches) topNiches[n.niche || "unknown"] = n._count._all;
-  const topLocations = {};
-  for (const l of locations) topLocations[l.location || "unknown"] = l._count._all;
+  const topNiches: Record<string, any> = {};
+  for (const n of niches) topNiches[n.niche || "unknown"] = (n as any)._count._all;
+  const topLocations: Record<string, any> = {};
+  for (const l of locations) topLocations[l.location || "unknown"] = (l as any)._count._all;
 
   return {
     totalUsers,

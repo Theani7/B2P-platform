@@ -10,7 +10,7 @@ const SORT_COLS = {
   username: "username",
 };
 
-export async function searchPromoters(params = {}) {
+export async function searchPromoters(params: any = {}) {
   const {
     search = "",
     niche,
@@ -26,7 +26,7 @@ export async function searchPromoters(params = {}) {
     limit = 20,
   } = params;
 
-  const where = {};
+  const where: any = {};
   if (search) {
     const like = search;
     where.OR = [
@@ -88,7 +88,7 @@ export async function searchPromoters(params = {}) {
     inAppFollowers: countByUser.get(i.userId) ?? 0,
   }));
 
-  return [withFollows, total];
+  return [withFollows, total] as [any[], number];
 }
 
 export async function getPublicProfile(username) {
@@ -177,10 +177,10 @@ export async function removeSavedPromoter(user, promoterId) {
   });
 }
 
-export async function getSavedPromoters(user, { search = "", page = 1, limit = 20 }) {
+export async function getSavedPromoters(user: any, { search = "", page = 1, limit = 20 }: any) {
   const business = await ensureBusinessProfile(user);
 
-  const where = { businessProfileId: business.id };
+  const where: any = { businessProfileId: business.id };
   if (search) {
     where.OR = [
       { promoterProfile: { username: { contains: search, mode: "insensitive" } } },
@@ -199,5 +199,5 @@ export async function getSavedPromoters(user, { search = "", page = 1, limit = 2
     }),
     prisma.savedPromoter.count({ where }),
   ]);
-  return [items, total];
+  return [items, total] as [any[], number];
 }

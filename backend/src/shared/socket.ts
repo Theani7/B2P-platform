@@ -22,7 +22,7 @@ function userIdFromSocket(socket) {
   const token = socket.handshake.auth?.token || socket.handshake.query?.token;
   if (!token) return null;
   try {
-    const payload = verifyToken(token);
+    const payload = verifyToken(token) as any;
     if (payload.type !== "access" || !payload.sub) return null;
     return payload.sub;
   } catch {

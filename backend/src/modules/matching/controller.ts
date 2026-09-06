@@ -9,6 +9,6 @@ export const generate = wrap(async (req, res) => {
 
 export const list = wrap(async (req, res) => {
   const [items, total] = await matchingService.getMatches(req.user, req.params.campaignId, req.query);
-  const { page = 1, limit = 10 } = req.query;
-  return ok(res, { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(total / Number(limit))) }, "Match results");
+  const { page = 1, limit = 10 }: any = req.query;
+  return ok(res, { items, total, page: Number(page), limit: Number(limit), pages: Math.max(1, Math.ceil(Number(total) / Number(limit))) }, "Match results");
 });
