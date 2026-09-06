@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const submitVerificationSchema = z.object({
+  documentUrl: z.string().max(1000).optional(),
+  documentName: z.string().max(255).optional(),
+});
+
 export const reviewSchema = z.object({
   adminNotes: z.string().max(2000).optional(),
 });

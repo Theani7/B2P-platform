@@ -550,6 +550,8 @@ model VerificationRequest {
   reviewedAt        DateTime?          @map("reviewed_at") @db.Timestamptz
   reviewedBy        String?            @map("reviewed_by") @db.Uuid
   adminNotes        String?            @map("admin_notes") @db.Text
+  documentUrl       String?            @map("document_url") @db.Text
+  documentName      String?            @map("document_name") @db.Text
 
   promoterProfile PromoterProfile? @relation(fields: [promoterProfileId], references: [id])
   businessProfile BusinessProfile? @relation(fields: [businessProfileId], references: [id])

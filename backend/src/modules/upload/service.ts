@@ -19,6 +19,8 @@ function urlFor(subfolder, filename) {
       return `/uploads/portfolio/${filename}`;
     case "chat":
       return `/uploads/chat/${filename}`;
+    case "documents":
+      return `/uploads/documents/${filename}`;
     default:
       return `/uploads/${subfolder}/${filename}`;
   }

@@ -15,3 +15,5 @@ export const uploadAvatar = handle("avatars");
 export const uploadLogo = handle("logos");
 export const uploadPortfolioImage = handle("portfolio");
 export const uploadChatAttachment = handle("chat");
+export const uploadDocument = handle("documents");
+

@@ -1,10 +1,19 @@
 import * as verificationService from "./service.js";
-import { wrap } from "../../shared/errors.js";
+import { wrap, AppError } from "../../shared/errors.js";
 import { ok } from "../../shared/response.js";
+import { submitVerificationSchema } from "./validation.js";
 
 // --- Business (self-service) ---
 export const submitBusiness = wrap(async (req, res) => {
-  const vr = await verificationService.submitBusiness(req.user, req);
+  const parsed = submitVerificationSchema.safeParse(req.body || {});
+  if (!parsed.success) {
+    const errors = parsed.error.errors.map((e) => ({
+      field: e.path.join("."),
+      message: e.message,
+    }));
+    throw new AppError("Validation failed", 422, errors);
+  }
+  const vr = await verificationService.submitBusiness(req.user, parsed.data, req);
   return ok(res, { id: vr.id, status: vr.status }, "Verification request submitted", 201);
 });
 
@@ -15,7 +24,15 @@ export const listBusinessRequests = wrap(async (req, res) => {
 
 // --- Promoter (self-service) ---
 export const submitPromoter = wrap(async (req, res) => {
-  const vr = await verificationService.submitPromoter(req.user, req);
+  const parsed = submitVerificationSchema.safeParse(req.body || {});
+  if (!parsed.success) {
+    const errors = parsed.error.errors.map((e) => ({
+      field: e.path.join("."),
+      message: e.message,
+    }));
+    throw new AppError("Validation failed", 422, errors);
+  }
+  const vr = await verificationService.submitPromoter(req.user, parsed.data, req);
   return ok(res, { id: vr.id, status: vr.status }, "Verification request submitted", 201);
 });
 
@@ -40,6 +57,10 @@ export const listRequests = wrap(async (req, res) => {
       requester_headline: isPromoter ? vr.promoterProfile?.headline ?? null : null,
       admin_notes: vr.adminNotes ?? null,
       reviewed_at: vr.reviewedAt ?? null,
+      documentUrl: vr.documentUrl ?? null,
+      documentName: vr.documentName ?? null,
+      document_url: vr.documentUrl ?? null,
+      document_name: vr.documentName ?? null,
       profile_data: isPromoter
         ? {
             niche: vr.promoterProfile?.niche ?? null,

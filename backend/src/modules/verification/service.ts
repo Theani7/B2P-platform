@@ -31,7 +31,23 @@ async function promoterProfileOf(user) {
   return profile;
 }
 
-async function submit({ profileId, key, alreadyVerified, req, userId }) {
+async function submit({
+  profileId,
+  key,
+  alreadyVerified,
+  req,
+  userId,
+  documentUrl,
+  documentName,
+}: {
+  profileId: string;
+  key: string;
+  alreadyVerified: boolean;
+  req?: any;
+  userId: string;
+  documentUrl?: string | null;
+  documentName?: string | null;
+}) {
   if (alreadyVerified) throw new AppError("Profile is already verified", 400);
 
   const existingPending = await prisma.verificationRequest.findFirst({
@@ -40,13 +56,20 @@ async function submit({ profileId, key, alreadyVerified, req, userId }) {
   if (existingPending) throw new AppError("A verification request is already pending", 400);
 
   const vr = await prisma.verificationRequest.create({
-    data: { [key]: profileId, status: "PENDING" },
+    data: {
+      [key]: profileId,
+      status: "PENDING",
+      documentUrl: documentUrl || null,
+      documentName: documentName || null,
+    },
   });
   await auditLog(userId, "VERIFICATION_SUBMITTED", vr.id, req);
   return vr;
 }
 
-export async function submitBusiness(user, req) {
+export async function submitBusiness(user: any, bodyOrReq?: any, maybeReq?: any) {
+  const body = maybeReq ? (bodyOrReq || {}) : (bodyOrReq?.body || bodyOrReq || {});
+  const req = maybeReq || bodyOrReq;
   const profile = await businessProfileOf(user);
   return submit({
     profileId: profile.id,
@@ -54,10 +77,14 @@ export async function submitBusiness(user, req) {
     alreadyVerified: profile.verified,
     req,
     userId: user.id,
+    documentUrl: body.documentUrl,
+    documentName: body.documentName,
   });
 }
 
-export async function submitPromoter(user, req) {
+export async function submitPromoter(user: any, bodyOrReq?: any, maybeReq?: any) {
+  const body = maybeReq ? (bodyOrReq || {}) : (bodyOrReq?.body || bodyOrReq || {});
+  const req = maybeReq || bodyOrReq;
   const profile = await promoterProfileOf(user);
   return submit({
     profileId: profile.id,
@@ -65,23 +92,35 @@ export async function submitPromoter(user, req) {
     alreadyVerified: profile.verified,
     req,
     userId: user.id,
+    documentUrl: body.documentUrl,
+    documentName: body.documentName,
   });
 }
 
-export async function getMyBusinessRequests(user) {
+export async function getMyBusinessRequests(user: any) {
   const profile = await businessProfileOf(user);
-  return prisma.verificationRequest.findMany({
+  const requests = await prisma.verificationRequest.findMany({
     where: { businessProfileId: profile.id },
     orderBy: { submittedAt: "desc" },
   });
+  return requests.map((vr) => ({
+    ...vr,
+    document_url: vr.documentUrl,
+    document_name: vr.documentName,
+  }));
 }
 
-export async function getMyPromoterRequests(user) {
+export async function getMyPromoterRequests(user: any) {
   const profile = await promoterProfileOf(user);
-  return prisma.verificationRequest.findMany({
+  const requests = await prisma.verificationRequest.findMany({
     where: { promoterProfileId: profile.id },
     orderBy: { submittedAt: "desc" },
   });
+  return requests.map((vr) => ({
+    ...vr,
+    document_url: vr.documentUrl,
+    document_name: vr.documentName,
+  }));
 }
 
 export async function listRequests(params: any = {}) {
