@@ -198,12 +198,23 @@ export function CommandPalette() {
   return (
     <>
       <div
-        className="flex items-center gap-2 px-3 py-1.5 bg-sky-wash rounded-inputs cursor-text hover:bg-slate-custom/5 transition-colors w-full sm:w-96"
+        role="button"
+        tabIndex={0}
+        aria-label="Search or command palette"
+        className="group flex items-center gap-2.5 h-9 px-3.5 bg-linen-canvas hover:bg-white border border-steel/15 hover:border-signal-blue/30 rounded-pill cursor-pointer transition-all shadow-sm hover:shadow-md w-full sm:w-80 md:w-96"
         onClick={() => setIsOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsOpen(true);
+          }
+        }}
       >
-        <Search size={16} className="text-ash flex-shrink-0" />
-        <span className="text-sm text-ash flex-1 text-left truncate">Search or type a command...</span>
-        <div className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border bg-white shadow-product-card-sm text-xs text-ash font-mono">
+        <Search size={15} className="text-ash group-hover:text-signal-blue transition-colors flex-shrink-0" />
+        <span className="text-xs font-medium text-ash group-hover:text-graphite transition-colors flex-1 text-left truncate">
+          Search or type a command...
+        </span>
+        <div className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-steel/20 bg-white/80 group-hover:bg-white text-[10px] font-mono font-semibold text-ash group-hover:text-graphite shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
           <span className="text-[10px]">⌘</span>K
         </div>
       </div>
@@ -211,30 +222,30 @@ export function CommandPalette() {
       {isOpen && (
         <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4 pb-4">
           <div
-            className={`fixed inset-0 bg-graphite/40 transition-all duration-300 ease-out ${
+            className={`fixed inset-0 bg-midnight-ink/40 transition-all duration-300 ease-out ${
               visible ? "opacity-100 backdrop-blur-md" : "opacity-0 backdrop-blur-none"
             }`}
             onClick={() => setIsOpen(false)}
           />
 
-          <div className={`relative w-full max-w-2xl bg-white rounded-cards-lg shadow-product-card border border-slate-custom/10 overflow-hidden flex flex-col max-h-[80vh] transition-all duration-300 ease-out ${
+          <div className={`relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-steel/15 overflow-hidden flex flex-col max-h-[80vh] transition-all duration-300 ease-out ${
             visible ? "translate-y-0 scale-100 opacity-100" : "-translate-y-3 scale-[0.98] opacity-0"
           }`}>
-            <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-custom/10">
-              <Search size={20} className="text-ash" />
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-steel/10 bg-linen-canvas/30">
+              <Search size={18} className="text-signal-blue flex-shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="What do you need?"
-                className="flex-1 bg-transparent border-none outline-none text-lg placeholder:text-fog text-graphite"
+                placeholder="What do you need? (e.g. campaigns, promoters, settings...)"
+                className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-ash text-graphite font-medium"
               />
               {query && (
                 <button
                   onClick={() => setQuery("")}
-                  className="p-1 rounded bg-sky-wash hover:bg-slate-custom/10 text-ash text-xs font-semibold px-2"
+                  className="p-1 rounded-md bg-steel/10 hover:bg-steel/20 text-graphite text-xs font-semibold px-2 transition-colors"
                 >
                   Clear
                 </button>
@@ -254,25 +265,25 @@ export function CommandPalette() {
                       data-active={idx === activeIndex}
                       onClick={() => executeCommand(cmd)}
                       onMouseEnter={() => setActiveIndex(idx)}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-inputs cursor-pointer transition-colors ${
-                        idx === activeIndex ? "bg-sky-wash border border-slate-custom/10" : "hover:bg-sky-wash border border-transparent"
+                      className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl cursor-pointer transition-all ${
+                        idx === activeIndex ? "bg-sky-wash/80 border border-signal-blue/20 text-signal-blue shadow-sm" : "hover:bg-sky-wash/40 border border-transparent"
                       }`}
                     >
                       <div
-                        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-inputs bg-white shadow-product-card-sm border ${
-                          idx === activeIndex ? "text-signal-blue border-signal-blue/20" : "text-ash border-slate-custom/10"
+                        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border ${
+                          idx === activeIndex ? "text-signal-blue border-signal-blue/30" : "text-ash border-steel/15"
                         }`}
                       >
                         {cmd.icon ? ICON_MAP[cmd.icon] || <Search size={16} /> : <Search size={16} />}
                       </div>
                       <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <span className={`text-sm font-medium truncate ${idx === activeIndex ? "text-signal-blue" : "text-graphite"}`}>
+                        <span className={`text-xs font-semibold truncate ${idx === activeIndex ? "text-signal-blue" : "text-graphite"}`}>
                           {cmd.title}
                         </span>
-                        {cmd.subtitle && <span className="text-xs text-fog truncate">{cmd.subtitle}</span>}
+                        {cmd.subtitle && <span className="text-[11px] text-ash truncate mt-0.5">{cmd.subtitle}</span>}
                       </div>
                       <div className="flex-shrink-0 flex items-center">
-                        <span className="text-xs text-fog uppercase tracking-wider font-semibold">
+                        <span className="text-[10px] text-ash uppercase tracking-wider font-mono font-semibold px-2 py-0.5 rounded bg-steel/10">
                           {(cmd.type as CommandType).replace("_", " ")}
                         </span>
                       </div>
@@ -282,20 +293,20 @@ export function CommandPalette() {
               )}
             </div>
 
-            <div className="px-4 py-3 bg-linen-canvas border-t border-slate-custom/10 text-xs text-ash flex justify-between items-center">
+            <div className="px-4 py-2.5 bg-linen-canvas/60 border-t border-steel/10 text-[11px] text-ash flex justify-between items-center">
               <div className="flex gap-4">
-                <span className="flex items-center gap-1">
-                  <kbd className="bg-white border border-slate-custom/10 rounded px-1.5 py-0.5 font-mono shadow-product-card-sm">↑↓</kbd> to navigate
+                <span className="flex items-center gap-1.5">
+                  <kbd className="bg-white border border-steel/20 rounded px-1.5 py-0.5 font-mono text-[10px] shadow-sm">↑↓</kbd> navigate
                 </span>
-                <span className="flex items-center gap-1">
-                  <kbd className="bg-white border border-slate-custom/10 rounded px-1.5 py-0.5 font-mono shadow-product-card-sm">↵</kbd> to select
+                <span className="flex items-center gap-1.5">
+                  <kbd className="bg-white border border-steel/20 rounded px-1.5 py-0.5 font-mono text-[10px] shadow-sm">↵</kbd> select
                 </span>
-                <span className="flex items-center gap-1">
-                  <kbd className="bg-white border border-slate-custom/10 rounded px-1.5 py-0.5 font-mono shadow-product-card-sm">esc</kbd> to close
+                <span className="flex items-center gap-1.5">
+                  <kbd className="bg-white border border-steel/20 rounded px-1.5 py-0.5 font-mono text-[10px] shadow-sm">esc</kbd> close
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-ash">Byparsathy Palette</span>
+                <span className="font-semibold text-fog font-mono text-[10px]">B2P Command</span>
               </div>
             </div>
           </div>

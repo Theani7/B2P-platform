@@ -54,21 +54,25 @@ export function NotificationBell() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className={`relative flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ${open ? 'bg-signal-blue/10 text-signal-blue' : 'text-graphite hover:bg-sky-wash'}`}
+        className={`relative flex h-9 w-9 items-center justify-center rounded-full border transition-all shadow-sm ${
+          open
+            ? 'bg-signal-blue/10 text-signal-blue border-signal-blue/30 shadow-md'
+            : 'border-steel/15 bg-white text-ash hover:text-signal-blue hover:border-signal-blue/30 hover:bg-sky-wash/50'
+        }`}
         aria-label="Notifications"
       >
-        <Bell size={20} className={open ? 'text-signal-blue' : 'text-graphite'} />
+        <Bell size={16} className={open ? 'text-signal-blue' : 'currentColor'} />
         {unread.data && unread.data.count > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-coral-alert px-1 text-[10px] font-bold text-white ring-2 ring-white">
+          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral-alert px-1 text-[9px] font-bold text-white ring-2 ring-white">
             {unread.data.count > 99 ? "99+" : unread.data.count}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="animate-pop-in absolute right-0 z-50 mt-2 w-96 rounded-2xl border border-white/40 bg-white/95 backdrop-blur-xl p-0 shadow-2xl shadow-midnight-ink/5 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-custom/10 bg-linen-canvas/50 px-5 py-4">
-              <h3 className="text-sm font-semibold text-graphite">Notifications</h3>
+        <div className="animate-pop-in absolute right-0 z-50 mt-2 w-96 rounded-2xl border border-steel/15 bg-white/95 backdrop-blur-xl p-0 shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-steel/10 bg-linen-canvas/50 px-5 py-3.5">
+              <h3 className="text-xs font-bold text-graphite uppercase tracking-wider font-mono">Notifications</h3>
               {unread.data && unread.data.count > 0 && (
                 <button
                   className="text-xs font-medium text-signal-blue hover:text-signal-blue/80 transition-colors flex items-center gap-1"
