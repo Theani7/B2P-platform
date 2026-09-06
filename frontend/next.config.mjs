@@ -60,6 +60,15 @@ const nextConfig = {
       { source: "/uploads/:path*", destination: `${backend}/uploads/:path*` },
     ];
   },
+
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "@phosphor-icons/react",
+      "@tanstack/react-query",
+      "recharts",
+    ],
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);

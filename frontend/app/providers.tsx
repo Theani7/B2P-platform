@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/providers/AuthProvider";
+import { NavigationProgress } from "@/components/common/NavigationProgress";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(() => new QueryClient({
@@ -20,6 +21,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }));
   return (
     <QueryClientProvider client={client}>
+      <Suspense fallback={null}>
+        <NavigationProgress />
+      </Suspense>
       <AuthProvider>{children}</AuthProvider>
       <Toaster position="top-right" />
     </QueryClientProvider>
