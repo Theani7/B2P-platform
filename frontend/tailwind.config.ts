@@ -78,6 +78,15 @@ export default {
         body: ["14px", { lineHeight: "1.43", letterSpacing: "0.06px" }],
         caption: ["10px", { lineHeight: "1.2", letterSpacing: "0.13px" }],
       },
+      keyframes: {
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+      },
+      animation: {
+        shimmer: "shimmer 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
     },
   },
   plugins: [],
