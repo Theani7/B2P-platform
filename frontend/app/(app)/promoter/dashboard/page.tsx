@@ -116,82 +116,83 @@ function DashboardInner() {
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white shadow-feature-section">
+      {/* SIGNATURE HERO BANNER */}
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
         <div
-          className="relative h-32 overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(100deg, #145aff 0%, #3b82f6 35%, #b6cbfd 70%, #f0f4fe 100%)",
-          }}
-        >
-          <div className="absolute -right-10 -top-16 h-56 w-56 rounded-full bg-white/15 blur-2xl" />
-          <div className="absolute -left-8 -bottom-20 h-48 w-48 rounded-full bg-midnight-ink/10 blur-2xl" />
-          <div className="absolute inset-0 opacity-[0.12] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay" />
-          <p className="absolute bottom-3 left-8 font-roboto-mono text-[11px] uppercase tracking-[0.2em] text-white/80">
-            Creator studio
-          </p>
-        </div>
-        <div className="px-6 pb-7 pt-0 sm:px-8 relative">
-          <div className="flex flex-col gap-5 -mt-16 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-              <div className="relative group w-fit shrink-0">
-                {avatarUploading ? (
-                  <div className="w-24 h-24 rounded-full bg-sky-wash border-4 border-white flex items-center justify-center shadow-product-card">
-                    <Spinner />
-                  </div>
-                ) : (
-                  <Avatar
-                    src={profile?.avatarUrl}
-                    initials={(user?.fullName?.[0] ?? "P").toUpperCase()}
-                    size="lg"
-                    className="w-24 h-24 text-2xl ring-4 ring-white shadow-product-card"
-                    colorIndex={2}
-                  />
-                )}
-                {profile?.verified && !avatarUploading && (
-                  <span className="absolute bottom-1 right-1 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-status text-white ring-4 ring-white" title="Verified creator">
-                    <CheckCircle2 size={15} />
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={onCameraClick}
-                  disabled={avatarUploading}
-                  className="absolute bottom-1 right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center border border-slate-custom/10 hover:bg-sky-wash transition-all text-graphite disabled:opacity-50 shadow-sm opacity-0 group-hover:opacity-100"
-                >
-                  <Camera size={14} />
-                </button>
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
-              </div>
-              <div className="min-w-0 sm:pb-1 sm:pt-16">
-                <p className="text-xs font-medium text-ash">Welcome back,</p>
-                <h1 className="mt-0.5 truncate font-display text-2xl font-semibold tracking-tight text-graphite sm:text-3xl">{user?.fullName ?? "Creator"}</h1>
-                <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-ash">
-                  <Star size={14} className="fill-amber-tag text-amber-tag" />
-                  <span className="text-graphite font-bold">{avgRating.toFixed(1)}</span>
-                  <span>({reviewsReceived} {reviewsReceived === 1 ? "review" : "reviews"})</span>
-                  {profile?.niche && (
-                    <span className="rounded-badges bg-sky-wash px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-signal-blue">{profile.niche}</span>
-                  )}
-                </p>
-              </div>
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+            <div className="relative group w-fit shrink-0">
+              {avatarUploading ? (
+                <div className="w-20 h-20 rounded-full bg-sky-wash border-2 border-white flex items-center justify-center shadow-md">
+                  <Spinner />
+                </div>
+              ) : (
+                <Avatar
+                  src={profile?.avatarUrl}
+                  initials={(user?.fullName?.[0] ?? "P").toUpperCase()}
+                  size="lg"
+                  className="w-20 h-20 text-2xl ring-2 ring-white shadow-md"
+                  colorIndex={2}
+                />
+              )}
+              {profile?.verified && !avatarUploading && (
+                <span className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-status text-white ring-2 ring-white" title="Verified creator">
+                  <CheckCircle2 size={13} />
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={onCameraClick}
+                disabled={avatarUploading}
+                className="absolute bottom-0 right-0 w-7 h-7 bg-white rounded-full flex items-center justify-center border border-steel/20 hover:bg-sky-wash transition-all text-graphite disabled:opacity-50 shadow-sm opacity-0 group-hover:opacity-100"
+                title="Change avatar"
+              >
+                <Camera size={13} />
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
             </div>
 
-            <div className="flex items-center gap-3 sm:pb-1">
-              <Link
-                href="/promoter/profile"
-                className="flex flex-1 justify-center items-center h-11 px-6 rounded-pill bg-white border border-slate-custom/15 text-sm font-semibold text-graphite hover:border-signal-blue/40 hover:text-signal-blue transition-all shadow-sm sm:flex-none"
-              >
-                Edit Profile
-              </Link>
-              <Link
-                href="/promoter/marketplace"
-                className="flex flex-1 justify-center items-center gap-1.5 h-11 px-6 rounded-pill bg-signal-blue text-white text-sm font-semibold hover:opacity-90 transition-all shadow-product-card sm:flex-none"
-              >
-                Browse Campaigns <ArrowRight size={15} />
-              </Link>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-signal-blue font-mono uppercase tracking-wider">Creator Studio</p>
+              <h1 className="mt-1 truncate font-display text-3xl font-semibold tracking-tight text-midnight-ink sm:text-4xl">
+                {user?.fullName ?? "Creator"}
+              </h1>
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-ash">
+                <span className="flex items-center gap-1 font-semibold text-graphite">
+                  <Star size={14} className="fill-amber-tag text-amber-tag" />
+                  <span>{avgRating.toFixed(1)}</span>
+                  <span className="text-ash font-normal">({reviewsReceived} {reviewsReceived === 1 ? "review" : "reviews"})</span>
+                </span>
+                {profile?.niche && (
+                  <span className="rounded-pill bg-sky-wash px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-signal-blue border border-signal-blue/20">
+                    {profile.niche}
+                  </span>
+                )}
+                {profile?.location && (
+                  <span className="text-ash flex items-center gap-1 text-[11px]">
+                    {profile.location}
+                  </span>
+                )}
+              </div>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/promoter/profile"
+              className="inline-flex items-center justify-center h-10 px-4 rounded-pill bg-white border border-steel/15 text-xs font-semibold text-graphite hover:border-signal-blue/40 hover:text-signal-blue transition-all shadow-sm"
+            >
+              Edit Profile
+            </Link>
+            <Link
+              href="/promoter/marketplace"
+              className="inline-flex items-center gap-1.5 h-10 px-5 rounded-pill bg-signal-blue text-white text-xs font-semibold hover:bg-signal-blue/90 transition-all shadow-product-card"
+            >
+              Browse Campaigns <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </div>

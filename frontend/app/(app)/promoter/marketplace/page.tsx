@@ -179,19 +179,19 @@ function MarketplaceInner() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-20">
-      {/* HERO */}
-      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-6 shadow-product-card sm:p-8">
+      {/* SIGNATURE HERO BANNER */}
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(55% 130% at 100% 0%, rgba(22,202,46,0.12) 0%, rgba(240,244,254,0) 60%)" }}
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
         />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">Marketplace</h1>
-            <p className="text-sm text-ash mt-2 max-w-md">Discover premium campaigns matched perfectly to your creator profile.</p>
+            <p className="text-sm text-ash mt-2 max-w-xl">Discover premium campaigns matched perfectly to your creator profile.</p>
           </div>
-          <span className="inline-flex w-fit items-center gap-1.5 rounded-pill bg-emerald-status/10 px-4 py-2 text-xs font-bold text-emerald-status">
-            <Sparkles size={13} /> {isLoading ? "…" : `${data?.total ?? 0} Available Campaigns`}
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-pill bg-sky-wash border border-signal-blue/20 px-4 py-2 text-xs font-bold text-signal-blue shadow-sm">
+            <Sparkles size={14} className="text-signal-blue" /> {isLoading ? "…" : `${data?.total ?? 0} Available Campaigns`}
           </span>
         </div>
       </div>

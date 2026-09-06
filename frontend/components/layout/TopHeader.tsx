@@ -12,6 +12,7 @@ import { notifyError } from "@/lib/notify";
 import {
   ShareNetwork,
   Plus,
+  Compass,
   User,
   Gear,
   SignOut,
@@ -30,8 +31,8 @@ export function TopHeader() {
       .map((n) => n[0])
       .join("")
       .toUpperCase() ||
-    user?.email?.[0]?.toUpperCase() ||
-    "?";
+      user?.email?.[0]?.toUpperCase() ||
+      "?";
 
   const avatarSrc = user?.promoterProfile?.avatarUrl || user?.businessProfile?.logoUrl || null;
 
@@ -84,6 +85,17 @@ export function TopHeader() {
           >
             <Plus size={15} weight="bold" className="flex-shrink-0" />
             <span>Create Campaign</span>
+          </button>
+        )}
+
+        {/* Browse Campaigns Shortcut (Promoter Only) */}
+        {user?.role === Role.PROMOTER && (
+          <button
+            onClick={() => router.push("/promoter/marketplace")}
+            className="hidden sm:inline-flex items-center gap-1.5 h-9 px-4 rounded-pill text-xs font-semibold shadow-product-card hover:shadow-elevated transition-all bg-signal-blue hover:bg-signal-blue/90 text-white"
+          >
+            <Compass size={15} weight="bold" className="flex-shrink-0" />
+            <span>Browse Campaigns</span>
           </button>
         )}
 
