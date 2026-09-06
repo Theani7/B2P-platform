@@ -16,8 +16,9 @@ import {
   Legend,
 } from "recharts";
 import { Spinner } from "@/components/ui/Spinner";
+import { ChartLineUp, ChartPie, Trophy } from "@phosphor-icons/react";
 
-const COLORS = ["#145aff", "#16ca2e", "#ffa64d", "#f26052", "#374151"];
+const COLORS = ["#145aff", "#16ca2e", "#ffa64d", "#f26052", "#696a72"];
 
 interface ChartData {
   charts?: {
@@ -36,10 +37,19 @@ export default function BusinessDashboardCharts({ analytics, loading }: { analyt
 
   return (
     <div className="lg:col-span-2 space-y-6">
-      <div className="bg-white border border-slate-custom/10 rounded-cards p-5 shadow-product-card">
-        <h2 className="text-heading text-graphite mb-1">Platform Activity Trend</h2>
-        <p className="text-sm text-ash mb-6">Applications and Collaborations over the last 6 months</p>
-        <div className="h-[300px] w-full">
+      {/* Platform Activity Trend */}
+      <div className="bg-white border border-steel/10 rounded-2xl p-5 shadow-product-card">
+        <div className="flex items-center gap-2.5 mb-1">
+          <div className="w-8 h-8 rounded-lg bg-sky-wash text-signal-blue flex items-center justify-center flex-shrink-0">
+            <ChartLineUp size={18} weight="bold" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-midnight-ink">Platform Activity Trend</h2>
+            <p className="text-xs text-ash">Applications and collaborations over the last 6 months</p>
+          </div>
+        </div>
+
+        <div className="h-[280px] w-full mt-4">
           {trendData.length ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -53,65 +63,142 @@ export default function BusinessDashboardCharts({ analytics, loading }: { analyt
                     <stop offset="95%" stopColor="#16ca2e" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="month" allowDuplicatedCategory={false} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#374151' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#374151' }} />
+                <XAxis
+                  dataKey="month"
+                  allowDuplicatedCategory={false}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11, fill: "#696a72" }}
+                  dy={10}
+                />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#696a72" }} />
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f4fe" />
                 <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #f0f4fe', boxShadow: 'rgba(0,0,0,0.1) 0px 0px 4px -2px' }}
-                  itemStyle={{ color: '#14141e', fontWeight: 500 }}
+                  contentStyle={{
+                    borderRadius: "12px",
+                    border: "1px solid rgba(107,114,128,0.15)",
+                    boxShadow: "rgba(0,0,0,0.08) 0px 4px 12px",
+                    fontSize: "12px",
+                  }}
+                  itemStyle={{ color: "#14141e", fontWeight: 600 }}
                 />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                <Area type="monotone" data={trendData} dataKey="value" name="Applications" stroke="#145aff" strokeWidth={2} fillOpacity={1} fill="url(#colorApps)" />
-                <Area type="monotone" data={collabData} dataKey="value" name="Collaborations" stroke="#16ca2e" strokeWidth={2} fillOpacity={1} fill="url(#colorCollabs)" />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: "11px", paddingTop: "12px" }} />
+                <Area
+                  type="monotone"
+                  data={trendData}
+                  dataKey="value"
+                  name="Applications"
+                  stroke="#145aff"
+                  strokeWidth={2.5}
+                  fillOpacity={1}
+                  fill="url(#colorApps)"
+                />
+                <Area
+                  type="monotone"
+                  data={collabData}
+                  dataKey="value"
+                  name="Collaborations"
+                  stroke="#16ca2e"
+                  strokeWidth={2.5}
+                  fillOpacity={1}
+                  fill="url(#colorCollabs)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-ash text-sm">
+            <div className="flex flex-col items-center justify-center h-full text-ash text-xs">
               {loading ? <Spinner /> : "No analytics available yet."}
             </div>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white border border-slate-custom/10 rounded-cards p-5 shadow-product-card">
-          <h2 className="text-heading-sm text-graphite mb-1">Application Status</h2>
-          <p className="text-sm text-ash mb-6">Distribution of your campaign applications</p>
-          <div className="h-[220px] w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Application Status Distribution */}
+        <div className="bg-white border border-steel/10 rounded-2xl p-5 shadow-product-card">
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="w-8 h-8 rounded-lg bg-emerald-status/10 text-emerald-status flex items-center justify-center flex-shrink-0">
+              <ChartPie size={18} weight="bold" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-midnight-ink">Application Status</h2>
+              <p className="text-[11px] text-ash">Distribution of received applications</p>
+            </div>
+          </div>
+
+          <div className="h-[210px] w-full mt-3">
             {statusData.length ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={statusData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                    {statusData.map((entry, index) => (
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={75}
+                    paddingAngle={4}
+                    dataKey="value"
+                  >
+                    {statusData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #f0f4fe', boxShadow: 'rgba(0,0,0,0.1) 0px 0px 4px -2px' }} />
-                  <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "1px solid rgba(107,114,128,0.15)",
+                      boxShadow: "rgba(0,0,0,0.08) 0px 4px 12px",
+                      fontSize: "12px",
+                    }}
+                  />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: "11px" }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-fog text-sm">No data</div>
+              <div className="flex items-center justify-center h-full text-fog text-xs">No data yet</div>
             )}
           </div>
         </div>
 
-        <div className="bg-white border border-slate-custom/10 rounded-cards p-5 shadow-product-card">
-          <h2 className="text-heading-sm text-graphite mb-1">Top Campaigns</h2>
-          <p className="text-sm text-ash mb-6">By number of applications received</p>
-          <div className="h-[220px] w-full">
+        {/* Top Campaigns */}
+        <div className="bg-white border border-steel/10 rounded-2xl p-5 shadow-product-card">
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="w-8 h-8 rounded-lg bg-amber-tag/15 text-amber-tag flex items-center justify-center flex-shrink-0">
+              <Trophy size={18} weight="bold" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-midnight-ink">Top Campaigns</h2>
+              <p className="text-[11px] text-ash">By applications received</p>
+            </div>
+          </div>
+
+          <div className="h-[210px] w-full mt-3">
             {topData.length ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f0f4fe" />
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={100} tick={{ fontSize: 11, fill: '#374151' }} />
-                  <Tooltip cursor={{ fill: '#fcfcfc' }} />
-                  <Bar dataKey="value" name="Applications" fill="#145aff" radius={[0, 4, 4, 0]} barSize={20} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    axisLine={false}
+                    tickLine={false}
+                    width={90}
+                    tick={{ fontSize: 11, fill: "#696a72" }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "#f0f4fe" }}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "1px solid rgba(107,114,128,0.15)",
+                      fontSize: "12px",
+                    }}
+                  />
+                  <Bar dataKey="value" name="Applications" fill="#145aff" radius={[0, 6, 6, 0]} barSize={18} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-fog text-sm">No data</div>
+              <div className="flex items-center justify-center h-full text-fog text-xs">No data yet</div>
             )}
           </div>
         </div>
