@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/providers/AuthProvider";
+import { NavigationProvider } from "@/providers/NavigationProvider";
 import { NavigationProgress } from "@/components/common/NavigationProgress";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -24,7 +25,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <Suspense fallback={null}>
         <NavigationProgress />
       </Suspense>
-      <AuthProvider>{children}</AuthProvider>
+      <NavigationProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </NavigationProvider>
       <Toaster position="top-right" />
     </QueryClientProvider>
   );

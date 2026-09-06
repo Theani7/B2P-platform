@@ -163,10 +163,12 @@ function getSections(role: string) {
   }
 }
 
+import { useNavigation } from "@/providers/NavigationProvider";
+
 export function Sidebar({ role }: SidebarProps) {
   const { user, hasProfile, openLogoutDialog } = useAuth();
   const sections = getSections(role);
-  const pathname = usePathname();
+  const { pathname, optimisticPath, isNavigating, navigateTo } = useNavigation();
   const prefetchedRef = useRef(false);
 
   const isMessagesPage = pathname === "/messages";
@@ -198,6 +200,12 @@ export function Sidebar({ role }: SidebarProps) {
         <Link
           href={user ? `/${user.role.toLowerCase()}/dashboard` : "/"}
           className="flex items-center gap-2.5"
+          onClick={(e) => {
+            if (user) {
+              e.preventDefault();
+              navigateTo(`/${user.role.toLowerCase()}/dashboard`);
+            }
+          }}
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-signal-blue to-azure-info text-base font-semibold text-white shadow-product-card">B</span>
           <span>
@@ -233,12 +241,20 @@ export function Sidebar({ role }: SidebarProps) {
                   );
                 }
 
-                const isActive = pathname === link.to;
+                const currentTarget = optimisticPath ?? pathname;
+                const isActive = currentTarget === link.to;
+                const isItemLoading = isNavigating && optimisticPath === link.to;
+
                 return (
                   <Link
                     key={link.to}
                     href={link.to}
-                    className={`flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
+                    prefetch={true}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateTo(link.to);
+                    }}
+                    className={`flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group cursor-pointer ${
                       isActive
                         ? "bg-midnight-ink text-white shadow-product-card"
                         : "text-steel hover:bg-sky-wash/60 hover:text-graphite"
@@ -249,11 +265,16 @@ export function Sidebar({ role }: SidebarProps) {
                         <Icon size={18} className={isActive ? "text-white" : "text-ash group-hover:text-signal-blue"} />
                         {link.label}
                       </div>
-                      {link.to === "/messages" && unreadMessagesCount > 0 && (
+                      {isItemLoading ? (
+                        <span className="flex h-2 w-2 relative mr-1">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-signal-blue opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-azure-info"></span>
+                        </span>
+                      ) : link.to === "/messages" && unreadMessagesCount > 0 ? (
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center ${isActive ? "bg-white text-midnight-ink" : "bg-coral-alert text-white"}`}>
                           {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
                         </span>
-                      )}
+                      ) : null}
                     </div>
                   </Link>
                 );
