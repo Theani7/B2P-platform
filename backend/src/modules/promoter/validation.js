@@ -3,6 +3,7 @@ import { z } from "zod";
 const nichesField = z.array(z.string().min(1).max(50)).min(1).max(3).optional();
 
 export const promoterProfileCreateSchema = z.object({
+  fullName: z.string().min(1).max(255).optional(),
   username: z.string().min(3).max(150).regex(/^[a-zA-Z0-9_-]+$/, "Username may only contain letters, numbers, underscores, and hyphens"),
   headline: z.string().max(255).optional(),
   bio: z.string().optional(),
@@ -16,6 +17,7 @@ export const promoterProfileCreateSchema = z.object({
 });
 
 export const promoterProfileUpdateSchema = z.object({
+  fullName: z.string().min(1).max(255).optional(),
   username: z.string().min(3).max(150).regex(/^[a-zA-Z0-9_-]+$/, "Username may only contain letters, numbers, underscores, and hyphens").optional(),
   headline: z.string().max(255).optional(),
   bio: z.string().optional(),

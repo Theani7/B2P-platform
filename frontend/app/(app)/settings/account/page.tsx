@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RequireAuth } from "@/components/common/RequireAuth";
+import { useAuth } from "@/providers/AuthProvider";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -13,7 +14,78 @@ import { notifySuccess, notifyError } from "@/lib/notify";
 import { getApiError } from "@/lib/apiError";
 import api, { clearTokens } from "@/lib/apiClient";
 import { useExport } from "@/features/export/api";
-import { Lock, Download, Trash2 } from "lucide-react";
+import { Lock, Download, Trash2, User } from "lucide-react";
+
+const personalInfoSchema = z.object({
+  fullName: z.string().min(2, "Full name must be at least 2 characters").max(100, "Full name is too long"),
+});
+
+type PersonalInfoValues = z.infer<typeof personalInfoSchema>;
+
+function PersonalInfoCard() {
+  const { user, refreshUser } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isDirty },
+    reset,
+  } = useForm<PersonalInfoValues>({
+    resolver: zodResolver(personalInfoSchema),
+    defaultValues: { fullName: user?.fullName || "" },
+  });
+
+  useEffect(() => {
+    if (user) {
+      reset({ fullName: user.fullName || "" });
+    }
+  }, [user, reset]);
+
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      await api.patch("/auth/me", { fullName: values.fullName });
+      notifySuccess("Name updated successfully");
+      reset(values);
+      refreshUser();
+    } catch (err: unknown) {
+      notifyError(getApiError(err, "Could not update name"));
+    }
+  });
+
+  return (
+    <Card>
+      <div className="mb-1 flex items-center gap-2.5">
+        <span className="flex h-9 w-9 items-center justify-center rounded-buttons bg-sky-wash text-signal-blue">
+          <User size={17} />
+        </span>
+        <h2 className="text-heading-sm font-semibold text-midnight-ink">Personal information</h2>
+      </div>
+      <p className="mb-5 text-sm text-ash">Update your display name visible across the platform.</p>
+      <form onSubmit={onSubmit} className="flex max-w-md flex-col gap-4">
+        <Input
+          label="Full name"
+          type="text"
+          {...register("fullName")}
+          error={errors.fullName?.message}
+        />
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-graphite">Email address</label>
+          <input
+            type="text"
+            disabled
+            className="w-full h-10 px-3.5 rounded-inputs border border-steel/15 bg-linen-canvas text-ash text-sm cursor-not-allowed"
+            value={user?.email || ""}
+          />
+          <p className="text-[11px] text-fog">Registered email address for your account.</p>
+        </div>
+        <div>
+          <Button type="submit" disabled={isSubmitting || !isDirty}>
+            {isSubmitting ? "Saving…" : "Save changes"}
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
 
 const passwordSchema = z
   .object({
@@ -182,6 +254,7 @@ export default function AccountSettingsPage() {
             </p>
           </div>
         </div>
+        <PersonalInfoCard />
         <ChangePasswordCard />
         <DownloadDataCard />
         <DeleteAccountCard />

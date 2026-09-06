@@ -34,7 +34,8 @@ import {
 import { usePublicSettings } from "@/features/settings/api";
 
 const schema = z.object({
-  username: z.string().min(3, "Username too short"),
+  fullName: z.string().min(2, "Full name must be at least 2 characters").max(100, "Full name is too long"),
+  username: z.string().min(3, "Username too short").regex(/^[a-zA-Z0-9_-]+$/, "Username may only contain letters, numbers, underscores, and hyphens"),
   headline: z.string().optional(),
   bio: z.string().optional(),
   niches: z.array(z.string()).min(1, "Pick at least one niche").max(3),
@@ -52,7 +53,7 @@ function formatCompactNumber(number: number) {
 }
 
 function PromoterProfileInner() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { data: profile, isLoading } = usePromoterProfile();
   const createProfile = useCreatePromoterProfile();
   const updateProfile = useUpdatePromoterProfile();
@@ -95,7 +96,8 @@ function PromoterProfileInner() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      username: profile?.username || user?.fullName || "",
+      fullName: profile?.fullName || user?.fullName || "",
+      username: profile?.username || user?.username || "",
       headline: profile?.headline || "",
       bio: profile?.bio || "",
       niches: profile?.niches?.length ? profile.niches : profile?.niche ? [profile.niche] : [],
@@ -123,7 +125,8 @@ function PromoterProfileInner() {
   useEffect(() => {
     if (profile) {
       reset({
-        username: profile.username || user?.fullName || "",
+        fullName: profile.fullName || user?.fullName || "",
+        username: profile.username || user?.username || "",
         headline: profile.headline || "",
         bio: profile.bio || "",
         niches: profile.niches?.length ? profile.niches : profile.niche ? [profile.niche] : [],
@@ -145,6 +148,7 @@ function PromoterProfileInner() {
       onSuccess: () => {
         notifySuccess("Profile saved successfully");
         reset(data);
+        refreshUser();
       },
       onError: () => notifyError("Failed to save profile"),
     });
@@ -159,6 +163,7 @@ function PromoterProfileInner() {
       const payload: PromoterProfileInput = { ...values, niche: values.niches[0], avatarUrl: res.url };
       const mutation = hasProfile ? updateProfile : createProfile;
       await mutation.mutateAsync(payload);
+      refreshUser();
       notifySuccess("Avatar updated successfully");
     } catch {
       notifyError("Failed to upload avatar");
@@ -218,7 +223,7 @@ function PromoterProfileInner() {
               disabled={verifying}
               className="flex items-center gap-2 px-4 py-2 rounded-button bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
             >
-              <BadgeCheck size={16} /> Request Verification
+              <Trophy size={16} /> Request Verification
             </button>
           ) : (
             <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-amber-tag/10 text-amber-tag border border-amber-tag/20 text-sm font-medium">
@@ -226,10 +231,11 @@ function PromoterProfileInner() {
             </div>
           )}
           <button
+            type="button"
             onClick={() => setShareOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-button bg-white border border-slate-custom/10 text-graphite text-sm font-medium hover:bg-sky-wash transition-colors shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 rounded-button border border-slate-custom/20 text-graphite hover:bg-sky-wash text-sm font-medium transition-colors"
           >
-            <Share size={16} /> Share Profile
+            <Share size={16} /> Share
           </button>
         </div>
       </div>
@@ -248,25 +254,26 @@ function PromoterProfileInner() {
         </div>
       )}
 
-      {/* Hero Profile Banner */}
-      <div className="bg-white border border-slate-custom/10 rounded-cards-lg shadow-product-card flex flex-col relative overflow-hidden">
-        <div className="h-32 sm:h-40 bg-gradient-to-r from-signal-blue to-signal-blue/80 relative">
-          <div className="absolute inset-0 bg-black/5 mix-blend-overlay"></div>
-          {profile?.verified && (
-            <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-button flex items-center gap-1.5 text-xs font-semibold text-white shadow-product-card-sm">
-              <BadgeCheck size={16} /> Verified Creator
-            </div>
-          )}
+      {/* Hero Profile Card */}
+      <div className="relative overflow-hidden rounded-cards border border-slate-custom/10 bg-white shadow-product-card">
+        <div className="h-32 bg-gradient-to-r from-signal-blue to-sky-wash relative">
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]" />
         </div>
         
-        <div className="px-6 sm:px-8 pb-6 sm:pb-8">
-          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 sm:gap-6">
-            <div className="relative shrink-0 -mt-12 sm:-mt-16 z-10">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-white shadow-sm flex items-center justify-center">
-                  {uploadAvatarMutation.isPending ? (
-                    <Spinner />
-                  ) : (
-                  <Avatar initials={user?.fullName?.[0] || 'U'} src={profile?.avatarUrl} size="xl" colorIndex={1} className="w-full h-full text-4xl" />
+        <div className="px-6 pb-6 pt-0 sm:px-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 -mt-12 sm:-mt-16">
+            <div className="relative group">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white overflow-hidden shadow-product-card bg-sky-wash flex items-center justify-center">
+                {avatarUploading ? (
+                  <Spinner />
+                ) : (
+                  <Avatar
+                    src={profile?.avatarUrl}
+                    initials={(user?.fullName?.[0] ?? "P").toUpperCase()}
+                    size="lg"
+                    className="w-full h-full text-3xl"
+                    colorIndex={2}
+                  />
                 )}
               </div>
               <button
@@ -281,7 +288,7 @@ function PromoterProfileInner() {
             </div>
             
             <div className="flex-1 text-center sm:text-left sm:pb-2">
-              <h2 className="text-2xl sm:text-3xl font-bold text-graphite tracking-tight">{user?.fullName || 'Creator Name'}</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-graphite tracking-tight">{watch("fullName") || user?.fullName || 'Creator Name'}</h2>
               <p className="text-sm sm:text-base font-medium text-signal-blue mt-1">{headline || 'Your awesome headline'}</p>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3 text-xs sm:text-sm font-medium text-ash">
                 {(niches?.length ?? 0) > 0 && (
@@ -317,8 +324,18 @@ function PromoterProfileInner() {
               <div className="p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-graphite">Full Name</label>
-                    <input type="text" disabled className="w-full h-11 px-4 rounded-inputs border border-slate-custom/10 bg-slate-custom/5 text-steel text-sm cursor-not-allowed" value={user?.fullName || ""} />
+                    <label className="text-sm font-medium text-graphite">Full Name <span className="text-coral-alert">*</span></label>
+                    <input
+                      type="text"
+                      {...register("fullName")}
+                      placeholder="Your full name"
+                      className={`w-full h-11 px-4 rounded-inputs border ${
+                        errors.fullName
+                          ? 'border-coral-alert focus:ring-coral-alert/10'
+                          : 'border-slate-custom/20 focus:border-signal-blue focus:ring-signal-blue/10'
+                      } focus:outline-none focus:ring-[3px] text-sm text-graphite`}
+                    />
+                    {errors.fullName && <p className="text-xs text-coral-alert">{errors.fullName.message}</p>}
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-graphite">Username <span className="text-coral-alert">*</span></label>

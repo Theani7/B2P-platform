@@ -17,6 +17,7 @@ export interface BusinessProfileRead {
 
 export interface PromoterProfileRead {
   id: string;
+  fullName?: string;
   username: string;
   headline?: string;
   bio?: string;
@@ -33,7 +34,7 @@ export interface PromoterProfileRead {
 }
 
 export type BusinessProfileInput = Partial<BusinessProfileRead>;
-export type PromoterProfileInput = Partial<PromoterProfileRead>;
+export type PromoterProfileInput = Partial<PromoterProfileRead> & { fullName?: string };
 
 export const useBusinessProfile = () =>
   useQuery<BusinessProfileRead>({

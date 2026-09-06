@@ -32,8 +32,15 @@ async function withPendingVerification(profile) {
 export async function createOrUpdate(user, payload) {
   ensurePromoter(user);
 
-  // Multi-niche support (max 3): keep legacy `niche` synced as niches[0].
   const data = { ...payload };
+
+  let newFullName;
+  if (data.fullName !== undefined) {
+    newFullName = typeof data.fullName === "string" ? data.fullName.trim() : "";
+    delete data.fullName;
+  }
+
+  // Multi-niche support (max 3): keep legacy `niche` synced as niches[0].
   if (data.niches !== undefined) {
     const normalized = normalizeNiches(data.niches);
     if (!normalized.length) throw new AppError("At least one valid niche is required", 400);
@@ -53,18 +60,34 @@ export async function createOrUpdate(user, payload) {
     if (existing) throw new AppError("Username already taken", 409);
   }
 
+  if (newFullName) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { fullName: newFullName },
+    });
+  }
+
   const profile = await prisma.promoterProfile.findUnique({ where: { userId: user.id } });
   const saved = profile
     ? await prisma.promoterProfile.update({ where: { id: profile.id }, data })
     : await prisma.promoterProfile.create({ data: { userId: user.id, ...data } });
-  return withPendingVerification(saved);
+
+  const withUser = {
+    ...saved,
+    fullName: newFullName || user.fullName,
+  };
+  return withPendingVerification(withUser);
 }
 
 export async function getMyProfile(user) {
   ensurePromoter(user);
-  const profile = await prisma.promoterProfile.findUnique({ where: { userId: user.id } });
+  const profile = await prisma.promoterProfile.findUnique({
+    where: { userId: user.id },
+    include: { user: { select: { fullName: true } } },
+  });
   if (!profile) throw new AppError("Profile not found", 404);
-  return withPendingVerification(profile);
+  const res = { ...profile, fullName: profile.user?.fullName };
+  return withPendingVerification(res);
 }
 
 export async function deleteProfile(user) {
