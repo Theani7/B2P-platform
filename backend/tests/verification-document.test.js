@@ -99,6 +99,13 @@ describe("Verification Document Feature Tests", () => {
     const empty = submitVerificationSchema.safeParse({});
     assert.equal(empty.success, true);
 
+    // Null values
+    const withNulls = submitVerificationSchema.safeParse({
+      documentUrl: null,
+      documentName: null,
+    });
+    assert.equal(withNulls.success, true);
+
     // Too long documentUrl (> 1000 chars)
     const longUrl = submitVerificationSchema.safeParse({
       documentUrl: "a".repeat(1001),
@@ -232,5 +239,78 @@ describe("Verification Document Feature Tests", () => {
     assert.equal(target.documentName, "portfolio2.pdf");
     assert.equal(target.document_url, "/uploads/documents/portfolio2.pdf");
     assert.equal(target.document_name, "portfolio2.pdf");
+  });
+
+  test("uploadDocument rejects non-PDF files and accepts PDF files", async () => {
+    const { uploadDocument } = await import("../src/modules/upload/controller.js");
+
+    // Non-PDF file (.png)
+    let errorCaught;
+    const reqPng = {
+      file: {
+        originalname: "test.png",
+        buffer: Buffer.from("fake-png-content"),
+      },
+    };
+    const res = {};
+    const nextPng = (err) => {
+      errorCaught = err;
+    };
+
+    await uploadDocument(reqPng, res, nextPng);
+    assert.ok(errorCaught);
+    assert.equal(errorCaught.statusCode, 400);
+    assert.equal(errorCaught.message, "Only PDF documents are allowed");
+
+    // Non-PDF file (.txt)
+    errorCaught = null;
+    const reqTxt = {
+      file: {
+        originalname: "test.txt",
+        buffer: Buffer.from("fake-txt-content"),
+      },
+    };
+    await uploadDocument(reqTxt, res, (err) => {
+      errorCaught = err;
+    });
+    assert.ok(errorCaught);
+    assert.equal(errorCaught.statusCode, 400);
+    assert.equal(errorCaught.message, "Only PDF documents are allowed");
+
+    // Valid PDF file
+    let jsonResult;
+    let statusCode;
+    const reqPdf = {
+      file: {
+        originalname: "valid.pdf",
+        buffer: Buffer.from("%PDF-1.4 test"),
+      },
+    };
+    const resPdf = {
+      status(code) {
+        statusCode = code;
+        return this;
+      },
+      json(data) {
+        jsonResult = data;
+        return this;
+      },
+    };
+
+    await uploadDocument(reqPdf, resPdf, (err) => {
+      if (err) throw err;
+    });
+
+    assert.equal(statusCode, 201);
+    assert.equal(jsonResult.success, true);
+    assert.ok(jsonResult.data.url.startsWith("/uploads/documents/"));
+    assert.ok(jsonResult.data.url.endsWith(".pdf"));
+
+    // Cleanup uploaded file
+    const filename = path.basename(jsonResult.data.url);
+    const cleanupPath = path.join(uploadService.uploadBaseDir(), "documents", filename);
+    if (fs.existsSync(cleanupPath)) {
+      fs.unlinkSync(cleanupPath);
+    }
   });
 });

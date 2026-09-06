@@ -7,6 +7,11 @@ import { ROLE } from "../../shared/enums.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+const documentUpload = multer({
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
@@ -17,6 +22,6 @@ router.post("/avatar", upload.single("file"), controllers.uploadAvatar);
 router.post("/logo", requireRole(ROLE.BUSINESS), upload.single("file"), controllers.uploadLogo);
 router.post("/portfolio-image", upload.single("file"), controllers.uploadPortfolioImage);
 router.post("/chat-attachment", upload.single("file"), controllers.uploadChatAttachment);
-router.post("/document", upload.single("file"), controllers.uploadDocument);
+router.post("/document", documentUpload.single("file"), controllers.uploadDocument);
 
 export default router;
