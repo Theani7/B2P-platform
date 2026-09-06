@@ -57,38 +57,44 @@ function DashboardInner() {
   const recentApplications = applicationsData?.items ?? [];
 
   return (
-    <div className="max-w-[1240px] mx-auto space-y-6 pb-20">
+    <div className="max-w-[1240px] mx-auto space-y-8 pb-20">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-midnight-ink">
-              Overview
-            </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill text-[11px] font-semibold bg-emerald-status/10 text-emerald-status border border-emerald-status/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-status animate-pulse" /> Live
-            </span>
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">
+                Overview
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill text-[11px] font-semibold bg-emerald-status/10 text-emerald-status border border-emerald-status/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-status animate-pulse" /> Live
+              </span>
+            </div>
+            <p className="text-sm text-ash mt-2">
+              Welcome back, {user?.fullName?.split(" ")[0] || "there"}. Here&apos;s what&apos;s happening with your brand today.
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-ash mt-1">
-            Welcome back, {user?.fullName?.split(" ")[0] || "there"}. Here&apos;s what&apos;s happening with your brand today.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
-          <Link
-            href="/business/promoters"
-            className="inline-flex items-center justify-center gap-2 h-10 px-4 bg-white border border-steel/20 text-graphite hover:bg-sky-wash hover:border-signal-blue/30 rounded-pill text-xs sm:text-sm font-semibold shadow-product-card transition-all"
-          >
-            <MagnifyingGlass size={16} weight="bold" />
-            <span>Find Promoters</span>
-          </Link>
-          <Link
-            href="/business/campaigns/create"
-            className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-signal-blue hover:bg-signal-blue/90 text-white rounded-pill text-xs sm:text-sm font-semibold shadow-product-card transition-all hover:shadow-elevated"
-          >
-            <Plus size={16} weight="bold" />
-            <span>Create Campaign</span>
-          </Link>
+          <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
+            <Link
+              href="/business/promoters"
+              className="inline-flex items-center gap-2 h-11 px-5 bg-white border border-slate-custom/20 text-slate-custom rounded-pill text-sm font-medium hover:bg-sky-wash transition-colors shadow-sm"
+            >
+              <MagnifyingGlass size={16} weight="bold" />
+              <span>Find Promoters</span>
+            </Link>
+            <Link
+              href="/business/campaigns/create"
+              className="inline-flex items-center gap-2 h-11 px-5 bg-signal-blue hover:bg-signal-blue/90 text-white rounded-pill text-sm font-semibold shadow-product-card transition-all hover:shadow-elevated"
+            >
+              <Plus size={16} weight="bold" />
+              <span>Create Campaign</span>
+            </Link>
+          </div>
         </div>
       </div>
 

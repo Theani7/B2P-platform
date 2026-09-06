@@ -327,29 +327,36 @@ function CampaignsPageInner() {
   }
 
   return (
-    <div className="max-w-[1240px] mx-auto space-y-6 pb-20">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-midnight-ink">
-              My Campaigns
-            </h1>
-            <span className="text-xs font-bold font-mono px-2.5 py-0.5 rounded-pill bg-sky-wash text-signal-blue border border-signal-blue/20">
-              {stats.data?.total_campaigns ?? totalCampaigns}
-            </span>
+    <div className="max-w-[1240px] mx-auto space-y-8 pb-20">
+      {/* Page Header Banner */}
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="font-display text-4xl font-semibold tracking-tight text-midnight-ink">
+                My Campaigns
+              </h1>
+              <span className="text-xs font-bold font-mono px-2.5 py-0.5 rounded-pill bg-sky-wash text-signal-blue border border-signal-blue/20">
+                {stats.data?.total_campaigns ?? totalCampaigns}
+              </span>
+            </div>
+            <p className="text-sm text-ash mt-2">
+              Track performance, review applications, and manage campaign lifecycles.
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-ash mt-1">
-            Track performance, review applications, and manage campaign lifecycles.
-          </p>
+
+          <button
+            onClick={() => router.push("/business/campaigns/create")}
+            className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-signal-blue hover:bg-signal-blue/90 text-white rounded-pill text-sm font-semibold shadow-product-card transition-all hover:shadow-elevated self-start sm:self-auto"
+          >
+            <Plus size={16} weight="bold" />
+            <span>Create Campaign</span>
+          </button>
         </div>
-        <button
-          onClick={() => router.push("/business/campaigns/create")}
-          className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-signal-blue hover:bg-signal-blue/90 text-white rounded-pill text-xs sm:text-sm font-semibold shadow-product-card transition-all hover:shadow-elevated self-start sm:self-auto"
-        >
-          <Plus size={16} weight="bold" />
-          <span>Create Campaign</span>
-        </button>
       </div>
 
       {/* Metrics Strip */}
