@@ -206,40 +206,6 @@ function PromoterProfileInner() {
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-8 pb-32">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h1 className="text-heading-lg text-midnight-ink">Promoter Profile</h1>
-          <p className="text-body text-steel mt-2">Manage your public profile and improve your discoverability.</p>
-        </div>
-        <div className="flex items-center gap-4">
-          {pendingVerification || profile?.verified ? (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-sm font-medium">
-              <BadgeCheck size={16} /> {profile?.verified ? "Verified Creator" : "Verification Pending"}
-            </div>
-          ) : isComplete ? (
-            <button
-              onClick={requestVerification}
-              disabled={verifying}
-              className="flex items-center gap-2 px-4 py-2 rounded-button bg-signal-blue/10 text-signal-blue text-sm font-medium hover:bg-signal-blue/20 transition-colors"
-            >
-              <Trophy size={16} /> Request Verification
-            </button>
-          ) : (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-button bg-amber-tag/10 text-amber-tag border border-amber-tag/20 text-sm font-medium">
-              <Clock size={16} /> Complete profile to verify
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => setShareOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-button border border-slate-custom/20 text-graphite hover:bg-sky-wash text-sm font-medium transition-colors"
-          >
-            <Share size={16} /> Share
-          </button>
-        </div>
-      </div>
-
       {!hasProfile && (
         <div className="bg-amber-tag/10 border border-amber-tag/20 rounded-inputs p-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -254,16 +220,17 @@ function PromoterProfileInner() {
         </div>
       )}
 
-      {/* Hero Profile Card */}
-      <div className="relative overflow-hidden rounded-cards border border-slate-custom/10 bg-white shadow-product-card">
-        <div className="h-32 bg-gradient-to-r from-signal-blue to-sky-wash relative">
-          <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]" />
-        </div>
-        
-        <div className="px-6 pb-6 pt-0 sm:px-8">
-          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 -mt-12 sm:-mt-16">
-            <div className="relative group">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white overflow-hidden shadow-product-card bg-sky-wash flex items-center justify-center">
+      {/* SIGNATURE HERO BANNER */}
+      <div className="relative overflow-hidden rounded-cards-lg border border-steel/10 bg-white p-8 shadow-product-card">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(60% 120% at 100% 0%, rgba(182,203,253,0.5) 0%, rgba(240,244,254,0) 60%)" }}
+        />
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+            {/* Avatar with photo upload trigger */}
+            <div className="relative group w-fit shrink-0">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-white overflow-hidden shadow-md bg-sky-wash flex items-center justify-center">
                 {avatarUploading ? (
                   <Spinner />
                 ) : (
@@ -280,33 +247,95 @@ function PromoterProfileInner() {
                 type="button"
                 onClick={onCameraClick}
                 disabled={avatarUploading}
-                className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-8 h-8 bg-white border border-slate-custom/10 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-colors shadow-product-card-sm disabled:opacity-50"
+                title="Change avatar"
+                className="absolute bottom-0 right-0 w-7 h-7 bg-white border border-steel/20 rounded-full flex items-center justify-center text-graphite hover:text-signal-blue hover:bg-sky-wash transition-all shadow-sm disabled:opacity-50 opacity-0 group-hover:opacity-100"
               >
-                <Upload size={14} />
+                <Upload size={13} />
               </button>
               <input type="file" ref={fileInputRef} onChange={onFileChange} accept="image/*" className="hidden" />
             </div>
-            
-            <div className="flex-1 text-center sm:text-left sm:pb-2">
-              <h2 className="text-2xl sm:text-3xl font-bold text-graphite tracking-tight">{watch("fullName") || user?.fullName || 'Creator Name'}</h2>
-              <p className="text-sm sm:text-base font-medium text-signal-blue mt-1">{headline || 'Your awesome headline'}</p>
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3 text-xs sm:text-sm font-medium text-ash">
+
+            {/* Creator Identity */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-signal-blue font-mono uppercase tracking-wider">
+                  Creator Profile
+                </span>
+                {profile?.verified && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-status bg-emerald-status/10 px-2 py-0.5 rounded-pill border border-emerald-status/20">
+                    <BadgeCheck size={12} /> Verified
+                  </span>
+                )}
+              </div>
+
+              {/* Full Name - Live Bound */}
+              <h1 className="mt-1 truncate font-display text-2xl sm:text-3xl font-bold tracking-tight text-midnight-ink">
+                {watch("fullName") || user?.fullName || "Creator Name"}
+              </h1>
+
+              {/* Headline */}
+              <p className="text-xs sm:text-sm font-medium text-signal-blue mt-0.5">
+                {headline || "Your awesome headline"}
+              </p>
+
+              {/* Badges / Metrics */}
+              <div className="flex flex-wrap items-center gap-2.5 mt-2 text-xs font-medium text-ash">
                 {(niches?.length ?? 0) > 0 && (
-                  <span className="inline-flex items-center gap-1.5 bg-sky-wash text-signal-blue px-2.5 py-1 rounded-button">
-                    <Briefcase size={14} /> {NICHE_OPTIONS.find((o: any) => o.value === niches[0])?.label || niches[0]}
-                    {niches.length > 1 && <span className="font-semibold">+{niches.length - 1}</span>}
+                  <span className="inline-flex items-center gap-1 bg-sky-wash text-signal-blue px-2.5 py-0.5 rounded-pill font-semibold text-[11px] border border-signal-blue/20">
+                    <Briefcase size={12} /> {NICHE_OPTIONS.find((o: any) => o.value === niches[0])?.label || niches[0]}
+                    {niches.length > 1 && <span className="font-bold">+{niches.length - 1}</span>}
                   </span>
                 )}
                 {location && (
-                  <span className="flex items-center gap-1.5 bg-slate-custom/5 text-graphite px-2.5 py-1 rounded-button border border-slate-custom/10">
-                    <MapPin size={14} /> {location}
+                  <span className="inline-flex items-center gap-1 bg-linen-canvas text-graphite px-2.5 py-0.5 rounded-pill text-[11px] border border-steel/15">
+                    <MapPin size={12} className="text-ash" /> {location}
                   </span>
                 )}
-                <span className="flex items-center gap-1.5 ml-2">
-                  <strong className="text-graphite">{formatCompactNumber(realFollowers)}</strong> Followers
+                <span className="text-[11px] text-ash">
+                  <strong className="text-graphite font-semibold">{formatCompactNumber(realFollowers)}</strong> Followers
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* Action CTAs */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setShareOpen(true)}
+              className="inline-flex items-center gap-1.5 h-10 px-4 rounded-pill border border-steel/15 bg-white text-graphite hover:bg-sky-wash hover:border-signal-blue/30 hover:text-signal-blue text-xs font-semibold shadow-sm transition-all"
+            >
+              <Share size={14} /> Share
+            </button>
+
+            {pendingVerification || profile?.verified ? (
+              <div className="inline-flex items-center gap-1.5 h-10 px-4 rounded-pill bg-emerald-status/10 text-emerald-status border border-emerald-status/20 text-xs font-semibold">
+                <BadgeCheck size={14} /> {profile?.verified ? "Verified" : "Pending"}
+              </div>
+            ) : isComplete ? (
+              <button
+                type="button"
+                onClick={requestVerification}
+                disabled={verifying}
+                className="inline-flex items-center gap-1.5 h-10 px-4 rounded-pill bg-signal-blue/10 text-signal-blue text-xs font-semibold hover:bg-signal-blue/20 transition-all border border-signal-blue/20"
+              >
+                <Trophy size={14} /> Request Verification
+              </button>
+            ) : null}
+
+            <button
+              type="submit"
+              form="profile-form"
+              disabled={!isDirty || isSubmitting}
+              className={`inline-flex items-center gap-1.5 h-10 px-5 rounded-pill text-xs font-semibold shadow-product-card transition-all ${
+                isDirty && !isSubmitting
+                  ? "bg-signal-blue hover:bg-signal-blue/90 text-white hover:shadow-elevated"
+                  : "bg-steel/10 text-steel cursor-not-allowed"
+              }`}
+            >
+              {isSubmitting ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
+              <span>{isSubmitting ? "Saving..." : "Save Changes"}</span>
+            </button>
           </div>
         </div>
       </div>
