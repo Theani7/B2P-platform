@@ -102,6 +102,13 @@ export interface VerificationRequestRead {
   id: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   submittedAt: string;
+  documentUrl?: string | null;
+  documentName?: string | null;
+}
+
+export interface VerificationRequestInput {
+  documentUrl?: string | null;
+  documentName?: string | null;
 }
 
 export const useMyVerificationRequests = () =>
@@ -115,3 +122,28 @@ export const useMyBusinessVerificationRequests = () =>
     queryKey: ["my-business-verification-requests"],
     queryFn: () => api.get<VerificationRequestRead[]>("/business/verification-request").then((r) => r.data),
   });
+
+export const useRequestPromoterVerification = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data?: VerificationRequestInput) =>
+      api.post("/promoter/verification-request", data || {}).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-verification-requests"] });
+      qc.invalidateQueries({ queryKey: ["promoter-profile"] });
+    },
+  });
+};
+
+export const useRequestBusinessVerification = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data?: VerificationRequestInput) =>
+      api.post("/business/verification-request", data || {}).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-business-verification-requests"] });
+      qc.invalidateQueries({ queryKey: ["business-profile"] });
+    },
+  });
+};
+

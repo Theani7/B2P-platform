@@ -26,6 +26,7 @@ import api from "@/lib/apiClient";
 import { ProfileCompletionWidget } from "@/components/profile/ProfileCompletionWidget";
 import { Spinner } from "@/components/ui/Spinner";
 import { ShareDialog } from "@/components/sharing/ShareDialog";
+import { VerificationRequestModal } from "@/components/verification/VerificationRequestModal";
 import { Avatar } from "@/components/ui/Avatar";
 import AIGenerateButton from "@/components/ui/AIGenerateButton";
 import {
@@ -66,7 +67,7 @@ function PromoterProfileInner() {
   const { data: myVerificationRequests } = useMyVerificationRequests();
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [verifying, setVerifying] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [pendingVerification, setPendingVerification] = useState(false);
 
   useEffect(() => {
@@ -180,19 +181,6 @@ function PromoterProfileInner() {
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleAvatarUpload(file);
-  };
-
-  const requestVerification = async () => {
-    setVerifying(true);
-    try {
-      await api.post("/promoter/verification-request");
-      notifySuccess("Verification request submitted!");
-      setPendingVerification(true);
-    } catch (err: any) {
-      notifyApiError(err, "Failed to submit request");
-    } finally {
-      setVerifying(false);
-    }
   };
 
   const isComplete = completionData?.completion === 100;
@@ -326,8 +314,7 @@ function PromoterProfileInner() {
             ) : isComplete ? (
               <button
                 type="button"
-                onClick={requestVerification}
-                disabled={verifying}
+                onClick={() => setIsVerificationModalOpen(true)}
                 className="inline-flex items-center gap-1.5 h-10 px-4 rounded-pill bg-signal-blue/10 text-signal-blue text-xs font-semibold hover:bg-signal-blue/20 transition-all border border-signal-blue/20"
               >
                 <Trophy size={14} /> Request Verification
@@ -557,6 +544,16 @@ function PromoterProfileInner() {
       )}
 
       <ShareDialog open={shareOpen} onClose={() => setShareOpen(false)} />
+      <VerificationRequestModal
+        open={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+        role="PROMOTER"
+        onSuccess={() => {
+          setPendingVerification(true);
+          qc.invalidateQueries({ queryKey: ["my-verification-requests"] });
+          qc.invalidateQueries({ queryKey: ["promoter-profile"] });
+        }}
+      />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/apiClient";
 import { ProfileCompletionWidget } from "@/components/profile/ProfileCompletionWidget";
 import { SocialEditor } from "@/components/social/SocialEditor";
+import { VerificationRequestModal } from "@/components/verification/VerificationRequestModal";
 import { useBusinessProfile, useCreateBusinessProfile, useUpdateBusinessProfile, useMyBusinessVerificationRequests } from "@/features/profile/api";
 import { useMySocialLinks, useDeleteSocialLink } from "@/features/social/api";
 import { useUpload } from "@/features/upload/api";
@@ -53,7 +54,7 @@ export default function BusinessProfilePage() {
   
   const fileRef = useRef<HTMLInputElement>(null);
   
-  const [verifying, setVerifying] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [pendingVerification, setPendingVerification] = useState(false);
   const [editingSocial, setEditingSocial] = useState(false);
 
@@ -130,20 +131,6 @@ export default function BusinessProfilePage() {
       if (fileRef.current) {
         fileRef.current.value = "";
       }
-    }
-  };
-
-  const requestVerification = async () => {
-    setVerifying(true);
-    try {
-      await api.post("/business/verification-request");
-      notifySuccess("Verification request submitted!");
-      setPendingVerification(true);
-      qc.invalidateQueries({ queryKey: ["my-business-verification-requests"] });
-    } catch (err: any) {
-      notifyApiError(err, "Failed to submit request");
-    } finally {
-      setVerifying(false);
     }
   };
 
@@ -239,8 +226,8 @@ export default function BusinessProfilePage() {
               ) : isComplete ? (
                 <button
                   type="button"
-                  onClick={requestVerification}
-                  disabled={verifying || hasPendingRequest}
+                  onClick={() => setIsVerificationModalOpen(true)}
+                  disabled={hasPendingRequest}
                   className="inline-flex items-center gap-1.5 h-10 px-4 rounded-pill bg-signal-blue/10 text-signal-blue text-xs font-semibold hover:bg-signal-blue/20 transition-all border border-signal-blue/20"
                 >
                   <BadgeCheck size={14} /> Request Verification
@@ -448,6 +435,16 @@ export default function BusinessProfilePage() {
         </div>
       )}
       
+      <VerificationRequestModal
+        open={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+        role="BUSINESS"
+        onSuccess={() => {
+          setPendingVerification(true);
+          qc.invalidateQueries({ queryKey: ["my-business-verification-requests"] });
+          qc.invalidateQueries({ queryKey: ["business-profile"] });
+        }}
+      />
     </RequireAuth>
   );
 }
