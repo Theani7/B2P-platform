@@ -1,41 +1,56 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import { Role } from "@/lib/roles";
 import { notifySuccess, notifyError } from "@/lib/notify";
-import { Card, PageHeader, Badge } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Spinner } from "@/components/ui/Spinner";
 import { SkeletonList } from "@/components/ui/Skeleton";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { Avatar } from "@/components/ui/Avatar";
-import { StatCard } from "@/components/ui/Stats";
+import { NicheBadge } from "@/components/discovery/NicheBadge";
+import { formatBudget } from "@/components/campaigns/StatusBadge";
 import { useBusinessInvitations, useCancelInvitation } from "@/features/invitations/api";
 import { useRouter } from "next/navigation";
 import {
-  Send, XCircle, MapPin, MessageSquare, UserPlus, Search, Clock, Users, Eye,
-  MoreHorizontal, CheckCircle2, ChevronRight, ChevronLeft,
-} from "lucide-react";
+  PaperPlaneTilt,
+  HourglassSimple,
+  CheckCircle,
+  TrendUp,
+  MagnifyingGlass,
+  X,
+  Users,
+  Eye,
+  Handshake,
+  XCircle,
+  ChatCircleDots,
+  MapPin,
+  CalendarBlank,
+  WarningCircle,
+  Plus,
+  CaretRight,
+  CaretLeft,
+} from "@phosphor-icons/react";
 
-function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { color: string; icon: any; label: string }> = {
-    ACCEPTED: { color: "text-emerald-status bg-emerald-status/10 ring-emerald-status/20", icon: CheckCircle2, label: "Accepted" },
-    PENDING: { color: "text-amber-700 bg-amber-50 ring-amber-600/20", icon: Clock, label: "Pending" },
-    REJECTED: { color: "text-coral-alert bg-coral-alert/10 ring-red-600/20", icon: XCircle, label: "Declined" },
-    CANCELLED: { color: "text-graphite bg-linen-canvas ring-gray-600/20", icon: XCircle, label: "Cancelled" },
-    EXPIRED: { color: "text-graphite bg-linen-canvas ring-gray-600/20", icon: Send, label: "Expired" },
+function InvitationStatusBadge({ status }: { status: string }) {
+  const norm = (status || "").toUpperCase();
+  const config: Record<string, { bg: string; text: string; dot: string; label: string }> = {
+    ACCEPTED: { bg: "bg-emerald-status/10", text: "text-emerald-status", dot: "bg-emerald-status", label: "Accepted" },
+    PENDING: { bg: "bg-amber-tag/15", text: "text-amber-tag", dot: "bg-amber-tag animate-pulse", label: "Pending" },
+    REJECTED: { bg: "bg-coral-alert/10", text: "text-coral-alert", dot: "bg-coral-alert", label: "Declined" },
+    DECLINED: { bg: "bg-coral-alert/10", text: "text-coral-alert", dot: "bg-coral-alert", label: "Declined" },
+    CANCELLED: { bg: "bg-steel/10", text: "text-ash", dot: "bg-steel", label: "Cancelled" },
+    EXPIRED: { bg: "bg-steel/10", text: "text-ash", dot: "bg-steel", label: "Expired" },
   };
-  const c = config[status] || { color: "text-graphite bg-linen-canvas ring-gray-600/20", icon: Send, label: status };
-  const Icon = c.icon;
+  const c = config[norm] || { bg: "bg-steel/10", text: "text-ash", dot: "bg-steel", label: status };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide ring-1 ring-inset ${c.color} whitespace-nowrap`}>
-      <Icon size={14} /> {c.label}
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill text-[11px] font-semibold tracking-wide whitespace-nowrap ${c.bg} ${c.text}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
+      <span>{c.label}</span>
     </span>
   );
 }
 
-// Map UI filter value → backend status value
 const STATUS_MAP: Record<string, string> = {
   all: "",
   pending: "PENDING",
@@ -50,6 +65,10 @@ function InvitationsPageInner() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const isSearchExpanded = isSearchOpen || search.trim().length > 0;
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const backendStatus = STATUS_MAP[statusFilter] || undefined;
 
@@ -61,6 +80,48 @@ function InvitationsPageInner() {
   const cancelMutation = useCancelInvitation();
   const [cancelConfirm, setCancelConfirm] = useState<string | null>(null);
 
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      if (!searchContainerRef.current) return;
+      if (!searchContainerRef.current.contains(e.target as Node)) {
+        if (!search.trim()) {
+          setIsSearchOpen(false);
+        }
+      }
+    };
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, [search]);
+
+  const handleOpenSearch = () => {
+    setIsSearchOpen(true);
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 50);
+  };
+
+  const handleCloseOrClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (search) {
+      setSearch("");
+      setPage(1);
+      searchInputRef.current?.focus();
+    } else {
+      setIsSearchOpen(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") {
+      if (search) {
+        setSearch("");
+        setPage(1);
+      } else {
+        setIsSearchOpen(false);
+      }
+    }
+  };
+
   // Client-side search filter on loaded results
   const filteredItems = useMemo(() => {
     const items = data?.items ?? [];
@@ -69,29 +130,24 @@ function InvitationsPageInner() {
     return items.filter(
       (inv: any) =>
         inv.campaign?.title?.toLowerCase().includes(q) ||
-        inv.promoterProfile?.username?.toLowerCase().includes(q)
+        inv.promoterProfile?.username?.toLowerCase().includes(q) ||
+        inv.campaign?.category?.toLowerCase().includes(q)
     );
   }, [data?.items, search]);
-
-  if (error) return (
-    <div className="flex flex-col items-center justify-center py-16">
-      <div className="w-16 h-16 rounded-2xl bg-coral-alert/10 flex items-center justify-center mb-4 ring-1 ring-coral-alert/10">
-        <XCircle size={32} className="text-coral-alert" />
-      </div>
-      <p className="text-lg font-medium text-graphite">Error loading invitations</p>
-      <p className="text-sm text-ash mt-1">{(error as Error).message}</p>
-    </div>
-  );
 
   const confirmCancel = () => {
     if (!cancelConfirm) return;
     cancelMutation.mutate(cancelConfirm, {
-      onSuccess: () => { notifySuccess("Invitation cancelled"); setCancelConfirm(null); },
-      onError: (e: any) => { notifyError(e?.response?.data?.message ?? "Failed"); setCancelConfirm(null); },
+      onSuccess: () => {
+        notifySuccess("Invitation cancelled");
+        setCancelConfirm(null);
+      },
+      onError: (e: any) => {
+        notifyError(e?.response?.data?.message ?? "Failed to cancel invitation");
+        setCancelConfirm(null);
+      },
     });
   };
-
-  const formatBudget = (n?: number) => (typeof n === "number" ? "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0) : "—");
 
   const allItems = data?.items ?? [];
   const pendingCount = allItems.filter((i: any) => i.status === "PENDING").length;
@@ -100,223 +156,432 @@ function InvitationsPageInner() {
     ? Math.round((allItems.filter((i: any) => i.status !== "PENDING").length / allItems.length) * 100)
     : 0;
 
-  return (
-    <div className="max-w-[1400px] mx-auto space-y-8 pb-32">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-graphite">Sent Invitations</h1>
-          <p className="text-sm text-ash mt-1.5">Track every invitation you've sent and monitor promoter responses.</p>
+  const TABS = [
+    { key: "all", label: "All", count: data?.total },
+    { key: "pending", label: "Pending", count: pendingCount },
+    { key: "accepted", label: "Accepted", count: acceptedCount },
+    { key: "declined", label: "Declined" },
+    { key: "cancelled", label: "Cancelled" },
+  ];
+
+  const fmtDate = (s?: string) => {
+    if (!s) return "";
+    try {
+      return new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    } catch {
+      return "";
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="w-14 h-14 rounded-2xl bg-coral-alert/10 text-coral-alert flex items-center justify-center mb-4">
+          <WarningCircle size={28} weight="bold" />
         </div>
-        <div className="flex items-center gap-3">
+        <p className="text-base font-bold text-graphite">Failed to load invitations</p>
+        <p className="text-xs text-ash mt-1.5 max-w-sm text-center">{(error as Error).message}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-sky-wash text-signal-blue text-xs font-semibold rounded-pill hover:bg-signal-blue hover:text-white transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-[1240px] mx-auto space-y-6 pb-20">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-midnight-ink">
+              Invitations
+            </h1>
+            <span className="text-xs font-bold font-mono px-2.5 py-0.5 rounded-pill bg-sky-wash text-signal-blue border border-signal-blue/20">
+              {data?.total ?? 0}
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-ash mt-1">
+            Track sent invitations, monitor promoter responses, and launch new collaborations.
+          </p>
+        </div>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
           <button
             onClick={() => router.push("/business/promoters")}
-            className="inline-flex items-center gap-2 bg-white border border-slate-custom/10 text-graphite h-10 px-4 rounded-lg text-sm font-medium hover:bg-linen-canvas transition-all shadow-product-card-sm"
+            className="inline-flex items-center justify-center gap-2 h-10 px-4 bg-white border border-steel/20 text-graphite hover:bg-sky-wash hover:border-signal-blue/30 rounded-pill text-xs sm:text-sm font-semibold shadow-product-card transition-all"
           >
-            <UserPlus size={16} /> Browse Promoters
+            <Users size={16} weight="bold" />
+            <span>Browse Promoters</span>
           </button>
           <button
             onClick={() => router.push("/business/campaigns/create")}
-            className="inline-flex items-center gap-2 bg-signal-blue text-white h-10 px-4 rounded-lg text-sm font-medium hover:opacity-90 transition-all shadow-product-card-sm"
+            className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-signal-blue hover:bg-signal-blue/90 text-white rounded-pill text-xs sm:text-sm font-semibold shadow-product-card transition-all hover:shadow-elevated"
           >
-            <Send size={16} /> Create Campaign
+            <Plus size={16} weight="bold" />
+            <span>Create Campaign</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Invitations Sent" value={data?.total ?? 0} />
-        <StatCard label="Pending Responses" value={pendingCount} />
-        <StatCard label="Accepted Invitations" value={acceptedCount} />
-        <StatCard label="Response Rate" value={`${responseRate}%`} />
-      </div>
-
-      {/* Search & Filters */}
-      <div className="bg-white rounded-xl shadow-product-card-sm ring-1 ring-gray-200 p-2 flex flex-col gap-3">
-        <div className="flex flex-col lg:flex-row gap-3">
-          <div className="relative flex-1 min-w-[300px]">
-            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fog" />
-            <input
-              type="text"
-              placeholder="Search by campaign or promoter…"
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full pl-10 pr-4 h-10 bg-linen-canvas border border-slate-custom/10 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-signal-blue text-sm text-graphite placeholder-gray-400 transition-all"
-            />
+      {/* Metrics Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-signal-blue/20 transition-all">
+          <div className="w-10 h-10 rounded-xl bg-sky-wash text-signal-blue flex items-center justify-center flex-shrink-0">
+            <PaperPlaneTilt size={20} weight="bold" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Invitations Sent</p>
+            <p className="text-2xl font-bold font-mono text-midnight-ink mt-0.5">
+              {data?.total ?? 0}
+            </p>
           </div>
         </div>
-        <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-          {["All", "Pending", "Accepted", "Declined", "Cancelled", "Expired"].map((label) => {
-            const key = label.toLowerCase();
-            const isActive = statusFilter === key;
+
+        <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-amber-tag/20 transition-all">
+          <div className="w-10 h-10 rounded-xl bg-amber-tag/15 text-amber-tag flex items-center justify-center flex-shrink-0">
+            <HourglassSimple size={20} weight="bold" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Pending Responses</p>
+            <p className="text-2xl font-bold font-mono text-midnight-ink mt-0.5">
+              {pendingCount}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-emerald-status/20 transition-all">
+          <div className="w-10 h-10 rounded-xl bg-emerald-status/10 text-emerald-status flex items-center justify-center flex-shrink-0">
+            <CheckCircle size={20} weight="bold" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Accepted Collabs</p>
+            <p className="text-2xl font-bold font-mono text-midnight-ink mt-0.5">
+              {acceptedCount}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-steel/10 rounded-2xl p-4 shadow-product-card flex items-center gap-3.5 hover:border-signal-blue/20 transition-all">
+          <div className="w-10 h-10 rounded-xl bg-sky-wash text-signal-blue flex items-center justify-center flex-shrink-0">
+            <TrendUp size={20} weight="bold" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-ash uppercase tracking-wider truncate">Response Rate</p>
+            <p className="text-2xl font-bold font-mono text-midnight-ink mt-0.5">
+              {responseRate}%
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Tabs & Expandable Search Toolbar */}
+      <div className="bg-white border border-steel/10 rounded-2xl p-2.5 shadow-product-card flex items-center justify-between gap-3">
+        <div
+          className={`flex items-center gap-1.5 overflow-x-auto hide-scrollbar transition-all duration-300 ${
+            isSearchExpanded ? "hidden sm:flex" : "flex"
+          }`}
+        >
+          {TABS.map((tab) => {
+            const isSelected = statusFilter === tab.key;
             return (
               <button
-                key={label}
-                onClick={() => { setStatusFilter(key); setPage(1); }}
-                className={`whitespace-nowrap px-4 h-8 rounded-full text-xs font-semibold tracking-wide transition-colors border flex-shrink-0 ${isActive ? "bg-sky-wash border-signal-blue text-signal-blue" : "bg-white border-slate-custom/10 text-ash hover:bg-linen-canvas"}`}
+                key={tab.key}
+                onClick={() => {
+                  setStatusFilter(tab.key);
+                  setPage(1);
+                }}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-pill whitespace-nowrap transition-all ${
+                  isSelected
+                    ? "bg-midnight-ink text-white shadow-sm"
+                    : "text-ash hover:text-graphite hover:bg-sky-wash/70"
+                }`}
               >
-                {label}
+                <span>{tab.label}</span>
+                {tab.count !== undefined && (
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded-pill leading-none ${
+                      isSelected ? "bg-white/20 text-white" : "bg-sky-wash text-ash"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
+
+        {/* Expandable Search Bar */}
+        <div
+          ref={searchContainerRef}
+          onClick={() => {
+            if (!isSearchExpanded) {
+              handleOpenSearch();
+            }
+          }}
+          className={`relative flex items-center h-9 rounded-pill transition-all duration-300 ease-in-out cursor-pointer ${
+            isSearchExpanded
+              ? "w-full sm:w-72 md:w-80 bg-white border border-signal-blue ring-2 ring-signal-blue/10 pl-3 pr-2 shadow-sm cursor-text"
+              : "w-9 bg-linen-canvas border border-steel/15 text-ash hover:text-signal-blue hover:border-signal-blue/40 hover:bg-sky-wash/50 justify-center shadow-sm flex-shrink-0"
+          }`}
+        >
+          <MagnifyingGlass
+            size={16}
+            weight="bold"
+            className={`flex-shrink-0 transition-colors duration-200 ${
+              isSearchExpanded ? "text-signal-blue" : "text-ash"
+            }`}
+          />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search by campaign or promoter..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            onKeyDown={handleKeyDown}
+            className={`h-full bg-transparent text-xs font-medium text-graphite placeholder:text-fog outline-none transition-all duration-200 ${
+              isSearchExpanded
+                ? "w-full pl-2.5 pr-1 opacity-100"
+                : "w-0 p-0 opacity-0 pointer-events-none"
+            }`}
+            tabIndex={isSearchExpanded ? 0 : -1}
+          />
+          {isSearchExpanded && (
+            <button
+              onClick={handleCloseOrClear}
+              aria-label="Close search"
+              className="flex-shrink-0 p-1 rounded-full text-fog hover:text-graphite hover:bg-steel/10 transition-colors"
+            >
+              <X size={13} weight="bold" />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-4">
+      {/* Invitations List */}
+      <div className="space-y-3.5">
         {isLoading ? (
-          <SkeletonList count={5} rowHeight="h-[104px]" />
+          <SkeletonList count={4} rowHeight="h-28" />
         ) : filteredItems.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center py-20 text-center rounded-cards-lg border border-slate-custom/10 bg-white shadow-product-card">
-            <div className="w-20 h-20 rounded-full bg-linen-canvas flex items-center justify-center mb-5 ring-1 ring-gray-900/5">
-              <Send size={32} className="text-gray-300 ml-1" />
+          <div className="bg-white border border-steel/10 rounded-2xl p-12 shadow-product-card text-center flex flex-col items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-sky-wash text-signal-blue flex items-center justify-center mb-4">
+              <PaperPlaneTilt size={28} weight="bold" />
             </div>
-            <h3 className="text-lg font-semibold text-graphite">
-              {search || statusFilter !== "all" ? "No invitations match your filters" : "No invitations sent yet"}
-            </h3>
-            <p className="text-sm text-ash mt-2 max-w-md">
+            <h3 className="text-base font-bold text-graphite">
               {search || statusFilter !== "all"
-                ? "Try clearing the search or changing the status filter."
-                : "Start inviting promoters from the directory to collaborate on your active marketing campaigns."}
+                ? "No invitations match your filters"
+                : "No invitations sent yet"}
+            </h3>
+            <p className="text-xs text-ash mt-1 max-w-sm leading-relaxed">
+              {search || statusFilter !== "all"
+                ? "Try clearing your search query or switching to another filter."
+                : "Explore our promoter directory to invite creators who match your target audience."}
             </p>
-            {!search && statusFilter === "all" && (
+            <div className="mt-5 flex items-center gap-3">
+              {search || statusFilter !== "all" ? (
+                <button
+                  onClick={() => {
+                    setSearch("");
+                    setIsSearchOpen(false);
+                    setStatusFilter("all");
+                    setPage(1);
+                  }}
+                  className="px-4 py-2 rounded-pill bg-sky-wash text-signal-blue text-xs font-semibold hover:bg-signal-blue hover:text-white transition-colors"
+                >
+                  Clear Filters
+                </button>
+              ) : null}
               <button
                 onClick={() => router.push("/business/promoters")}
-                className="mt-6 inline-flex items-center gap-2 rounded-pill bg-signal-blue px-6 py-2.5 text-sm font-semibold text-white shadow-product-card transition-all hover:opacity-90"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-signal-blue text-white rounded-pill text-xs font-bold shadow-product-card hover:bg-signal-blue/90 transition-colors"
               >
-                <Users size={16} /> Browse Promoters
+                <Users size={15} weight="bold" /> Browse Promoters
               </button>
-            )}
+            </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="w-full overflow-x-auto pb-6 -mb-6">
-              <div className="min-w-[1100px] flex flex-col gap-4">
-                <div className="grid grid-cols-[minmax(260px,2.5fr)_minmax(220px,2fr)_minmax(180px,1.5fr)_minmax(320px,2.5fr)_140px] gap-8 px-6 py-2 text-xs font-semibold text-ash uppercase tracking-wider">
-                  <div>Campaign</div>
-                  <div>Promoter</div>
-                  <div>Status</div>
-                  <div>Message</div>
-                  <div className="text-right">Actions</div>
+          filteredItems.map((inv: any) => (
+            <div
+              key={inv.id}
+              className="group bg-white border border-steel/10 rounded-2xl p-5 shadow-product-card hover:-translate-y-0.5 hover:border-signal-blue/30 hover:shadow-elevated transition-all duration-200 flex flex-col lg:flex-row lg:items-center justify-between gap-5"
+            >
+              {/* Left Column: Campaign & Promoter Info */}
+              <div className="space-y-3 flex-1 min-w-0">
+                {/* Campaign header line */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {inv.campaign?.category && (
+                    <NicheBadge niche={inv.campaign.category} className="!py-0.5 !px-2 text-[10px]" />
+                  )}
+                  <h3
+                    onClick={() => router.push(`/business/campaigns/${inv.campaign?.id}`)}
+                    className="text-base font-bold text-graphite hover:text-signal-blue transition-colors cursor-pointer truncate"
+                  >
+                    {inv.campaign?.title || "Campaign"}
+                  </h3>
+                  <span className="text-xs font-bold font-mono text-ash bg-linen-canvas border border-steel/15 px-2 py-0.5 rounded-pill">
+                    {formatBudget(inv.campaign?.budget)}
+                  </span>
                 </div>
 
-                {filteredItems.map((inv: any, index: number) => (
+                {/* Promoter Info Cardlet */}
+                <div className="flex items-center gap-3">
                   <div
-                    key={inv.id}
-                    style={{ zIndex: 100 - index, position: "relative" }}
-                    className="grid grid-cols-[minmax(260px,2.5fr)_minmax(220px,2fr)_minmax(180px,1.5fr)_minmax(320px,2.5fr)_140px] gap-8 items-center p-6 rounded-cards-lg border border-slate-custom/10 bg-white shadow-product-card hover:-translate-y-0.5 hover:border-signal-blue/30 hover:shadow-feature-section transition-all duration-200 group"
+                    onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)}
+                    className="cursor-pointer flex-shrink-0"
                   >
-                    <div className="flex items-start gap-4 min-w-0">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-product-card-sm flex-shrink-0 bg-signal-blue">
-                        {inv.campaign?.title?.charAt(0).toUpperCase() || "C"}
-                      </div>
-                      <div className="min-w-0 flex flex-col justify-center">
-                        <p className="text-[20px] leading-tight font-bold text-graphite truncate">{inv.campaign?.title}</p>
-                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          {inv.campaign?.category && (
-                            <span className="text-[10px] font-bold text-ash bg-sky-wash px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap">{inv.campaign.category}</span>
-                          )}
-                          <span className="text-sm font-medium text-ash whitespace-nowrap">{formatBudget(inv.campaign?.budget)}</span>
-                        </div>
-                      </div>
-                    </div>
+                    {inv.promoterProfile?.avatarUrl ? (
+                      <img
+                        src={inv.promoterProfile.avatarUrl}
+                        alt=""
+                        className="w-10 h-10 rounded-full object-cover border border-steel/15 shadow-sm"
+                      />
+                    ) : (
+                      <Avatar
+                        initials={inv.promoterProfile?.username?.[0]?.toUpperCase() ?? "P"}
+                        size="md"
+                        colorIndex={2}
+                      />
+                    )}
+                  </div>
 
-                    <div
-                      className="flex items-center gap-3 cursor-pointer group/promoter hover:bg-linen-canvas p-2 -ml-2 rounded-lg transition-colors min-w-0"
-                      onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)}
-                    >
-                      {inv.promoterProfile?.avatarUrl ? (
-                        <img src={inv.promoterProfile.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-50 flex-shrink-0" />
-                      ) : (
-                        <Avatar initials={inv.promoterProfile?.username?.[0]?.toUpperCase() ?? "P"} size="md" colorIndex={1} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span
+                        onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)}
+                        className="text-sm font-semibold text-graphite hover:text-signal-blue transition-colors cursor-pointer truncate"
+                      >
+                        @{inv.promoterProfile?.username || "Promoter"}
+                      </span>
+                      {inv.promoterProfile?.niche && (
+                        <NicheBadge niche={inv.promoterProfile.niche} className="!py-0.2 !px-1.5 text-[9px]" />
                       )}
-                      <div className="min-w-0 flex-1">
-                        <p className="text-base font-semibold text-graphite truncate group-hover/promoter:text-signal-blue transition-colors">
-                          {inv.promoterProfile?.username || "Promoter"}
-                        </p>
-                        <p className="text-sm text-ash mt-0.5 flex items-center gap-1 truncate">
-                          <MapPin size={12} className="flex-shrink-0" /> <span className="truncate">{inv.campaign?.location || "Remote"}</span>
-                        </p>
-                      </div>
                     </div>
-
-                    <div className="flex flex-col gap-3 min-w-0">
-                      <StatusBadge status={inv.status} />
-                      <span className="text-xs text-fog font-medium whitespace-nowrap">
-                        {new Date(inv.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    <div className="flex items-center gap-3 text-xs text-ash mt-0.5">
+                      <span className="inline-flex items-center gap-1 truncate">
+                        <MapPin size={12} weight="bold" className="text-signal-blue/70 flex-shrink-0" />
+                        <span className="truncate max-w-[120px]">{inv.campaign?.location || "Remote"}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1 flex-shrink-0">
+                        <CalendarBlank size={12} weight="bold" className="text-signal-blue/70 flex-shrink-0" />
+                        <span>Sent on {fmtDate(inv.createdAt)}</span>
                       </span>
                     </div>
-
-                    <div className="w-full min-w-0">
-                      {inv.message ? (
-                        <div className="bg-linen-canvas/80 border border-slate-custom/10 rounded-2xl p-3">
-                          <p className="text-sm text-ash line-clamp-2 leading-relaxed">{inv.message}</p>
-                        </div>
-                      ) : (
-                        <div className="bg-linen-canvas/50 border border-slate-custom/10 border-dashed rounded-2xl p-4 flex items-center justify-center gap-2 whitespace-nowrap">
-                          <MessageSquare size={16} className="text-gray-300 flex-shrink-0" />
-                          <span className="text-sm text-fog italic font-medium truncate">No custom message</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-end gap-2 w-[140px] flex-shrink-0">
-                      <div className="flex-1">
-                        {inv.status === "ACCEPTED" ? (
-                          <button onClick={() => router.push("/business/collaborations")} className="w-full rounded-pill bg-signal-blue px-3 py-2.5 text-sm font-semibold text-white shadow-product-card-sm transition-all hover:opacity-90 whitespace-nowrap">
-                            View Collab
-                          </button>
-                        ) : inv.status === "PENDING" ? (
-                          <button onClick={() => setCancelConfirm(inv.id)} className="w-full rounded-pill border border-slate-custom/10 bg-white px-3 py-2.5 text-sm font-semibold text-graphite shadow-product-card-sm transition-colors hover:bg-linen-canvas hover:text-coral-alert hover:border-coral-alert/20 whitespace-nowrap">
-                            Cancel
-                          </button>
-                        ) : (
-                          <button onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)} className="w-full rounded-pill border border-slate-custom/10 bg-white px-3 py-2.5 text-sm font-semibold text-graphite shadow-product-card-sm transition-colors hover:bg-linen-canvas whitespace-nowrap">
-                            Profile
-                          </button>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)}
-                        className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-custom/10 bg-white text-ash shadow-product-card-sm transition-colors hover:bg-linen-canvas hover:text-graphite"
-                        title="View promoter profile"
-                      >
-                        <Eye size={18} />
-                      </button>
-                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {(data?.pages ?? 0) > 1 && (
-              <div className="rounded-cards-lg border border-slate-custom/10 bg-white px-6 py-4 shadow-product-card flex items-center justify-between mt-6">
-                <p className="text-sm text-ash">
-                  Page <span className="font-semibold text-graphite">{page}</span> of <span className="font-semibold text-graphite">{data?.pages}</span>
-                  {" "}· <span className="font-semibold text-graphite">{data?.total ?? 0}</span> total invitations
-                </p>
+                {/* Custom message (if sent) */}
+                {inv.message && (
+                  <div className="bg-sky-wash/40 border border-steel/10 rounded-xl px-3 py-2 text-xs text-graphite flex items-start gap-2.5 max-w-2xl">
+                    <ChatCircleDots size={15} weight="bold" className="text-signal-blue flex-shrink-0 mt-0.5" />
+                    <p className="italic text-ash line-clamp-2 leading-relaxed">
+                      "{inv.message}"
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column: Status Badge & Action Buttons */}
+              <div className="flex items-center justify-between lg:justify-end gap-3 pt-3 lg:pt-0 border-t lg:border-t-0 border-steel/10 flex-shrink-0">
+                <InvitationStatusBadge status={inv.status} />
+
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button onClick={() => setPage((p) => Math.min(data?.pages ?? 1, p + 1))} disabled={page >= (data?.pages ?? 1)} className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-custom/10 text-ash hover:bg-linen-canvas disabled:opacity-50 transition-colors shadow-product-card-sm">
-                    <ChevronRight size={16} />
+                  {inv.status === "ACCEPTED" ? (
+                    <button
+                      onClick={() => router.push("/business/collaborations")}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-pill bg-signal-blue hover:bg-signal-blue/90 text-white text-xs font-semibold shadow-product-card transition-all"
+                    >
+                      <Handshake size={14} weight="bold" />
+                      <span>View Collab</span>
+                    </button>
+                  ) : inv.status === "PENDING" ? (
+                    <button
+                      onClick={() => setCancelConfirm(inv.id)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-pill border border-steel/15 bg-white text-ash hover:text-coral-alert hover:border-coral-alert/30 hover:bg-coral-alert/5 text-xs font-semibold transition-colors"
+                    >
+                      <XCircle size={14} weight="bold" />
+                      <span>Cancel</span>
+                    </button>
+                  ) : null}
+
+                  <button
+                    onClick={() => inv.promoterProfile?.username && router.push(`/u/${inv.promoterProfile.username}`)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-pill bg-sky-wash text-signal-blue hover:bg-signal-blue hover:text-white text-xs font-semibold transition-colors"
+                    title="View promoter profile"
+                  >
+                    <Eye size={14} weight="bold" />
+                    <span>Profile</span>
                   </button>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          ))
         )}
       </div>
 
+      {/* Pagination */}
+      {(data?.pages ?? 0) > 1 && (
+        <div className="flex items-center justify-center gap-1 pt-4">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="h-8 min-w-[32px] px-2.5 rounded-pill text-xs font-bold text-ash hover:bg-sky-wash hover:text-graphite disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center justify-center"
+          >
+            <CaretLeft size={14} weight="bold" />
+          </button>
+          {Array.from({ length: data?.pages ?? 1 }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`h-8 min-w-[32px] px-2.5 rounded-pill text-xs font-bold transition-colors ${
+                p === page
+                  ? "bg-signal-blue text-white shadow-sm"
+                  : "text-ash hover:bg-sky-wash hover:text-graphite"
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => setPage((p) => Math.min(data?.pages ?? 1, p + 1))}
+            disabled={page >= (data?.pages ?? 1)}
+            className="h-8 min-w-[32px] px-2.5 rounded-pill text-xs font-bold text-ash hover:bg-sky-wash hover:text-graphite disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center justify-center"
+          >
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
       {cancelConfirm && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/60 backdrop-blur-md p-4">
-          <div className="rounded-cards-lg border border-slate-custom/10 bg-white p-6 max-w-md w-full shadow-xl">
-            <h3 className="text-heading font-bold text-graphite">Cancel Invitation</h3>
-            <p className="text-sm text-ash mt-2">Are you sure you want to cancel this invitation? The promoter will be notified that the offer was withdrawn.</p>
-            <div className="mt-6 flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setCancelConfirm(null)}>Keep it</Button>
-              <Button variant="danger" onClick={confirmCancel} disabled={cancelMutation.isPending}>
-                {cancelMutation.isPending ? "Cancelling…" : "Yes, Cancel"}
-              </Button>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-midnight-ink/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-steel/10">
+            <div className="w-11 h-11 rounded-xl bg-coral-alert/10 text-coral-alert flex items-center justify-center mb-3">
+              <WarningCircle size={22} weight="bold" />
+            </div>
+            <h3 className="text-base font-bold text-graphite">Cancel Invitation</h3>
+            <p className="text-xs text-ash mt-1.5 leading-relaxed">
+              Are you sure you want to cancel this invitation? The promoter will be notified that the invitation was withdrawn.
+            </p>
+            <div className="mt-6 flex justify-end gap-2.5">
+              <button
+                onClick={() => setCancelConfirm(null)}
+                className="px-4 py-2 rounded-pill text-xs font-semibold text-ash hover:text-graphite hover:bg-sky-wash transition-colors"
+              >
+                Keep Invitation
+              </button>
+              <button
+                onClick={confirmCancel}
+                disabled={cancelMutation.isPending}
+                className="px-4 py-2 rounded-pill text-xs font-bold bg-coral-alert hover:bg-coral-alert/90 text-white shadow-sm transition-colors disabled:opacity-50"
+              >
+                {cancelMutation.isPending ? "Cancelling..." : "Yes, Cancel Invitation"}
+              </button>
             </div>
           </div>
         </div>

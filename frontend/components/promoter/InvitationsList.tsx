@@ -14,8 +14,8 @@ import {
   ChevronRight, ChevronLeft, Inbox, X,
 } from "lucide-react";
 
-const fmtNpr = (n?: number | null) =>
-  "Rs. " + new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n ?? 0);
+const fmtBudget = (n?: number | null) =>
+  typeof n === "number" ? "$" + n.toLocaleString() : "—";
 
 // Map filter tab labels to API status values
 const STATUS_FILTER_MAP: Record<string, string | undefined> = {
@@ -199,7 +199,7 @@ export function InvitationsInner() {
                   <h4 className="text-sm font-bold text-graphite mb-1">{inv.campaign?.title ?? "Untitled Campaign"}</h4>
                   <div className="flex items-center gap-3 text-xs text-ash">
                     <span className="flex items-center gap-1 font-bold text-emerald-status">
-                      {fmtNpr(inv.campaign?.budget)}
+                      {fmtBudget(inv.campaign?.budget)}
                     </span>
                     <span className="flex items-center gap-1">
                       <MapPin size={12} /> {inv.campaign?.location || "Remote"}
@@ -347,7 +347,7 @@ export function InvitationsInner() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-linen-canvas p-3 rounded-inputs border border-slate-custom/10">
                     <span className="text-[10px] font-bold text-fog uppercase tracking-wider block mb-1">Budget</span>
-                    <span className="text-sm font-bold text-emerald-status">{fmtNpr(selectedCampaignDetails.budget)}</span>
+                    <span className="text-sm font-bold text-emerald-status">{fmtBudget(selectedCampaignDetails.budget)}</span>
                   </div>
                   <div className="bg-linen-canvas p-3 rounded-inputs border border-slate-custom/10">
                     <span className="text-[10px] font-bold text-fog uppercase tracking-wider block mb-1">Location</span>
