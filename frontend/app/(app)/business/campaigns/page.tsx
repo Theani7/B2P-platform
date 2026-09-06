@@ -173,12 +173,58 @@ function CampaignsPageInner() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const isSearchExpanded = isSearchOpen || search.trim().length > 0;
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 400);
     return () => clearTimeout(timer);
   }, [search]);
+
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      if (!searchContainerRef.current) return;
+      if (!searchContainerRef.current.contains(e.target as Node)) {
+        if (!search.trim()) {
+          setIsSearchOpen(false);
+        }
+      }
+    };
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, [search]);
+
+  const handleOpenSearch = () => {
+    setIsSearchOpen(true);
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 50);
+  };
+
+  const handleCloseOrClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (search) {
+      setSearch("");
+      setPage(1);
+      searchInputRef.current?.focus();
+    } else {
+      setIsSearchOpen(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") {
+      if (search) {
+        setSearch("");
+        setPage(1);
+      } else {
+        setIsSearchOpen(false);
+      }
+    }
+  };
 
   const { data, isLoading, error } = useCampaigns({
     page,
@@ -358,8 +404,12 @@ function CampaignsPageInner() {
       </div>
 
       {/* Filter & Search Toolbar */}
-      <div className="bg-white border border-steel/10 rounded-2xl p-2.5 shadow-product-card flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 hide-scrollbar">
+      <div className="bg-white border border-steel/10 rounded-2xl p-2.5 shadow-product-card flex items-center justify-between gap-3">
+        <div
+          className={`flex items-center gap-1.5 overflow-x-auto hide-scrollbar transition-all duration-300 ${
+            isSearchExpanded ? "hidden sm:flex" : "flex"
+          }`}
+        >
           {TABS.map((tab) => {
             const isSelected = statusFilter === tab.key;
             return (
@@ -390,13 +440,29 @@ function CampaignsPageInner() {
           })}
         </div>
 
-        <div className="relative w-full md:w-72 flex-shrink-0">
+        {/* Expandable Search Bar */}
+        <div
+          ref={searchContainerRef}
+          onClick={() => {
+            if (!isSearchExpanded) {
+              handleOpenSearch();
+            }
+          }}
+          className={`relative flex items-center h-9 rounded-pill transition-all duration-300 ease-in-out cursor-pointer ${
+            isSearchExpanded
+              ? "w-full sm:w-72 md:w-80 bg-white border border-signal-blue ring-2 ring-signal-blue/10 pl-3 pr-2 shadow-sm cursor-text"
+              : "w-9 bg-linen-canvas border border-steel/15 text-ash hover:text-signal-blue hover:border-signal-blue/40 hover:bg-sky-wash/50 justify-center shadow-sm flex-shrink-0"
+          }`}
+        >
           <MagnifyingGlass
             size={16}
             weight="bold"
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fog pointer-events-none"
+            className={`flex-shrink-0 transition-colors duration-200 ${
+              isSearchExpanded ? "text-signal-blue" : "text-ash"
+            }`}
           />
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Search campaigns..."
             value={search}
@@ -404,15 +470,19 @@ function CampaignsPageInner() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="h-9.5 w-full bg-linen-canvas border border-steel/15 rounded-pill pl-9 pr-8 text-xs font-medium text-graphite placeholder:text-fog focus:bg-white focus:border-signal-blue focus:ring-2 focus:ring-signal-blue/10 outline-none transition-all"
+            onKeyDown={handleKeyDown}
+            className={`h-full bg-transparent text-xs font-medium text-graphite placeholder:text-fog outline-none transition-all duration-200 ${
+              isSearchExpanded
+                ? "w-full pl-2.5 pr-1 opacity-100"
+                : "w-0 p-0 opacity-0 pointer-events-none"
+            }`}
+            tabIndex={isSearchExpanded ? 0 : -1}
           />
-          {search && (
+          {isSearchExpanded && (
             <button
-              onClick={() => {
-                setSearch("");
-                setPage(1);
-              }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-fog hover:text-graphite p-1 rounded-full"
+              onClick={handleCloseOrClear}
+              aria-label="Close search"
+              className="flex-shrink-0 p-1 rounded-full text-fog hover:text-graphite hover:bg-steel/10 transition-colors"
             >
               <X size={13} weight="bold" />
             </button>
@@ -443,6 +513,7 @@ function CampaignsPageInner() {
               <button
                 onClick={() => {
                   setSearch("");
+                  setIsSearchOpen(false);
                   setStatusFilter("ALL");
                   setPage(1);
                 }}
